@@ -1,0 +1,28 @@
+.page-shell {
+  min-height: 100vh;
+  color: var(--color-ink);
+  background: var(--color-paper);
+}
+
+.page-shell__main {
+  min-height: 55vh;
+  overflow: clip;
+}
+
+.page-shell__main--home {
+}
+
+.page-shell__main--work {
+}
+
+.page-shell__main--project {
+}
+
+.page-shell__main--about {
+}
+
+.page-shell__main--service {
+}
+
+.page-shell__main--contact {
+}

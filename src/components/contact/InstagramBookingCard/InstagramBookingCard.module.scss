@@ -1,0 +1,61 @@
+.instagram-booking-card {
+  display: grid;
+  gap: var(--space-2xl);
+  border: 1px solid var(--color-ink);
+  background: var(--color-ink);
+  color: #f6f3ee;
+  padding: clamp(var(--space-xl), 4vw, var(--space-3xl));
+}
+
+.instagram-booking-card__copy {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.instagram-booking-card__title {
+  max-width: 30rem;
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4.1vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.instagram-booking-card__description {
+  max-width: 31rem;
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.instagram-booking-card__button {
+  justify-self: start;
+  border: 1px solid #f6f3ee;
+  background: #f6f3ee;
+  color: var(--color-ink);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.85rem 1rem;
+  text-transform: uppercase;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.instagram-booking-card__button:hover,
+.instagram-booking-card__button:focus-visible {
+  background: transparent;
+  color: #f6f3ee;
+}
+
+@media (max-width: 560px) {
+  .instagram-booking-card {
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+  }
+
+  .instagram-booking-card__description,
+  .instagram-booking-card__button {
+    font-size: var(--font-size-sm);
+  }
+}

@@ -1,66 +1,246 @@
 import Image from "next/image";
-import styles from "./page.module.css";
+import Link from "next/link";
+import { PageShell } from "@/components/layout/PageShell/PageShell";
+import { Icon } from "@/components/ui/Icon/Icon";
+import { icons } from "@/constants/icons";
+import { services as servicePackages } from "@/data/services";
+import { instagramUrl } from "@/data/social";
+import styles from "./home.module.scss";
+
+const featuredWorks = [
+  {
+    id: "forest-feature",
+    image: "/images/figma/source/forest-session.png",
+    alt: "Woman in an orange dress seated in a forest",
+    title: "Forest Portraits",
+    meta: "Editorial Session",
+    className: "home-page__work-card--wide",
+  },
+  {
+    id: "blue-feature",
+    image: "/images/figma/source/blue-sky-portrait.png",
+    alt: "Two women seated in a green field below blue and white clouds",
+    title: "Blue Sky",
+    meta: "Creative Portraits",
+    className: "home-page__work-card--poster",
+  },
+  {
+    id: "blue-secondary",
+    image: "/images/figma/source/blue-sky-portrait.png",
+    alt: "Two women seated in a green field below blue and white clouds",
+    title: "Open Field",
+    meta: "Lifestyle Story",
+    className: "home-page__work-card--poster",
+  },
+  {
+    id: "forest-secondary",
+    image: "/images/figma/source/forest-session.png",
+    alt: "Woman in an orange dress seated in a forest",
+    title: "Golden Hour",
+    meta: "Brand Portraits",
+    className: "home-page__work-card--wide",
+  },
+  {
+    id: "blue-small",
+    image: "/images/figma/source/blue-sky-portrait.png",
+    alt: "Two women seated in a green field below blue and white clouds",
+    title: "Cloud Study",
+    meta: "Fashion Portraits",
+    className: "home-page__work-card--small-poster",
+  },
+  {
+    id: "field-wide",
+    image: "/images/figma/source/field-wide.png",
+    alt: "Two people standing apart in a wide green field",
+    title: "Meadow Walk",
+    meta: "Couples Session",
+    className: "home-page__work-card--field",
+  },
+];
+
+const serviceIcons: Record<string, (typeof icons)[keyof typeof icons]> = {
+  "portrait-session": icons.portrait,
+  "couples-session": icons.userGroup,
+  "wedding-package": icons.ring,
+};
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <PageShell variant="home">
+      <section className={styles["home-page"]} aria-labelledby="home-title">
+        <div className={styles["home-page__hero"]}>
+          <div className={styles["home-page__brand-group"]}>
+            <h1 className={styles["home-page__brand"]} id="home-title">
+              <Image
+                src="/logos/logo-larah.svg"
+                alt="Larah"
+                width={273}
+                height={91}
+                loading="eager"
+              />
+            </h1>
+            <div className={styles["home-page__portrait-frame"]}>
+              <Image
+                className={styles["home-page__portrait"]}
+                src="/images/figma/source/home-portrait.png"
+                alt="Model is smiling at Ross Park"
+                fill
+                loading="eager"
+                sizes="(max-width: 720px) 70vw, 326px"
+              />
+            </div>
+          </div>
+          <p className={styles["home-page__tagline"]}>
+            VISUAL STORYTELLING FOR BRANDS, PEOPLE, AND MOMENTS.
           </p>
-        </div>
-        <div className={styles.ctas}>
+          <div className={styles["home-page__feature"]}>
+            <div className={styles["home-page__feature-frame"]}>
+              <Image
+                className={styles["home-page__feature-image"]}
+                src="/images/figma/source/larah-about.png"
+                alt="Larah portrait in warm sunset light"
+                fill
+                loading="eager"
+                sizes="(max-width: 720px) calc(100vw - 48px), (max-width: 1180px) 48vw, 591px"
+              />
+            </div>
+          </div>
+          <Link
+            aria-label="Discover more about Larah"
+            className={styles["home-page__intro-link"]}
+            href="/about"
+          >
+            <span className={styles["home-page__intro-link-label"]}>
+              <Icon
+                className={styles["home-page__inline-icon"]}
+                decorative
+                icon={icons.chevronRight}
+              />
+              More
+            </span>
+            <span>Discover</span>
+          </Link>
           <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+            className={styles["home-page__hero-cta"]}
+            href={instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            Message on Instagram
+          </a>
+        </div>
+
+        <section className={styles["home-page__work"]} aria-label="Featured work">
+          <div className={styles["home-page__work-grid"]}>
+            {featuredWorks.map((work) => (
+              <article
+                className={`${styles["home-page__work-card"]} ${styles[work.className]}`}
+                key={work.id}
+              >
+                <Link href="/work">
+                  <span className={styles["home-page__work-media"]}>
+                    <Image
+                      className={styles["home-page__work-image"]}
+                      src={work.image}
+                      alt={work.alt}
+                      fill
+                      sizes="(max-width: 720px) calc(100vw - 48px), (max-width: 1100px) 45vw, 42vw"
+                    />
+                  </span>
+                  <span className={styles["home-page__work-title"]}>
+                    {work.title}
+                  </span>
+                  <span className={styles["home-page__work-meta"]}>
+                    {work.meta}
+                  </span>
+                </Link>
+              </article>
+            ))}
+          </div>
+          <article className={styles["home-page__work-card-feature"]}>
+            <Link href="/work">
+              <span className={styles["home-page__work-media"]}>
+                <Image
+                  className={styles["home-page__work-image"]}
+                  src="/images/figma/source/field-wide.png"
+                  alt="Two people standing apart in a wide green field"
+                  fill
+                  sizes="(max-width: 720px) calc(100vw - 48px), 85rem"
+                />
+              </span>
+              <span className={styles["home-page__work-title"]}>
+                Field Notes
+              </span>
+              <span className={styles["home-page__work-meta"]}>
+                Outdoor Portraits
+              </span>
+            </Link>
+          </article>
+          <Link className={styles["home-page__view-all"]} href="/work">
+            VIEW ALL WORK
+            <Icon
+              className={styles["home-page__inline-icon"]}
+              decorative
+              icon={icons.arrowRight}
             />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+          </Link>
+        </section>
+
+        <section
+          className={styles["home-page__services"]}
+          aria-labelledby="home-services-title"
+        >
+          <h2 className={styles["home-page__services-title"]} id="home-services-title">
+            SERVICE
+          </h2>
+          <Icon
+            className={styles["home-page__services-caret"]}
+            decorative
+            icon={icons.chevronDown}
+          />
+          <div className={styles["home-page__services-grid"]}>
+            {servicePackages.map((service) => (
+              <article className={styles["home-page__service"]} key={service.title}>
+                <Icon
+                  className={styles["home-page__service-icon"]}
+                  decorative
+                  icon={serviceIcons[service.id]}
+                />
+                <h3 className={styles["home-page__service-title"]}>
+                  {service.title}
+                </h3>
+                <p className={styles["home-page__service-description"]}>
+                  {service.description}
+                </p>
+                <ul className={styles["home-page__service-list"]}>
+                  {service.features.map((detail) => (
+                    <li key={detail}>{detail}</li>
+                  ))}
+                </ul>
+                <div className={styles["home-page__service-footer"]}>
+                  <span>FROM ${service.price}</span>
+                  <a
+                    href={instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span>BOOK NOW</span>
+                    <Icon
+                      className={styles["home-page__inline-icon"]}
+                      decorative
+                      icon={icons.arrowRight}
+                    />
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className={styles["home-page__services-note"]}>
+            CUSTOM PHOTOGRAPHY AVAILABLE
+            <span>Please contact for more information</span>
+          </p>
+        </section>
+      </section>
+    </PageShell>
   );
 }

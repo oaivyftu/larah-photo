@@ -1,0 +1,112 @@
+.about-page {
+  display: grid;
+  width: calc(100% - (var(--page-gutter) * 2));
+  max-width: var(--container-max);
+  grid-template-columns: minmax(0, 39rem) minmax(0, 41.8125rem);
+  gap: clamp(var(--space-3xl), 4.65vw, 4.1875rem);
+  align-items: start;
+  min-height: 41.0625rem;
+  margin: 0 auto;
+  padding: 2.5rem 0 5rem;
+}
+
+.about-page__copy {
+  max-width: 39rem;
+}
+
+.about-page__title {
+  margin-bottom: var(--space-xl);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xl);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.about-page__title span {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+
+.about-page__body {
+  display: grid;
+  gap: var(--space-lg);
+  max-width: 39rem;
+  font-size: var(--font-size-md);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.about-page__media {
+  position: relative;
+  width: 100%;
+  max-width: 41.8125rem;
+  min-height: 36.0625rem;
+}
+
+.about-page__image-frame {
+  position: relative;
+  width: 88.34080717%;
+  margin-left: auto;
+  aspect-ratio: 591 / 394;
+  overflow: hidden;
+}
+
+.about-page__image {
+  object-fit: cover;
+  object-position: 46% 44%;
+}
+
+@media (max-width: 1180px) {
+  .about-page {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: var(--space-3xl) 0 5rem;
+  }
+
+  .about-page__copy {
+    max-width: 39rem;
+  }
+
+  .about-page__media {
+    max-width: 41.8125rem;
+    min-height: clamp(18rem, 62vw, 36.0625rem);
+    justify-self: end;
+  }
+}
+
+@media (max-width: 720px) {
+  .about-page {
+    gap: var(--space-3xl);
+    padding-top: var(--space-2xl);
+  }
+
+  .about-page__title {
+    margin-bottom: var(--space-lg);
+    font-size: 2rem;
+  }
+
+  .about-page__body {
+    gap: var(--space-lg);
+    font-size: var(--font-size-base);
+    line-height: 1.2;
+  }
+
+  .about-page__image-frame {
+    width: 100%;
+  }
+
+}
+
+@media (max-width: 480px) {
+  .about-page__title {
+    font-size: 1.75rem;
+  }
+
+  .about-page__body {
+    font-size: var(--font-size-sm);
+  }
+
+  .about-page__media {
+    min-height: 15.5rem;
+  }
+}

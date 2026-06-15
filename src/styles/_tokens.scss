@@ -1,0 +1,49 @@
+:root {
+  /* Color */
+  --color-paper: #ffffff;
+  --color-ink: #111111;
+  --color-ink-soft: #1f1f1f;
+  --color-muted: #8d8d8d;
+  --color-line: #111111;
+  --color-line-soft: #d8d8d8;
+  --color-accent-red: #e31b23;
+
+  /* Typography */
+  --font-sans: "Montserrat", Arial, Helvetica, sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
+
+  --font-size-2xs: 0.625rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-md: 1.25rem;
+  --font-size-lg: 1.75rem;
+  --font-size-xl: 2rem;
+  --font-size-2xl: 3rem;
+  --font-size-marquee: clamp(3rem, 4.45vw, 4rem);
+
+  --line-height-tight: 1;
+  --line-height-heading: 1.05;
+  --line-height-copy: 1.18;
+  --line-height-body: 1.4;
+
+  /* Layout */
+  --page-gutter-min: 1.5rem;
+  --page-gutter-max: 2.5rem;
+  --page-gutter: clamp(var(--page-gutter-min), 2.777vw, var(--page-gutter-max));
+  --container-max: 85rem;
+  --frame-max: 90rem;
+  --header-height: 4.5rem;
+
+  /* Spacing */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 2.5rem;
+  --space-3xl: 4rem;
+  --space-4xl: 5.5rem;
+  --space-section: clamp(4.5rem, 7.8vw, 7rem);
+}

@@ -1,0 +1,55 @@
+import type { ServicePackage } from "@/types/service";
+
+export const services: ServicePackage[] = [
+  {
+    id: "portrait-session",
+    index: "01",
+    title: "PORTRAIT SESSION",
+    description: "Personal portrait, individual or lifestyle session.",
+    features: [
+      "1 - 2 hours photoshoot",
+      "1 location",
+      "50+ edited high-resolution images",
+      "Online gallery",
+      "2 outfits",
+    ],
+    price: 350,
+    image: "/images/figma/source/forest-session.png",
+    imageAlt: "Woman in an orange dress seated in a forest",
+    ctaHref: "/contact",
+  },
+  {
+    id: "couples-session",
+    index: "02",
+    title: "COUPLES SESSION",
+    description: "For couples, engagements or anniversaries.",
+    features: [
+      "2 - 3 hours photoshoot",
+      "1 - 2 locations",
+      "80+ edited high-resolution images",
+      "Online gallery",
+      "2 - 3 outfits",
+    ],
+    price: 350,
+    image: "/images/figma/source/forest-session.png",
+    imageAlt: "Woman in an orange dress seated in a forest",
+    ctaHref: "/contact",
+  },
+  {
+    id: "wedding-package",
+    index: "03",
+    title: "WEDDING PACKAGE",
+    description: "Documenting your day with warmth and storytelling.",
+    features: [
+      "8 hours coverage",
+      "600+ edited high-resolution images",
+      "Online gallery",
+      "1 photographer",
+      "Engagement session",
+    ],
+    price: 350,
+    image: "/images/figma/source/forest-session.png",
+    imageAlt: "Woman in an orange dress seated in a forest",
+    ctaHref: "/contact",
+  },
+];

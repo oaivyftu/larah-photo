@@ -16,6 +16,22 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Contact Form Email
+
+The booking inquiry form sends email from the server through Resend. Add these
+environment variables locally and in production:
+
+```bash
+RESEND_API_KEY=your_resend_api_key
+CONTACT_FROM_EMAIL="Larah Photo <inquiries@your-verified-domain.com>"
+CONTACT_TO_EMAIL=hello@example.com
+NEXT_PUBLIC_INSTAGRAM_URL=https://instagram.com/your_username
+```
+
+`CONTACT_FROM_EMAIL` must use a domain verified in Resend. `CONTACT_TO_EMAIL` is
+the inbox that should receive session inquiries. `NEXT_PUBLIC_INSTAGRAM_URL`
+controls the primary booking CTA used across the site.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
