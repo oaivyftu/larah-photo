@@ -5,6 +5,7 @@ import { Icon } from "@/components/ui/Icon/Icon";
 import { icons } from "@/constants/icons";
 import { services as servicePackages } from "@/data/services";
 import { instagramUrl } from "@/data/social";
+import { FeaturedWorkMasonry } from "./FeaturedWorkMasonry";
 import styles from "./home.module.scss";
 
 const featuredWorks = [
@@ -62,19 +63,19 @@ const featuredWorks = [
     alt: "Two women seated in a green field below blue and white clouds",
     title: "Cloud Study",
     meta: "Fashion Portraits",
-    className: "home-page__work-card--4",
+    className: "home-page__work-card--7",
     resolution: {
       width: 440,
       height: 660
     }
   },
   {
-    id: "field-wide",
+    id: "field-wide-large",
     image: "/images/figma/source/field-wide.png",
     alt: "Two people standing apart in a wide green field",
     title: "Meadow Walk",
     meta: "Couples Session",
-    className: "home-page__work-card--8",
+    className: "home-page__work-card--5",
     resolution: {
       width: 900,
       height: 600,
@@ -167,10 +168,15 @@ export default function Home() {
         </div>
 
         <section className={styles["home-page__work"]} aria-label="Featured work">
-          <div className={styles["home-page__work-grid"]}>
+          <FeaturedWorkMasonry
+            className={styles["home-page__work-grid"]}
+            columnSizerClassName={styles["home-page__work-column-sizer"]}
+            gutterSizerClassName={styles["home-page__work-gutter-sizer"]}
+          >
             {featuredWorks.map((work) => (
               <article
                 className={`${styles["home-page__work-card"]} ${styles[work.className]}`}
+                data-featured-work-item
                 key={work.id}
               >
                 <Link href="/work">
@@ -192,7 +198,7 @@ export default function Home() {
                 </Link>
               </article>
             ))}
-          </div>
+          </FeaturedWorkMasonry>
           <Link className={styles["home-page__view-all"]} href="/work">
             VIEW ALL WORK
             <Icon

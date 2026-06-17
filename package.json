@@ -14,6 +14,8 @@
     "@fortawesome/free-regular-svg-icons": "^7.2.0",
     "@fortawesome/free-solid-svg-icons": "^7.2.0",
     "@fortawesome/react-fontawesome": "^3.3.1",
+    "imagesloaded": "^5.0.0",
+    "isotope-layout": "^3.0.6",
     "next": "16.2.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -21,6 +23,8 @@
     "sass": "^1.101.0"
   },
   "devDependencies": {
+    "@types/imagesloaded": "^4.1.7",
+    "@types/isotope-layout": "^3.0.15",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

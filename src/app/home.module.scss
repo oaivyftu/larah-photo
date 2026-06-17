@@ -135,16 +135,17 @@
 }
 
 .home-page__work-grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 2rem 1.25rem;
-  align-items: start;
+  --work-columns: 12;
+  --work-gap-x: 1.25rem;
+  --work-gap-y: 5rem;
+  position: relative;
+  width: 100%;
 }
 
 .home-page__work-card,
 .home-page__work-card-feature {
   min-width: 0;
-  padding-bottom: 80px;
+  padding-bottom: var(--work-gap-y);
 }
 
 .home-page__work-card a,
@@ -154,51 +155,95 @@
 }
 
 .home-page__work-card--1 {
-  grid-column: span 1;
+  width: calc(
+    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 1)
+  );
 }
 
 .home-page__work-card--2 {
-  grid-column: span 2;
+  width: calc(
+    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 2) +
+      (var(--work-gap-x) * 1)
+  );
 }
 
 .home-page__work-card--3 {
-  grid-column: span 3;
+  width: calc(
+    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 3) +
+      (var(--work-gap-x) * 2)
+  );
 }
 
 .home-page__work-card--4 {
-  grid-column: span 4;
+  width: calc(
+    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 4) +
+      (var(--work-gap-x) * 3)
+  );
 }
 
 .home-page__work-card--5 {
-  grid-column: span 5;
+  width: calc(
+    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 5) +
+      (var(--work-gap-x) * 4)
+  );
 }
 
 .home-page__work-card--6 {
-  grid-column: span 6;
+  width: calc(
+    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 6) +
+      (var(--work-gap-x) * 5)
+  );
 }
 
 .home-page__work-card--7 {
-  grid-column: span 7;
+  width: calc(
+    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 7) +
+      (var(--work-gap-x) * 6)
+  );
 }
 
 .home-page__work-card--8 {
-  grid-column: span 8;
+  width: calc(
+    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 8) +
+      (var(--work-gap-x) * 7)
+  );
 }
 
 .home-page__work-card--9 {
-  grid-column: span 9;
+  width: calc(
+    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 9) +
+      (var(--work-gap-x) * 8)
+  );
 }
 
 .home-page__work-card--10 {
-  grid-column: span 10;
+  width: calc(
+    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 10) +
+      (var(--work-gap-x) * 9)
+  );
 }
 
 .home-page__work-card--11 {
-  grid-column: span 11;
+  width: calc(
+    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 11) +
+      (var(--work-gap-x) * 10)
+  );
 }
 
 .home-page__work-card--12 {
-  grid-column: span 12;
+  width: 100%;
+}
+
+.home-page__work-column-sizer {
+  width: calc(
+    (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns)
+  );
+  height: 0;
+}
+
+.home-page__work-gutter-sizer {
+  width: var(--work-gap-x);
+  height: 0;
 }
 
 .home-page__work-card--field {
@@ -382,17 +427,25 @@
   }
 
   .home-page__work-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    --work-columns: 2;
   }
 
-  .home-page__work-card--wide,
-  .home-page__work-card--field {
-    grid-column: span 3;
+  .home-page__work-card--1,
+  .home-page__work-card--2,
+  .home-page__work-card--3,
+  .home-page__work-card--4,
+  .home-page__work-card--5,
+  .home-page__work-card--6 {
+    width: calc((100% - var(--work-gap-x)) / 2);
   }
 
-  .home-page__work-card--poster,
-  .home-page__work-card--small-poster {
-    grid-column: span 2;
+  .home-page__work-card--7,
+  .home-page__work-card--8,
+  .home-page__work-card--9,
+  .home-page__work-card--10,
+  .home-page__work-card--11,
+  .home-page__work-card--12 {
+    width: 100%;
   }
 }
 
@@ -402,7 +455,6 @@
   }
 
   .home-page__hero,
-  .home-page__work-grid,
   .home-page__services-grid {
     grid-template-columns: 1fr;
   }
@@ -462,11 +514,23 @@
     margin-bottom: var(--space-3xl);
   }
 
-  .home-page__work-card--wide,
-  .home-page__work-card--poster,
-  .home-page__work-card--small-poster,
-  .home-page__work-card--field {
-    grid-column: auto;
+  .home-page__work-grid {
+    --work-columns: 1;
+  }
+
+  .home-page__work-card--1,
+  .home-page__work-card--2,
+  .home-page__work-card--3,
+  .home-page__work-card--4,
+  .home-page__work-card--5,
+  .home-page__work-card--6,
+  .home-page__work-card--7,
+  .home-page__work-card--8,
+  .home-page__work-card--9,
+  .home-page__work-card--10,
+  .home-page__work-card--11,
+  .home-page__work-card--12 {
+    width: 100%;
   }
 
   .home-page__work-card--poster .home-page__work-media,
