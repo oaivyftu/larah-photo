@@ -14,7 +14,11 @@ const featuredWorks = [
     alt: "Woman in an orange dress seated in a forest",
     title: "Forest Portraits",
     meta: "Editorial Session",
-    className: "home-page__work-card--wide",
+    className: "home-page__work-card--8",
+    resolution: {
+      width: 900,
+      height: 600,
+    }
   },
   {
     id: "blue-feature",
@@ -22,7 +26,11 @@ const featuredWorks = [
     alt: "Two women seated in a green field below blue and white clouds",
     title: "Blue Sky",
     meta: "Creative Portraits",
-    className: "home-page__work-card--poster",
+    className: "home-page__work-card--4",
+    resolution: {
+      width: 440,
+      height: 660,
+    }
   },
   {
     id: "blue-secondary",
@@ -30,7 +38,11 @@ const featuredWorks = [
     alt: "Two women seated in a green field below blue and white clouds",
     title: "Open Field",
     meta: "Lifestyle Story",
-    className: "home-page__work-card--poster",
+    className: "home-page__work-card--5",
+    resolution: {
+      width: 555,
+      height: 833,
+    }
   },
   {
     id: "forest-secondary",
@@ -38,7 +50,11 @@ const featuredWorks = [
     alt: "Woman in an orange dress seated in a forest",
     title: "Golden Hour",
     meta: "Brand Portraits",
-    className: "home-page__work-card--wide",
+    className: "home-page__work-card--7",
+    resolution: {
+      width: 786,
+      height: 524,
+    }
   },
   {
     id: "blue-small",
@@ -46,7 +62,11 @@ const featuredWorks = [
     alt: "Two women seated in a green field below blue and white clouds",
     title: "Cloud Study",
     meta: "Fashion Portraits",
-    className: "home-page__work-card--small-poster",
+    className: "home-page__work-card--4",
+    resolution: {
+      width: 440,
+      height: 660
+    }
   },
   {
     id: "field-wide",
@@ -54,7 +74,23 @@ const featuredWorks = [
     alt: "Two people standing apart in a wide green field",
     title: "Meadow Walk",
     meta: "Couples Session",
-    className: "home-page__work-card--field",
+    className: "home-page__work-card--8",
+    resolution: {
+      width: 900,
+      height: 600,
+    }
+  },
+  {
+    id: "field-wide",
+    image: "/images/figma/source/field-wide.png",
+    alt: "Two people standing apart in a wide green field",
+    title: "Meadow Walk",
+    meta: "Couples Session",
+    className: "home-page__work-card--12",
+    resolution: {
+      width: 1360,
+      height: 907,
+    }
   },
 ];
 
@@ -143,7 +179,7 @@ export default function Home() {
                       className={styles["home-page__work-image"]}
                       src={work.image}
                       alt={work.alt}
-                      fill
+                      {...work.resolution}
                       sizes="(max-width: 720px) calc(100vw - 48px), (max-width: 1100px) 45vw, 42vw"
                     />
                   </span>
@@ -157,25 +193,6 @@ export default function Home() {
               </article>
             ))}
           </div>
-          <article className={styles["home-page__work-card-feature"]}>
-            <Link href="/work">
-              <span className={styles["home-page__work-media"]}>
-                <Image
-                  className={styles["home-page__work-image"]}
-                  src="/images/figma/source/field-wide.png"
-                  alt="Two people standing apart in a wide green field"
-                  fill
-                  sizes="(max-width: 720px) calc(100vw - 48px), 85rem"
-                />
-              </span>
-              <span className={styles["home-page__work-title"]}>
-                Field Notes
-              </span>
-              <span className={styles["home-page__work-meta"]}>
-                Outdoor Portraits
-              </span>
-            </Link>
-          </article>
           <Link className={styles["home-page__view-all"]} href="/work">
             VIEW ALL WORK
             <Icon
