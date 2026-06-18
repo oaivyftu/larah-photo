@@ -1,11 +1,61 @@
 .work-card {
+  min-width: 0;
+}
+
+.work-card__link {
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+.work-card__media {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-bottom: var(--space-2xs);
+  overflow: hidden;
 }
 
 .work-card__image {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .work-card__title {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .work-card__meta {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.work-card--work .work-card__link {
+  gap: 0.35rem;
+}
+
+.work-card--work .work-card__media {
+  margin-bottom: 0.35rem;
+}
+
+.work-card--work .work-card__title {
+  font-size: clamp(1.2rem, 1.25vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.work-card--work .work-card__meta {
+  font-family: var(--font-sans);
+  font-size: clamp(0.86rem, 0.84vw, 1rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (max-width: 620px) {
+  .work-card--work .work-card__title {
+    font-size: 1.2rem;
+  }
 }
