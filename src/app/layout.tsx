@@ -24,7 +24,11 @@ export default function RootLayout({
   modal: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={montserrat.className}>
+    <html
+      lang="en"
+      className={montserrat.className}
+      data-scroll-behavior="smooth"
+    >
       <body>
         {children}
         {modal}
