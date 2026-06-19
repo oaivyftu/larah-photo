@@ -11,18 +11,24 @@ const montserrat = Montserrat({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "Larah Photo",
   description: "Photography portfolio website.",
 };
 
 export default function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   return (
     <html lang="en" className={montserrat.className}>
-      <body>{children}</body>
+      <body>
+        {children}
+        {modal}
+      </body>
     </html>
   );
 }

@@ -53,7 +53,9 @@ const featuredPlacements: Record<
   "forest-02": { featured: true, featuredOrder: 4, homepageSpan: 7, workSpan: 3 },
   "blue-sky-03": { featured: true, featuredOrder: 5, homepageSpan: 7, workSpan: 3 },
   "field-01": { featured: true, featuredOrder: 6, homepageSpan: 5, workSpan: 3 },
+  "forest-04": { featured: true, featuredOrder: 8, homepageSpan: 12, workSpan: 3 },
   "field-02": { featured: true, featuredOrder: 7, homepageSpan: 12, workSpan: 3 },
+
 };
 
 const categoryDetails: Record<
