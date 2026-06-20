@@ -159,7 +159,7 @@ export function WorkProjectGalleryClient({
           </p>
           <div className={styles["work-project-gallery__title-block"]}>
             <p className={styles["work-project-gallery__meta"]}>
-              {project.service}
+              {project.serviceCategory}
             </p>
             <h1
               className={styles["work-project-gallery__title"]}
@@ -196,13 +196,31 @@ export function WorkProjectGalleryClient({
           ))}
         </div>
 
-        {!isModal ? (
-          <footer className={styles["work-project-gallery__footer"]}>
+        <footer className={styles["work-project-gallery__footer"]}>
+          <dl className={styles["work-project-gallery__details"]}>
+            <div className={styles["work-project-gallery__detail"]}>
+              <dt>Year</dt>
+              <dd>{project.year}</dd>
+            </div>
+            <div className={styles["work-project-gallery__detail"]}>
+              <dt>Location</dt>
+              <dd>{project.location}</dd>
+            </div>
+            <div className={styles["work-project-gallery__detail"]}>
+              <dt>Client / Subject</dt>
+              <dd>{project.clientSubject}</dd>
+            </div>
+            <div className={styles["work-project-gallery__detail"]}>
+              <dt>Service / Category</dt>
+              <dd>{project.serviceCategory}</dd>
+            </div>
+          </dl>
+          <div className={styles["work-project-gallery__summary"]}>
             <p className={styles["work-project-gallery__description"]}>
               {project.description}
             </p>
-          </footer>
-        ) : null}
+          </div>
+        </footer>
       </div>
     </section>
   );
