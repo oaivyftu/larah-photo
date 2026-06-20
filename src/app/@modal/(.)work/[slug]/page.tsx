@@ -16,7 +16,5 @@ export default async function ProjectModalPage({ params }: ProjectModalPageProps
     notFound();
   }
 
-  return (
-    <WorkProjectGallery isModal project={project} showFullStoryLink />
-  );
+  return <WorkProjectGallery isModal project={project} />;
 }

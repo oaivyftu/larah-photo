@@ -47,8 +47,6 @@
 
 .work-project-gallery__counter,
 .work-project-gallery__close,
-.work-project-gallery__control,
-.work-project-gallery__story-link,
 .work-project-gallery__meta {
   font-size: clamp(0.75rem, 0.85vw, 0.95rem);
   font-weight: 800;
@@ -85,8 +83,7 @@
   line-height: 1.15;
 }
 
-.work-project-gallery__close,
-.work-project-gallery__control {
+.work-project-gallery__close {
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -96,58 +93,91 @@
   justify-self: end;
 }
 
-.work-project-gallery__close:hover,
-.work-project-gallery__control:hover,
-.work-project-gallery__story-link:hover {
+.work-project-gallery__close:hover {
   color: var(--color-muted);
 }
 
 .work-project-gallery__close:focus-visible,
-.work-project-gallery__control:focus-visible,
-.work-project-gallery__story-link:focus-visible,
-.work-project-gallery__viewport:focus-visible {
+.work-project-gallery__carousel:focus-visible {
   outline: 1px solid currentColor;
   outline-offset: 0.35rem;
 }
 
-.work-project-gallery__viewport {
+.work-project-gallery__carousel {
   position: relative;
   min-width: 0;
   height: clamp(24rem, 62vh, 45rem);
   overflow: hidden;
-  cursor: grab;
   contain: layout paint;
-  overscroll-behavior-inline: contain;
-  touch-action: pan-y pinch-zoom;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
 
-.work-project-gallery__viewport--dragging {
-  cursor: grabbing;
+.work-project-gallery__carousel:global(.flickity-enabled) {
+  overflow: visible;
 }
 
-.work-project-gallery__track {
-  display: flex;
-  align-items: stretch;
-  gap: clamp(1rem, 2.2vw, 2rem);
-  width: max-content;
+.work-project-gallery__carousel :global(.flickity-viewport) {
+  width: 100%;
   height: 100%;
-  padding: 0;
-  opacity: 0;
-  transform: translate3d(0, 0, 0);
-  transform-origin: 0 50%;
-  will-change: transform;
-  backface-visibility: hidden;
+  overflow: hidden;
 }
 
-.work-project-gallery__track--ready {
-  opacity: 1;
+.work-project-gallery__carousel :global(.flickity-slider) {
+  height: 100%;
+  will-change: transform;
+}
+
+.work-project-gallery__carousel :global(.flickity-button) {
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--color-ink);
+  background: rgba(255, 255, 255, 0.86);
+  border-radius: 50%;
+}
+
+.work-project-gallery__carousel :global(.flickity-button:hover) {
+  background: var(--color-paper);
+}
+
+.work-project-gallery__carousel :global(.flickity-button:focus-visible) {
+  outline: 1px solid var(--color-paper);
+  outline-offset: 0.25rem;
+  box-shadow: none;
+}
+
+.work-project-gallery__carousel :global(.flickity-prev-next-button.previous) {
+  left: clamp(0.75rem, 2vw, 2rem);
+}
+
+.work-project-gallery__carousel :global(.flickity-prev-next-button.next) {
+  right: clamp(0.75rem, 2vw, 2rem);
+}
+
+.work-project-gallery__carousel :global(.flickity-page-dots) {
+  bottom: 1.25rem;
+  gap: 0.65rem;
+}
+
+.work-project-gallery__carousel :global(.flickity-page-dot) {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.work-project-gallery__carousel :global(.flickity-page-dot.is-selected) {
+  background: var(--color-paper);
+}
+
+.work-project-gallery__carousel :global(.flickity-page-dot:focus-visible) {
+  outline: 1px solid var(--color-paper);
+  outline-offset: 0.25rem;
+  box-shadow: none;
 }
 
 .work-project-gallery__slide {
-  position: relative;
   flex: 0 0 auto;
   height: 100%;
   min-width: 0;
@@ -155,7 +185,7 @@
   overflow: hidden;
   background: #1a1a1a;
   contain: layout paint;
-  transform: translateZ(0);
+  margin-right: clamp(1rem, 2.2vw, 2rem);
   -webkit-user-drag: none;
 }
 
@@ -168,8 +198,7 @@
 }
 
 .work-project-gallery__image {
-  position: absolute;
-  inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -182,19 +211,10 @@
 .work-project-gallery__footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 1rem;
   padding: clamp(1.25rem, 2.4vw, 2.25rem) clamp(1.5rem, 3vw, 2.875rem)
     clamp(1.5rem, 3vw, 2.875rem);
-}
-
-.work-project-gallery__actions {
-  display: flex;
-  gap: 1.25rem;
-}
-
-.work-project-gallery__story-link {
-  justify-self: end;
 }
 
 .work-project-gallery__description {
@@ -233,7 +253,7 @@
     text-align: left;
   }
 
-  .work-project-gallery__viewport {
+  .work-project-gallery__carousel {
     height: min(64vh, 35rem);
   }
 

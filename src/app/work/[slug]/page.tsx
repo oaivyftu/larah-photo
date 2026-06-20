@@ -62,7 +62,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <PageShell variant="project">
-      <WorkProjectGallery closeHref="/work" project={project} />
+      <WorkProjectGallery project={project} />
     </PageShell>
   );
 }
