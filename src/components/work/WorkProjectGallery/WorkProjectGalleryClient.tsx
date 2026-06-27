@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type Flickity from "flickity";
 import "flickity/css/flickity.css";
@@ -63,6 +63,9 @@ export function WorkProjectGalleryClient({
   const flickityRef = useRef<Flickity | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const totalLabel = String(images.length).padStart(2, "0");
+  const handleClose = useCallback(() => {
+    router.back();
+  }, [router]);
 
   const slideIds = useMemo(
     () =>
@@ -132,6 +135,27 @@ export function WorkProjectGalleryClient({
     };
   }, [images]);
 
+  useEffect(() => {
+    if (!isModal) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) {
+        return;
+      }
+
+      event.preventDefault();
+      handleClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleClose, isModal]);
+
   return (
     <section
       aria-labelledby="work-gallery-title"
@@ -140,11 +164,13 @@ export function WorkProjectGalleryClient({
           ? styles["work-project-gallery--modal"]
           : styles["work-project-gallery--page"]
       }`}
+      onClick={isModal ? handleClose : undefined}
     >
       <div
         aria-labelledby={isModal ? "work-gallery-title" : undefined}
         aria-modal={isModal ? true : undefined}
         className={styles["work-project-gallery__panel"]}
+        onClick={isModal ? (event) => event.stopPropagation() : undefined}
         role={isModal ? "dialog" : undefined}
       >
         <header className={styles["work-project-gallery__header"]}>
@@ -171,7 +197,7 @@ export function WorkProjectGalleryClient({
           {isModal ? (
             <button
               className={styles["work-project-gallery__close"]}
-              onClick={() => router.back()}
+              onClick={handleClose}
               type="button"
             >
               Close
