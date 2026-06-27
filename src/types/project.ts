@@ -22,8 +22,8 @@ export type Project = {
   tags: string[];
   year: string;
   location: string;
-  client: string;
-  service: string;
+  clientSubject: string;
+  serviceCategory: string;
   description: string;
   image: string;
   alt: string;

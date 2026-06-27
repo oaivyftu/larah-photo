@@ -53,34 +53,36 @@ const featuredPlacements: Record<
   "forest-02": { featured: true, featuredOrder: 4, homepageSpan: 7, workSpan: 3 },
   "blue-sky-03": { featured: true, featuredOrder: 5, homepageSpan: 7, workSpan: 3 },
   "field-01": { featured: true, featuredOrder: 6, homepageSpan: 5, workSpan: 3 },
+  "forest-04": { featured: true, featuredOrder: 8, homepageSpan: 12, workSpan: 3 },
   "field-02": { featured: true, featuredOrder: 7, homepageSpan: 12, workSpan: 3 },
+
 };
 
 const categoryDetails: Record<
   string,
-  Pick<Project, "location" | "service" | "description">
+  Pick<Project, "location" | "serviceCategory" | "description">
 > = {
   couples: {
     location: "London, Ontario",
-    service: "Couples Photography",
+    serviceCategory: "Couples Photography",
     description:
       "A quiet outdoor session shaped around soft movement, open air, and the natural connection between two people.",
   },
   portraits: {
     location: "London, Ontario",
-    service: "Portrait Photography",
+    serviceCategory: "Portrait Photography",
     description:
       "A personal portrait story with gentle direction, warm textures, and space for the subject to feel present on camera.",
   },
   graduation: {
     location: "Western University",
-    service: "Graduation Photography",
+    serviceCategory: "Graduation Photography",
     description:
       "A celebratory graduation session balancing classic campus portraits with relaxed editorial frames.",
   },
   editorial: {
     location: "London, Ontario",
-    service: "Editorial Photography",
+    serviceCategory: "Editorial Photography",
     description:
       "An editorial-inspired study in landscape, styling, and calm portraiture for a romantic visual story.",
   },
@@ -90,7 +92,7 @@ function makeProject(
   project: Omit<
     Project,
     | "location"
-    | "service"
+    | "serviceCategory"
     | "description"
     | "id"
     | "tags"
@@ -127,7 +129,7 @@ function makeProject(
     id: project.id ?? project.slug,
     tags: project.tags ?? [project.category],
     location: detail.location,
-    service: detail.service,
+    serviceCategory: detail.serviceCategory,
     description: detail.description,
     alt,
     imageAlt: alt,
@@ -150,7 +152,7 @@ export const workProjects: Project[] = [
     meta: "Couples 2024",
     category: "couples",
     year: "2024",
-    client: "Couple Session",
+    clientSubject: "Couple Session",
     image: "/images/figma/source/blue-sky-portrait.png",
     width: 260,
     height: 392,
@@ -167,7 +169,7 @@ export const workProjects: Project[] = [
     meta: "Portraits 2024",
     category: "portraits",
     year: "2024",
-    client: "Portrait Subject",
+    clientSubject: "Portrait Subject",
     image: "/images/figma/source/forest-session.png",
     width: 260,
     height: 174,
@@ -184,7 +186,7 @@ export const workProjects: Project[] = [
     meta: "Graduation 2024",
     category: "graduation",
     year: "2024",
-    client: "Graduate Session",
+    clientSubject: "Graduate Session",
     image: "/images/figma/source/blue-sky-portrait.png",
     width: 260,
     height: 392,
@@ -201,7 +203,7 @@ export const workProjects: Project[] = [
     meta: "Editorial 2024",
     category: "editorial",
     year: "2024",
-    client: "Editorial Subject",
+    clientSubject: "Editorial Subject",
     image: "/images/figma/source/field-wide.png",
     width: 260,
     height: 147,
@@ -218,7 +220,7 @@ export const workProjects: Project[] = [
     meta: "Couples 2024",
     category: "couples",
     year: "2024",
-    client: "Couple Session",
+    clientSubject: "Couple Session",
     image: "/images/figma/source/field-wide.png",
     width: 260,
     height: 147,
@@ -235,7 +237,7 @@ export const workProjects: Project[] = [
     meta: "Portraits 2024",
     category: "portraits",
     year: "2024",
-    client: "Portrait Subject",
+    clientSubject: "Portrait Subject",
     image: "/images/figma/source/forest-session.png",
     width: 260,
     height: 174,
@@ -252,7 +254,7 @@ export const workProjects: Project[] = [
     meta: "Graduation 2024",
     category: "graduation",
     year: "2024",
-    client: "Graduate Session",
+    clientSubject: "Graduate Session",
     image: "/images/figma/source/blue-sky-portrait.png",
     width: 260,
     height: 392,
@@ -269,7 +271,7 @@ export const workProjects: Project[] = [
     meta: "Editorial 2024",
     category: "editorial",
     year: "2024",
-    client: "Editorial Subject",
+    clientSubject: "Editorial Subject",
     image: "/images/figma/source/field-wide.png",
     width: 260,
     height: 147,
@@ -286,7 +288,7 @@ export const workProjects: Project[] = [
     meta: "Portraits 2024",
     category: "portraits",
     year: "2024",
-    client: "Portrait Subject",
+    clientSubject: "Portrait Subject",
     image: "/images/figma/source/forest-session.png",
     width: 260,
     height: 174,
@@ -303,7 +305,7 @@ export const workProjects: Project[] = [
     meta: "Couples 2024",
     category: "couples",
     year: "2024",
-    client: "Couple Session",
+    clientSubject: "Couple Session",
     image: "/images/figma/source/blue-sky-portrait.png",
     width: 260,
     height: 392,
@@ -320,7 +322,7 @@ export const workProjects: Project[] = [
     meta: "Editorial 2024",
     category: "editorial",
     year: "2024",
-    client: "Editorial Subject",
+    clientSubject: "Editorial Subject",
     image: "/images/figma/source/forest-session.png",
     width: 260,
     height: 174,
@@ -337,7 +339,7 @@ export const workProjects: Project[] = [
     meta: "Graduation 2024",
     category: "graduation",
     year: "2024",
-    client: "Graduate Session",
+    clientSubject: "Graduate Session",
     image: "/images/figma/source/field-wide.png",
     width: 260,
     height: 147,
@@ -354,7 +356,7 @@ export const workProjects: Project[] = [
     meta: "Graduation 2024",
     category: "graduation",
     year: "2024",
-    client: "Graduate Session",
+    clientSubject: "Graduate Session",
     image: "/images/figma/source/blue-sky-portrait.png",
     width: 260,
     height: 392,
@@ -371,7 +373,7 @@ export const workProjects: Project[] = [
     meta: "Couples 2024",
     category: "couples",
     year: "2024",
-    client: "Couple Session",
+    clientSubject: "Couple Session",
     image: "/images/figma/source/field-wide.png",
     width: 260,
     height: 147,
