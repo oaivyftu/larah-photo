@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import styles from "./PageTransition.module.scss";
 
-const TRANSITION_DURATION = 620;
+const TRANSITION_DURATION = 780;
 
 function isModifiedClick(event: MouseEvent) {
   return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
@@ -84,7 +84,7 @@ export function PageTransition() {
 
       timeoutRef.current = setTimeout(() => {
         router.push(destination);
-      }, TRANSITION_DURATION - 180);
+      }, TRANSITION_DURATION - 260);
     }
 
     document.addEventListener("click", handleClick, true);
@@ -102,9 +102,9 @@ export function PageTransition() {
         state === "leaving" ? styles["page-transition--leaving"] : ""
       } ${state === "entering" ? styles["page-transition--entering"] : ""}`}
     >
-      <div className={styles["page-transition__panel"]} />
-      <div className={styles["page-transition__panel"]} />
-      <div className={styles["page-transition__panel"]} />
+      <div className={styles["page-transition__curtain"]} />
+      <div className={styles["page-transition__accent"]} />
+      <p className={styles["page-transition__kicker"]}>Larah Photo</p>
       <p className={styles["page-transition__label"]}>{label}</p>
     </div>
   );

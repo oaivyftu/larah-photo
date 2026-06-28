@@ -165,9 +165,9 @@ export function HomeExperience({ projects, services }: HomeExperienceProps) {
             },
           },
         );
-
-        return () => mm.revert();
       });
+
+      return () => mm.revert();
     },
     { scope: rootRef },
   );

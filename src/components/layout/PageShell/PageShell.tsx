@@ -1,6 +1,5 @@
 import { SiteFooter } from "@/components/layout/SiteFooter/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader/SiteHeader";
-import { SocialMarquee } from "@/components/layout/SocialMarquee/SocialMarquee";
 import styles from "./PageShell.module.scss";
 
 type PageShellProps = {
@@ -28,7 +27,6 @@ export function PageShell({ children, variant }: PageShellProps) {
       >
         {children}
       </main>
-      <SocialMarquee />
       <SiteFooter />
     </div>
   );

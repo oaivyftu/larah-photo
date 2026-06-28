@@ -1,98 +1,171 @@
-.contact-page {
+.contact {
+  overflow: clip;
+  background: #f6f1e8;
+  color: #11100e;
+}
+
+.contact__hero {
   display: grid;
-  width: calc(100% - (var(--page-gutter) * 2));
-  max-width: var(--container-max);
-  grid-template-columns: minmax(0, 27.5rem) minmax(0, 41.8125rem);
-  gap: clamp(var(--space-3xl), 17.43vw, 15.6875rem);
-  align-items: start;
-  min-height: 32.8125rem;
+  gap: 1rem;
+  width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
+  min-height: calc(100svh - var(--header-height));
+  align-content: center;
   margin: 0 auto;
-  padding: 2.5rem 0 5rem;
 }
 
-.contact-page__intro {
-  display: flex;
-  min-height: 25.3125rem;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--space-3xl);
+.contact__eyebrow,
+.contact-card span,
+.contact-card small {
+  color: #756f66;
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
-.contact-page__title {
-  font-family: var(--font-sans);
-  font-size: var(--font-size-xl);
-  font-weight: 400;
-  line-height: 1.2;
-}
-
-.contact-page__title span {
+.contact__title {
+  max-width: 82rem;
   font-family: var(--font-serif);
+  font-size: clamp(3.8rem, 10.5vw, 12rem);
   font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.78;
 }
 
-.contact-page__statement {
-  max-width: 27.5rem;
-  font-size: var(--font-size-md);
-  font-weight: 500;
-  line-height: 1.2;
+.contact__title > span {
+  display: inline-block;
+  overflow: hidden;
+  padding-right: 0.1em;
 }
 
-.contact-page__booking {
+.contact__title > span > span {
+  display: inline-block;
+}
+
+.contact__pin {
+  position: relative;
   display: grid;
-  width: 100%;
-  gap: var(--space-2xl);
+  min-height: 100svh;
+  place-items: center;
+  overflow: hidden;
+  background: #11100e;
+  color: #f6f1e8;
 }
 
-.contact-page__form-intro {
-  display: grid;
-  gap: var(--space-xs);
-  max-width: 31rem;
-  padding-top: var(--space-sm);
-}
-
-.contact-page__form-title {
+.contact__large {
+  position: absolute;
+  left: -0.08em;
+  color: rgb(246 241 232 / 12%);
   font-family: var(--font-serif);
-  font-size: var(--font-size-md);
+  font-size: clamp(8rem, 22vw, 24rem);
+  letter-spacing: 0;
+  line-height: 0.72;
+  white-space: nowrap;
+}
+
+.contact-card {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  gap: 1rem;
+  width: min(30rem, calc(100% - 3rem));
+  border: 1px solid rgb(246 241 232 / 20%);
+  border-radius: 0.35rem;
+  background: rgb(246 241 232 / 8%);
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.contact-card--primary {
+  top: 16vh;
+  left: 10vw;
+}
+
+.contact-card:not(.contact-card--primary) {
+  right: 8vw;
+  bottom: 13vh;
+}
+
+.contact-card strong {
+  color: #f6f1e8;
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 4vw, 5rem);
   font-weight: 400;
-  line-height: 1.15;
+  letter-spacing: 0;
+  line-height: 0.88;
 }
 
-.contact-page__form-description {
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  line-height: 1.35;
+.contact-card small {
+  color: rgb(246 241 232 / 66%);
+  line-height: 1.25;
 }
 
-@media (max-width: 1080px) {
-  .contact-page {
+.contact__image {
+  position: relative;
+  width: min(36rem, 42vw);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  background: #2c2822;
+}
+
+.contact__image img {
+  object-fit: cover;
+}
+
+.contact__form-section {
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.8fr) minmax(20rem, 1.1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
+  margin: 0 auto;
+  padding: clamp(4rem, 8vw, 8rem) 0;
+}
+
+.contact__form-copy {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+}
+
+.contact__form-copy h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 7vw, 8rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.78;
+}
+
+.contact__form-copy p:last-child {
+  max-width: 28rem;
+  font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.contact__form-panel {
+  border: 1px solid rgb(17 16 14 / 18%);
+  border-radius: 0.35rem;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+@media (max-width: 900px) {
+  .contact__pin {
+    min-height: auto;
+    padding: 4rem var(--page-gutter);
+  }
+
+  .contact__large,
+  .contact-card {
+    position: static;
+  }
+
+  .contact__image {
+    width: min(100%, 30rem);
+    margin: 2rem 0;
+  }
+
+  .contact__form-section {
     grid-template-columns: 1fr;
-    min-height: auto;
-    gap: var(--space-3xl);
-    padding: var(--space-3xl) 0 5rem;
-  }
-
-  .contact-page__intro {
-    min-height: auto;
-    gap: 3rem;
-  }
-
-  .contact-page__statement {
-    max-width: 27.5rem;
-  }
-}
-
-@media (max-width: 700px) {
-  .contact-page {
-    padding-top: var(--space-2xl);
-  }
-
-  .contact-page__booking {
-    gap: var(--space-xl);
-  }
-}
-
-@media (max-width: 480px) {
-  .contact-page__title {
-    font-size: 1.75rem;
   }
 }

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageShell } from "@/components/layout/PageShell/PageShell";
-import { WorkProjectGallery } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
 import {
   formatWorkCategory,
   getWorkProject,
   workProjects,
 } from "@/data/work";
+import { ProjectExperience } from "./ProjectExperience";
 
 type ProjectPageProps = {
   params: Promise<{
@@ -62,7 +62,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <PageShell variant="project">
-      <WorkProjectGallery project={project} />
+      <ProjectExperience project={project} />
     </PageShell>
   );
 }

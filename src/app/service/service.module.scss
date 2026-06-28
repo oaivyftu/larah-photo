@@ -1,50 +1,165 @@
-.service-page {
-  padding: 4.375rem var(--page-gutter) 5rem;
+.service {
+  overflow: clip;
+  background: #f6f1e8;
+  color: #11100e;
 }
 
-.service-page__title {
-  max-width: var(--container-max);
-  margin: 0 auto var(--space-xl);
-  font-family: var(--font-sans);
-  font-size: var(--font-size-xl);
-  font-weight: 400;
-  line-height: 1.2;
-}
-
-.service-page__title span {
-  font-family: var(--font-serif);
-  font-weight: 400;
-}
-
-.service-page__list {
+.service__hero {
   display: grid;
-  max-width: var(--container-max);
+  gap: 1rem;
+  width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
+  min-height: calc(100svh - var(--header-height));
+  align-content: center;
   margin: 0 auto;
-  gap: 5rem;
 }
 
-@media (max-width: 1200px) {
-  .service-page {
-    padding-top: var(--space-3xl);
-  }
+.service__eyebrow {
+  color: #756f66;
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
-@media (max-width: 820px) {
-  .service-page {
-    padding-top: var(--space-3xl);
-  }
-
-  .service-page__title {
-    margin-bottom: var(--space-2xl);
-  }
-
-  .service-page__list {
-    gap: var(--space-4xl);
-  }
+.service__title {
+  max-width: 78rem;
+  font-family: var(--font-serif);
+  font-size: clamp(4rem, 12vw, 13rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.78;
 }
 
-@media (max-width: 520px) {
-  .service-page {
-    padding-top: var(--space-2xl);
+.service__title > span {
+  display: inline-block;
+  overflow: hidden;
+  padding-right: 0.1em;
+}
+
+.service__title > span > span {
+  display: inline-block;
+}
+
+.service__pin {
+  display: grid;
+  min-height: 100svh;
+  align-content: center;
+  overflow: hidden;
+  background: #11100e;
+  color: #f6f1e8;
+}
+
+.service__track {
+  display: flex;
+  width: max-content;
+  gap: clamp(1rem, 2vw, 2rem);
+  padding: 0 var(--page-gutter);
+}
+
+.service-card {
+  display: grid;
+  width: clamp(20rem, 38vw, 42rem);
+  min-height: clamp(28rem, 62vh, 40rem);
+  align-content: space-between;
+  gap: 1.5rem;
+  flex: 0 0 auto;
+  border: 1px solid rgb(246 241 232 / 18%);
+  border-radius: 0.35rem;
+  background: rgb(246 241 232 / 7%);
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.service-card > span {
+  color: #d33b2f;
+  font-family: var(--font-serif);
+  font-size: clamp(4rem, 9vw, 9rem);
+  letter-spacing: 0;
+  line-height: 0.72;
+}
+
+.service-card h2 {
+  max-width: 22rem;
+  font-size: clamp(2rem, 4.5vw, 5rem);
+  font-weight: 900;
+  line-height: 0.82;
+}
+
+.service-card p,
+.service-card li {
+  color: rgb(246 241 232 / 72%);
+  font-size: clamp(1rem, 1.25vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.service-card ul {
+  display: grid;
+  gap: 0.45rem;
+  list-style: none;
+}
+
+.service-card a {
+  justify-self: start;
+  border: 1px solid currentColor;
+  padding: 0.85rem 1rem;
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.service__image-panel {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  align-items: end;
+  overflow: hidden;
+  background: #11100e;
+  color: #f6f1e8;
+}
+
+.service__image-panel::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 62%), rgb(0 0 0 / 18%) 62%),
+    linear-gradient(0deg, rgb(0 0 0 / 55%), transparent 54%);
+  content: "";
+}
+
+.service__image-panel img {
+  object-fit: cover;
+  transform: scale(1.15);
+}
+
+.service__image-panel p {
+  position: relative;
+  z-index: 1;
+  width: min(58rem, calc(100% - (var(--page-gutter) * 2)));
+  margin: 0 auto;
+  padding-bottom: clamp(3rem, 8vw, 7rem);
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 6vw, 7rem);
+  letter-spacing: 0;
+  line-height: 0.84;
+}
+
+@media (max-width: 900px) {
+  .service__pin {
+    min-height: auto;
+    padding: 4rem 0;
+  }
+
+  .service__track {
+    width: auto;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .service-card {
+    width: min(84vw, 34rem);
+    scroll-snap-align: center;
   }
 }
