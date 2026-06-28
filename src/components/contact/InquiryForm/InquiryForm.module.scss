@@ -146,7 +146,16 @@
 }
 
 @media (max-width: 480px) {
+  .inquiry-form {
+    gap: 2rem;
+  }
+
   .inquiry-form__label {
     font-size: var(--font-size-sm);
+  }
+
+  .inquiry-form__submit {
+    width: 100%;
+    min-height: 2.85rem;
   }
 }

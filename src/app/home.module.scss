@@ -449,6 +449,7 @@
   .hero {
     grid-template-columns: 1fr;
     min-height: auto;
+    padding-top: clamp(2rem, 8vw, 4rem);
   }
 
   .hero__media {
@@ -510,6 +511,7 @@
     width: auto;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
   }
 
   .service-card {
@@ -519,8 +521,26 @@
 }
 
 @media (max-width: 620px) {
+  .home {
+    overflow: hidden;
+  }
+
   .hero__title {
-    font-size: clamp(3.6rem, 18vw, 5.8rem);
+    font-size: clamp(3.15rem, 17vw, 5.1rem);
+    line-height: 0.84;
+  }
+
+  .hero__media {
+    min-height: 0;
+    aspect-ratio: 4 / 5;
+  }
+
+  .hero__actions a {
+    width: 100%;
+  }
+
+  .hero__actions a:first-child {
+    border-color: currentColor;
   }
 
   .hero__caption {
@@ -528,23 +548,93 @@
     gap: 0.4rem;
   }
 
-  .manifesto__image-one,
-  .manifesto__image-two {
-    opacity: 0.62;
+  .manifesto {
+    display: block;
+    min-height: auto;
+    padding: 4.5rem var(--page-gutter);
+  }
+
+  .manifesto__words {
+    position: relative;
+    inset: auto;
+    align-content: start;
   }
 
   .manifesto__words span {
-    font-size: clamp(5rem, 24vw, 8rem);
+    text-align: left;
+    white-space: normal;
+  }
+
+  .manifesto__image-one,
+  .manifesto__image-two {
+    position: relative;
+    inset: auto;
+    width: min(88%, 18rem);
+    margin: 1rem 0;
+    opacity: 0.82;
+  }
+
+  .manifesto__image-two {
+    margin-left: auto;
+  }
+
+  .manifesto__words span {
+    font-size: clamp(4.2rem, 21vw, 7rem);
   }
 
   .manifesto__copy {
-    font-size: clamp(2rem, 11vw, 4rem);
+    width: auto;
+    margin-top: 1.25rem;
+    font-size: clamp(1.8rem, 9vw, 3.2rem);
+    line-height: 0.98;
+    text-align: left;
   }
 
   .stack__intro h2,
   .services__header h2,
   .closing__copy h2 {
-    font-size: clamp(2.6rem, 14vw, 5rem);
+    font-size: clamp(2.35rem, 12vw, 4.35rem);
+    line-height: 0.9;
+  }
+
+  .stack {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .stack-card__inner {
+    padding: 0.9rem;
+  }
+
+  .stack-card__number-mask,
+  .stack-card__number-mask span {
+    height: 3.4rem;
+    font-size: 3.8rem;
+  }
+
+  .stack-card__copy strong {
+    font-size: clamp(2.2rem, 12vw, 3.8rem);
+  }
+
+  .services__header {
+    padding-top: 4rem;
+  }
+
+  .services__track {
+    padding-bottom: 4rem;
+  }
+
+  .service-card {
+    width: min(88vw, 25rem);
+    min-height: 28rem;
+  }
+
+  .closing {
+    min-height: 76svh;
+  }
+
+  .closing__copy {
+    padding-bottom: 3rem;
   }
 }
 

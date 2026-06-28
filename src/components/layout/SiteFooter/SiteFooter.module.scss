@@ -99,3 +99,26 @@
     justify-self: start;
   }
 }
+
+@media (max-width: 560px) {
+  .site-footer__inner {
+    gap: 2rem;
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .site-footer__statement {
+    font-size: clamp(2.2rem, 11vw, 3.8rem);
+    line-height: 0.88;
+  }
+
+  .site-footer__cta {
+    width: 100%;
+    text-align: center;
+  }
+
+  .site-footer__bar {
+    gap: 0.9rem;
+    line-height: 1.2;
+  }
+}

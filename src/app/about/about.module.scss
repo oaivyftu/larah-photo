@@ -37,6 +37,10 @@
   padding-right: 0.1em;
 }
 
+.about__title > span:not(:last-child) {
+  margin-right: 0.08em;
+}
+
 .about__title > span > span {
   display: inline-block;
 }
@@ -122,6 +126,16 @@
 }
 
 @media (max-width: 900px) {
+  .about__hero {
+    min-height: auto;
+    padding: clamp(3rem, 12vw, 5rem) 0;
+  }
+
+  .about__title {
+    font-size: clamp(3.25rem, 15vw, 7rem);
+    line-height: 0.82;
+  }
+
   .about__pin {
     min-height: auto;
     padding: 5rem var(--page-gutter);
@@ -147,5 +161,36 @@
 
   .about__story {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .about__hero {
+    padding: 3rem 0 2.5rem;
+  }
+
+  .about__title {
+    font-size: clamp(3rem, 17vw, 5.4rem);
+  }
+
+  .about__pin {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .about__large {
+    font-size: clamp(3.7rem, 18vw, 5.8rem);
+  }
+
+  .about__notes p {
+    font-size: clamp(1.8rem, 9vw, 3.1rem);
+  }
+
+  .about__story {
+    padding: 3.5rem 0;
+  }
+
+  .about__story p {
+    font-size: clamp(1.25rem, 6vw, 1.9rem);
   }
 }

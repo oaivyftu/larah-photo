@@ -152,6 +152,15 @@
 }
 
 @media (max-width: 900px) {
+  .project__hero {
+    min-height: 82svh;
+  }
+
+  .project__title {
+    font-size: clamp(3.3rem, 15vw, 7rem);
+    line-height: 0.8;
+  }
+
   .project__details,
   .project__frames {
     grid-template-columns: 1fr;
@@ -165,5 +174,33 @@
 
   .project__details div {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .project__hero {
+    min-height: 78svh;
+  }
+
+  .project__hero-copy {
+    padding-bottom: 2rem;
+  }
+
+  .project__title {
+    font-size: clamp(3rem, 17vw, 5.4rem);
+  }
+
+  .project__details,
+  .project__frames {
+    padding: 3.5rem 0;
+  }
+
+  .project__details p {
+    font-size: clamp(1.8rem, 9vw, 3rem);
+  }
+
+  .project__nav a {
+    width: 100%;
+    text-align: center;
   }
 }

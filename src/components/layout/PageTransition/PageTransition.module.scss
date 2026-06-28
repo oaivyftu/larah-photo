@@ -93,6 +93,17 @@
   }
 }
 
+@media (max-width: 560px) {
+  .page-transition__accent {
+    height: 0.32rem;
+  }
+
+  .page-transition__label {
+    max-width: 168vw;
+    font-size: clamp(4rem, 26vw, 7.5rem);
+  }
+}
+
 @keyframes curtain-in {
   from {
     clip-path: inset(100% 0 0 0);

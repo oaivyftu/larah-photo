@@ -37,6 +37,10 @@
   padding-right: 0.1em;
 }
 
+.service__title > span:not(:last-child) {
+  margin-right: 0.08em;
+}
+
 .service__title > span > span {
   display: inline-block;
 }
@@ -147,6 +151,16 @@
 }
 
 @media (max-width: 900px) {
+  .service__hero {
+    min-height: auto;
+    padding: clamp(3rem, 12vw, 5rem) 0;
+  }
+
+  .service__title {
+    font-size: clamp(3.25rem, 15vw, 7rem);
+    line-height: 0.82;
+  }
+
   .service__pin {
     min-height: auto;
     padding: 4rem 0;
@@ -156,10 +170,51 @@
     width: auto;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
   }
 
   .service-card {
     width: min(84vw, 34rem);
     scroll-snap-align: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .service__hero {
+    padding: 3rem 0 2.5rem;
+  }
+
+  .service__title {
+    font-size: clamp(3rem, 17vw, 5.4rem);
+  }
+
+  .service__pin {
+    padding: 3.5rem 0;
+  }
+
+  .service__track {
+    padding-right: var(--page-gutter);
+  }
+
+  .service-card {
+    width: min(88vw, 25rem);
+    min-height: 29rem;
+  }
+
+  .service-card > span {
+    font-size: 4.2rem;
+  }
+
+  .service-card h2 {
+    font-size: clamp(2.2rem, 12vw, 4rem);
+  }
+
+  .service__image-panel {
+    min-height: 76svh;
+  }
+
+  .service__image-panel p {
+    padding-bottom: 3rem;
+    font-size: clamp(2.1rem, 11vw, 4rem);
   }
 }
