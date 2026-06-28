@@ -3,6 +3,7 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.scss";
 import { Montserrat } from 'next/font/google'
+import { PageTransition } from "@/components/layout/PageTransition/PageTransition";
 
 config.autoAddCss = false;
 
@@ -32,6 +33,7 @@ export default function RootLayout({
       <body>
         {children}
         {modal}
+        <PageTransition />
       </body>
     </html>
   );

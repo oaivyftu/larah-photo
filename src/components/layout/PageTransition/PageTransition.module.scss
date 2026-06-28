@@ -1,0 +1,120 @@
+.page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.page-transition__panel {
+  background: #10100f;
+  transform: translateY(100%);
+}
+
+.page-transition__panel:nth-child(2) {
+  background: #161512;
+}
+
+.page-transition__panel:nth-child(3) {
+  background: #f6f1e8;
+}
+
+.page-transition__label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: min(34rem, calc(100vw - 3rem));
+  color: #f6f1e8;
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 8vw, 6.5rem);
+  letter-spacing: 0;
+  line-height: 0.9;
+  text-align: center;
+  text-transform: none;
+  opacity: 0;
+  filter: blur(14px);
+  transform: translate(-50%, -42%) scale(0.96);
+}
+
+.page-transition--leaving,
+.page-transition--entering {
+  visibility: visible;
+}
+
+.page-transition--leaving .page-transition__panel {
+  animation: panel-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.page-transition--leaving .page-transition__panel:nth-child(2) {
+  animation-delay: 55ms;
+}
+
+.page-transition--leaving .page-transition__panel:nth-child(3) {
+  animation-delay: 110ms;
+}
+
+.page-transition--leaving .page-transition__label {
+  animation: label-in 520ms 110ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.page-transition--entering .page-transition__panel {
+  animation: panel-out 580ms cubic-bezier(0.7, 0, 0.2, 1) both;
+}
+
+.page-transition--entering .page-transition__panel:nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.page-transition--entering .page-transition__panel:nth-child(3) {
+  animation-delay: 80ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    display: none;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes panel-out {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes label-in {
+  0% {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translate(-50%, -38%) scale(0.96);
+  }
+
+  44%,
+  74% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate(-50%, -56%) scale(1.02);
+  }
+}
