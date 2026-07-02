@@ -48,7 +48,6 @@ export function HomeExperience({
 
       mm.add("(min-width: 901px) and (prefers-reduced-motion: no-preference)", () => {
         const heroTl = gsap.timeline({ defaults: { ease: "power4.out" } });
-        gsap.set("[data-manifesto-copy]", { opacity: 0, y: 32 });
 
         heroTl
           .from("[data-hero-word]", {
@@ -87,8 +86,7 @@ export function HomeExperience({
           .to("[data-manifesto-word='memory']", { xPercent: 12, scale: 0.88 }, 0)
           .to("[data-manifesto-word='motion']", { xPercent: -8, scale: 1.05 }, 0)
           .to("[data-manifesto-image='one']", { yPercent: -16, rotate: -6 }, 0)
-          .to("[data-manifesto-image='two']", { yPercent: 18, rotate: 5 }, 0)
-          .to("[data-manifesto-copy]", { opacity: 1, y: 0 }, 0.18);
+          .to("[data-manifesto-image='two']", { yPercent: 18, rotate: 5 }, 0);
 
         const serviceTrack = document.querySelector<HTMLElement>("[data-service-track]");
 
@@ -199,15 +197,15 @@ export function HomeExperience({
             sizes="(max-width: 760px) 42vw, 20vw"
           />
         </div>
-        <p className={styles["manifesto__copy"]} data-manifesto-copy>
-          {content.manifestoCopy}
-        </p>
       </section>
 
-      <section className={styles["stack"]} data-stack-section aria-labelledby="stack-title">
+      <section
+        className={styles["stack"]}
+        data-stack-section
+        aria-label={content.selectedWorkEyebrow}
+      >
         <div className={styles["stack__header"]}>
           <p className={styles["eyebrow"]}>{content.selectedWorkEyebrow}</p>
-          <h2 id="stack-title">{content.selectedWorkTitle}</h2>
         </div>
         <WorkMasonryGrid
           className={styles["stack__grid"]}
