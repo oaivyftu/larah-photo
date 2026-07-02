@@ -8,7 +8,18 @@ type WorkProjectGalleryProps = {
 };
 
 export function getProjectGalleryImages(project: Project): ProjectImage[] {
-  return [project.heroImage, ...project.images];
+  if (project.images.length) {
+    return project.images;
+  }
+
+  return [
+    {
+      src: project.image,
+      alt: project.alt,
+      width: project.width,
+      height: project.height,
+    },
+  ];
 }
 
 export function WorkProjectGallery({

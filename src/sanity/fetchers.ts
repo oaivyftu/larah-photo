@@ -8,7 +8,7 @@ import {
 import { services as fallbackServices } from "@/data/services";
 import { fallbackSiteSettings } from "@/data/site";
 import { workProjects as fallbackProjects } from "@/data/work";
-import type { Project, ProjectImage, WorkPlacement } from "@/types/project";
+import type { Project, WorkPlacement } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
 import type {
   AboutPageContent,
@@ -98,9 +98,7 @@ type SanityProject = {
   featuredOrder?: number;
   homepageSpan?: string;
   workSpan?: string;
-  heroImage?: SanityPageImage;
   images?: Array<{
-    layout?: ProjectImage["layout"];
     image?: SanityPageImage;
   }>;
 };
@@ -303,20 +301,18 @@ function parseSpan(value: string | undefined): WorkPlacement["homepageSpan"] {
 
 function mapSanityProject(project: SanityProject, fallback: Project): Project {
   const slug = getSlug(project.slug) ?? fallback.slug;
-  const heroImage = resolveSanityImage(project.heroImage, fallback.heroImage);
-  const images =
-    project.images?.length
-      ? project.images.map((item, index) => ({
-          ...resolveSanityImage(item.image, fallback.images[index] ?? heroImage),
-          layout: item.layout ?? fallback.images[index]?.layout,
-        }))
-      : fallback.images;
   const cardImage = resolveSanityImage(project.cardImage, {
     src: fallback.image,
     alt: fallback.alt,
     width: fallback.width,
     height: fallback.height,
   });
+  const images =
+    project.images?.length
+      ? project.images.map((item, index) =>
+          resolveSanityImage(item.image, fallback.images[index] ?? cardImage),
+        )
+      : fallback.images;
   const featured = project.featured ?? fallback.featured ?? false;
 
   return {
@@ -347,7 +343,6 @@ function mapSanityProject(project: SanityProject, fallback: Project): Project {
         fallback.placement?.workSpan,
     },
     coverImage: cardImage.src,
-    heroImage,
     images,
   };
 }

@@ -6,6 +6,7 @@ import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { getProjectGalleryImages } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
 import { formatWorkCategory } from "@/data/work";
 import type { Project } from "@/types/project";
 import styles from "./project.module.scss";
@@ -18,7 +19,8 @@ type ProjectExperienceProps = {
 
 export function ProjectExperience({ project }: ProjectExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
-  const images = [project.heroImage, ...project.images];
+  const images = getProjectGalleryImages(project);
+  const heroImage = images[0];
 
   useGSAP(
     () => {
@@ -75,8 +77,8 @@ export function ProjectExperience({ project }: ProjectExperienceProps) {
         <div className={styles["project__hero-media"]}>
           <Image
             data-project-image
-            src={project.heroImage.src}
-            alt={project.heroImage.alt}
+            src={heroImage.src}
+            alt={heroImage.alt}
             fill
             priority
             loading="eager"

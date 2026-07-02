@@ -104,9 +104,7 @@ export const projectsQuery = `*[_type == "workProject"] | order(featuredOrder as
   featuredOrder,
   homepageSpan,
   workSpan,
-  heroImage{${imageFields}},
   images[]{
-    layout,
     image{${imageFields}}
   }
 }`;

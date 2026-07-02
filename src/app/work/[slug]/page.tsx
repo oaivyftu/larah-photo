@@ -29,6 +29,13 @@ export async function generateMetadata({
     notFound();
   }
 
+  const openGraphImage = project.images[0] ?? {
+    src: project.image,
+    alt: project.alt,
+    width: project.width,
+    height: project.height,
+  };
+
   return {
     title: `${project.title} | Work | Larah Photo`,
     description:
@@ -39,10 +46,10 @@ export async function generateMetadata({
       description: project.description,
       images: [
         {
-          url: project.heroImage.src,
-          width: project.heroImage.width,
-          height: project.heroImage.height,
-          alt: project.heroImage.alt,
+          url: openGraphImage.src,
+          width: openGraphImage.width,
+          height: openGraphImage.height,
+          alt: openGraphImage.alt,
         },
       ],
     },

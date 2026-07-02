@@ -31,7 +31,16 @@ export function HomeExperience({
   const rootRef = useRef<HTMLElement>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const heroProject = projects[0];
-  const heroImage = content.heroImage ?? heroProject?.heroImage ?? content.closingImage;
+  const heroImage =
+    content.heroImage ??
+    (heroProject
+      ? {
+          src: heroProject.image,
+          alt: heroProject.alt,
+          width: heroProject.width,
+          height: heroProject.height,
+        }
+      : content.closingImage);
 
   useGSAP(
     () => {
