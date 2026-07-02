@@ -11,16 +11,6 @@ type SiteFooterProps = {
 export function SiteFooter({ settings }: SiteFooterProps) {
   return (
     <footer className={styles["site-footer"]}>
-      <div className={styles["site-footer__marquee"]} aria-label="Social update">
-        <div className={styles["site-footer__marquee-track"]}>
-          <span>Check out our latest news on Facebook</span>
-          <span aria-hidden="true">-&gt;</span>
-          <span>https://www.facebook.com/hoanglanmotor</span>
-          <span>Check out our latest news on Facebook</span>
-          <span aria-hidden="true">-&gt;</span>
-          <span>https://www.facebook.com/hoanglanmotor</span>
-        </div>
-      </div>
       <div className={styles["site-footer__inner"]}>
         <p className={styles["site-footer__statement"]}>
           WE BELIEVE IN THE POWER OF DIGITAL, AND WE LOVE COLLABORATING WITH BRANDS THAT FEEL THE SAME. LET&apos;S CONNECT.

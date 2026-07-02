@@ -3,8 +3,7 @@
   --home-paper-soft: var(--color-paper);
   --home-ink: var(--color-ink);
   --home-muted: var(--color-muted);
-  --home-line: color-mix(in srgb, var(--color-ink) 18%, transparent);
-  --home-red: var(--color-accent-red);
+  --home-line: var(--color-line-soft);
   color: var(--home-ink);
   background: var(--home-paper);
   overflow: clip;
@@ -84,7 +83,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding-top: 0.8rem;
-  border-top: 1px solid color-mix(in srgb, var(--color-paper) 55%, transparent);
+  border-top: 1px solid var(--color-line-soft);
   font-size: var(--font-size-xs);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -279,7 +278,7 @@
 }
 
 .services__header .eyebrow {
-  color: color-mix(in srgb, var(--color-paper) 62%, transparent);
+  color: var(--color-paper);
 }
 
 .services__track {
@@ -297,13 +296,13 @@
   gap: 1.5rem;
   flex: 0 0 auto;
   padding: clamp(1.1rem, 2vw, 2rem);
-  border: 1px solid color-mix(in srgb, var(--color-paper) 20%, transparent);
+  border: 1px solid var(--color-paper);
   border-radius: 0.35rem;
-  background: color-mix(in srgb, var(--color-paper) 7%, transparent);
+  background: transparent;
 }
 
 .service-card > span {
-  color: var(--home-red);
+  color: var(--color-paper);
   font-family: var(--font-serif);
   font-size: clamp(3rem, 6vw, 6rem);
   line-height: 0.8;
@@ -318,7 +317,7 @@
 
 .service-card p,
 .service-card li {
-  color: color-mix(in srgb, var(--color-paper) 70%, transparent);
+  color: var(--color-paper);
   font-size: var(--font-size-sm);
   font-weight: 600;
   line-height: 1.35;
@@ -355,12 +354,12 @@
   background:
     linear-gradient(
       90deg,
-      color-mix(in srgb, var(--color-ink) 65%, transparent),
-      color-mix(in srgb, var(--color-ink) 14%, transparent) 62%
+      var(--color-ink),
+      transparent 62%
     ),
     linear-gradient(
       0deg,
-      color-mix(in srgb, var(--color-ink) 55%, transparent),
+      var(--color-ink),
       transparent 54%
     );
   content: "";
@@ -377,7 +376,7 @@
 }
 
 .closing__copy .eyebrow {
-  color: color-mix(in srgb, var(--color-paper) 70%, transparent);
+  color: var(--color-paper);
 }
 
 .closing__copy a {
