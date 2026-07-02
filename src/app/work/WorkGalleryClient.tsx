@@ -8,7 +8,6 @@ import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGr
 import { WorkProjectGallery } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
 import { formatWorkCategory } from "@/data/work";
 import type { Project } from "@/types/project";
-import type { WorkPageContent } from "@/types/site";
 import styles from "./work.module.scss";
 
 gsap.registerPlugin(useGSAP);
@@ -16,11 +15,10 @@ gsap.registerPlugin(useGSAP);
 const ALL_FILTER = "all";
 
 type WorkGalleryClientProps = {
-  content: WorkPageContent;
   projects: Project[];
 };
 
-export function WorkGalleryClient({ content, projects }: WorkGalleryClientProps) {
+export function WorkGalleryClient({ projects }: WorkGalleryClientProps) {
   const rootRef = useRef<HTMLElement>(null);
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -38,19 +36,41 @@ export function WorkGalleryClient({ content, projects }: WorkGalleryClientProps)
 
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
+      const intro = gsap.timeline({ paused: true });
 
-      mm.add("(min-width: 901px) and (prefers-reduced-motion: no-preference)", () => {
-        gsap.from("[data-work-title] span", {
-          yPercent: 105,
+      intro
+        .from("[data-page-heading] > span", {
+          yPercent: 115,
           opacity: 0,
-          duration: 0.78,
-          stagger: 0.045,
+          rotate: 2,
+          duration: 0.82,
+          stagger: 0.07,
           ease: "power4.out",
-        });
-      });
+        })
+        .from(
+          "[data-work-filter], [data-work-card]",
+          {
+            y: 28,
+            opacity: 0,
+            duration: 0.72,
+            stagger: 0.035,
+            ease: "power3.out",
+          },
+          "-=0.38",
+        );
 
-      return () => mm.revert();
+      const playIntro = () => intro.play(0);
+
+      if (document.documentElement.dataset.pageTransition === "ready") {
+        requestAnimationFrame(playIntro);
+      } else {
+        window.addEventListener("larah:page-ready", playIntro, { once: true });
+      }
+
+      return () => {
+        window.removeEventListener("larah:page-ready", playIntro);
+        intro.kill();
+      };
     },
     { scope: rootRef },
   );
@@ -58,17 +78,13 @@ export function WorkGalleryClient({ content, projects }: WorkGalleryClientProps)
   return (
     <section className={styles["work-page"]} ref={rootRef} aria-labelledby="work-title">
       <div className={styles["work-page__hero"]}>
-        <p className={styles["work-page__eyebrow"]}>{content.eyebrow}</p>
-        <h1 className={styles["work-page__title"]} data-work-title id="work-title">
-          {content.titleWords.map((word) => (
-            <span key={word}>
-              <span>{word}</span>
-            </span>
-          ))}
+        <h1 className={styles["work-page__title"]} data-page-heading id="work-title">
+          <span>Recent Work&nbsp;-</span>
+          <span>Enjoy!</span>
         </h1>
       </div>
 
-      <div className={styles["work-page__toolbar"]}>
+      <div className={styles["work-page__toolbar"]} data-work-filter>
         <WorkFilters
           activeFilter={activeFilter}
           filters={filters}

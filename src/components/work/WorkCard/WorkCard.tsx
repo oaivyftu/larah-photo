@@ -47,6 +47,7 @@ export function WorkCard({
       className={`${styles["work-card"]} ${styles[`work-card--${variant}`]} ${
         className ?? ""
       }`}
+      data-work-card
       data-work-category={project.category}
     >
       {onSelectProject ? (

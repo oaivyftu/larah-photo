@@ -10,15 +10,15 @@
   -webkit-mask-image: linear-gradient(
     90deg,
     transparent 0,
-    #000 8%,
-    #000 92%,
+    var(--color-ink) 8%,
+    var(--color-ink) 92%,
     transparent 100%
   );
   mask-image: linear-gradient(
     90deg,
     transparent 0,
-    #000 8%,
-    #000 92%,
+    var(--color-ink) 8%,
+    var(--color-ink) 92%,
     transparent 100%
   );
 }
@@ -103,15 +103,15 @@
     -webkit-mask-image: linear-gradient(
       90deg,
       transparent 0,
-      #000 12%,
-      #000 88%,
+      var(--color-ink) 12%,
+      var(--color-ink) 88%,
       transparent 100%
     );
     mask-image: linear-gradient(
       90deg,
       transparent 0,
-      #000 12%,
-      #000 88%,
+      var(--color-ink) 12%,
+      var(--color-ink) 88%,
       transparent 100%
     );
   }

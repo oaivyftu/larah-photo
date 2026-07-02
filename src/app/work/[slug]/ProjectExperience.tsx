@@ -25,6 +25,42 @@ export function ProjectExperience({ project }: ProjectExperienceProps) {
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
+      const intro = gsap.timeline({ paused: true });
+
+      intro
+        .from("[data-project-meta]", {
+          y: 20,
+          opacity: 0,
+          duration: 0.58,
+          ease: "power3.out",
+        })
+        .from(
+          "[data-project-title]",
+          {
+            yPercent: 18,
+            opacity: 0,
+            duration: 0.82,
+            ease: "power4.out",
+          },
+          "-=0.28",
+        )
+        .from(
+          "[data-project-image]",
+          {
+            scale: 1.08,
+            duration: 1,
+            ease: "power3.out",
+          },
+          "-=0.78",
+        );
+
+      const playIntro = () => intro.play(0);
+
+      if (document.documentElement.dataset.pageTransition === "ready") {
+        requestAnimationFrame(playIntro);
+      } else {
+        window.addEventListener("larah:page-ready", playIntro, { once: true });
+      }
 
       mm.add("(min-width: 901px) and (prefers-reduced-motion: no-preference)", () => {
         gsap
@@ -58,7 +94,11 @@ export function ProjectExperience({ project }: ProjectExperienceProps) {
         });
       });
 
-      return () => mm.revert();
+      return () => {
+        window.removeEventListener("larah:page-ready", playIntro);
+        intro.kill();
+        mm.revert();
+      };
     },
     { scope: rootRef },
   );

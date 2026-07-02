@@ -10,7 +10,7 @@
   display: grid;
   place-items: stretch;
   padding: clamp(0.75rem, 2vw, 2rem);
-  background: rgba(0, 0, 0, 0.38);
+  background: color-mix(in srgb, var(--color-ink) 38%, transparent);
 }
 
 .work-project-gallery--page {
@@ -132,7 +132,7 @@
   width: 2.75rem;
   height: 2.75rem;
   color: var(--color-ink);
-  background: rgba(255, 255, 255, 0.86);
+  background: color-mix(in srgb, var(--color-paper) 86%, transparent);
   border-radius: 50%;
 }
 
@@ -163,7 +163,7 @@
   width: 0.5rem;
   height: 0.5rem;
   margin: 0;
-  background: rgba(255, 255, 255, 0.42);
+  background: color-mix(in srgb, var(--color-paper) 42%, transparent);
 }
 
 .work-project-gallery__carousel :global(.flickity-page-dot.is-selected) {
@@ -182,7 +182,7 @@
   min-width: 0;
   margin: 0;
   overflow: hidden;
-  background: #1a1a1a;
+  background: var(--color-ink-soft);
   contain: layout paint;
   margin-right: clamp(1rem, 2.2vw, 2rem);
   -webkit-user-drag: none;

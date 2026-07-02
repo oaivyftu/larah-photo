@@ -5,114 +5,103 @@ import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { ServicePackage } from "@/types/service";
-import type { ServicePageContent } from "@/types/site";
 import styles from "./service.module.scss";
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+gsap.registerPlugin(useGSAP);
 
 type ServiceExperienceProps = {
-  content: ServicePageContent;
   services: ServicePackage[];
 };
 
-export function ServiceExperience({ content, services }: ServiceExperienceProps) {
+export function ServiceExperience({ services }: ServiceExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
+      const intro = gsap.timeline({ paused: true });
 
-      mm.add("(min-width: 901px) and (prefers-reduced-motion: no-preference)", () => {
-        gsap.from("[data-service-title] span", {
-          yPercent: 110,
+      intro
+        .from("[data-page-heading] > span", {
+          yPercent: 115,
           opacity: 0,
-          rotate: 4,
-          duration: 1,
-          stagger: 0.08,
+          rotate: 2,
+          duration: 0.82,
+          stagger: 0.07,
           ease: "power4.out",
-        });
-
-        const track = document.querySelector<HTMLElement>("[data-service-track]");
-
-        if (track) {
-          const distance = () => track.scrollWidth - window.innerWidth;
-
-          gsap.to(track, {
-            x: () => -Math.max(distance(), 0),
-            ease: "none",
-            scrollTrigger: {
-              trigger: "[data-service-pin]",
-              start: "top top",
-              end: () => `+=${Math.max(distance(), window.innerHeight * 1.4)}`,
-              pin: true,
-              scrub: 1,
-              invalidateOnRefresh: true,
-            },
-          });
-        }
-
-        gsap.to("[data-service-image]", {
-          scale: 1,
-          yPercent: -8,
-          ease: "none",
-          scrollTrigger: {
-            trigger: "[data-service-image]",
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
+        })
+        .from(
+          "[data-service-row]",
+          {
+            y: 38,
+            opacity: 0,
+            duration: 0.76,
+            stagger: 0.12,
+            ease: "power3.out",
           },
-        });
-      });
+          "-=0.4",
+        );
 
-      return () => mm.revert();
+      const playIntro = () => intro.play(0);
+
+      if (document.documentElement.dataset.pageTransition === "ready") {
+        requestAnimationFrame(playIntro);
+      } else {
+        window.addEventListener("larah:page-ready", playIntro, { once: true });
+      }
+
+      return () => {
+        window.removeEventListener("larah:page-ready", playIntro);
+        intro.kill();
+      };
     },
     { scope: rootRef },
   );
 
   return (
     <main className={styles["service"]} ref={rootRef}>
-      <section className={styles["service__hero"]}>
-        <p className={styles["service__eyebrow"]}>{content.eyebrow}</p>
-        <h1 className={styles["service__title"]} data-service-title>
-          {content.titleWords.map((word) => (
-            <span key={word}>
-              <span>{word}</span>
-            </span>
-          ))}
+      <section className={styles["service__header"]} aria-labelledby="service-title">
+        <h1 className={styles["service__title"]} data-page-heading id="service-title">
+          <span>Service&nbsp;-</span>
+          <span>Enjoy!</span>
         </h1>
       </section>
 
-      <section className={styles["service__pin"]} data-service-pin>
-        <div className={styles["service__track"]} data-service-track>
-          {services.map((service) => (
-            <article className={styles["service-card"]} key={service.id}>
-              <span>{service.index}</span>
+      <section className={styles["service__list"]} aria-label="Photography services">
+        {services.map((service) => (
+          <article className={styles["service-row"]} data-service-row key={service.id}>
+            <span className={styles["service-row__index"]}>{service.index}</span>
+
+            <div className={styles["service-row__summary"]}>
               <h2>{service.title}</h2>
               <p>{service.description}</p>
+              <Link data-transition-label="Contact" href={service.ctaHref}>
+                BOOK NOW <span aria-hidden="true">-&gt;</span>
+              </Link>
+            </div>
+
+            <div className={styles["service-row__media"]}>
+              <Image
+                src={service.image}
+                alt={service.imageAlt}
+                fill
+                sizes="(max-width: 900px) calc(100vw - 48px), 31vw"
+              />
+            </div>
+
+            <div className={styles["service-row__details"]}>
               <ul>
                 {service.features.map((feature) => (
                   <li key={feature}>{feature}</li>
                 ))}
               </ul>
-              <Link data-transition-label="Contact" href={service.ctaHref}>
-                From ${service.price}
-              </Link>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles["service__image-panel"]}>
-        <Image
-          data-service-image
-          src={content.image.src}
-          alt={content.image.alt}
-          fill
-          sizes="100vw"
-        />
-        <p>{content.imageCopy}</p>
+              <div>
+                <span>STARTING FROM</span>
+                <strong>${service.price}</strong>
+              </div>
+            </div>
+          </article>
+        ))}
       </section>
     </main>
   );

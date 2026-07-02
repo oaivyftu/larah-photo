@@ -1,10 +1,10 @@
 .home {
-  --home-paper: #f3eee5;
-  --home-paper-soft: #fbf8f1;
-  --home-ink: #11100e;
-  --home-muted: #756f66;
-  --home-line: rgb(17 16 14 / 18%);
-  --home-red: #d33b2f;
+  --home-paper: var(--color-paper);
+  --home-paper-soft: var(--color-paper);
+  --home-ink: var(--color-ink);
+  --home-muted: var(--color-muted);
+  --home-line: color-mix(in srgb, var(--color-ink) 18%, transparent);
+  --home-red: var(--color-accent-red);
   color: var(--home-ink);
   background: var(--home-paper);
   overflow: clip;
@@ -65,7 +65,7 @@
   min-height: clamp(32rem, 74svh, 48rem);
   overflow: hidden;
   border-radius: 0.3rem;
-  background: #181613;
+  background: var(--color-ink);
   color: var(--home-paper-soft);
   clip-path: inset(0 0 0 0);
 }
@@ -84,7 +84,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding-top: 0.8rem;
-  border-top: 1px solid rgb(251 248 241 / 55%);
+  border-top: 1px solid color-mix(in srgb, var(--color-paper) 55%, transparent);
   font-size: var(--font-size-xs);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -178,7 +178,7 @@
   position: absolute;
   overflow: hidden;
   border-radius: 0.3rem;
-  background: #302b25;
+  background: var(--color-ink-soft);
 }
 
 .manifesto__image-one {
@@ -279,7 +279,7 @@
 }
 
 .services__header .eyebrow {
-  color: rgb(251 248 241 / 62%);
+  color: color-mix(in srgb, var(--color-paper) 62%, transparent);
 }
 
 .services__track {
@@ -297,9 +297,9 @@
   gap: 1.5rem;
   flex: 0 0 auto;
   padding: clamp(1.1rem, 2vw, 2rem);
-  border: 1px solid rgb(251 248 241 / 20%);
+  border: 1px solid color-mix(in srgb, var(--color-paper) 20%, transparent);
   border-radius: 0.35rem;
-  background: rgb(251 248 241 / 7%);
+  background: color-mix(in srgb, var(--color-paper) 7%, transparent);
 }
 
 .service-card > span {
@@ -318,7 +318,7 @@
 
 .service-card p,
 .service-card li {
-  color: rgb(251 248 241 / 70%);
+  color: color-mix(in srgb, var(--color-paper) 70%, transparent);
   font-size: var(--font-size-sm);
   font-weight: 600;
   line-height: 1.35;
@@ -340,7 +340,7 @@
   min-height: 100svh;
   align-items: end;
   color: var(--home-paper-soft);
-  background: #171512;
+  background: var(--color-ink);
   overflow: hidden;
 }
 
@@ -353,8 +353,16 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgb(0 0 0 / 65%), rgb(0 0 0 / 14%) 62%),
-    linear-gradient(0deg, rgb(0 0 0 / 55%), transparent 54%);
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-ink) 65%, transparent),
+      color-mix(in srgb, var(--color-ink) 14%, transparent) 62%
+    ),
+    linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--color-ink) 55%, transparent),
+      transparent 54%
+    );
   content: "";
 }
 
@@ -369,7 +377,7 @@
 }
 
 .closing__copy .eyebrow {
-  color: rgb(251 248 241 / 70%);
+  color: color-mix(in srgb, var(--color-paper) 70%, transparent);
 }
 
 .closing__copy a {

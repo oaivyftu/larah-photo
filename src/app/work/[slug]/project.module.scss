@@ -1,6 +1,6 @@
 .project {
-  background: #f6f1e8;
-  color: #11100e;
+  background: var(--color-paper);
+  color: var(--color-ink);
   overflow: clip;
 }
 
@@ -10,8 +10,8 @@
   min-height: 100svh;
   align-items: end;
   overflow: hidden;
-  color: #f6f1e8;
-  background: #11100e;
+  color: var(--color-paper);
+  background: var(--color-ink);
 }
 
 .project__hero-media {
@@ -23,8 +23,16 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgb(0 0 0 / 70%), rgb(0 0 0 / 10%) 64%),
-    linear-gradient(0deg, rgb(0 0 0 / 64%), transparent 52%);
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-ink) 70%, transparent),
+      color-mix(in srgb, var(--color-ink) 10%, transparent) 64%
+    ),
+    linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--color-ink) 64%, transparent),
+      transparent 52%
+    );
   content: "";
 }
 
@@ -53,7 +61,7 @@
 }
 
 .project__eyebrow {
-  color: rgb(246 241 232 / 70%);
+  color: color-mix(in srgb, var(--color-paper) 70%, transparent);
 }
 
 .project__title {
@@ -72,7 +80,7 @@
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
   padding: clamp(4rem, 8vw, 8rem) 0;
-  border-bottom: 1px solid rgb(17 16 14 / 16%);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 16%, transparent);
 }
 
 .project__details dl {
@@ -84,12 +92,12 @@
   display: grid;
   grid-template-columns: 8rem 1fr;
   gap: 1rem;
-  border-top: 1px solid rgb(17 16 14 / 16%);
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 16%, transparent);
   padding-top: 1rem;
 }
 
 .project__details dt {
-  color: #756f66;
+  color: var(--color-muted);
 }
 
 .project__details dd,
@@ -119,7 +127,7 @@
   grid-column: span 7;
   overflow: hidden;
   border-radius: 0.35rem;
-  background: #ddd3c4;
+  background: var(--color-line-soft);
 }
 
 .project-frame:nth-child(even) {

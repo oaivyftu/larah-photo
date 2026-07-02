@@ -22,7 +22,7 @@ export const fallbackSiteSettings: SiteSettings = {
   }`,
   email: "hoanglanmotor@gmail.com",
   phone: "+1 (226) 977-2845",
-  location: "London, ON, Canada",
+  location: "680 Wonderland Road North",
   footerStatement:
-    "READY TO PLAN SOMETHING BEAUTIFUL? INSTAGRAM IS THE FASTEST WAY TO START YOUR SESSION.",
+    "WE BELIEVE IN THE POWER OF DIGITAL, AND WE LOVE COLLABORATING WITH BRANDS THAT FEEL THE SAME. LET'S CONNECT.",
 };

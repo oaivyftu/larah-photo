@@ -1,16 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MainNav } from "@/components/navigation/MainNav/MainNav";
-import type { SiteSettings } from "@/types/site";
 import styles from "./SiteHeader.module.scss";
 
 type SiteHeaderProps = {
   activeHref?: string;
   hideBrand?: boolean;
-  settings: SiteSettings;
 };
 
-export function SiteHeader({ activeHref, hideBrand = false, settings }: SiteHeaderProps) {
+export function SiteHeader({ activeHref, hideBrand = false }: SiteHeaderProps) {
   return (
     <header className={styles["site-header"]}>
       {hideBrand ? (
@@ -31,14 +29,6 @@ export function SiteHeader({ activeHref, hideBrand = false, settings }: SiteHead
         </Link>
       )}
       <MainNav activeHref={activeHref} />
-      <a
-        className={styles["site-header__cta"]}
-        href={settings.instagramUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Message on Instagram
-      </a>
     </header>
   );
 }

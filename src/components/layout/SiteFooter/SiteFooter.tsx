@@ -11,43 +11,42 @@ type SiteFooterProps = {
 export function SiteFooter({ settings }: SiteFooterProps) {
   return (
     <footer className={styles["site-footer"]}>
+      <div className={styles["site-footer__marquee"]} aria-label="Social update">
+        <div className={styles["site-footer__marquee-track"]}>
+          <span>Check out our latest news on Facebook</span>
+          <span aria-hidden="true">-&gt;</span>
+          <span>https://www.facebook.com/hoanglanmotor</span>
+          <span>Check out our latest news on Facebook</span>
+          <span aria-hidden="true">-&gt;</span>
+          <span>https://www.facebook.com/hoanglanmotor</span>
+        </div>
+      </div>
       <div className={styles["site-footer__inner"]}>
         <p className={styles["site-footer__statement"]}>
-          {settings.footerStatement}
+          WE BELIEVE IN THE POWER OF DIGITAL, AND WE LOVE COLLABORATING WITH BRANDS THAT FEEL THE SAME. LET&apos;S CONNECT.
         </p>
-        <div className={styles["site-footer__cta-group"]}>
-          <span className={styles["site-footer__label"]}>BOOKING</span>
-          <a
-            className={styles["site-footer__cta"]}
-            href={settings.instagramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Message on Instagram
-          </a>
-        </div>
         <address className={styles["site-footer__contact"]}>
           <span className={styles["site-footer__label"]}>BUSINESS ENQUIRIES</span>
-          <a href={`mailto:${settings.email}`}>{settings.email}</a>
+          <a href="mailto:hoanglanmotor@gmail.com">hoanglanmotor@gmail.com</a>
           <a href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`}>
             {settings.phone}
           </a>
         </address>
         <address className={styles["site-footer__contact"]}>
-          <span className={styles["site-footer__label"]}>SOCIAL</span>
-          <span>{settings.location}</span>
+          <span className={styles["site-footer__label"]}>BUSINESS ENQUIRIES</span>
+          <span>680 Wonderland Road North</span>
           <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
-            {settings.instagramDisplayUrl}
+            Larahatelier.photography
           </a>
         </address>
       </div>
       <div className={styles["site-footer__bar"]}>
-        <span>LARAHPHOTO® ©2026</span>
+        <span>DASHDIGITAL® ©2026</span>
         <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
-          INSTAGRAM
+          DRIBBBLE
         </a>
-        <Link href="/contact#book">EMAIL INQUIRY</Link>
-        <Link href="/work">WORK</Link>
+        <Link href="/contact#book">DRIBBBLE</Link>
+        <Link href="/work">DRIBBBLE</Link>
         <a className={styles["site-footer__back-to-top"]} href="#top">
           <span>BACK TO TOP</span>
           <Icon
