@@ -46,11 +46,11 @@
 
 @media (max-width: 720px) {
   .site-header {
+    display: grid;
+    grid-template-columns: 1fr;
     min-height: auto;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: var(--space-lg);
-    padding-top: var(--space-md);
+    gap: 0.8rem;
+    padding: 1rem var(--page-gutter) 0.75rem;
   }
 
   .site-header__brand {
@@ -59,13 +59,23 @@
     flex-basis: 4.75rem;
   }
 
+  .site-header__brand--hidden {
+    display: none;
+  }
+
   .site-header__cta {
-    margin-left: auto;
+    justify-self: start;
+    margin-left: 0;
   }
 }
 
 @media (max-width: 560px) {
+  .site-header {
+    gap: 0.7rem;
+  }
+
   .site-header__cta {
+    width: 100%;
     font-size: var(--font-size-xs);
     padding: 0.5rem 0.65rem;
   }

@@ -1,15 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MainNav } from "@/components/navigation/MainNav/MainNav";
-import { instagramUrl } from "@/data/social";
+import type { SiteSettings } from "@/types/site";
 import styles from "./SiteHeader.module.scss";
 
 type SiteHeaderProps = {
   activeHref?: string;
   hideBrand?: boolean;
+  settings: SiteSettings;
 };
 
-export function SiteHeader({ activeHref, hideBrand = false }: SiteHeaderProps) {
+export function SiteHeader({ activeHref, hideBrand = false, settings }: SiteHeaderProps) {
   return (
     <header className={styles["site-header"]}>
       {hideBrand ? (
@@ -32,7 +33,7 @@ export function SiteHeader({ activeHref, hideBrand = false }: SiteHeaderProps) {
       <MainNav activeHref={activeHref} />
       <a
         className={styles["site-header__cta"]}
-        href={instagramUrl}
+        href={settings.instagramUrl}
         target="_blank"
         rel="noopener noreferrer"
       >

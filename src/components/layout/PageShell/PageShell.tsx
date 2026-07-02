@@ -1,6 +1,6 @@
 import { SiteFooter } from "@/components/layout/SiteFooter/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader/SiteHeader";
-import { SocialMarquee } from "@/components/layout/SocialMarquee/SocialMarquee";
+import { getSiteSettings } from "@/sanity/fetchers";
 import styles from "./PageShell.module.scss";
 
 type PageShellProps = {
@@ -17,19 +17,23 @@ const activeHrefByVariant: Record<PageShellProps["variant"], string> = {
   contact: "/contact",
 };
 
-export function PageShell({ children, variant }: PageShellProps) {
+export async function PageShell({ children, variant }: PageShellProps) {
+  const settings = await getSiteSettings();
   const isHome = variant === "home";
 
   return (
     <div className={styles["page-shell"]} id="top">
-      <SiteHeader activeHref={activeHrefByVariant[variant]} hideBrand={isHome} />
+      <SiteHeader
+        activeHref={activeHrefByVariant[variant]}
+        hideBrand={isHome}
+        settings={settings}
+      />
       <main
         className={`${styles["page-shell__main"]} ${styles[`page-shell__main--${variant}`]}`}
       >
         {children}
       </main>
-      <SocialMarquee />
-      <SiteFooter />
+      <SiteFooter settings={settings} />
     </div>
   );
 }

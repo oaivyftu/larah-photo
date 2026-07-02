@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageShell } from "@/components/layout/PageShell/PageShell";
-import { WorkProjectGallery } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
-import {
-  formatWorkCategory,
-  getWorkProject,
-  workProjects,
-} from "@/data/work";
+import { formatWorkCategory } from "@/data/work";
+import { getWorkProject, getWorkProjects } from "@/sanity/fetchers";
+import { ProjectExperience } from "./ProjectExperience";
 
 type ProjectPageProps = {
   params: Promise<{
@@ -14,10 +11,10 @@ type ProjectPageProps = {
   }>;
 };
 
-export const dynamicParams = false;
+export async function generateStaticParams() {
+  const projects = await getWorkProjects();
 
-export function generateStaticParams() {
-  return workProjects.map((project) => ({
+  return projects.map((project) => ({
     slug: project.slug,
   }));
 }
@@ -26,7 +23,7 @@ export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getWorkProject(slug);
+  const project = await getWorkProject(slug);
 
   if (!project) {
     notFound();
@@ -54,7 +51,7 @@ export async function generateMetadata({
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = getWorkProject(slug);
+  const project = await getWorkProject(slug);
 
   if (!project) {
     notFound();
@@ -62,7 +59,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <PageShell variant="project">
-      <WorkProjectGallery project={project} />
+      <ProjectExperience project={project} />
     </PageShell>
   );
 }

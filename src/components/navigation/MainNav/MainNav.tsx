@@ -19,6 +19,7 @@ export function MainNav({ activeHref }: MainNavProps) {
               ]
                 .filter(Boolean)
                 .join(" ")}
+              data-transition-label={item.label}
               href={item.href}
             >
               {item.label}

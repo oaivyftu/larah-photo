@@ -23,7 +23,11 @@ export function WorkCard({
       }`}
       data-work-category={project.category}
     >
-      <Link className={styles["work-card__link"]} href={`/work/${project.slug}`}>
+      <Link
+        className={styles["work-card__link"]}
+        data-transition-label={project.title}
+        href={`/work/${project.slug}`}
+      >
         <span className={styles["work-card__media"]}>
           <Image
             className={styles["work-card__image"]}

@@ -1,14 +1,13 @@
 import { PageShell } from "@/components/layout/PageShell/PageShell";
-import { workProjects } from "@/data/work";
+import { getWorkPage, getWorkProjects } from "@/sanity/fetchers";
 import { WorkGalleryClient } from "./WorkGalleryClient";
-import styles from "./work.module.scss";
 
-export default function WorkPage() {
+export default async function WorkPage() {
+  const [content, projects] = await Promise.all([getWorkPage(), getWorkProjects()]);
+
   return (
     <PageShell variant="work">
-      <section className={styles["work-page"]} aria-labelledby="work-title">
-        <WorkGalleryClient projects={workProjects} />
-      </section>
+      <WorkGalleryClient content={content} projects={projects} />
     </PageShell>
   );
 }

@@ -16,6 +16,49 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## CMS / Backend
+
+This project uses Sanity as the CMS because it gives editors a hosted admin UI,
+image uploads, asset management, and a simple Content Lake API without running a
+custom database server.
+
+Managed content:
+
+- Site settings: Instagram URL, email, phone, location, footer statement
+- Home page: hero text/images, manifesto copy/images, section headings, closing image
+- Work projects: slug, category, metadata, card image, hero image, gallery images
+- Service packages: package title, description, features, price, CTA
+- About page: title, portraits, notes, story paragraphs
+- Contact page: title, cards, contact image, inquiry copy
+
+Create or connect a Sanity project:
+
+```bash
+npx sanity@latest init
+```
+
+Use `/studio` as the Studio route when prompted. Then copy `.env.example` to
+`.env.local` and fill in:
+
+```bash
+NEXT_PUBLIC_SANITY_PROJECT_ID=your_sanity_project_id
+NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2026-07-01
+```
+
+Run the site and open the Studio:
+
+```bash
+npm run dev
+```
+
+- Website: [http://localhost:3000](http://localhost:3000)
+- CMS admin: [http://localhost:3000/studio](http://localhost:3000/studio)
+
+If Sanity environment variables are missing or the dataset has no documents yet,
+the website falls back to the local content in `src/data/*` so the frontend still
+builds and renders.
+
 ## Contact Form Email
 
 The booking inquiry form sends email from the server through Resend. Add these
