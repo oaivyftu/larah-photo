@@ -19,13 +19,11 @@ const activeHrefByVariant: Record<PageShellProps["variant"], string> = {
 
 export async function PageShell({ children, variant }: PageShellProps) {
   const settings = await getSiteSettings();
-  const isHome = variant === "home";
 
   return (
     <div className={styles["page-shell"]} id="top">
       <SiteHeader
         activeHref={activeHrefByVariant[variant]}
-        hideBrand={isHome}
         settings={settings}
       />
       <main
