@@ -5,6 +5,14 @@
 .work-card__link {
   display: grid;
   gap: var(--space-2xs);
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
 }
 
 .work-card__media {
@@ -19,6 +27,17 @@
   display: block;
   width: 100%;
   height: auto;
+  transition: transform 320ms ease;
+}
+
+.work-card__link:hover .work-card__image,
+.work-card__link:focus-visible .work-card__image {
+  transform: scale(1.025);
+}
+
+.work-card__link:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 0.35rem;
 }
 
 .work-card__title {

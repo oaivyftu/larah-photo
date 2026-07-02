@@ -216,118 +216,51 @@
 
 .stack {
   position: relative;
-  min-height: 100svh;
-  padding: 0;
+  padding: clamp(4rem, 8vw, 7rem) 0 clamp(2rem, 5vw, 4rem);
   background: var(--home-paper-soft);
-  overflow: hidden;
+  overflow: visible;
 }
 
-.stack__intro {
-  position: absolute;
-  top: clamp(1.5rem, 4vw, 3.5rem);
-  left: 50%;
-  z-index: 0;
+.stack__header {
   display: grid;
-  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: end;
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
-  transform: translateX(-50%);
+  margin: 0 auto clamp(1.5rem, 3vw, 2.5rem);
 }
 
-.stack__intro h2,
+.stack__header h2,
 .services__header h2,
 .closing__copy h2 {
   max-width: 58rem;
   font-family: var(--font-serif);
-  font-size: clamp(2.8rem, 7vw, 7.5rem);
+  font-size: clamp(2.4rem, 5.2vw, 6rem);
   font-weight: 400;
   letter-spacing: 0;
-  line-height: 0.86;
+  line-height: 0.92;
 }
 
-.stack__stage {
-  position: relative;
-  height: 100svh;
+.stack__grid {
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
 }
 
-.stack-card {
-  position: absolute;
-  right: 0;
-  bottom: clamp(1.25rem, 3vw, 2.5rem);
-  left: 0;
-  z-index: 1;
-  transform-origin: 50% 100%;
-  will-change: transform, opacity;
+.stack__footer {
+  display: flex;
+  justify-content: center;
+  width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
+  margin: clamp(0.5rem, 2vw, 1.5rem) auto 0;
+  padding-top: clamp(1rem, 2vw, 1.75rem);
+  border-top: 1px solid var(--home-line);
 }
 
-.stack-card__inner {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(4rem, 0.28fr) minmax(18rem, 0.92fr) minmax(14rem, 0.52fr);
-  gap: clamp(1rem, 2.2vw, 2rem);
-  align-items: end;
-  width: 100%;
-  min-height: min(62svh, 44rem);
-  margin: 0 auto;
-  padding: clamp(1rem, 2vw, 2rem);
-  border: 1px solid var(--home-line);
-  border-radius: 0.35rem;
-  background: var(--home-paper);
-  box-shadow: 0 1.8rem 5rem rgb(17 16 14 / 11%);
-  overflow: hidden;
-}
-
-.stack-card__number-mask {
-  height: clamp(3.4rem, 8vw, 7rem);
-  overflow: hidden;
-  align-self: start;
-}
-
-.stack-card__number-mask span {
-  display: block;
-  color: var(--home-red);
-  font-family: var(--font-serif);
-  font-size: clamp(3.8rem, 8vw, 8rem);
-  letter-spacing: 0;
-  line-height: 0.78;
-}
-
-.stack-card__media {
-  position: relative;
-  display: block;
-  height: min(64svh, 42rem);
-  overflow: hidden;
-  border-radius: 0.25rem;
-  background: #d9d0c1;
-}
-
-.stack-card__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.stack-card__copy {
-  display: grid;
-  gap: 0.8rem;
-}
-
-.stack-card__copy span {
-  color: var(--home-muted);
+.stack__footer a {
   font-size: var(--font-size-xs);
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 0.08em;
-  line-height: 1.1;
+  line-height: 1;
   text-transform: uppercase;
-}
-
-.stack-card__copy strong {
-  font-family: var(--font-serif);
-  font-size: clamp(2rem, 4.2vw, 5.5rem);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 0.86;
 }
 
 .services {
@@ -467,40 +400,18 @@
     margin-left: 0;
   }
 
-  .stack-card {
-    position: relative;
-    min-height: auto;
-    padding-bottom: 2rem;
-  }
-
   .stack {
-    min-height: auto;
-    overflow: visible;
     padding: clamp(4rem, 9vw, 7rem) var(--page-gutter);
   }
 
-  .stack__intro {
-    position: static;
+  .stack__header,
+  .stack__grid,
+  .stack__footer {
     width: auto;
-    margin-bottom: 2rem;
-    transform: none;
   }
 
-  .stack__stage {
-    display: grid;
-    gap: 1rem;
-    width: auto;
-    height: auto;
-  }
-
-  .stack-card__inner {
+  .stack__header {
     grid-template-columns: 1fr;
-    min-height: auto;
-  }
-
-  .stack-card__media {
-    height: auto;
-    aspect-ratio: 4 / 5;
   }
 
   .services {
@@ -590,7 +501,7 @@
     text-align: left;
   }
 
-  .stack__intro h2,
+  .stack__header h2,
   .services__header h2,
   .closing__copy h2 {
     font-size: clamp(2.35rem, 12vw, 4.35rem);
@@ -600,20 +511,6 @@
   .stack {
     padding-top: 4rem;
     padding-bottom: 4rem;
-  }
-
-  .stack-card__inner {
-    padding: 0.9rem;
-  }
-
-  .stack-card__number-mask,
-  .stack-card__number-mask span {
-    height: 3.4rem;
-    font-size: 3.8rem;
-  }
-
-  .stack-card__copy strong {
-    font-size: clamp(2.2rem, 12vw, 3.8rem);
   }
 
   .services__header {

@@ -11,6 +11,7 @@ import styles from "./WorkProjectGallery.module.scss";
 type WorkProjectGalleryClientProps = {
   images: ProjectImage[];
   isModal: boolean;
+  onClose?: () => void;
   project: Project;
 };
 
@@ -56,6 +57,7 @@ const GallerySlide = memo(function GallerySlide({
 export function WorkProjectGalleryClient({
   images,
   isModal,
+  onClose,
   project,
 }: WorkProjectGalleryClientProps) {
   const router = useRouter();
@@ -64,8 +66,13 @@ export function WorkProjectGalleryClient({
   const [activeIndex, setActiveIndex] = useState(0);
   const totalLabel = String(images.length).padStart(2, "0");
   const handleClose = useCallback(() => {
+    if (onClose) {
+      onClose();
+      return;
+    }
+
     router.back();
-  }, [router]);
+  }, [onClose, router]);
 
   const slideIds = useMemo(
     () =>
@@ -140,6 +147,9 @@ export function WorkProjectGalleryClient({
       return;
     }
 
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape" || event.defaultPrevented) {
         return;
@@ -152,6 +162,7 @@ export function WorkProjectGalleryClient({
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
+      document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleClose, isModal]);

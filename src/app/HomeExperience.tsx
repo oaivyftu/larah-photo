@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { formatWorkCategory } from "@/data/work";
+import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
+import { WorkProjectGallery } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
 import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
 import type { HomePageContent, SiteSettings } from "@/types/site";
@@ -28,6 +29,7 @@ export function HomeExperience({
   settings,
 }: HomeExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const heroProject = projects[0];
   const heroImage = content.heroImage ?? heroProject?.heroImage ?? content.closingImage;
 
@@ -78,67 +80,6 @@ export function HomeExperience({
           .to("[data-manifesto-image='one']", { yPercent: -16, rotate: -6 }, 0)
           .to("[data-manifesto-image='two']", { yPercent: 18, rotate: 5 }, 0)
           .to("[data-manifesto-copy]", { opacity: 1, y: 0 }, 0.18);
-
-        const cards = gsap.utils.toArray<HTMLElement>("[data-stack-card]");
-        const stackTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: "[data-stack-section]",
-            start: "top top",
-            end: () => `+=${window.innerHeight * cards.length}`,
-            pin: true,
-            scrub: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        gsap.set(cards, {
-          yPercent: 112,
-          scale: 0.86,
-          opacity: 0,
-          rotate: (index) => (index % 2 === 0 ? -3 : 3),
-        });
-
-        cards.forEach((card, index) => {
-          const image = card.querySelector<HTMLElement>("[data-stack-image]");
-          const number = card.querySelector<HTMLElement>("[data-stack-number]");
-          const at = index * 1.18;
-
-          stackTl
-            .to(
-              card,
-              {
-                yPercent: 0,
-                scale: 1,
-                opacity: 1,
-                rotate: 0,
-                duration: 0.82,
-                ease: "power3.out",
-              },
-              at,
-            )
-            .fromTo(
-              image,
-              { scale: 1.2 },
-              { scale: 1.02, duration: 1.1, ease: "power2.out" },
-              at,
-            )
-            .to(number, { yPercent: -130, duration: 0.7, ease: "power2.inOut" }, at + 0.2);
-
-          if (index < cards.length - 1) {
-            stackTl.to(
-              card,
-              {
-                yPercent: -22,
-                scale: 0.84,
-                opacity: 0.28,
-                rotate: index % 2 === 0 ? 1.4 : -1.4,
-                duration: 0.62,
-                ease: "power2.in",
-              },
-              at + 0.86,
-            );
-          }
-        });
 
         const serviceTrack = document.querySelector<HTMLElement>("[data-service-track]");
 
@@ -255,40 +196,20 @@ export function HomeExperience({
       </section>
 
       <section className={styles["stack"]} data-stack-section aria-labelledby="stack-title">
-        <div className={styles["stack__intro"]}>
+        <div className={styles["stack__header"]}>
           <p className={styles["eyebrow"]}>{content.selectedWorkEyebrow}</p>
           <h2 id="stack-title">{content.selectedWorkTitle}</h2>
         </div>
-        <div className={styles["stack__stage"]}>
-          {projects.map((project, index) => (
-            <article className={styles["stack-card"]} data-stack-card key={project.id}>
-              <Link
-                className={styles["stack-card__inner"]}
-                data-transition-label={project.title}
-                href={`/work/${project.slug}`}
-              >
-                <span className={styles["stack-card__number-mask"]}>
-                  <span data-stack-number>{String(index + 1).padStart(2, "0")}</span>
-                </span>
-                <span className={styles["stack-card__media"]}>
-                  <Image
-                    className={styles["stack-card__image"]}
-                    data-stack-image
-                    src={project.image}
-                    alt={project.alt}
-                    width={project.width}
-                    height={project.height}
-                    sizes="(max-width: 760px) calc(100vw - 32px), 54vw"
-                  />
-                </span>
-                <span className={styles["stack-card__copy"]}>
-                  <span>{formatWorkCategory(project.category)}</span>
-                  <strong>{project.title}</strong>
-                  <span>{project.location}</span>
-                </span>
-              </Link>
-            </article>
-          ))}
+        <WorkMasonryGrid
+          className={styles["stack__grid"]}
+          items={projects}
+          onSelectProject={setSelectedProject}
+          variant="homepage"
+        />
+        <div className={styles["stack__footer"]}>
+          <Link data-transition-label="Work" href="/work">
+            View all work
+          </Link>
         </div>
       </section>
 
@@ -335,6 +256,14 @@ export function HomeExperience({
           </a>
         </div>
       </section>
+
+      {selectedProject ? (
+        <WorkProjectGallery
+          isModal
+          onClose={() => setSelectedProject(null)}
+          project={selectedProject}
+        />
+      ) : null}
     </main>
   );
 }
