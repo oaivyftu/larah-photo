@@ -6,12 +6,17 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { InquiryForm } from "@/components/contact/InquiryForm/InquiryForm";
-import { instagramDisplayUrl, instagramUrl } from "@/data/social";
+import type { ContactPageContent, SiteSettings } from "@/types/site";
 import styles from "./contact.module.scss";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-export function ContactExperience() {
+type ContactExperienceProps = {
+  content: ContactPageContent;
+  settings: SiteSettings;
+};
+
+export function ContactExperience({ content, settings }: ContactExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -51,42 +56,40 @@ export function ContactExperience() {
   return (
     <main className={styles["contact"]} ref={rootRef}>
       <section className={styles["contact__hero"]}>
-        <p className={styles["contact__eyebrow"]}>Contact / Booking</p>
+        <p className={styles["contact__eyebrow"]}>{content.eyebrow}</p>
         <h1 className={styles["contact__title"]}>
-          {["Tell", "me", "what", "the", "frame", "should", "feel", "like."].map(
-            (word) => (
-              <span key={word}>
-                <span data-contact-word>{word}</span>
-              </span>
-            ),
-          )}
+          {content.titleWords.map((word) => (
+            <span key={word}>
+              <span data-contact-word>{word}</span>
+            </span>
+          ))}
         </h1>
       </section>
 
       <section className={styles["contact__pin"]} data-contact-pin>
         <p className={styles["contact__large"]} data-contact-large>
-          Start here
+          {content.largeText}
         </p>
         <a
           className={`${styles["contact-card"]} ${styles["contact-card--primary"]}`}
           data-contact-card="one"
-          href={instagramUrl}
+          href={settings.instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span>Fastest route</span>
-          <strong>Message on Instagram</strong>
-          <small>{instagramDisplayUrl}</small>
+          <span>{content.fastestRouteLabel}</span>
+          <strong>{content.fastestRouteTitle}</strong>
+          <small>{settings.instagramDisplayUrl}</small>
         </a>
         <div className={styles["contact-card"]} data-contact-card="two">
-          <span>Based in</span>
-          <strong>London, Ontario</strong>
-          <small>Available for portraits, couples, graduation, brands, and weddings.</small>
+          <span>{content.locationLabel}</span>
+          <strong>{content.locationTitle}</strong>
+          <small>{content.locationDescription}</small>
         </div>
         <div className={styles["contact__image"]}>
           <Image
-            src="/images/figma/optimized/blue-sky-portrait.avif"
-            alt="Two women seated in a green field below blue and white clouds"
+            src={content.image.src}
+            alt={content.image.alt}
             fill
             sizes="(max-width: 760px) 82vw, 32vw"
           />
@@ -95,12 +98,9 @@ export function ContactExperience() {
 
       <section className={styles["contact__form-section"]} id="book">
         <div className={styles["contact__form-copy"]}>
-          <p className={styles["contact__eyebrow"]}>Email Inquiry</p>
-          <h2>Prefer a slower note?</h2>
-          <p>
-            Share a little context, date, location, and the feeling you want the
-            session to carry.
-          </p>
+          <p className={styles["contact__eyebrow"]}>{content.formEyebrow}</p>
+          <h2>{content.formTitle}</h2>
+          <p>{content.formCopy}</p>
         </div>
         <div className={styles["contact__form-panel"]}>
           <InquiryForm />

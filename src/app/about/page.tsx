@@ -1,10 +1,13 @@
 import { PageShell } from "@/components/layout/PageShell/PageShell";
+import { getAboutPage } from "@/sanity/fetchers";
 import { AboutExperience } from "./AboutExperience";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const content = await getAboutPage();
+
   return (
     <PageShell variant="about">
-      <AboutExperience />
+      <AboutExperience content={content} />
     </PageShell>
   );
 }

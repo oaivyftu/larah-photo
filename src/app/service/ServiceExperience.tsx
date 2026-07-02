@@ -7,15 +7,17 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { ServicePackage } from "@/types/service";
+import type { ServicePageContent } from "@/types/site";
 import styles from "./service.module.scss";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type ServiceExperienceProps = {
+  content: ServicePageContent;
   services: ServicePackage[];
 };
 
-export function ServiceExperience({ services }: ServiceExperienceProps) {
+export function ServiceExperience({ content, services }: ServiceExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -72,9 +74,9 @@ export function ServiceExperience({ services }: ServiceExperienceProps) {
   return (
     <main className={styles["service"]} ref={rootRef}>
       <section className={styles["service__hero"]}>
-        <p className={styles["service__eyebrow"]}>Services / Session design</p>
+        <p className={styles["service__eyebrow"]}>{content.eyebrow}</p>
         <h1 className={styles["service__title"]} data-service-title>
-          {["Packages", "for", "stories", "with", "shape."].map((word) => (
+          {content.titleWords.map((word) => (
             <span key={word}>
               <span>{word}</span>
             </span>
@@ -105,12 +107,12 @@ export function ServiceExperience({ services }: ServiceExperienceProps) {
       <section className={styles["service__image-panel"]}>
         <Image
           data-service-image
-          src="/images/services/service-package.jpg"
-          alt="Photography package detail"
+          src={content.image.src}
+          alt={content.image.alt}
           fill
           sizes="100vw"
         />
-        <p>Custom photography is available for intimate events, brands, and stories that need a different rhythm.</p>
+        <p>{content.imageCopy}</p>
       </section>
     </main>
   );

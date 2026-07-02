@@ -1,22 +1,25 @@
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { icons } from "@/constants/icons";
-import { instagramDisplayUrl, instagramUrl } from "@/data/social";
+import type { SiteSettings } from "@/types/site";
 import styles from "./SiteFooter.module.scss";
 
-export function SiteFooter() {
+type SiteFooterProps = {
+  settings: SiteSettings;
+};
+
+export function SiteFooter({ settings }: SiteFooterProps) {
   return (
     <footer className={styles["site-footer"]}>
       <div className={styles["site-footer__inner"]}>
         <p className={styles["site-footer__statement"]}>
-          READY TO PLAN SOMETHING BEAUTIFUL? INSTAGRAM IS THE FASTEST WAY TO
-          START YOUR SESSION.
+          {settings.footerStatement}
         </p>
         <div className={styles["site-footer__cta-group"]}>
           <span className={styles["site-footer__label"]}>BOOKING</span>
           <a
             className={styles["site-footer__cta"]}
-            href={instagramUrl}
+            href={settings.instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -25,20 +28,22 @@ export function SiteFooter() {
         </div>
         <address className={styles["site-footer__contact"]}>
           <span className={styles["site-footer__label"]}>BUSINESS ENQUIRIES</span>
-          <a href="mailto:hoanglanmotor@gmail.com">hoanglanmotor@gmail.com</a>
-          <a href="tel:+12269772845">+1 (226) 977-2845</a>
+          <a href={`mailto:${settings.email}`}>{settings.email}</a>
+          <a href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`}>
+            {settings.phone}
+          </a>
         </address>
         <address className={styles["site-footer__contact"]}>
           <span className={styles["site-footer__label"]}>SOCIAL</span>
-          <span>London, ON, Canada</span>
-          <a href={instagramUrl} target="_blank" rel="noopener noreferrer">
-            {instagramDisplayUrl}
+          <span>{settings.location}</span>
+          <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
+            {settings.instagramDisplayUrl}
           </a>
         </address>
       </div>
       <div className={styles["site-footer__bar"]}>
         <span>LARAHPHOTO® ©2026</span>
-        <a href={instagramUrl} target="_blank" rel="noopener noreferrer">
+        <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
           INSTAGRAM
         </a>
         <Link href="/contact#book">EMAIL INQUIRY</Link>

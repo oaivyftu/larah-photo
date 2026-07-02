@@ -5,17 +5,16 @@ import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import type { AboutPageContent } from "@/types/site";
 import styles from "./about.module.scss";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const notes = [
-  "Direction that feels calm, never staged.",
-  "Warm textures, honest expressions, and space to breathe.",
-  "A visual rhythm shaped around the person in front of the lens.",
-];
+type AboutExperienceProps = {
+  content: AboutPageContent;
+};
 
-export function AboutExperience() {
+export function AboutExperience({ content }: AboutExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -56,9 +55,9 @@ export function AboutExperience() {
   return (
     <main className={styles["about"]} ref={rootRef}>
       <section className={styles["about__hero"]}>
-        <p className={styles["about__eyebrow"]}>About / Larah Photo</p>
+        <p className={styles["about__eyebrow"]}>{content.eyebrow}</p>
         <h1 className={styles["about__title"]}>
-          {["A", "camera", "with", "a", "quiet", "heart."].map((word) => (
+          {content.titleWords.map((word) => (
             <span key={word}>
               <span data-about-word>{word}</span>
             </span>
@@ -68,26 +67,26 @@ export function AboutExperience() {
 
       <section className={styles["about__pin"]} data-about-pin>
         <p className={styles["about__large"]} data-about-large>
-          Presence before pose.
+          {content.largeText}
         </p>
         <div className={styles["about__portrait-one"]} data-about-portrait="one">
           <Image
-            src="/images/figma/optimized/larah-about.avif"
-            alt="Larah portrait in warm sunset light"
+            src={content.portraitOne.src}
+            alt={content.portraitOne.alt}
             fill
             sizes="(max-width: 760px) 72vw, 28vw"
           />
         </div>
         <div className={styles["about__portrait-two"]} data-about-portrait="two">
           <Image
-            src="/images/figma/optimized/home-portrait.avif"
-            alt="Portrait session detail"
+            src={content.portraitTwo.src}
+            alt={content.portraitTwo.alt}
             fill
             sizes="(max-width: 760px) 52vw, 18vw"
           />
         </div>
         <div className={styles["about__notes"]}>
-          {notes.map((note) => (
+          {content.notes.map((note) => (
             <p data-about-note key={note}>
               {note}
             </p>
@@ -96,15 +95,9 @@ export function AboutExperience() {
       </section>
 
       <section className={styles["about__story"]}>
-        <p>
-          Larah is a photographer dedicated to honest moments, meaningful
-          connection, and timeless visual stories. Every session is shaped with
-          trust, attention, and enough softness for the subject to feel present.
-        </p>
-        <p>
-          Based in London, Ontario, working with portraits, couples, graduation,
-          editorial sessions, and wedding stories.
-        </p>
+        {content.story.map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
       </section>
     </main>
   );

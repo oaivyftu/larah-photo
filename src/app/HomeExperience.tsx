@@ -6,22 +6,30 @@ import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { instagramUrl } from "@/data/social";
 import { formatWorkCategory } from "@/data/work";
 import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
+import type { HomePageContent, SiteSettings } from "@/types/site";
 import styles from "./home.module.scss";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type HomeExperienceProps = {
+  content: HomePageContent;
   projects: Project[];
   services: ServicePackage[];
+  settings: SiteSettings;
 };
 
-export function HomeExperience({ projects, services }: HomeExperienceProps) {
+export function HomeExperience({
+  content,
+  projects,
+  services,
+  settings,
+}: HomeExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
   const heroProject = projects[0];
+  const heroImage = content.heroImage ?? heroProject?.heroImage ?? content.closingImage;
 
   useGSAP(
     () => {
@@ -177,37 +185,35 @@ export function HomeExperience({ projects, services }: HomeExperienceProps) {
       <section className={styles["hero"]}>
         <div className={styles["hero__copy"]}>
           <p className={styles["eyebrow"]} data-hero-meta>
-            Larah Photo / London, Ontario
+            {content.eyebrow}
           </p>
           <h1 className={styles["hero__title"]} id="home-title">
-            {["Editorial", "photo", "stories", "with", "a", "pulse."].map(
-              (word) => (
-                <span className={styles["hero__word-wrap"]} key={word}>
-                  <span data-hero-word>{word}</span>
-                </span>
-              ),
-            )}
+            {content.titleWords.map((word) => (
+              <span className={styles["hero__word-wrap"]} key={word}>
+                <span data-hero-word>{word}</span>
+              </span>
+            ))}
           </h1>
         </div>
 
         <Link
           className={styles["hero__media"]}
           data-hero-media
-          data-transition-label={heroProject.title}
-          href={`/work/${heroProject.slug}`}
+          data-transition-label={heroProject?.title}
+          href={heroProject ? `/work/${heroProject.slug}` : "/work"}
         >
           <Image
             className={styles["hero__image"]}
-            src="/images/figma/optimized/forest-session.avif"
-            alt={heroProject.alt}
+            src={heroImage.src}
+            alt={heroImage.alt}
             fill
             loading="eager"
             priority
             sizes="(max-width: 760px) calc(100vw - 32px), 52vw"
           />
           <span className={styles["hero__caption"]} data-hero-meta>
-            <span>{heroProject.title}</span>
-            <span>{heroProject.meta}</span>
+            <span>{heroProject?.title ?? "Featured Work"}</span>
+            <span>{heroProject?.meta ?? "Portfolio"}</span>
           </span>
         </Link>
 
@@ -215,7 +221,7 @@ export function HomeExperience({ projects, services }: HomeExperienceProps) {
           <Link data-transition-label="Work" href="/work">
             Explore Work
           </Link>
-          <a href={instagramUrl} target="_blank" rel="noopener noreferrer">
+          <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
             Book Session
           </a>
         </div>
@@ -223,36 +229,35 @@ export function HomeExperience({ projects, services }: HomeExperienceProps) {
 
       <section className={styles["manifesto"]} data-manifesto>
         <div className={styles["manifesto__words"]} aria-hidden="true">
-          <span data-manifesto-word="light">Light</span>
-          <span data-manifesto-word="memory">Memory</span>
-          <span data-manifesto-word="motion">Motion</span>
+          <span data-manifesto-word="light">{content.manifestoWords[0]}</span>
+          <span data-manifesto-word="memory">{content.manifestoWords[1]}</span>
+          <span data-manifesto-word="motion">{content.manifestoWords[2]}</span>
         </div>
         <div className={styles["manifesto__image-one"]} data-manifesto-image="one">
           <Image
-            src="/images/figma/optimized/blue-sky-portrait.avif"
-            alt="Two women seated in a green field below blue and white clouds"
+            src={content.manifestoImageOne.src}
+            alt={content.manifestoImageOne.alt}
             fill
             sizes="(max-width: 760px) 46vw, 24vw"
           />
         </div>
         <div className={styles["manifesto__image-two"]} data-manifesto-image="two">
           <Image
-            src="/images/figma/optimized/home-portrait.avif"
-            alt="Portrait session detail"
+            src={content.manifestoImageTwo.src}
+            alt={content.manifestoImageTwo.alt}
             fill
             sizes="(max-width: 760px) 42vw, 20vw"
           />
         </div>
         <p className={styles["manifesto__copy"]} data-manifesto-copy>
-          Warm direction, cinematic framing, and images that feel alive after
-          the moment has passed.
+          {content.manifestoCopy}
         </p>
       </section>
 
       <section className={styles["stack"]} data-stack-section aria-labelledby="stack-title">
         <div className={styles["stack__intro"]}>
-          <p className={styles["eyebrow"]}>Selected Work</p>
-          <h2 id="stack-title">Pinned frames that unfold like a story.</h2>
+          <p className={styles["eyebrow"]}>{content.selectedWorkEyebrow}</p>
+          <h2 id="stack-title">{content.selectedWorkTitle}</h2>
         </div>
         <div className={styles["stack__stage"]}>
           {projects.map((project, index) => (
@@ -289,8 +294,8 @@ export function HomeExperience({ projects, services }: HomeExperienceProps) {
 
       <section className={styles["services"]} data-services aria-labelledby="services-title">
         <div className={styles["services__header"]}>
-          <p className={styles["eyebrow"]}>Services</p>
-          <h2 id="services-title">Choose the way your story is held.</h2>
+          <p className={styles["eyebrow"]}>{content.servicesEyebrow}</p>
+          <h2 id="services-title">{content.servicesTitle}</h2>
         </div>
         <div className={styles["services__track"]} data-service-track>
           {services.map((service) => (
@@ -316,16 +321,16 @@ export function HomeExperience({ projects, services }: HomeExperienceProps) {
           <Image
             className={styles["closing__image"]}
             data-closing-image
-            src="/images/figma/optimized/field-wide.avif"
-            alt="Two people standing apart in a wide green field"
+            src={content.closingImage.src}
+            alt={content.closingImage.alt}
             fill
             sizes="100vw"
           />
         </div>
         <div className={styles["closing__copy"]}>
           <p className={styles["eyebrow"]}>Now Booking</p>
-          <h2>Let&apos;s make the frame feel inevitable.</h2>
-          <a href={instagramUrl} target="_blank" rel="noopener noreferrer">
+          <h2>{content.closingTitle}</h2>
+          <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
             Message on Instagram
           </a>
         </div>

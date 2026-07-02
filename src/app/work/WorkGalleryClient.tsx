@@ -8,15 +8,17 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { formatWorkCategory } from "@/data/work";
 import type { Project } from "@/types/project";
+import type { WorkPageContent } from "@/types/site";
 import styles from "./work.module.scss";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type WorkGalleryClientProps = {
+  content: WorkPageContent;
   projects: Project[];
 };
 
-export function WorkGalleryClient({ projects }: WorkGalleryClientProps) {
+export function WorkGalleryClient({ content, projects }: WorkGalleryClientProps) {
   const rootRef = useRef<HTMLElement>(null);
   const featuredProjects = projects.slice(0, 9);
 
@@ -85,9 +87,9 @@ export function WorkGalleryClient({ projects }: WorkGalleryClientProps) {
   return (
     <section className={styles["work-page"]} ref={rootRef} aria-labelledby="work-title">
       <div className={styles["work-page__hero"]}>
-        <p className={styles["work-page__eyebrow"]}>Portfolio / Selected stories</p>
+        <p className={styles["work-page__eyebrow"]}>{content.eyebrow}</p>
         <h1 className={styles["work-page__title"]} data-work-title id="work-title">
-          {["Every", "frame", "has", "a", "before", "and", "after."].map((word) => (
+          {content.titleWords.map((word) => (
             <span key={word}>
               <span>{word}</span>
             </span>
@@ -96,7 +98,7 @@ export function WorkGalleryClient({ projects }: WorkGalleryClientProps) {
       </div>
 
       <div className={styles["work-page__index"]} data-work-index aria-hidden="true">
-        Index
+        {content.indexLabel}
       </div>
 
       <div className={styles["work-page__list"]}>

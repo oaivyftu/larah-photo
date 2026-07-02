@@ -1,11 +1,13 @@
 import { PageShell } from "@/components/layout/PageShell/PageShell";
-import { services } from "@/data/services";
+import { getServicePage, getServices } from "@/sanity/fetchers";
 import { ServiceExperience } from "./ServiceExperience";
 
-export default function ServicePage() {
+export default async function ServicePage() {
+  const [content, services] = await Promise.all([getServicePage(), getServices()]);
+
   return (
     <PageShell variant="service">
-      <ServiceExperience services={services} />
+      <ServiceExperience content={content} services={services} />
     </PageShell>
   );
 }

@@ -33,6 +33,7 @@ function getDestinationLabel(link: HTMLAnchorElement) {
 export function PageTransition() {
   const pathname = usePathname();
   const router = useRouter();
+  const isStudioRoute = pathname.startsWith("/studio");
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [label, setLabel] = useState("Larah Photo");
   const [state, setState] = useState<"idle" | "leaving" | "entering">("idle");
@@ -69,6 +70,8 @@ export function PageTransition() {
       const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
 
       if (
+        pathname.startsWith("/studio") ||
+        url.pathname.startsWith("/studio") ||
         destination === current ||
         (url.pathname === window.location.pathname &&
           url.search === window.location.search &&
@@ -93,7 +96,11 @@ export function PageTransition() {
       document.removeEventListener("click", handleClick, true);
       clearTimeout(timeoutRef.current);
     };
-  }, [router]);
+  }, [pathname, router]);
+
+  if (isStudioRoute) {
+    return null;
+  }
 
   return (
     <div
