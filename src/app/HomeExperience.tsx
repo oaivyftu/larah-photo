@@ -167,9 +167,6 @@ export function HomeExperience({
           <Link data-transition-label="Work" href="/work">
             Explore Work
           </Link>
-          <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
-            Book Session
-          </a>
         </div>
       </section>
 
