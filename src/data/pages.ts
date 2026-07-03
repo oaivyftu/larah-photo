@@ -10,8 +10,6 @@ export const fallbackHomePage: HomePageContent = {
   eyebrow: "Larah Photo / London, Ontario",
   titleWords: ["Editorial", "photo", "stories", "with", "a", "pulse."],
   manifestoWords: ["Light", "Memory", "Motion"],
-  manifestoCopy:
-    "Warm direction, cinematic framing, and images that feel alive after the moment has passed.",
   manifestoImageOne: {
     src: "/images/figma/optimized/blue-sky-portrait.avif",
     alt: "Two women seated in a green field below blue and white clouds",
@@ -25,7 +23,6 @@ export const fallbackHomePage: HomePageContent = {
     height: 562,
   },
   selectedWorkEyebrow: "Selected Work",
-  selectedWorkTitle: "Pinned frames that unfold like a story.",
   servicesEyebrow: "Services",
   servicesTitle: "Choose the way your story is held.",
   closingImage: {

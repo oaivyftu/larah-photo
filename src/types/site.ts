@@ -16,11 +16,9 @@ export type HomePageContent = {
   titleWords: string[];
   heroImage?: ProjectImage;
   manifestoWords: [string, string, string];
-  manifestoCopy: string;
   manifestoImageOne: ProjectImage;
   manifestoImageTwo: ProjectImage;
   selectedWorkEyebrow: string;
-  selectedWorkTitle: string;
   servicesEyebrow: string;
   servicesTitle: string;
   closingImage: ProjectImage;

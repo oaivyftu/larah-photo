@@ -144,11 +144,9 @@ export function HomeExperience({
           </h1>
         </div>
 
-        <Link
+        <div
           className={styles["hero__media"]}
           data-hero-media
-          data-transition-label={heroProject?.title}
-          href={heroProject ? `/work/${heroProject.slug}` : "/work"}
         >
           <Image
             className={styles["hero__image"]}
@@ -163,7 +161,7 @@ export function HomeExperience({
             <span>{heroProject?.title ?? "Featured Work"}</span>
             <span>{heroProject?.meta ?? "Portfolio"}</span>
           </span>
-        </Link>
+        </div>
 
         <div className={styles["hero__actions"]} data-hero-meta>
           <Link data-transition-label="Work" href="/work">

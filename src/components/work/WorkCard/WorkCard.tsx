@@ -1,11 +1,10 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { Project } from "@/types/project";
 import styles from "./WorkCard.module.scss";
 
 type WorkCardProps = {
   className?: string;
-  onSelectProject?: (project: Project) => void;
+  onSelectProject: (project: Project) => void;
   project: Project;
   titleSuffix?: string;
   variant?: "homepage" | "work";
@@ -50,23 +49,13 @@ export function WorkCard({
       data-work-card
       data-work-category={project.category}
     >
-      {onSelectProject ? (
-        <button
-          className={styles["work-card__link"]}
-          onClick={() => onSelectProject(project)}
-          type="button"
-        >
-          {content}
-        </button>
-      ) : (
-        <Link
-          className={styles["work-card__link"]}
-          data-transition-label={project.title}
-          href={`/work/${project.slug}`}
-        >
-          {content}
-        </Link>
-      )}
+      <button
+        className={styles["work-card__link"]}
+        onClick={() => onSelectProject(project)}
+        type="button"
+      >
+        {content}
+      </button>
     </article>
   );
 }

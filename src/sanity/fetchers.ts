@@ -273,12 +273,6 @@ export async function getFeaturedWorkProjects(): Promise<Project[]> {
     );
 }
 
-export async function getWorkProject(slug: string): Promise<Project | undefined> {
-  const projects = await getWorkProjects();
-
-  return projects.find((project) => project.slug === slug);
-}
-
 function getSlug(slug?: SanityProject["slug"]) {
   return typeof slug === "string" ? slug : slug?.current;
 }

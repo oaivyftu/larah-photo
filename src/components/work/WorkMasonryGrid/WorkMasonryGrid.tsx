@@ -15,7 +15,7 @@ type WorkMasonryGridProps = {
   activeFilter?: string;
   className?: string;
   items: Project[];
-  onSelectProject?: (project: Project) => void;
+  onSelectProject: (project: Project) => void;
   titleSuffix?: string;
   variant: "homepage" | "work";
 };

@@ -402,21 +402,3 @@ export const featuredWorkProjects = workProjects
 export const workCategories = Array.from(
   new Set(workProjects.map((project) => project.category)),
 );
-
-export function getWorkProject(slug: string) {
-  return workProjects.find((project) => project.slug === slug);
-}
-
-export function getAdjacentWorkProjects(slug: string) {
-  const currentIndex = workProjects.findIndex((project) => project.slug === slug);
-
-  if (currentIndex === -1) {
-    return { previousProject: undefined, nextProject: undefined };
-  }
-
-  return {
-    previousProject:
-      workProjects[(currentIndex - 1 + workProjects.length) % workProjects.length],
-    nextProject: workProjects[(currentIndex + 1) % workProjects.length],
-  };
-}
