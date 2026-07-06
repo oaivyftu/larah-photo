@@ -21,8 +21,6 @@ export type HomePageContent = {
   selectedWorkEyebrow: string;
   servicesEyebrow: string;
   servicesTitle: string;
-  closingImage: ProjectImage;
-  closingTitle: string;
 };
 
 export type WorkPageContent = {

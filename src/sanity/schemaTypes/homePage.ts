@@ -33,11 +33,5 @@ export const homePage = defineType({
       title: "Services title",
       type: "string",
     }),
-    imageField("closingImage", "Closing image"),
-    defineField({
-      name: "closingTitle",
-      title: "Closing title",
-      type: "string",
-    }),
   ],
 });

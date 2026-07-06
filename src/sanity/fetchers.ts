@@ -42,14 +42,13 @@ type SanitySiteSettings = Partial<
 type SanityPageImage = SanityImageValue | null;
 
 type SanityHomePage = Partial<
-  Omit<HomePageContent, "manifestoWords" | "manifestoImageOne" | "manifestoImageTwo" | "closingImage" | "heroImage">
+  Omit<HomePageContent, "manifestoWords" | "manifestoImageOne" | "manifestoImageTwo" | "heroImage">
 > & {
   titleWords?: string[];
   manifestoWords?: string[];
   heroImage?: SanityPageImage;
   manifestoImageOne?: SanityPageImage;
   manifestoImageTwo?: SanityPageImage;
-  closingImage?: SanityPageImage;
 };
 
 type SanityAboutPage = Partial<
@@ -155,7 +154,7 @@ export async function getHomePage(): Promise<HomePageContent> {
         ? [page.manifestoWords[0], page.manifestoWords[1], page.manifestoWords[2]]
         : fallbackHomePage.manifestoWords,
     heroImage: page?.heroImage
-      ? resolveSanityImage(page.heroImage, fallbackHomePage.closingImage)
+      ? resolveSanityImage(page.heroImage, fallbackHomePage.manifestoImageOne)
       : undefined,
     manifestoImageOne: resolveSanityImage(
       page?.manifestoImageOne,
@@ -165,7 +164,6 @@ export async function getHomePage(): Promise<HomePageContent> {
       page?.manifestoImageTwo,
       fallbackHomePage.manifestoImageTwo,
     ),
-    closingImage: resolveSanityImage(page?.closingImage, fallbackHomePage.closingImage),
   };
 }
 

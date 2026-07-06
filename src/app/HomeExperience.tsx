@@ -10,7 +10,7 @@ import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGr
 import { WorkProjectGallery } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
 import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
-import type { HomePageContent, SiteSettings } from "@/types/site";
+import type { HomePageContent } from "@/types/site";
 import styles from "./home.module.scss";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -19,14 +19,12 @@ type HomeExperienceProps = {
   content: HomePageContent;
   projects: Project[];
   services: ServicePackage[];
-  settings: SiteSettings;
 };
 
 export function HomeExperience({
   content,
   projects,
   services,
-  settings,
 }: HomeExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -40,7 +38,7 @@ export function HomeExperience({
           width: heroProject.width,
           height: heroProject.height,
         }
-      : content.closingImage);
+      : content.manifestoImageOne);
 
   useGSAP(
     () => {
@@ -107,20 +105,6 @@ export function HomeExperience({
           });
         }
 
-        gsap.fromTo(
-          "[data-closing-image]",
-          { scale: 1.18 },
-          {
-            scale: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: "[data-closing]",
-              start: "top bottom",
-              end: "bottom bottom",
-              scrub: 1,
-            },
-          },
-        );
       });
 
       return () => mm.revert();
@@ -236,26 +220,6 @@ export function HomeExperience({
               </Link>
             </article>
           ))}
-        </div>
-      </section>
-
-      <section className={styles["closing"]} data-closing>
-        <div className={styles["closing__media"]}>
-          <Image
-            className={styles["closing__image"]}
-            data-closing-image
-            src={content.closingImage.src}
-            alt={content.closingImage.alt}
-            fill
-            sizes="100vw"
-          />
-        </div>
-        <div className={styles["closing__copy"]}>
-          <p className={styles["eyebrow"]}>Now Booking</p>
-          <h2>{content.closingTitle}</h2>
-          <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
-            Message on Instagram
-          </a>
         </div>
       </section>
 

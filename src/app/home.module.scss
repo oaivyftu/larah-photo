@@ -69,8 +69,7 @@
   clip-path: inset(0 0 0 0);
 }
 
-.hero__image,
-.closing__image {
+.hero__image {
   object-fit: cover;
 }
 
@@ -102,7 +101,6 @@
 }
 
 .hero__actions a,
-.closing__copy a,
 .service-card a {
   display: inline-flex;
   min-height: 2.6rem;
@@ -128,7 +126,6 @@
 }
 
 .hero__actions a:last-child,
-.closing__copy a:hover,
 .service-card a:hover {
   background: var(--home-ink);
   color: var(--home-paper-soft);
@@ -136,8 +133,6 @@
 
 .hero__actions a:hover,
 .hero__actions a:focus-visible,
-.closing__copy a:hover,
-.closing__copy a:focus-visible,
 .service-card a:hover,
 .service-card a:focus-visible {
   transform: translateY(-2px);
@@ -214,8 +209,7 @@
   margin: 0 auto clamp(1.5rem, 3vw, 2.5rem);
 }
 
-.services__header h2,
-.closing__copy h2 {
+.services__header h2 {
   max-width: 58rem;
   font-family: var(--font-serif);
   font-size: clamp(2.4rem, 5.2vw, 6rem);
@@ -315,58 +309,6 @@
 
 .service-card a {
   justify-self: start;
-}
-
-.closing {
-  position: relative;
-  display: grid;
-  min-height: 100svh;
-  align-items: end;
-  color: var(--home-paper-soft);
-  background: var(--color-ink);
-  overflow: hidden;
-}
-
-.closing__media {
-  position: absolute;
-  inset: 0;
-}
-
-.closing__media::after {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      90deg,
-      var(--color-ink),
-      transparent 62%
-    ),
-    linear-gradient(
-      0deg,
-      var(--color-ink),
-      transparent 54%
-    );
-  content: "";
-}
-
-.closing__copy {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 1.25rem;
-  width: min(58rem, calc(100% - (var(--page-gutter) * 2)));
-  margin: 0 auto;
-  padding-bottom: clamp(3rem, 8vw, 7rem);
-}
-
-.closing__copy .eyebrow {
-  color: var(--color-paper);
-}
-
-.closing__copy a {
-  justify-self: start;
-  background: var(--home-paper-soft);
-  color: var(--home-ink);
 }
 
 @media (max-width: 900px) {
@@ -484,8 +426,7 @@
     font-size: clamp(4.2rem, 21vw, 7rem);
   }
 
-  .services__header h2,
-  .closing__copy h2 {
+  .services__header h2 {
     font-size: clamp(2.35rem, 12vw, 4.35rem);
     line-height: 0.9;
   }
@@ -508,13 +449,6 @@
     min-height: 28rem;
   }
 
-  .closing {
-    min-height: 76svh;
-  }
-
-  .closing__copy {
-    padding-bottom: 3rem;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

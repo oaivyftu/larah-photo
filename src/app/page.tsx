@@ -3,16 +3,14 @@ import {
   getFeaturedWorkProjects,
   getHomePage,
   getServices,
-  getSiteSettings,
 } from "@/sanity/fetchers";
 import { HomeExperience } from "./HomeExperience";
 
 export default async function Home() {
-  const [homePage, projects, services, settings] = await Promise.all([
+  const [homePage, projects, services] = await Promise.all([
     getHomePage(),
     getFeaturedWorkProjects(),
     getServices(),
-    getSiteSettings(),
   ]);
 
   return (
@@ -21,7 +19,6 @@ export default async function Home() {
         content={homePage}
         projects={projects.slice(0, 6)}
         services={services}
-        settings={settings}
       />
     </PageShell>
   );

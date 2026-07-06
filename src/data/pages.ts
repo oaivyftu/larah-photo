@@ -25,13 +25,6 @@ export const fallbackHomePage: HomePageContent = {
   selectedWorkEyebrow: "Selected Work",
   servicesEyebrow: "Services",
   servicesTitle: "Choose the way your story is held.",
-  closingImage: {
-    src: "/images/figma/optimized/field-wide.avif",
-    alt: "Two people standing apart in a wide green field",
-    width: 2048,
-    height: 1366,
-  },
-  closingTitle: "Let the frame remember how it felt.",
 };
 
 export const fallbackWorkPage: WorkPageContent = {
