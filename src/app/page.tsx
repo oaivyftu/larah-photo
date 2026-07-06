@@ -17,7 +17,7 @@ export default async function Home() {
     <PageShell variant="home">
       <HomeExperience
         content={homePage}
-        projects={projects.slice(0, 6)}
+        projects={projects.slice(0, 7)}
         services={services}
       />
     </PageShell>

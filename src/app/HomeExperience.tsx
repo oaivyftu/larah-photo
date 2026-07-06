@@ -8,6 +8,8 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
 import { WorkProjectGallery } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
+import { Icon } from "@/components/ui/Icon/Icon";
+import { icons } from "@/constants/icons";
 import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
 import type { HomePageContent } from "@/types/site";
@@ -19,6 +21,13 @@ type HomeExperienceProps = {
   content: HomePageContent;
   projects: Project[];
   services: ServicePackage[];
+};
+
+const serviceIcons: Record<string, typeof icons.portrait> = {
+  "portrait-session": icons.portrait,
+  "couples-session": icons.userGroup,
+  wedding: icons.ring,
+  "wedding-package": icons.ring,
 };
 
 export function HomeExperience({
@@ -86,25 +95,72 @@ export function HomeExperience({
           .to("[data-manifesto-image='one']", { yPercent: -16, rotate: -6 }, 0)
           .to("[data-manifesto-image='two']", { yPercent: 18, rotate: 5 }, 0);
 
-        const serviceTrack = document.querySelector<HTMLElement>("[data-service-track]");
+      });
 
-        if (serviceTrack) {
-          const distance = () => serviceTrack.scrollWidth - window.innerWidth;
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const root = rootRef.current;
+        const servicesSection = root?.querySelector<HTMLElement>("[data-services]");
+        const revealItems = gsap.utils.toArray<HTMLElement>(
+          "[data-service-reveal]",
+          root,
+        );
 
-          gsap.to(serviceTrack, {
-            x: () => -Math.max(distance(), 0),
-            ease: "none",
-            scrollTrigger: {
-              trigger: "[data-services]",
-              start: "top top",
-              end: () => `+=${Math.max(distance(), window.innerHeight)}`,
-              pin: true,
-              scrub: 1,
-              invalidateOnRefresh: true,
-            },
-          });
+        if (!servicesSection || !revealItems.length) {
+          return undefined;
         }
 
+        let hasPlayed = false;
+        let revealTween: gsap.core.Tween | undefined;
+
+        const playReveal = () => {
+          if (hasPlayed) {
+            return;
+          }
+
+          hasPlayed = true;
+          revealTween = gsap.to(revealItems, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.95,
+            ease: "power3.out",
+            stagger: 0.12,
+          });
+        };
+
+        gsap.set(revealItems, {
+          autoAlpha: 0,
+          y: 42,
+        });
+
+        let revealFrame = 0;
+
+        const checkServiceReveal = () => {
+          window.cancelAnimationFrame(revealFrame);
+
+          revealFrame = window.requestAnimationFrame(() => {
+            const sectionBox = servicesSection.getBoundingClientRect();
+            const isInRevealRange =
+              sectionBox.top <= window.innerHeight * 0.82 &&
+              sectionBox.bottom >= 0;
+
+            if (isInRevealRange) {
+              playReveal();
+              window.removeEventListener("scroll", checkServiceReveal);
+              window.removeEventListener("resize", checkServiceReveal);
+            }
+          });
+        };
+
+        window.addEventListener("scroll", checkServiceReveal, { passive: true });
+        window.addEventListener("resize", checkServiceReveal);
+        checkServiceReveal();
+
+        return () => {
+          window.cancelAnimationFrame(revealFrame);
+          window.removeEventListener("scroll", checkServiceReveal);
+          window.removeEventListener("resize", checkServiceReveal);
+          revealTween?.kill();
+        };
       });
 
       return () => mm.revert();
@@ -200,14 +256,28 @@ export function HomeExperience({
       </section>
 
       <section className={styles["services"]} data-services aria-labelledby="services-title">
-        <div className={styles["services__header"]}>
-          <p className={styles["eyebrow"]}>{content.servicesEyebrow}</p>
-          <h2 id="services-title">{content.servicesTitle}</h2>
+        <div className={styles["services__header"]} data-service-reveal>
+          <p className={styles["services__eyebrow"]} id="services-title">
+            {content.servicesEyebrow}
+          </p>
+          <Icon
+            className={styles["services__chevron"]}
+            decorative
+            icon={icons.chevronDown}
+          />
         </div>
         <div className={styles["services__track"]} data-service-track>
           {services.map((service) => (
-            <article className={styles["service-card"]} key={service.id}>
-              <span>{service.index}</span>
+            <article
+              className={styles["service-card"]}
+              data-service-reveal
+              key={service.id}
+            >
+              <Icon
+                className={styles["service-card__icon"]}
+                decorative
+                icon={serviceIcons[service.id] ?? icons.circle}
+              />
               <h3>{service.title}</h3>
               <p>{service.description}</p>
               <ul>
@@ -216,7 +286,9 @@ export function HomeExperience({
                 ))}
               </ul>
               <Link data-transition-label="Contact" href={service.ctaHref}>
-                From ${service.price}
+                <span>From ${service.price}</span>
+                <span>Book now</span>
+                <Icon decorative icon={icons.arrowRight} />
               </Link>
             </article>
           ))}
