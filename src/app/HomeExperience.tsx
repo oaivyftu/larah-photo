@@ -1,15 +1,18 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { formatWorkCategory } from "@/data/work";
+import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
+import { WorkProjectGallery } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
+import { Icon } from "@/components/ui/Icon/Icon";
+import { icons } from "@/constants/icons";
 import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
-import type { HomePageContent, SiteSettings } from "@/types/site";
+import type { HomePageContent } from "@/types/site";
 import styles from "./home.module.scss";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -18,18 +21,33 @@ type HomeExperienceProps = {
   content: HomePageContent;
   projects: Project[];
   services: ServicePackage[];
-  settings: SiteSettings;
+};
+
+const serviceIcons: Record<string, typeof icons.portrait> = {
+  "portrait-session": icons.portrait,
+  "couples-session": icons.userGroup,
+  wedding: icons.ring,
+  "wedding-package": icons.ring,
 };
 
 export function HomeExperience({
   content,
   projects,
   services,
-  settings,
 }: HomeExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const heroProject = projects[0];
-  const heroImage = content.heroImage ?? heroProject?.heroImage ?? content.closingImage;
+  const heroImage =
+    content.heroImage ??
+    (heroProject
+      ? {
+          src: heroProject.image,
+          alt: heroProject.alt,
+          width: heroProject.width,
+          height: heroProject.height,
+        }
+      : content.manifestoImageOne);
 
   useGSAP(
     () => {
@@ -37,7 +55,6 @@ export function HomeExperience({
 
       mm.add("(min-width: 901px) and (prefers-reduced-motion: no-preference)", () => {
         const heroTl = gsap.timeline({ defaults: { ease: "power4.out" } });
-        gsap.set("[data-manifesto-copy]", { opacity: 0, y: 32 });
 
         heroTl
           .from("[data-hero-word]", {
@@ -76,103 +93,74 @@ export function HomeExperience({
           .to("[data-manifesto-word='memory']", { xPercent: 12, scale: 0.88 }, 0)
           .to("[data-manifesto-word='motion']", { xPercent: -8, scale: 1.05 }, 0)
           .to("[data-manifesto-image='one']", { yPercent: -16, rotate: -6 }, 0)
-          .to("[data-manifesto-image='two']", { yPercent: 18, rotate: 5 }, 0)
-          .to("[data-manifesto-copy]", { opacity: 1, y: 0 }, 0.18);
+          .to("[data-manifesto-image='two']", { yPercent: 18, rotate: 5 }, 0);
 
-        const cards = gsap.utils.toArray<HTMLElement>("[data-stack-card]");
-        const stackTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: "[data-stack-section]",
-            start: "top top",
-            end: () => `+=${window.innerHeight * cards.length}`,
-            pin: true,
-            scrub: 1,
-            invalidateOnRefresh: true,
-          },
-        });
+      });
 
-        gsap.set(cards, {
-          yPercent: 112,
-          scale: 0.86,
-          opacity: 0,
-          rotate: (index) => (index % 2 === 0 ? -3 : 3),
-        });
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const root = rootRef.current;
+        const servicesSection = root?.querySelector<HTMLElement>("[data-services]");
+        const revealItems = gsap.utils.toArray<HTMLElement>(
+          "[data-service-reveal]",
+          root,
+        );
 
-        cards.forEach((card, index) => {
-          const image = card.querySelector<HTMLElement>("[data-stack-image]");
-          const number = card.querySelector<HTMLElement>("[data-stack-number]");
-          const at = index * 1.18;
-
-          stackTl
-            .to(
-              card,
-              {
-                yPercent: 0,
-                scale: 1,
-                opacity: 1,
-                rotate: 0,
-                duration: 0.82,
-                ease: "power3.out",
-              },
-              at,
-            )
-            .fromTo(
-              image,
-              { scale: 1.2 },
-              { scale: 1.02, duration: 1.1, ease: "power2.out" },
-              at,
-            )
-            .to(number, { yPercent: -130, duration: 0.7, ease: "power2.inOut" }, at + 0.2);
-
-          if (index < cards.length - 1) {
-            stackTl.to(
-              card,
-              {
-                yPercent: -22,
-                scale: 0.84,
-                opacity: 0.28,
-                rotate: index % 2 === 0 ? 1.4 : -1.4,
-                duration: 0.62,
-                ease: "power2.in",
-              },
-              at + 0.86,
-            );
-          }
-        });
-
-        const serviceTrack = document.querySelector<HTMLElement>("[data-service-track]");
-
-        if (serviceTrack) {
-          const distance = () => serviceTrack.scrollWidth - window.innerWidth;
-
-          gsap.to(serviceTrack, {
-            x: () => -Math.max(distance(), 0),
-            ease: "none",
-            scrollTrigger: {
-              trigger: "[data-services]",
-              start: "top top",
-              end: () => `+=${Math.max(distance(), window.innerHeight)}`,
-              pin: true,
-              scrub: 1,
-              invalidateOnRefresh: true,
-            },
-          });
+        if (!servicesSection || !revealItems.length) {
+          return undefined;
         }
 
-        gsap.fromTo(
-          "[data-closing-image]",
-          { scale: 1.18 },
-          {
-            scale: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: "[data-closing]",
-              start: "top bottom",
-              end: "bottom bottom",
-              scrub: 1,
-            },
-          },
-        );
+        let hasPlayed = false;
+        let revealTween: gsap.core.Tween | undefined;
+
+        const playReveal = () => {
+          if (hasPlayed) {
+            return;
+          }
+
+          hasPlayed = true;
+          revealTween = gsap.to(revealItems, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.95,
+            ease: "power3.out",
+            stagger: 0.12,
+          });
+        };
+
+        gsap.set(revealItems, {
+          autoAlpha: 0,
+          y: 42,
+        });
+
+        let revealFrame = 0;
+
+        const checkServiceReveal = () => {
+          window.cancelAnimationFrame(revealFrame);
+
+          revealFrame = window.requestAnimationFrame(() => {
+            const sectionBox = servicesSection.getBoundingClientRect();
+            const isInRevealRange =
+              sectionBox.top <= window.innerHeight * 0.82 &&
+              sectionBox.bottom >= 0;
+
+            if (isInRevealRange) {
+              playReveal();
+              window.removeEventListener("scroll", checkServiceReveal);
+              window.removeEventListener("resize", checkServiceReveal);
+            }
+          });
+        };
+
+        window.addEventListener("scroll", checkServiceReveal, { passive: true });
+        window.addEventListener("resize", checkServiceReveal);
+        checkServiceReveal();
+
+        return () => {
+          window.cancelAnimationFrame(revealFrame);
+          window.removeEventListener("scroll", checkServiceReveal);
+          window.removeEventListener("resize", checkServiceReveal);
+          revealTween?.kill();
+        };
       });
 
       return () => mm.revert();
@@ -196,11 +184,9 @@ export function HomeExperience({
           </h1>
         </div>
 
-        <Link
+        <div
           className={styles["hero__media"]}
           data-hero-media
-          data-transition-label={heroProject?.title}
-          href={heroProject ? `/work/${heroProject.slug}` : "/work"}
         >
           <Image
             className={styles["hero__image"]}
@@ -215,15 +201,12 @@ export function HomeExperience({
             <span>{heroProject?.title ?? "Featured Work"}</span>
             <span>{heroProject?.meta ?? "Portfolio"}</span>
           </span>
-        </Link>
+        </div>
 
         <div className={styles["hero__actions"]} data-hero-meta>
           <Link data-transition-label="Work" href="/work">
             Explore Work
           </Link>
-          <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
-            Book Session
-          </a>
         </div>
       </section>
 
@@ -249,58 +232,52 @@ export function HomeExperience({
             sizes="(max-width: 760px) 42vw, 20vw"
           />
         </div>
-        <p className={styles["manifesto__copy"]} data-manifesto-copy>
-          {content.manifestoCopy}
-        </p>
       </section>
 
-      <section className={styles["stack"]} data-stack-section aria-labelledby="stack-title">
-        <div className={styles["stack__intro"]}>
+      <section
+        className={styles["stack"]}
+        data-stack-section
+        aria-label={content.selectedWorkEyebrow}
+      >
+        <div className={styles["stack__header"]}>
           <p className={styles["eyebrow"]}>{content.selectedWorkEyebrow}</p>
-          <h2 id="stack-title">{content.selectedWorkTitle}</h2>
         </div>
-        <div className={styles["stack__stage"]}>
-          {projects.map((project, index) => (
-            <article className={styles["stack-card"]} data-stack-card key={project.id}>
-              <Link
-                className={styles["stack-card__inner"]}
-                data-transition-label={project.title}
-                href={`/work/${project.slug}`}
-              >
-                <span className={styles["stack-card__number-mask"]}>
-                  <span data-stack-number>{String(index + 1).padStart(2, "0")}</span>
-                </span>
-                <span className={styles["stack-card__media"]}>
-                  <Image
-                    className={styles["stack-card__image"]}
-                    data-stack-image
-                    src={project.image}
-                    alt={project.alt}
-                    width={project.width}
-                    height={project.height}
-                    sizes="(max-width: 760px) calc(100vw - 32px), 54vw"
-                  />
-                </span>
-                <span className={styles["stack-card__copy"]}>
-                  <span>{formatWorkCategory(project.category)}</span>
-                  <strong>{project.title}</strong>
-                  <span>{project.location}</span>
-                </span>
-              </Link>
-            </article>
-          ))}
+        <WorkMasonryGrid
+          className={styles["stack__grid"]}
+          items={projects}
+          onSelectProject={setSelectedProject}
+          variant="homepage"
+        />
+        <div className={styles["stack__footer"]}>
+          <Link data-transition-label="Work" href="/work">
+            View all work
+          </Link>
         </div>
       </section>
 
       <section className={styles["services"]} data-services aria-labelledby="services-title">
-        <div className={styles["services__header"]}>
-          <p className={styles["eyebrow"]}>{content.servicesEyebrow}</p>
-          <h2 id="services-title">{content.servicesTitle}</h2>
+        <div className={styles["services__header"]} data-service-reveal>
+          <p className={styles["services__eyebrow"]} id="services-title">
+            {content.servicesEyebrow}
+          </p>
+          <Icon
+            className={styles["services__chevron"]}
+            decorative
+            icon={icons.chevronDown}
+          />
         </div>
         <div className={styles["services__track"]} data-service-track>
           {services.map((service) => (
-            <article className={styles["service-card"]} key={service.id}>
-              <span>{service.index}</span>
+            <article
+              className={styles["service-card"]}
+              data-service-reveal
+              key={service.id}
+            >
+              <Icon
+                className={styles["service-card__icon"]}
+                decorative
+                icon={serviceIcons[service.id] ?? icons.circle}
+              />
               <h3>{service.title}</h3>
               <p>{service.description}</p>
               <ul>
@@ -309,32 +286,22 @@ export function HomeExperience({
                 ))}
               </ul>
               <Link data-transition-label="Contact" href={service.ctaHref}>
-                From ${service.price}
+                <span>From ${service.price}</span>
+                <span>Book now</span>
+                <Icon decorative icon={icons.arrowRight} />
               </Link>
             </article>
           ))}
         </div>
       </section>
 
-      <section className={styles["closing"]} data-closing>
-        <div className={styles["closing__media"]}>
-          <Image
-            className={styles["closing__image"]}
-            data-closing-image
-            src={content.closingImage.src}
-            alt={content.closingImage.alt}
-            fill
-            sizes="100vw"
-          />
-        </div>
-        <div className={styles["closing__copy"]}>
-          <p className={styles["eyebrow"]}>Now Booking</p>
-          <h2>{content.closingTitle}</h2>
-          <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
-            Message on Instagram
-          </a>
-        </div>
-      </section>
+      {selectedProject ? (
+        <WorkProjectGallery
+          isModal
+          onClose={() => setSelectedProject(null)}
+          project={selectedProject}
+        />
+      ) : null}
     </main>
   );
 }

@@ -24,10 +24,14 @@ export async function PageShell({ children, variant }: PageShellProps) {
     <div className={styles["page-shell"]} id="top">
       <SiteHeader
         activeHref={activeHrefByVariant[variant]}
-        settings={settings}
       />
       <main
-        className={`${styles["page-shell__main"]} ${styles[`page-shell__main--${variant}`]}`}
+        className={[
+          styles["page-shell__main"],
+          styles[`page-shell__main--${variant}`],
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
         {children}
       </main>

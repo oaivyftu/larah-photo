@@ -3,7 +3,6 @@ export type ProjectImage = {
   alt: string;
   width: number;
   height: number;
-  layout?: "full" | "half";
 };
 
 export type WorkPlacement = {
@@ -33,6 +32,5 @@ export type Project = {
   featured?: boolean;
   placement?: WorkPlacement;
   coverImage: string;
-  heroImage: ProjectImage;
   images: ProjectImage[];
 };

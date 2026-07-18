@@ -101,7 +101,6 @@ function makeProject(
     | "featured"
     | "placement"
     | "coverImage"
-    | "heroImage"
     | "images"
   > & {
     id?: string;
@@ -114,9 +113,9 @@ function makeProject(
   },
 ): Project {
   const detail = categoryDetails[project.category];
-  const [heroImage, ...supportingImages] = project.gallery;
+  const galleryImages = project.gallery;
   const displayImage =
-    displayImages.find((image) => image.src === project.image) ?? heroImage;
+    displayImages.find((image) => image.src === project.image) ?? galleryImages[0];
   const placement = {
     ...featuredPlacements[project.slug],
     ...project.placement,
@@ -138,8 +137,7 @@ function makeProject(
     featured,
     placement,
     coverImage: displayImage.src,
-    heroImage,
-    images: supportingImages,
+    images: galleryImages,
   };
 }
 
@@ -157,10 +155,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 392,
     gallery: [
-      { ...blueSkyPortrait, layout: "full" },
-      { ...fieldWide, layout: "half" },
-      { ...forestSession, layout: "half" },
-      { ...aboutPortrait, layout: "full" },
+      { ...blueSkyPortrait },
+      { ...fieldWide },
+      { ...forestSession },
+      { ...aboutPortrait },
     ],
   }),
   makeProject({
@@ -174,10 +172,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 174,
     gallery: [
-      { ...forestSession, layout: "full" },
-      { ...rossParkPortrait, layout: "half" },
-      { ...blueSkyPortrait, layout: "half" },
-      { ...fieldWide, layout: "full" },
+      { ...forestSession },
+      { ...rossParkPortrait },
+      { ...blueSkyPortrait },
+      { ...fieldWide },
     ],
   }),
   makeProject({
@@ -191,10 +189,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 392,
     gallery: [
-      { ...blueSkyPortrait, layout: "full" },
-      { ...fieldWide, layout: "half" },
-      { ...forestSession, layout: "half" },
-      { ...rossParkPortrait, layout: "full" },
+      { ...blueSkyPortrait },
+      { ...fieldWide },
+      { ...forestSession },
+      { ...rossParkPortrait },
     ],
   }),
   makeProject({
@@ -208,10 +206,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 147,
     gallery: [
-      { ...fieldWide, layout: "full" },
-      { ...blueSkyPortrait, layout: "half" },
-      { ...forestSession, layout: "half" },
-      { ...aboutPortrait, layout: "full" },
+      { ...fieldWide },
+      { ...blueSkyPortrait },
+      { ...forestSession },
+      { ...aboutPortrait },
     ],
   }),
   makeProject({
@@ -225,10 +223,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 147,
     gallery: [
-      { ...fieldWide, layout: "full" },
-      { ...blueSkyPortrait, layout: "half" },
-      { ...aboutPortrait, layout: "half" },
-      { ...forestSession, layout: "full" },
+      { ...fieldWide },
+      { ...blueSkyPortrait },
+      { ...aboutPortrait },
+      { ...forestSession },
     ],
   }),
   makeProject({
@@ -242,10 +240,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 174,
     gallery: [
-      { ...forestSession, layout: "full" },
-      { ...aboutPortrait, layout: "half" },
-      { ...rossParkPortrait, layout: "half" },
-      { ...fieldWide, layout: "full" },
+      { ...forestSession },
+      { ...aboutPortrait },
+      { ...rossParkPortrait },
+      { ...fieldWide },
     ],
   }),
   makeProject({
@@ -259,10 +257,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 392,
     gallery: [
-      { ...blueSkyPortrait, layout: "full" },
-      { ...rossParkPortrait, layout: "half" },
-      { ...fieldWide, layout: "half" },
-      { ...forestSession, layout: "full" },
+      { ...blueSkyPortrait },
+      { ...rossParkPortrait },
+      { ...fieldWide },
+      { ...forestSession },
     ],
   }),
   makeProject({
@@ -276,10 +274,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 147,
     gallery: [
-      { ...fieldWide, layout: "full" },
-      { ...forestSession, layout: "half" },
-      { ...blueSkyPortrait, layout: "half" },
-      { ...rossParkPortrait, layout: "full" },
+      { ...fieldWide },
+      { ...forestSession },
+      { ...blueSkyPortrait },
+      { ...rossParkPortrait },
     ],
   }),
   makeProject({
@@ -293,10 +291,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 174,
     gallery: [
-      { ...forestSession, layout: "full" },
-      { ...fieldWide, layout: "half" },
-      { ...aboutPortrait, layout: "half" },
-      { ...blueSkyPortrait, layout: "full" },
+      { ...forestSession },
+      { ...fieldWide },
+      { ...aboutPortrait },
+      { ...blueSkyPortrait },
     ],
   }),
   makeProject({
@@ -310,10 +308,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 392,
     gallery: [
-      { ...blueSkyPortrait, layout: "full" },
-      { ...forestSession, layout: "half" },
-      { ...fieldWide, layout: "half" },
-      { ...aboutPortrait, layout: "full" },
+      { ...blueSkyPortrait },
+      { ...forestSession },
+      { ...fieldWide },
+      { ...aboutPortrait },
     ],
   }),
   makeProject({
@@ -327,10 +325,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 174,
     gallery: [
-      { ...forestSession, layout: "full" },
-      { ...rossParkPortrait, layout: "half" },
-      { ...fieldWide, layout: "half" },
-      { ...blueSkyPortrait, layout: "full" },
+      { ...forestSession },
+      { ...rossParkPortrait },
+      { ...fieldWide },
+      { ...blueSkyPortrait },
     ],
   }),
   makeProject({
@@ -344,10 +342,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 147,
     gallery: [
-      { ...fieldWide, layout: "full" },
-      { ...blueSkyPortrait, layout: "half" },
-      { ...forestSession, layout: "half" },
-      { ...rossParkPortrait, layout: "full" },
+      { ...fieldWide },
+      { ...blueSkyPortrait },
+      { ...forestSession },
+      { ...rossParkPortrait },
     ],
   }),
   makeProject({
@@ -361,10 +359,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 392,
     gallery: [
-      { ...blueSkyPortrait, layout: "full" },
-      { ...fieldWide, layout: "half" },
-      { ...aboutPortrait, layout: "half" },
-      { ...forestSession, layout: "full" },
+      { ...blueSkyPortrait },
+      { ...fieldWide },
+      { ...aboutPortrait },
+      { ...forestSession },
     ],
   }),
   makeProject({
@@ -378,10 +376,10 @@ export const workProjects: Project[] = [
     width: 260,
     height: 147,
     gallery: [
-      { ...fieldWide, layout: "full" },
-      { ...forestSession, layout: "half" },
-      { ...blueSkyPortrait, layout: "half" },
-      { ...rossParkPortrait, layout: "full" },
+      { ...fieldWide },
+      { ...forestSession },
+      { ...blueSkyPortrait },
+      { ...rossParkPortrait },
     ],
   }),
 ];
@@ -404,21 +402,3 @@ export const featuredWorkProjects = workProjects
 export const workCategories = Array.from(
   new Set(workProjects.map((project) => project.category)),
 );
-
-export function getWorkProject(slug: string) {
-  return workProjects.find((project) => project.slug === slug);
-}
-
-export function getAdjacentWorkProjects(slug: string) {
-  const currentIndex = workProjects.findIndex((project) => project.slug === slug);
-
-  if (currentIndex === -1) {
-    return { previousProject: undefined, nextProject: undefined };
-  }
-
-  return {
-    previousProject:
-      workProjects[(currentIndex - 1 + workProjects.length) % workProjects.length],
-    nextProject: workProjects[(currentIndex + 1) % workProjects.length],
-  };
-}

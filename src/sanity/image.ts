@@ -24,6 +24,5 @@ export function resolveSanityImage(
     alt: image?.alt ?? fallback.alt,
     width: dimensions?.width ?? fallback.width,
     height: dimensions?.height ?? fallback.height,
-    layout: fallback.layout,
   };
 }

@@ -1,5 +1,5 @@
 .main-nav {
-  width: min(48vw, 42.5rem);
+  width: 100%;
 }
 
 .main-nav__list {
@@ -16,8 +16,8 @@
 .main-nav__link {
   position: relative;
   display: inline-block;
-  padding-bottom: 0.25rem;
-  font-size: var(--font-size-base);
+  padding-bottom: 0.32rem;
+  font-size: clamp(1rem, 1.25vw, 1.45rem);
   font-weight: 500;
   line-height: 1;
 }
@@ -54,8 +54,8 @@
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0;
-    border-top: 1px solid rgb(17 16 14 / 16%);
-    border-bottom: 1px solid rgb(17 16 14 / 16%);
+    border-top: 1px solid var(--color-line-soft);
+    border-bottom: 1px solid var(--color-line-soft);
   }
 
   .main-nav__link {

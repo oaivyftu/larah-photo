@@ -55,7 +55,6 @@ export const workProject = defineType({
       type: "string",
       options: { list: spanOptions.slice(0, 7) },
     }),
-    imageField("heroImage", "Project hero image"),
     defineField({
       name: "images",
       title: "Gallery images",
@@ -65,22 +64,10 @@ export const workProject = defineType({
           type: "object",
           fields: [
             imageField("image", "Image"),
-            defineField({
-              name: "layout",
-              title: "Layout",
-              type: "string",
-              options: {
-                list: [
-                  { title: "Full", value: "full" },
-                  { title: "Half", value: "half" },
-                ],
-              },
-            }),
           ],
           preview: {
             select: {
               title: "image.alt",
-              subtitle: "layout",
               media: "image",
             },
           },

@@ -16,22 +16,11 @@ export const homePage = defineType({
       of: [defineArrayMember({ type: "string" })],
       validation: (rule) => rule.length(3),
     }),
-    defineField({
-      name: "manifestoCopy",
-      title: "Manifesto copy",
-      type: "text",
-      rows: 3,
-    }),
     imageField("manifestoImageOne", "Manifesto image one"),
     imageField("manifestoImageTwo", "Manifesto image two"),
     defineField({
       name: "selectedWorkEyebrow",
       title: "Selected work eyebrow",
-      type: "string",
-    }),
-    defineField({
-      name: "selectedWorkTitle",
-      title: "Selected work title",
       type: "string",
     }),
     defineField({
@@ -42,12 +31,6 @@ export const homePage = defineType({
     defineField({
       name: "servicesTitle",
       title: "Services title",
-      type: "string",
-    }),
-    imageField("closingImage", "Closing image"),
-    defineField({
-      name: "closingTitle",
-      title: "Closing title",
       type: "string",
     }),
   ],

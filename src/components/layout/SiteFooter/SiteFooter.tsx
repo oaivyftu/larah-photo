@@ -15,39 +15,24 @@ export function SiteFooter({ settings }: SiteFooterProps) {
         <p className={styles["site-footer__statement"]}>
           {settings.footerStatement}
         </p>
-        <div className={styles["site-footer__cta-group"]}>
-          <span className={styles["site-footer__label"]}>BOOKING</span>
-          <a
-            className={styles["site-footer__cta"]}
-            href={settings.instagramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Message on Instagram
-          </a>
-        </div>
         <address className={styles["site-footer__contact"]}>
           <span className={styles["site-footer__label"]}>BUSINESS ENQUIRIES</span>
-          <a href={`mailto:${settings.email}`}>{settings.email}</a>
+          <a href="mailto:hoanglanmotor@gmail.com">{settings.email}</a>
           <a href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`}>
             {settings.phone}
           </a>
         </address>
         <address className={styles["site-footer__contact"]}>
-          <span className={styles["site-footer__label"]}>SOCIAL</span>
+          <span className={styles["site-footer__label"]}>Location</span>
           <span>{settings.location}</span>
-          <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
-            {settings.instagramDisplayUrl}
-          </a>
         </address>
       </div>
       <div className={styles["site-footer__bar"]}>
-        <span>LARAHPHOTO® ©2026</span>
+        <span>Larah Photo©2026</span>
         <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
-          INSTAGRAM
+          Instagram
         </a>
-        <Link href="/contact#book">EMAIL INQUIRY</Link>
-        <Link href="/work">WORK</Link>
+        <Link href="/work">Work</Link>
         <a className={styles["site-footer__back-to-top"]} href="#top">
           <span>BACK TO TOP</span>
           <Icon

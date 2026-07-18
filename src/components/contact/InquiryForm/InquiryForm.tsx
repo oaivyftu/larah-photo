@@ -17,10 +17,8 @@ const sessionTypes = [
 type FormValues = {
   name: string;
   email: string;
-  instagram: string;
+  phone: string;
   sessionType: string;
-  preferredDate: string;
-  preferredLocation: string;
   message: string;
   website: string;
 };
@@ -30,10 +28,8 @@ type FormErrors = Partial<Record<keyof FormValues, string>>;
 const initialValues: FormValues = {
   name: "",
   email: "",
-  instagram: "",
+  phone: "",
   sessionType: "",
-  preferredDate: "",
-  preferredLocation: "",
   message: "",
   website: "",
 };
@@ -194,26 +190,9 @@ export function InquiryForm() {
       <div className={styles["inquiry-form__row"]}>
         <label
           className={styles["inquiry-form__field"]}
-          htmlFor={`${formId}-instagram`}
-        >
-          <span className={styles["inquiry-form__label"]}>INSTAGRAM HANDLE</span>
-          <input
-            className={styles["inquiry-form__input"]}
-            id={`${formId}-instagram`}
-            name="instagram"
-            type="text"
-            autoComplete="off"
-            placeholder="@"
-            value={values.instagram}
-            onChange={(event) => updateValue("instagram", event.target.value)}
-          />
-        </label>
-
-        <label
-          className={styles["inquiry-form__field"]}
           htmlFor={`${formId}-session-type`}
         >
-          <span className={styles["inquiry-form__label"]}>SESSION TYPE*</span>
+          <span className={styles["inquiry-form__label"]}>SERVICE</span>
           <select
             className={styles["inquiry-form__select"]}
             id={`${formId}-session-type`}
@@ -247,37 +226,20 @@ export function InquiryForm() {
             </span>
           ) : null}
         </label>
-      </div>
-
-      <div className={styles["inquiry-form__row"]}>
-        <label
-          className={styles["inquiry-form__field"]}
-          htmlFor={`${formId}-preferred-date`}
-        >
-          <span className={styles["inquiry-form__label"]}>PREFERRED DATE</span>
-          <input
-            className={styles["inquiry-form__input"]}
-            id={`${formId}-preferred-date`}
-            name="preferredDate"
-            type="date"
-            value={values.preferredDate}
-            onChange={(event) => updateValue("preferredDate", event.target.value)}
-          />
-        </label>
 
         <label
           className={styles["inquiry-form__field"]}
-          htmlFor={`${formId}-preferred-location`}
+          htmlFor={`${formId}-phone`}
         >
-          <span className={styles["inquiry-form__label"]}>PREFERRED LOCATION</span>
+          <span className={styles["inquiry-form__label"]}>🇨🇦 PHONE NUMBER</span>
           <input
             className={styles["inquiry-form__input"]}
-            id={`${formId}-preferred-location`}
-            name="preferredLocation"
-            type="text"
-            autoComplete="street-address"
-            value={values.preferredLocation}
-            onChange={(event) => updateValue("preferredLocation", event.target.value)}
+            id={`${formId}-phone`}
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            value={values.phone}
+            onChange={(event) => updateValue("phone", event.target.value)}
           />
         </label>
       </div>
@@ -286,9 +248,7 @@ export function InquiryForm() {
         className={`${styles["inquiry-form__field"]} ${styles["inquiry-form__field--message"]}`}
         htmlFor={`${formId}-message`}
       >
-        <span className={styles["inquiry-form__label"]}>
-          MESSAGE / TELL ME ABOUT YOUR VISION*
-        </span>
+        <span className={styles["inquiry-form__label"]}>MESSAGE*</span>
         <textarea
           className={styles["inquiry-form__textarea"]}
           id={`${formId}-message`}
@@ -328,7 +288,7 @@ export function InquiryForm() {
         type="submit"
         disabled={status === "loading"}
       >
-        {status === "loading" ? "Sending..." : "Send Inquiry"}
+        {status === "loading" ? "SENDING..." : "SUBMIT"}
       </button>
     </form>
   );

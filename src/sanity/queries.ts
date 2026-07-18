@@ -26,15 +26,11 @@ export const homePageQuery = `*[_type == "homePage"][0]{
   titleWords,
   heroImage{${imageFields}},
   manifestoWords,
-  manifestoCopy,
   manifestoImageOne{${imageFields}},
   manifestoImageTwo{${imageFields}},
   selectedWorkEyebrow,
-  selectedWorkTitle,
   servicesEyebrow,
-  servicesTitle,
-  closingImage{${imageFields}},
-  closingTitle
+  servicesTitle
 }`;
 
 export const workPageQuery = `*[_type == "workPage"][0]{
@@ -104,9 +100,7 @@ export const projectsQuery = `*[_type == "workProject"] | order(featuredOrder as
   featuredOrder,
   homepageSpan,
   workSpan,
-  heroImage{${imageFields}},
   images[]{
-    layout,
     image{${imageFields}}
   }
 }`;

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import styles from "./PageTransition.module.scss";
@@ -18,29 +19,21 @@ function getInternalLink(target: EventTarget | null) {
   return target.closest<HTMLAnchorElement>("a[href]");
 }
 
-function getDestinationLabel(link: HTMLAnchorElement) {
-  const explicitLabel = link.dataset.transitionLabel?.trim();
-
-  if (explicitLabel) {
-    return explicitLabel;
-  }
-
-  const text = link.textContent?.replace(/\s+/g, " ").trim();
-
-  return text || "Larah Photo";
-}
-
 export function PageTransition() {
   const pathname = usePathname();
   const router = useRouter();
   const isStudioRoute = pathname.startsWith("/studio");
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const [label, setLabel] = useState("Larah Photo");
   const [state, setState] = useState<"idle" | "leaving" | "entering">("idle");
 
   useEffect(() => {
+    document.documentElement.dataset.pageTransition = "entering";
     const enterTimeout = setTimeout(() => setState("entering"), 0);
-    const idleTimeout = setTimeout(() => setState("idle"), TRANSITION_DURATION);
+    const idleTimeout = setTimeout(() => {
+      document.documentElement.dataset.pageTransition = "ready";
+      setState("idle");
+      window.dispatchEvent(new CustomEvent("larah:page-ready"));
+    }, TRANSITION_DURATION);
 
     return () => {
       clearTimeout(enterTimeout);
@@ -82,7 +75,7 @@ export function PageTransition() {
 
       event.preventDefault();
       clearTimeout(timeoutRef.current);
-      setLabel(getDestinationLabel(link));
+      document.documentElement.dataset.pageTransition = "leaving";
       setState("leaving");
 
       timeoutRef.current = setTimeout(() => {
@@ -111,8 +104,14 @@ export function PageTransition() {
     >
       <div className={styles["page-transition__curtain"]} />
       <div className={styles["page-transition__accent"]} />
-      <p className={styles["page-transition__kicker"]}>Larah Photo</p>
-      <p className={styles["page-transition__label"]}>{label}</p>
+      <Image
+        className={styles["page-transition__logo"]}
+        src="/logos/logo-larah.svg"
+        alt=""
+        width={220}
+        height={74}
+        priority
+      />
     </div>
   );
 }

@@ -4,11 +4,17 @@ import { useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { AboutPageContent } from "@/types/site";
 import styles from "./about.module.scss";
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+gsap.registerPlugin(useGSAP);
+
+const aboutCopy = [
+  "LARAH is a photographer dedicated to capturing honest moments, meaningful connections, and timeless visual stories.",
+  "Every session is unique. Rather than simply taking photographs, I focus on creating images that reflect genuine emotions, personality, and atmosphere. Through a thoughtful and natural approach, each story is documented with authenticity and care.",
+  "I believe that beautiful photography comes from trust, attention to detail, and a deep understanding of the people in front of the camera. My goal is to provide not only refined imagery, but also an experience that feels comfortable, personal, and memorable.",
+  "Based in Vietnam, available worldwide.",
+];
 
 type AboutExperienceProps = {
   content: AboutPageContent;
@@ -19,85 +25,78 @@ export function AboutExperience({ content }: AboutExperienceProps) {
 
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
+      const intro = gsap.timeline({ paused: true });
 
-      mm.add("(min-width: 901px) and (prefers-reduced-motion: no-preference)", () => {
-        gsap.from("[data-about-word]", {
-          yPercent: 110,
+      intro
+        .from("[data-page-heading] > span", {
+          yPercent: 115,
           opacity: 0,
-          rotate: 4,
-          duration: 1,
-          stagger: 0.08,
+          rotate: 2,
+          duration: 0.82,
+          stagger: 0.07,
           ease: "power4.out",
-        });
+        })
+        .from(
+          "[data-about-copy] p, [data-about-media]",
+          {
+            y: 34,
+            opacity: 0,
+            duration: 0.78,
+            stagger: 0.08,
+            ease: "power3.out",
+          },
+          "-=0.42",
+        )
+        .from(
+          "[data-about-logo]",
+          {
+            x: -34,
+            opacity: 0,
+            duration: 0.66,
+            ease: "power3.out",
+          },
+          "-=0.48",
+        );
 
-        gsap
-          .timeline({
-            scrollTrigger: {
-              trigger: "[data-about-pin]",
-              start: "top top",
-              end: "+=160%",
-              pin: true,
-              scrub: 1,
-            },
-          })
-          .to("[data-about-large]", { xPercent: -16, scale: 0.92, ease: "none" }, 0)
-          .to("[data-about-portrait='one']", { yPercent: -16, rotate: -5, ease: "none" }, 0)
-          .to("[data-about-portrait='two']", { yPercent: 20, rotate: 6, ease: "none" }, 0)
-          .fromTo("[data-about-note]", { opacity: 0.15 }, { opacity: 1, stagger: 0.18 }, 0.15);
-      });
+      const playIntro = () => intro.play(0);
 
-      return () => mm.revert();
+      if (document.documentElement.dataset.pageTransition === "ready") {
+        requestAnimationFrame(playIntro);
+      } else {
+        window.addEventListener("larah:page-ready", playIntro, { once: true });
+      }
+
+      return () => {
+        window.removeEventListener("larah:page-ready", playIntro);
+        intro.kill();
+      };
     },
     { scope: rootRef },
   );
 
   return (
     <main className={styles["about"]} ref={rootRef}>
-      <section className={styles["about__hero"]}>
-        <p className={styles["about__eyebrow"]}>{content.eyebrow}</p>
-        <h1 className={styles["about__title"]}>
-          {content.titleWords.map((word) => (
-            <span key={word}>
-              <span data-about-word>{word}</span>
-            </span>
+      <section className={styles["about__intro"]} aria-labelledby="about-title">
+        <div className={styles["about__copy"]} data-about-copy>
+          <h1 className={styles["about__title"]} data-page-heading id="about-title">
+            <span>A little intro&nbsp;-</span>
+            <span>About me</span>
+          </h1>
+          {aboutCopy.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
           ))}
-        </h1>
-      </section>
+        </div>
 
-      <section className={styles["about__pin"]} data-about-pin>
-        <p className={styles["about__large"]} data-about-large>
-          {content.largeText}
-        </p>
-        <div className={styles["about__portrait-one"]} data-about-portrait="one">
+        <figure className={styles["about__media"]} data-about-media>
           <Image
             src={content.portraitOne.src}
             alt={content.portraitOne.alt}
             fill
-            sizes="(max-width: 760px) 72vw, 28vw"
+            priority
+            sizes="(max-width: 900px) calc(100vw - 48px), 42vw"
           />
-        </div>
-        <div className={styles["about__portrait-two"]} data-about-portrait="two">
-          <Image
-            src={content.portraitTwo.src}
-            alt={content.portraitTwo.alt}
-            fill
-            sizes="(max-width: 760px) 52vw, 18vw"
-          />
-        </div>
-        <div className={styles["about__notes"]}>
-          {content.notes.map((note) => (
-            <p data-about-note key={note}>
-              {note}
-            </p>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles["about__story"]}>
-        {content.story.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
-        ))}
+          <figcaption data-about-logo>LARAH</figcaption>
+        </figure>
       </section>
     </main>
   );

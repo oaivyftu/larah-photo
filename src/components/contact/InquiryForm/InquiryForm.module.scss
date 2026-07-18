@@ -1,13 +1,13 @@
 .inquiry-form {
   display: grid;
   width: 100%;
-  gap: 2.75rem;
+  gap: clamp(3rem, 5vw, 5.8rem);
 }
 
 .inquiry-form__row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.25rem;
+  gap: clamp(1.6rem, 2vw, 2.25rem);
 }
 
 .inquiry-form__field {
@@ -21,9 +21,11 @@
   display: flex;
   min-height: 1.0625rem;
   align-items: center;
-  font-size: var(--font-size-sm);
+  font-size: clamp(1rem, 1.22vw, 1.35rem);
   font-weight: 500;
+  letter-spacing: 0;
   line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .inquiry-form__input,
@@ -41,7 +43,7 @@
 
 .inquiry-form__input,
 .inquiry-form__select {
-  min-height: 2rem;
+  min-height: 2.1rem;
 }
 
 .inquiry-form__input::placeholder {
@@ -64,14 +66,14 @@
 .inquiry-form__select-icon {
   position: absolute;
   right: 0;
-  top: 2.45rem;
+  top: 2.55rem;
   width: 0.5rem;
   height: 0.5rem;
   pointer-events: none;
 }
 
 .inquiry-form__textarea {
-  min-height: 8rem;
+  min-height: clamp(8.5rem, 13vw, 14rem);
   resize: vertical;
 }
 
@@ -80,14 +82,15 @@
 }
 
 .inquiry-form__error {
-  color: #8a2d24;
+  color: var(--color-ink);
   font-size: var(--font-size-xs);
   font-weight: 500;
   line-height: 1.25;
 }
 
 .inquiry-form__message {
-  min-height: 1.25rem;
+  min-height: 1rem;
+  margin-top: -2.1rem;
   max-width: 31rem;
   font-size: var(--font-size-sm);
   font-weight: 500;
@@ -98,13 +101,14 @@
   justify-self: start;
   border: 1px solid var(--color-ink);
   background: var(--color-ink);
-  color: #f6f3ee;
+  color: var(--color-paper);
   cursor: pointer;
   font: inherit;
-  font-size: var(--font-size-md);
+  font-size: clamp(1.35rem, 1.65vw, 1.9rem);
   font-weight: 500;
   line-height: 1.2;
-  padding: 0.7rem 1rem;
+  margin-top: -3.6rem;
+  padding: 0.58rem 0.86rem;
   transition:
     background 180ms ease,
     color 180ms ease,
@@ -142,6 +146,11 @@
 
   .inquiry-form__textarea {
     min-height: 8.5rem;
+  }
+
+  .inquiry-form__message,
+  .inquiry-form__submit {
+    margin-top: 0;
   }
 }
 

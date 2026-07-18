@@ -14,7 +14,7 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type ContactPayload = {
   name?: unknown;
   email?: unknown;
-  instagram?: unknown;
+  phone?: unknown;
   sessionType?: unknown;
   preferredDate?: unknown;
   preferredLocation?: unknown;
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 
   const name = readString(payload.name);
   const email = readString(payload.email);
-  const instagram = readString(payload.instagram);
+  const phone = readString(payload.phone);
   const sessionType = readString(payload.sessionType);
   const preferredDate = readString(payload.preferredDate);
   const preferredLocation = readString(payload.preferredLocation);
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
   const inquiryLines = [
     formatLine("Name", name),
     formatLine("Email", email),
-    formatLine("Instagram", instagram),
+    formatLine("Phone", phone),
     formatLine("Session type", sessionType),
     formatLine("Preferred date", preferredDate),
     formatLine("Preferred location", preferredLocation),
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
         <h1>New photography inquiry</h1>
         <p><strong>Name:</strong> ${escapeHtml(name)}</p>
         <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-        <p><strong>Instagram:</strong> ${escapeHtml(instagram || "Not provided")}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(phone || "Not provided")}</p>
         <p><strong>Session type:</strong> ${escapeHtml(sessionType)}</p>
         <p><strong>Preferred date:</strong> ${escapeHtml(preferredDate || "Not provided")}</p>
         <p><strong>Preferred location:</strong> ${escapeHtml(preferredLocation || "Not provided")}</p>
