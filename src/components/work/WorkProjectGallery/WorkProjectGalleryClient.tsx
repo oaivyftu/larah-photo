@@ -1,12 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type Flickity from "flickity";
 import "flickity/css/flickity.css";
+import "flickity-fade/flickity-fade.css";
+import { icons } from "@/constants/icons";
+import { Icon } from "@/components/ui/Icon/Icon";
 import type { Project, ProjectImage } from "@/types/project";
 import styles from "./WorkProjectGallery.module.scss";
+
+const CONTROLS_IDLE_DELAY = 1600;
+const AUTO_HIDE_MEDIA =
+  "(hover: hover) and (pointer: fine) and (min-width: 761px)";
 
 type WorkProjectGalleryClientProps = {
   images: ProjectImage[];
@@ -14,10 +27,6 @@ type WorkProjectGalleryClientProps = {
   onClose?: () => void;
   project: Project;
 };
-
-function formatIndex(index: number) {
-  return String(index + 1).padStart(2, "0");
-}
 
 const GallerySlide = memo(function GallerySlide({
   image,
@@ -54,25 +63,210 @@ const GallerySlide = memo(function GallerySlide({
   );
 });
 
+type GalleryFloatNavProps = {
+  currentIndex: number;
+  isModal: boolean;
+  isVisible: boolean;
+  onClose?: () => void;
+  onControlsBlur: () => void;
+  onControlsFocus: () => void;
+  onControlsPointerEnter: () => void;
+  onControlsPointerLeave: () => void;
+  onNext: () => void;
+  onPrevious: () => void;
+  total: number;
+};
+
+function GalleryFloatNav({
+  currentIndex,
+  isModal,
+  isVisible,
+  onClose,
+  onControlsBlur,
+  onControlsFocus,
+  onControlsPointerEnter,
+  onControlsPointerLeave,
+  onNext,
+  onPrevious,
+  total,
+}: GalleryFloatNavProps) {
+  const currentLabel = String(currentIndex + 1).padStart(2, "0");
+  const totalLabel = String(total).padStart(2, "0");
+  const hasMultipleSlides = total > 1;
+
+  return (
+    <nav
+      aria-label="Gallery controls"
+      className={`${styles["work-project-gallery__float-nav"]} ${
+        isVisible
+          ? styles["work-project-gallery__float-nav--visible"]
+          : ""
+      }`}
+      onFocusCapture={onControlsFocus}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          onControlsBlur();
+        }
+      }}
+      onPointerEnter={onControlsPointerEnter}
+      onPointerLeave={onControlsPointerLeave}
+    >
+      {isModal && onClose ? (
+        <button
+          aria-label="Close gallery"
+          className={styles["work-project-gallery__float-close"]}
+          onClick={onClose}
+          type="button"
+        >
+          <Icon decorative icon={icons.close} />
+        </button>
+      ) : null}
+
+      <div className={styles["work-project-gallery__float-controls"]}>
+        <p
+          aria-atomic="true"
+          aria-live="polite"
+          className={styles["work-project-gallery__float-counter"]}
+        >
+          <span aria-hidden="true">{currentLabel}</span>
+          <span
+            aria-hidden="true"
+            className={styles["work-project-gallery__float-separator"]}
+          >
+            -
+          </span>
+          <span aria-hidden="true">{totalLabel}</span>
+          <span className={styles["work-project-gallery__sr-only"]}>
+            Image {currentIndex + 1} of {total}
+          </span>
+        </p>
+
+        <button
+          aria-label="Previous image"
+          className={styles["work-project-gallery__float-button"]}
+          disabled={!hasMultipleSlides}
+          onClick={onPrevious}
+          type="button"
+        >
+          <Icon decorative icon={icons.chevronLeft} />
+        </button>
+        <button
+          aria-label="Next image"
+          className={styles["work-project-gallery__float-button"]}
+          disabled={!hasMultipleSlides}
+          onClick={onNext}
+          type="button"
+        >
+          <Icon decorative icon={icons.chevronRight} />
+        </button>
+      </div>
+    </nav>
+  );
+}
+
 export function WorkProjectGalleryClient({
   images,
   isModal,
   onClose,
   project,
 }: WorkProjectGalleryClientProps) {
-  const router = useRouter();
   const carouselRef = useRef<HTMLDivElement>(null);
   const flickityRef = useRef<Flickity | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const totalLabel = String(images.length).padStart(2, "0");
+  const controlsTimerRef = useRef<number | null>(null);
+  const controlsFocusedRef = useRef(false);
+  const controlsHoveredRef = useRef(false);
+  const canAutoHideControlsRef = useRef(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [areControlsVisible, setAreControlsVisible] = useState(true);
+
   const handleClose = useCallback(() => {
-    if (onClose) {
-      onClose();
+    if (isModal) {
+      onClose?.();
+    }
+  }, [isModal, onClose]);
+
+  const clearControlsTimer = useCallback(() => {
+    if (controlsTimerRef.current === null) {
       return;
     }
 
-    router.back();
-  }, [onClose, router]);
+    window.clearTimeout(controlsTimerRef.current);
+    controlsTimerRef.current = null;
+  }, []);
+
+  const scheduleControlsHide = useCallback(() => {
+    clearControlsTimer();
+
+    if (
+      !canAutoHideControlsRef.current ||
+      controlsFocusedRef.current ||
+      controlsHoveredRef.current
+    ) {
+      return;
+    }
+
+    controlsTimerRef.current = window.setTimeout(() => {
+      setAreControlsVisible(false);
+      controlsTimerRef.current = null;
+    }, CONTROLS_IDLE_DELAY);
+  }, [clearControlsTimer]);
+
+  const revealControls = useCallback(() => {
+    setAreControlsVisible(true);
+    scheduleControlsHide();
+  }, [scheduleControlsHide]);
+
+  const keepControlsVisible = useCallback(() => {
+    clearControlsTimer();
+    setAreControlsVisible(true);
+  }, [clearControlsTimer]);
+
+  const handleControlsFocus = useCallback(() => {
+    controlsFocusedRef.current = true;
+    keepControlsVisible();
+  }, [keepControlsVisible]);
+
+  const handleControlsBlur = useCallback(() => {
+    controlsFocusedRef.current = false;
+    scheduleControlsHide();
+  }, [scheduleControlsHide]);
+
+  const handleControlsPointerEnter = useCallback(() => {
+    controlsHoveredRef.current = true;
+    keepControlsVisible();
+  }, [keepControlsVisible]);
+
+  const handleControlsPointerLeave = useCallback(() => {
+    controlsHoveredRef.current = false;
+    scheduleControlsHide();
+  }, [scheduleControlsHide]);
+
+  const handlePrevious = useCallback(() => {
+    flickityRef.current?.previous(true);
+  }, []);
+
+  const handleNext = useCallback(() => {
+    flickityRef.current?.next(true);
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(AUTO_HIDE_MEDIA);
+
+    const syncAutoHide = () => {
+      canAutoHideControlsRef.current = mediaQuery.matches;
+      clearControlsTimer();
+      setAreControlsVisible(true);
+      scheduleControlsHide();
+    };
+
+    syncAutoHide();
+    mediaQuery.addEventListener("change", syncAutoHide);
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncAutoHide);
+      clearControlsTimer();
+    };
+  }, [clearControlsTimer, scheduleControlsHide]);
 
   const slideIds = useMemo(
     () =>
@@ -91,36 +285,42 @@ export function WorkProjectGalleryClient({
 
     let cancelled = false;
     let instance: Flickity | null = null;
-    const handleSelect = (index: number) => setActiveIndex(index);
-
+    let handleChange: ((index: number) => void) | null = null;
     const initializeFlickity = async () => {
       const { default: FlickityConstructor } = await import("flickity");
+      await import("flickity-fade");
 
       if (cancelled) {
         return;
       }
 
-      instance = new FlickityConstructor(carousel, {
+      const flickityOptions = {
         adaptiveHeight: false,
         cellAlign: "center",
         contain: true,
         dragThreshold: 10,
         draggable: true,
-        friction: 0.35,
+        // friction: 1,
+        // selectedAttraction: 0.5,
         imagesLoaded: true,
-        pageDots: true,
+        pageDots: false,
         percentPosition: true,
-        prevNextButtons: true,
-        selectedAttraction: 0.04,
+        prevNextButtons: false,
         setGallerySize: false,
-      });
-      flickityRef.current = instance;
+        freeScroll: false,
+        lazyLoad: true,
+        wrapAround: true,
+        fade: true,
+      } satisfies Flickity.Options & { fade: boolean };
 
-      instance.on("select", handleSelect);
-      setActiveIndex(instance.selectedIndex);
+      instance = new FlickityConstructor(carousel, flickityOptions);
+      flickityRef.current = instance;
+      handleChange = (index) => setCurrentIndex(index);
+      instance.on("change", handleChange);
+      setCurrentIndex(instance.selectedIndex);
 
       if (cancelled) {
-        instance.off("select", handleSelect);
+        instance.off("change", handleChange);
         instance.destroy();
         instance = null;
         flickityRef.current = null;
@@ -133,7 +333,9 @@ export function WorkProjectGalleryClient({
       cancelled = true;
 
       if (instance) {
-        instance.off("select", handleSelect);
+        if (handleChange) {
+          instance.off("change", handleChange);
+        }
         instance.destroy();
         instance = null;
       }
@@ -151,12 +353,38 @@ export function WorkProjectGalleryClient({
     document.body.style.overflow = "hidden";
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape" || event.defaultPrevented) {
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        handleClose();
+
+        return;
+      }
+
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+        return;
+      }
+
+      const activeElement = document.activeElement;
+      const isCarouselFocused =
+        activeElement instanceof Element &&
+        Boolean(carouselRef.current?.contains(activeElement));
+
+      if (isCarouselFocused || images.length <= 1) {
         return;
       }
 
       event.preventDefault();
-      handleClose();
+      revealControls();
+
+      if (event.key === "ArrowLeft") {
+        handlePrevious();
+      } else {
+        handleNext();
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -165,56 +393,44 @@ export function WorkProjectGalleryClient({
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleClose, isModal]);
+  }, [
+    handleClose,
+    handleNext,
+    handlePrevious,
+    images.length,
+    isModal,
+    revealControls,
+  ]);
 
   return (
     <section
-      aria-labelledby="work-gallery-title"
+      aria-labelledby={`work-gallery-title-${project.slug}`}
       className={`${styles["work-project-gallery"]} ${
         isModal
           ? styles["work-project-gallery--modal"]
           : styles["work-project-gallery--page"]
       }`}
+      onKeyDown={revealControls}
       onClick={isModal ? handleClose : undefined}
+      onPointerDown={revealControls}
+      onPointerEnter={revealControls}
+      onPointerMove={revealControls}
     >
       <div
-        aria-labelledby={isModal ? "work-gallery-title" : undefined}
+        aria-labelledby={
+          isModal ? `work-gallery-title-${project.slug}` : undefined
+        }
         aria-modal={isModal ? true : undefined}
         className={styles["work-project-gallery__panel"]}
         onClick={isModal ? (event) => event.stopPropagation() : undefined}
         role={isModal ? "dialog" : undefined}
       >
-        <header className={styles["work-project-gallery__header"]}>
-          <p
-            aria-label={`Image ${activeIndex + 1} of ${images.length}`}
-            aria-live="polite"
-            className={styles["work-project-gallery__counter"]}
-          >
-            <span>{formatIndex(activeIndex)}</span>
-            <span aria-hidden="true">-</span>
-            <span>{totalLabel}</span>
-          </p>
-          <div className={styles["work-project-gallery__title-block"]}>
-            <p className={styles["work-project-gallery__meta"]}>
-              {project.serviceCategory}
-            </p>
-            <h1
-              className={styles["work-project-gallery__title"]}
-              id="work-gallery-title"
-            >
-              {project.title}
-            </h1>
-          </div>
-          {isModal ? (
-            <button
-              className={styles["work-project-gallery__close"]}
-              onClick={handleClose}
-              type="button"
-            >
-              Close
-            </button>
-          ) : null}
-        </header>
+        <h2
+          className={styles["work-project-gallery__sr-only"]}
+          id={`work-gallery-title-${project.slug}`}
+        >
+          {project.title} gallery
+        </h2>
 
         <div
           aria-label={`${project.title} image gallery`}
@@ -233,31 +449,19 @@ export function WorkProjectGalleryClient({
           ))}
         </div>
 
-        <footer className={styles["work-project-gallery__footer"]}>
-          <dl className={styles["work-project-gallery__details"]}>
-            <div className={styles["work-project-gallery__detail"]}>
-              <dt>Year</dt>
-              <dd>{project.year}</dd>
-            </div>
-            <div className={styles["work-project-gallery__detail"]}>
-              <dt>Location</dt>
-              <dd>{project.location}</dd>
-            </div>
-            <div className={styles["work-project-gallery__detail"]}>
-              <dt>Client / Subject</dt>
-              <dd>{project.clientSubject}</dd>
-            </div>
-            <div className={styles["work-project-gallery__detail"]}>
-              <dt>Service / Category</dt>
-              <dd>{project.serviceCategory}</dd>
-            </div>
-          </dl>
-          <div className={styles["work-project-gallery__summary"]}>
-            <p className={styles["work-project-gallery__description"]}>
-              {project.description}
-            </p>
-          </div>
-        </footer>
+        <GalleryFloatNav
+          currentIndex={currentIndex}
+          isModal={isModal}
+          isVisible={areControlsVisible}
+          onClose={onClose ? handleClose : undefined}
+          onControlsBlur={handleControlsBlur}
+          onControlsFocus={handleControlsFocus}
+          onControlsPointerEnter={handleControlsPointerEnter}
+          onControlsPointerLeave={handleControlsPointerLeave}
+          onNext={handleNext}
+          onPrevious={handlePrevious}
+          total={images.length}
+        />
       </div>
     </section>
   );
