@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type Flickity from "flickity";
 import "flickity/css/flickity.css";
+import "flickity-fade/flickity-fade.css";
 import type { Project, ProjectImage } from "@/types/project";
 import styles from "./WorkProjectGallery.module.scss";
 
@@ -14,10 +15,6 @@ type WorkProjectGalleryClientProps = {
   onClose?: () => void;
   project: Project;
 };
-
-function formatIndex(index: number) {
-  return String(index + 1).padStart(2, "0");
-}
 
 const GallerySlide = memo(function GallerySlide({
   image,
@@ -63,8 +60,6 @@ export function WorkProjectGalleryClient({
   const router = useRouter();
   const carouselRef = useRef<HTMLDivElement>(null);
   const flickityRef = useRef<Flickity | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const totalLabel = String(images.length).padStart(2, "0");
   const handleClose = useCallback(() => {
     if (onClose) {
       onClose();
@@ -91,36 +86,37 @@ export function WorkProjectGalleryClient({
 
     let cancelled = false;
     let instance: Flickity | null = null;
-    const handleSelect = (index: number) => setActiveIndex(index);
-
     const initializeFlickity = async () => {
       const { default: FlickityConstructor } = await import("flickity");
+      await import("flickity-fade");
 
       if (cancelled) {
         return;
       }
 
-      instance = new FlickityConstructor(carousel, {
+      const flickityOptions = {
         adaptiveHeight: false,
         cellAlign: "center",
         contain: true,
         dragThreshold: 10,
         draggable: true,
-        friction: 0.35,
+        // friction: 1,
+        // selectedAttraction: 0.5,
         imagesLoaded: true,
         pageDots: true,
         percentPosition: true,
         prevNextButtons: true,
-        selectedAttraction: 0.04,
         setGallerySize: false,
-      });
+        freeScroll: false,
+        lazyLoad: true,
+        wrapAround: true,
+        fade: true,
+      } satisfies Flickity.Options & { fade: boolean };
+
+      instance = new FlickityConstructor(carousel, flickityOptions);
       flickityRef.current = instance;
 
-      instance.on("select", handleSelect);
-      setActiveIndex(instance.selectedIndex);
-
       if (cancelled) {
-        instance.off("select", handleSelect);
         instance.destroy();
         instance = null;
         flickityRef.current = null;
@@ -133,7 +129,6 @@ export function WorkProjectGalleryClient({
       cancelled = true;
 
       if (instance) {
-        instance.off("select", handleSelect);
         instance.destroy();
         instance = null;
       }
@@ -184,38 +179,6 @@ export function WorkProjectGalleryClient({
         onClick={isModal ? (event) => event.stopPropagation() : undefined}
         role={isModal ? "dialog" : undefined}
       >
-        <header className={styles["work-project-gallery__header"]}>
-          <p
-            aria-label={`Image ${activeIndex + 1} of ${images.length}`}
-            aria-live="polite"
-            className={styles["work-project-gallery__counter"]}
-          >
-            <span>{formatIndex(activeIndex)}</span>
-            <span aria-hidden="true">-</span>
-            <span>{totalLabel}</span>
-          </p>
-          <div className={styles["work-project-gallery__title-block"]}>
-            <p className={styles["work-project-gallery__meta"]}>
-              {project.serviceCategory}
-            </p>
-            <h1
-              className={styles["work-project-gallery__title"]}
-              id="work-gallery-title"
-            >
-              {project.title}
-            </h1>
-          </div>
-          {isModal ? (
-            <button
-              className={styles["work-project-gallery__close"]}
-              onClick={handleClose}
-              type="button"
-            >
-              Close
-            </button>
-          ) : null}
-        </header>
-
         <div
           aria-label={`${project.title} image gallery`}
           className={styles["work-project-gallery__carousel"]}
@@ -232,32 +195,6 @@ export function WorkProjectGalleryClient({
             />
           ))}
         </div>
-
-        <footer className={styles["work-project-gallery__footer"]}>
-          <dl className={styles["work-project-gallery__details"]}>
-            <div className={styles["work-project-gallery__detail"]}>
-              <dt>Year</dt>
-              <dd>{project.year}</dd>
-            </div>
-            <div className={styles["work-project-gallery__detail"]}>
-              <dt>Location</dt>
-              <dd>{project.location}</dd>
-            </div>
-            <div className={styles["work-project-gallery__detail"]}>
-              <dt>Client / Subject</dt>
-              <dd>{project.clientSubject}</dd>
-            </div>
-            <div className={styles["work-project-gallery__detail"]}>
-              <dt>Service / Category</dt>
-              <dd>{project.serviceCategory}</dd>
-            </div>
-          </dl>
-          <div className={styles["work-project-gallery__summary"]}>
-            <p className={styles["work-project-gallery__description"]}>
-              {project.description}
-            </p>
-          </div>
-        </footer>
       </div>
     </section>
   );
