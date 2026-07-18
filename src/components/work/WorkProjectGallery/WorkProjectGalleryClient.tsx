@@ -353,12 +353,38 @@ export function WorkProjectGalleryClient({
     document.body.style.overflow = "hidden";
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape" || event.defaultPrevented) {
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        handleClose();
+
+        return;
+      }
+
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+        return;
+      }
+
+      const activeElement = document.activeElement;
+      const isCarouselFocused =
+        activeElement instanceof Element &&
+        Boolean(carouselRef.current?.contains(activeElement));
+
+      if (isCarouselFocused || images.length <= 1) {
         return;
       }
 
       event.preventDefault();
-      handleClose();
+      revealControls();
+
+      if (event.key === "ArrowLeft") {
+        handlePrevious();
+      } else {
+        handleNext();
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -367,7 +393,14 @@ export function WorkProjectGalleryClient({
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleClose, isModal]);
+  }, [
+    handleClose,
+    handleNext,
+    handlePrevious,
+    images.length,
+    isModal,
+    revealControls,
+  ]);
 
   return (
     <section
