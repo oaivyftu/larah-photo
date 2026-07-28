@@ -97,17 +97,14 @@
   width: 100%;
   aspect-ratio: 1.52 / 1;
   overflow: hidden;
-  background: var(--color-line-soft);
 }
 
 .service-row__media img {
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .service-row__details {
   display: grid;
-  min-height: clamp(17rem, 20vw, 24rem);
-  align-content: space-between;
   gap: 2rem;
 }
 

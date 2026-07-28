@@ -84,7 +84,7 @@ export const fallbackContactPage: ContactPageContent = {
 
 export const fallbackServicePage: ServicePageContent = {
   eyebrow: "Services / Session design",
-  titleWords: ["Packages", "for", "stories", "with", "shape."],
+  titleWords: ["Service -", "Enjoy!"],
   image: {
     src: "/images/services/service-package.jpg",
     alt: "Photography package detail",
