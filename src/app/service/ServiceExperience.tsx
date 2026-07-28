@@ -6,15 +6,17 @@ import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import type { ServicePackage } from "@/types/service";
+import type { ServicePageContent } from "@/types/site";
 import styles from "./service.module.scss";
 
 gsap.registerPlugin(useGSAP);
 
 type ServiceExperienceProps = {
+  content: ServicePageContent;
   services: ServicePackage[];
 };
 
-export function ServiceExperience({ services }: ServiceExperienceProps) {
+export function ServiceExperience({ content, services }: ServiceExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -62,8 +64,9 @@ export function ServiceExperience({ services }: ServiceExperienceProps) {
     <main className={styles["service"]} ref={rootRef}>
       <section className={styles["service__header"]} aria-labelledby="service-title">
         <h1 className={styles["service__title"]} data-page-heading id="service-title">
-          <span>Service&nbsp;-</span>
-          <span>Enjoy!</span>
+          {content.titleWords.map((word, index) => (
+            <span key={`${word}-${index}`}>{word}</span>
+          ))}
         </h1>
       </section>
 
@@ -76,7 +79,7 @@ export function ServiceExperience({ services }: ServiceExperienceProps) {
               <h2>{service.title}</h2>
               <p>{service.description}</p>
               <Link data-transition-label="Contact" href={service.ctaHref}>
-                BOOK NOW <span aria-hidden="true">-&gt;</span>
+                BOOK NOW <span aria-hidden="true">&#8594;</span>
               </Link>
             </div>
 
