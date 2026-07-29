@@ -4,11 +4,20 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { InquiryForm } from "@/components/contact/InquiryForm/InquiryForm";
+import type { ContactPageContent } from "@/types/site";
 import styles from "./contact.module.scss";
 
 gsap.registerPlugin(useGSAP);
 
-export function ContactExperience() {
+type ContactExperienceProps = {
+  content: ContactPageContent;
+  sessionTypes: string[];
+};
+
+export function ContactExperience({
+  content,
+  sessionTypes,
+}: ContactExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -57,15 +66,14 @@ export function ContactExperience() {
       <section className={styles["contact__layout"]} aria-labelledby="contact-title">
         <div className={styles["contact__copy"]}>
           <h1 className={styles["contact__title"]} data-page-heading id="contact-title">
-            <span>Contact&nbsp;-</span>
-            <span>Enjoy!</span>
+            {content.titleWords.map((word, index) => (
+              <span key={`${word}-${index}`}>{word}</span>
+            ))}
           </h1>
-          <p data-contact-statement>
-            I BELIEVE IN THE POWER OF DIGITAL, AND I LOVE COLLABORATING WITH BRANDS THAT FEEL THE SAME. LET&apos;S CONNECT.
-          </p>
+          <p data-contact-statement>{content.formCopy}</p>
         </div>
         <div className={styles["contact__form"]} data-contact-form id="book">
-          <InquiryForm />
+          <InquiryForm sessionTypes={sessionTypes} />
         </div>
       </section>
     </main>

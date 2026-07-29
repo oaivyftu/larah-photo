@@ -24,6 +24,8 @@ export async function PageShell({ children, variant }: PageShellProps) {
     <div className={styles["page-shell"]} id="top">
       <SiteHeader
         activeHref={activeHrefByVariant[variant]}
+        navigationItems={settings.navigationItems}
+        siteName={settings.name}
       />
       <main
         className={[

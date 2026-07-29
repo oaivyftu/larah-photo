@@ -3,6 +3,7 @@ export type ProjectImage = {
   alt: string;
   width: number;
   height: number;
+  blurDataURL?: string;
 };
 
 export type WorkPlacement = {
@@ -25,6 +26,7 @@ export type Project = {
   serviceCategory: string;
   description: string;
   image: string;
+  imageBlurDataURL?: string;
   alt: string;
   imageAlt: string;
   width: number;

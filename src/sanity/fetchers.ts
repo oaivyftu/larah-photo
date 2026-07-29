@@ -1,14 +1,5 @@
-import {
-  fallbackAboutPage,
-  fallbackContactPage,
-  fallbackHomePage,
-  fallbackServicePage,
-  fallbackWorkPage,
-} from "@/data/pages";
-import { services as fallbackServices } from "@/data/services";
-import { fallbackSiteSettings } from "@/data/site";
-import { workProjects as fallbackProjects } from "@/data/work";
-import type { Project, WorkPlacement } from "@/types/project";
+import type { NavigationItem } from "@/types/navigation";
+import type { Project, ProjectImage, WorkPlacement } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
 import type {
   AboutPageContent,
@@ -32,40 +23,64 @@ import {
   workPageQuery,
 } from "./queries";
 
-type SanitySiteSettings = Partial<
-  Pick<
-    SiteSettings,
-    "name" | "instagramUrl" | "email" | "phone" | "location" | "footerStatement"
-  >
->;
+type SanitySiteSettings = {
+  name?: string;
+  instagramUrl?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  footerStatement?: string;
+  navigationItems?: NavigationItem[];
+};
 
-type SanityPageImage = SanityImageValue | null;
-
-type SanityHomePage = Partial<
-  Omit<HomePageContent, "manifestoWords" | "manifestoImageOne" | "manifestoImageTwo" | "heroImage">
-> & {
+type SanityHomePage = {
+  eyebrow?: string;
   titleWords?: string[];
+  heroImage?: SanityImageValue;
   manifestoWords?: string[];
-  heroImage?: SanityPageImage;
-  manifestoImageOne?: SanityPageImage;
-  manifestoImageTwo?: SanityPageImage;
+  manifestoImageOne?: SanityImageValue;
+  manifestoImageTwo?: SanityImageValue;
+  selectedWorkEyebrow?: string;
+  servicesEyebrow?: string;
+  servicesTitle?: string;
 };
 
-type SanityAboutPage = Partial<
-  Omit<AboutPageContent, "portraitOne" | "portraitTwo">
-> & {
-  portraitOne?: SanityPageImage;
-  portraitTwo?: SanityPageImage;
+type SanityAboutPage = {
+  eyebrow?: string;
+  titleWords?: string[];
+  largeText?: string;
+  portraitOne?: SanityImageValue;
+  portraitTwo?: SanityImageValue;
+  notes?: string[];
+  story?: string[];
 };
 
-type SanityWorkPage = Partial<WorkPageContent>;
-
-type SanityContactPage = Partial<Omit<ContactPageContent, "image">> & {
-  image?: SanityPageImage;
+type SanityWorkPage = {
+  eyebrow?: string;
+  titleWords?: string[];
+  indexLabel?: string;
 };
 
-type SanityServicePage = Partial<Omit<ServicePageContent, "image">> & {
-  image?: SanityPageImage;
+type SanityContactPage = {
+  eyebrow?: string;
+  titleWords?: string[];
+  largeText?: string;
+  fastestRouteLabel?: string;
+  fastestRouteTitle?: string;
+  locationLabel?: string;
+  locationTitle?: string;
+  locationDescription?: string;
+  image?: SanityImageValue;
+  formEyebrow?: string;
+  formTitle?: string;
+  formCopy?: string;
+};
+
+type SanityServicePage = {
+  eyebrow?: string;
+  titleWords?: string[];
+  image?: SanityImageValue;
+  imageCopy?: string;
 };
 
 type SanityService = {
@@ -76,7 +91,7 @@ type SanityService = {
   description?: string;
   features?: string[];
   price?: number;
-  image?: SanityPageImage;
+  image?: SanityImageValue;
   ctaHref?: string;
 };
 
@@ -92,27 +107,70 @@ type SanityProject = {
   clientSubject?: string;
   serviceCategory?: string;
   description?: string;
-  cardImage?: SanityPageImage;
+  cardImage?: SanityImageValue;
   featured?: boolean;
   featuredOrder?: number;
   homepageSpan?: string;
   workSpan?: string;
   images?: Array<{
-    image?: SanityPageImage;
+    image?: SanityImageValue;
   }>;
 };
 
-async function fetchSanity<T>(query: string): Promise<T | null> {
+async function fetchSanity<T>(query: string, label: string): Promise<T> {
   if (!isSanityConfigured) {
-    return null;
+    throw new Error(
+      `Sanity is required to load ${label}. Configure NEXT_PUBLIC_SANITY_PROJECT_ID and NEXT_PUBLIC_SANITY_DATASET.`,
+    );
   }
 
   try {
     return await sanityClient.fetch<T>(query);
   } catch (error) {
-    console.warn("Sanity fetch failed; using local fallback.", error);
-    return null;
+    throw new Error(`Unable to load ${label} from Sanity.`, { cause: error });
   }
+}
+
+function requireValue<T>(
+  value: T | null | undefined,
+  field: string,
+): NonNullable<T> {
+  if (value === null || value === undefined) {
+    throw new Error(`Sanity field "${field}" is required.`);
+  }
+
+  return value;
+}
+
+function requireString(value: string | null | undefined, field: string) {
+  const resolved = requireValue(value, field).trim();
+
+  if (!resolved) {
+    throw new Error(`Sanity field "${field}" cannot be empty.`);
+  }
+
+  return resolved;
+}
+
+function requireStringArray(
+  value: string[] | null | undefined,
+  field: string,
+) {
+  const resolved = requireValue(value, field);
+
+  if (!resolved.length || resolved.some((item) => !item.trim())) {
+    throw new Error(`Sanity field "${field}" must contain non-empty values.`);
+  }
+
+  return resolved;
+}
+
+function requireDocument<T>(value: T | null, label: string): T {
+  if (!value) {
+    throw new Error(`Sanity document "${label}" is required.`);
+  }
+
+  return value;
 }
 
 function getInstagramDisplayUrl(url: string) {
@@ -120,143 +178,265 @@ function getInstagramDisplayUrl(url: string) {
 }
 
 function getInstagramHandle(displayUrl: string) {
-  return `@${
-    displayUrl
-      .replace(/^www\./, "")
-      .replace(/^instagram\.com\//, "")
-      .replace(/\/$/, "") || "larahphoto"
-  }`;
+  const handle = displayUrl
+    .replace(/^www\./, "")
+    .replace(/^instagram\.com\//, "")
+    .replace(/\/$/, "");
+
+  return `@${handle}`;
 }
 
 export async function getSiteSettings(): Promise<SiteSettings> {
-  const settings = await fetchSanity<SanitySiteSettings>(siteSettingsQuery);
-  const instagramUrl = settings?.instagramUrl ?? fallbackSiteSettings.instagramUrl;
+  const settings = requireDocument(
+    await fetchSanity<SanitySiteSettings | null>(
+      siteSettingsQuery,
+      "site settings",
+    ),
+    "siteSettings",
+  );
+  const instagramUrl = requireString(
+    settings.instagramUrl,
+    "siteSettings.instagramUrl",
+  );
   const instagramDisplayUrl = getInstagramDisplayUrl(instagramUrl);
+  const navigationItems = requireValue(
+    settings.navigationItems,
+    "siteSettings.navigationItems",
+  );
+
+  if (!navigationItems.length) {
+    throw new Error(
+      'Sanity field "siteSettings.navigationItems" must contain at least one item.',
+    );
+  }
 
   return {
-    ...fallbackSiteSettings,
-    ...settings,
+    name: requireString(settings.name, "siteSettings.name"),
     instagramUrl,
     instagramDisplayUrl,
     instagramHandle: getInstagramHandle(instagramDisplayUrl),
+    email: requireString(settings.email, "siteSettings.email"),
+    phone: requireString(settings.phone, "siteSettings.phone"),
+    location: requireString(settings.location, "siteSettings.location"),
+    footerStatement: requireString(
+      settings.footerStatement,
+      "siteSettings.footerStatement",
+    ),
+    navigationItems: navigationItems.map((item, index) => ({
+      label: requireString(
+        item.label,
+        `siteSettings.navigationItems[${index}].label`,
+      ),
+      href: requireString(
+        item.href,
+        `siteSettings.navigationItems[${index}].href`,
+      ),
+    })),
   };
 }
 
 export async function getHomePage(): Promise<HomePageContent> {
-  const page = await fetchSanity<SanityHomePage>(homePageQuery);
+  const page = requireDocument(
+    await fetchSanity<SanityHomePage | null>(homePageQuery, "the home page"),
+    "homePage",
+  );
+  const manifestoWords = requireStringArray(
+    page.manifestoWords,
+    "homePage.manifestoWords",
+  );
+
+  if (manifestoWords.length !== 3) {
+    throw new Error(
+      'Sanity field "homePage.manifestoWords" must contain exactly three items.',
+    );
+  }
 
   return {
-    ...fallbackHomePage,
-    ...page,
-    titleWords: page?.titleWords?.length ? page.titleWords : fallbackHomePage.titleWords,
-    manifestoWords:
-      page?.manifestoWords?.length === 3
-        ? [page.manifestoWords[0], page.manifestoWords[1], page.manifestoWords[2]]
-        : fallbackHomePage.manifestoWords,
-    heroImage: page?.heroImage
-      ? resolveSanityImage(page.heroImage, fallbackHomePage.manifestoImageOne)
-      : undefined,
+    eyebrow: requireString(page.eyebrow, "homePage.eyebrow"),
+    titleWords: requireStringArray(page.titleWords, "homePage.titleWords"),
+    heroImage: resolveSanityImage(page.heroImage, "homePage.heroImage"),
+    manifestoWords: [
+      manifestoWords[0],
+      manifestoWords[1],
+      manifestoWords[2],
+    ],
     manifestoImageOne: resolveSanityImage(
-      page?.manifestoImageOne,
-      fallbackHomePage.manifestoImageOne,
+      page.manifestoImageOne,
+      "homePage.manifestoImageOne",
     ),
     manifestoImageTwo: resolveSanityImage(
-      page?.manifestoImageTwo,
-      fallbackHomePage.manifestoImageTwo,
+      page.manifestoImageTwo,
+      "homePage.manifestoImageTwo",
+    ),
+    selectedWorkEyebrow: requireString(
+      page.selectedWorkEyebrow,
+      "homePage.selectedWorkEyebrow",
+    ),
+    servicesEyebrow: requireString(
+      page.servicesEyebrow,
+      "homePage.servicesEyebrow",
+    ),
+    servicesTitle: requireString(
+      page.servicesTitle,
+      "homePage.servicesTitle",
     ),
   };
 }
 
 export async function getAboutPage(): Promise<AboutPageContent> {
-  const page = await fetchSanity<SanityAboutPage>(aboutPageQuery);
+  const page = requireDocument(
+    await fetchSanity<SanityAboutPage | null>(aboutPageQuery, "the about page"),
+    "aboutPage",
+  );
 
   return {
-    ...fallbackAboutPage,
-    ...page,
-    titleWords: page?.titleWords?.length ? page.titleWords : fallbackAboutPage.titleWords,
-    notes: page?.notes?.length ? page.notes : fallbackAboutPage.notes,
-    story: page?.story?.length ? page.story : fallbackAboutPage.story,
-    portraitOne: resolveSanityImage(page?.portraitOne, fallbackAboutPage.portraitOne),
-    portraitTwo: resolveSanityImage(page?.portraitTwo, fallbackAboutPage.portraitTwo),
+    eyebrow: requireString(page.eyebrow, "aboutPage.eyebrow"),
+    titleWords: requireStringArray(page.titleWords, "aboutPage.titleWords"),
+    largeText: requireString(page.largeText, "aboutPage.largeText"),
+    portraitOne: resolveSanityImage(
+      page.portraitOne,
+      "aboutPage.portraitOne",
+    ),
+    portraitTwo: resolveSanityImage(
+      page.portraitTwo,
+      "aboutPage.portraitTwo",
+    ),
+    notes: requireStringArray(page.notes, "aboutPage.notes"),
+    story: requireStringArray(page.story, "aboutPage.story"),
   };
 }
 
 export async function getWorkPage(): Promise<WorkPageContent> {
-  const page = await fetchSanity<SanityWorkPage>(workPageQuery);
+  const page = requireDocument(
+    await fetchSanity<SanityWorkPage | null>(workPageQuery, "the work page"),
+    "workPage",
+  );
 
   return {
-    ...fallbackWorkPage,
-    ...page,
-    titleWords: page?.titleWords?.length ? page.titleWords : fallbackWorkPage.titleWords,
+    eyebrow: requireString(page.eyebrow, "workPage.eyebrow"),
+    titleWords: requireStringArray(page.titleWords, "workPage.titleWords"),
+    indexLabel: requireString(page.indexLabel, "workPage.indexLabel"),
   };
 }
 
 export async function getContactPage(): Promise<ContactPageContent> {
-  const page = await fetchSanity<SanityContactPage>(contactPageQuery);
+  const page = requireDocument(
+    await fetchSanity<SanityContactPage | null>(
+      contactPageQuery,
+      "the contact page",
+    ),
+    "contactPage",
+  );
 
   return {
-    ...fallbackContactPage,
-    ...page,
-    titleWords: page?.titleWords?.length
-      ? page.titleWords
-      : fallbackContactPage.titleWords,
-    image: resolveSanityImage(page?.image, fallbackContactPage.image),
+    eyebrow: requireString(page.eyebrow, "contactPage.eyebrow"),
+    titleWords: requireStringArray(page.titleWords, "contactPage.titleWords"),
+    largeText: requireString(page.largeText, "contactPage.largeText"),
+    fastestRouteLabel: requireString(
+      page.fastestRouteLabel,
+      "contactPage.fastestRouteLabel",
+    ),
+    fastestRouteTitle: requireString(
+      page.fastestRouteTitle,
+      "contactPage.fastestRouteTitle",
+    ),
+    locationLabel: requireString(
+      page.locationLabel,
+      "contactPage.locationLabel",
+    ),
+    locationTitle: requireString(
+      page.locationTitle,
+      "contactPage.locationTitle",
+    ),
+    locationDescription: requireString(
+      page.locationDescription,
+      "contactPage.locationDescription",
+    ),
+    image: resolveSanityImage(page.image, "contactPage.image"),
+    formEyebrow: requireString(
+      page.formEyebrow,
+      "contactPage.formEyebrow",
+    ),
+    formTitle: requireString(page.formTitle, "contactPage.formTitle"),
+    formCopy: requireString(page.formCopy, "contactPage.formCopy"),
   };
 }
 
 export async function getServicePage(): Promise<ServicePageContent> {
-  const page = await fetchSanity<SanityServicePage>(servicePageQuery);
+  const page = requireDocument(
+    await fetchSanity<SanityServicePage | null>(
+      servicePageQuery,
+      "the service page",
+    ),
+    "servicePage",
+  );
 
   return {
-    ...fallbackServicePage,
-    ...page,
-    titleWords: page?.titleWords?.length
-      ? page.titleWords
-      : fallbackServicePage.titleWords,
-    image: resolveSanityImage(page?.image, fallbackServicePage.image),
+    eyebrow: requireString(page.eyebrow, "servicePage.eyebrow"),
+    titleWords: requireStringArray(page.titleWords, "servicePage.titleWords"),
+    image: page.image?.asset?.url
+      ? resolveSanityImage(page.image, "servicePage.image")
+      : undefined,
+    imageCopy: requireString(page.imageCopy, "servicePage.imageCopy"),
   };
 }
 
 export async function getServices(): Promise<ServicePackage[]> {
-  const services = await fetchSanity<SanityService[]>(servicesQuery);
-
-  if (!services?.length) {
-    return fallbackServices;
-  }
+  const services = await fetchSanity<SanityService[]>(
+    servicesQuery,
+    "service packages",
+  );
 
   return services.map((service, index) => {
-    const fallback = fallbackServices[index] ?? fallbackServices[0];
-    const image = resolveSanityImage(service.image, {
-      src: fallback.image,
-      alt: fallback.imageAlt,
-      width: 2048,
-      height: 1366,
-    });
+    const id = requireString(
+      service.id ?? service._id,
+      `servicePackage[${index}].id`,
+    );
+    const image = resolveSanityImage(
+      service.image,
+      `servicePackage[${index}].image`,
+    );
 
     return {
-      id: service.id ?? service._id ?? fallback.id,
-      index: service.index ?? fallback.index,
-      title: service.title ?? fallback.title,
-      description: service.description ?? fallback.description,
-      features: service.features?.length ? service.features : fallback.features,
-      price: service.price ?? fallback.price,
+      id,
+      index: requireString(
+        service.index,
+        `servicePackage[${index}].index`,
+      ),
+      title: requireString(
+        service.title,
+        `servicePackage[${index}].title`,
+      ),
+      description: requireString(
+        service.description,
+        `servicePackage[${index}].description`,
+      ),
+      features: requireStringArray(
+        service.features,
+        `servicePackage[${index}].features`,
+      ),
+      price: requireValue(
+        service.price,
+        `servicePackage[${index}].price`,
+      ),
       image: image.src,
+      imageBlurDataURL: image.blurDataURL,
       imageAlt: image.alt,
-      ctaHref: service.ctaHref ?? fallback.ctaHref,
+      ctaHref: requireString(
+        service.ctaHref,
+        `servicePackage[${index}].ctaHref`,
+      ),
     };
   });
 }
 
 export async function getWorkProjects(): Promise<Project[]> {
-  const projects = await fetchSanity<SanityProject[]>(projectsQuery);
+  const projects = await fetchSanity<SanityProject[]>(
+    projectsQuery,
+    "work projects",
+  );
 
-  if (!projects?.length) {
-    return fallbackProjects;
-  }
-
-  return projects
-    .map((project, index) => mapSanityProject(project, fallbackProjects[index] ?? fallbackProjects[0]))
-    .filter(Boolean);
+  return projects.map(mapSanityProject);
 }
 
 export async function getFeaturedWorkProjects(): Promise<Project[]> {
@@ -291,36 +471,41 @@ function parseSpan(value: string | undefined): WorkPlacement["homepageSpan"] {
     : undefined;
 }
 
-function mapSanityProject(project: SanityProject, fallback: Project): Project {
-  const slug = getSlug(project.slug) ?? fallback.slug;
-  const cardImage = resolveSanityImage(project.cardImage, {
-    src: fallback.image,
-    alt: fallback.alt,
-    width: fallback.width,
-    height: fallback.height,
-  });
-  const images =
-    project.images?.length
-      ? project.images.map((item, index) =>
-          resolveSanityImage(item.image, fallback.images[index] ?? cardImage),
-        )
-      : fallback.images;
-  const featured = project.featured ?? fallback.featured ?? false;
+function mapSanityProject(project: SanityProject, index: number): Project {
+  const fieldPrefix = `workProject[${index}]`;
+  const slug = requireString(getSlug(project.slug), `${fieldPrefix}.slug`);
+  const cardImage = resolveSanityImage(
+    project.cardImage,
+    `${fieldPrefix}.cardImage`,
+  );
+  const images: ProjectImage[] = (project.images ?? []).map((item, imageIndex) =>
+    resolveSanityImage(item.image, `${fieldPrefix}.images[${imageIndex}].image`),
+  );
+  const featured = project.featured === true;
 
   return {
-    ...fallback,
-    id: project._id ?? slug,
+    id: requireString(project._id, `${fieldPrefix}._id`),
     slug,
-    title: project.title ?? fallback.title,
-    meta: project.meta ?? fallback.meta,
-    category: project.category ?? fallback.category,
-    tags: project.tags?.length ? project.tags : fallback.tags,
-    year: project.year ?? fallback.year,
-    location: project.location ?? fallback.location,
-    clientSubject: project.clientSubject ?? fallback.clientSubject,
-    serviceCategory: project.serviceCategory ?? fallback.serviceCategory,
-    description: project.description ?? fallback.description,
+    title: requireString(project.title, `${fieldPrefix}.title`),
+    meta: requireString(project.meta, `${fieldPrefix}.meta`),
+    category: requireString(project.category, `${fieldPrefix}.category`),
+    tags: requireStringArray(project.tags, `${fieldPrefix}.tags`),
+    year: requireString(project.year, `${fieldPrefix}.year`),
+    location: requireString(project.location, `${fieldPrefix}.location`),
+    clientSubject: requireString(
+      project.clientSubject,
+      `${fieldPrefix}.clientSubject`,
+    ),
+    serviceCategory: requireString(
+      project.serviceCategory,
+      `${fieldPrefix}.serviceCategory`,
+    ),
+    description: requireString(
+      project.description,
+      `${fieldPrefix}.description`,
+    ),
     image: cardImage.src,
+    imageBlurDataURL: cardImage.blurDataURL,
     alt: cardImage.alt,
     imageAlt: cardImage.alt,
     width: cardImage.width,
@@ -328,11 +513,9 @@ function mapSanityProject(project: SanityProject, fallback: Project): Project {
     featured,
     placement: {
       featured,
-      featuredOrder: project.featuredOrder ?? fallback.placement?.featuredOrder,
-      homepageSpan: parseSpan(project.homepageSpan) ?? fallback.placement?.homepageSpan,
-      workSpan:
-        (parseSpan(project.workSpan) as WorkPlacement["workSpan"] | undefined) ??
-        fallback.placement?.workSpan,
+      featuredOrder: project.featuredOrder,
+      homepageSpan: parseSpan(project.homepageSpan),
+      workSpan: parseSpan(project.workSpan) as WorkPlacement["workSpan"],
     },
     coverImage: cardImage.src,
     images,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type Isotope from "isotope-layout";
 import type { Project } from "@/types/project";
 import { WorkCard } from "../WorkCard/WorkCard";
@@ -10,6 +10,11 @@ const ALL_FILTER = "all";
 const ITEM_SELECTOR = `.${styles["work-layout__item"]}`;
 const COLUMN_SIZER_SELECTOR = `.${styles["work-layout__sizer"]}`;
 const GUTTER_SIZER_SELECTOR = `.${styles["work-layout__gutter-sizer"]}`;
+const SKELETON_COLUMNS = [
+  ["tall", "short"],
+  ["medium", "tall"],
+  ["short", "medium"],
+] as const;
 
 type WorkMasonryGridProps = {
   activeFilter?: string;
@@ -40,6 +45,7 @@ export function WorkMasonryGrid({
   const activeFilterRef = useRef(activeFilter);
   const layoutRef = useRef<Isotope | undefined>(undefined);
   const gridRef = useRef<HTMLDivElement>(null);
+  const [isMasonryReady, setIsMasonryReady] = useState(false);
 
   const sortedItems = useMemo(() => {
     if (variant !== "homepage") {
@@ -68,19 +74,18 @@ export function WorkMasonryGrid({
       return;
     }
 
-    let cleanupImagesLoaded: (() => void) | undefined;
     let cancelled = false;
 
     async function initMasonry(masonryElement: HTMLDivElement) {
-      const [{ default: IsotopeLayout }, { default: imagesLoaded }] =
-        await Promise.all([import("isotope-layout"), import("imagesloaded")]);
+      const { default: IsotopeLayout } = await import("isotope-layout");
 
       if (cancelled) {
         return;
       }
 
-      layoutRef.current = new IsotopeLayout(masonryElement, {
+      const instance = new IsotopeLayout(masonryElement, {
         filter: filterItem,
+        initLayout: true,
         itemSelector: ITEM_SELECTOR,
         layoutMode: "masonry",
         masonry: {
@@ -91,23 +96,25 @@ export function WorkMasonryGrid({
         transitionDuration: "260ms",
       });
 
-      const tracker = imagesLoaded(masonryElement);
-      const handleLayout = () => layoutRef.current?.layout();
-
-      tracker.on("progress", handleLayout);
-      tracker.on("always", handleLayout);
-
-      cleanupImagesLoaded = () => {
-        tracker.off("progress", handleLayout);
-        tracker.off("always", handleLayout);
+      const handleFirstLayoutComplete = () => {
+        if (!cancelled) {
+          setIsMasonryReady(true);
+        }
       };
+
+      layoutRef.current = instance;
+      instance.once("layoutComplete", handleFirstLayoutComplete);
+      instance.arrange({ filter: filterItem });
     }
 
-    void initMasonry(container);
+    void initMasonry(container).catch(() => {
+      if (!cancelled) {
+        setIsMasonryReady(true);
+      }
+    });
 
     return () => {
       cancelled = true;
-      cleanupImagesLoaded?.();
       layoutRef.current?.destroy();
       layoutRef.current = undefined;
     };
@@ -123,8 +130,38 @@ export function WorkMasonryGrid({
       className={`${styles["work-layout"]} ${
         styles[`work-layout--${variant}`]
       } ${className ?? ""}`}
+      aria-busy={!isMasonryReady}
     >
-      <div className={styles["work-layout__grid"]} ref={gridRef}>
+      {!isMasonryReady && (
+        <div
+          aria-hidden="true"
+          className={`${styles["work-layout__skeleton"]} styles["work-layout__skeleton--visible"]`}
+        >
+          {SKELETON_COLUMNS.map((column, columnIndex) => (
+            <div
+              className={styles["work-layout__skeleton-column"]}
+              key={columnIndex}
+            >
+              {column.map((size, blockIndex) => (
+                <span
+                  className={`${styles["work-layout__skeleton-block"]} ${
+                    styles[`work-layout__skeleton-block--${size}`]
+                  }`}
+                  key={`${size}-${blockIndex}`}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+      <div
+        className={`${styles["work-layout__grid"]} ${
+          isMasonryReady
+            ? styles["work-layout__grid--ready"]
+            : styles["work-layout__grid--pending"]
+        }`}
+        ref={gridRef}
+      >
         <div className={styles["work-layout__sizer"]} aria-hidden="true" />
         <div
           className={styles["work-layout__gutter-sizer"]}

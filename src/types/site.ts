@@ -1,4 +1,5 @@
 import type { ProjectImage } from "@/types/project";
+import type { NavigationItem } from "@/types/navigation";
 
 export type SiteSettings = {
   name: string;
@@ -9,12 +10,13 @@ export type SiteSettings = {
   phone: string;
   location: string;
   footerStatement: string;
+  navigationItems: NavigationItem[];
 };
 
 export type HomePageContent = {
   eyebrow: string;
   titleWords: string[];
-  heroImage?: ProjectImage;
+  heroImage: ProjectImage;
   manifestoWords: [string, string, string];
   manifestoImageOne: ProjectImage;
   manifestoImageTwo: ProjectImage;
@@ -57,6 +59,6 @@ export type ContactPageContent = {
 export type ServicePageContent = {
   eyebrow: string;
   titleWords: string[];
-  image: ProjectImage;
+  image?: ProjectImage;
   imageCopy: string;
 };

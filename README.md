@@ -55,9 +55,9 @@ npm run dev
 - Website: [http://localhost:3000](http://localhost:3000)
 - CMS admin: [http://localhost:3000/studio](http://localhost:3000/studio)
 
-If Sanity environment variables are missing or the dataset has no documents yet,
-the website falls back to the local content in `src/data/*` so the frontend still
-builds and renders.
+Sanity is the required content source for page copy, navigation, site settings,
+services, and work projects. The website reports a configuration or content
+error when required Sanity data is unavailable.
 
 ## Contact Form Email
 
@@ -68,12 +68,11 @@ environment variables locally and in production:
 RESEND_API_KEY=your_resend_api_key
 CONTACT_FROM_EMAIL="Larah Photo <inquiries@your-verified-domain.com>"
 CONTACT_TO_EMAIL=hello@example.com
-NEXT_PUBLIC_INSTAGRAM_URL=https://instagram.com/your_username
 ```
 
 `CONTACT_FROM_EMAIL` must use a domain verified in Resend. `CONTACT_TO_EMAIL` is
-the inbox that should receive session inquiries. `NEXT_PUBLIC_INSTAGRAM_URL`
-controls the primary booking CTA used across the site.
+the inbox that should receive session inquiries. The Instagram URL is managed in
+the Sanity `Site settings` document.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

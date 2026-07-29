@@ -1,7 +1,12 @@
-import { instagramUrl } from "@/data/social";
 import styles from "./InstagramBookingCard.module.scss";
 
-export function InstagramBookingCard() {
+type InstagramBookingCardProps = {
+  instagramUrl: string;
+};
+
+export function InstagramBookingCard({
+  instagramUrl,
+}: InstagramBookingCardProps) {
   return (
     <aside
       className={styles["instagram-booking-card"]}

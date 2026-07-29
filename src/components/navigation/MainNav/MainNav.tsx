@@ -1,16 +1,17 @@
 import Link from "next/link";
-import { navigationItems } from "@/data/navigation";
+import type { NavigationItem } from "@/types/navigation";
 import styles from "./MainNav.module.scss";
 
 type MainNavProps = {
   activeHref?: string;
+  items: NavigationItem[];
 };
 
-export function MainNav({ activeHref }: MainNavProps) {
+export function MainNav({ activeHref, items }: MainNavProps) {
   return (
     <nav className={styles["main-nav"]} aria-label="Primary">
       <ul className={styles["main-nav__list"]}>
-        {navigationItems.map((item) => (
+        {items.map((item) => (
           <li className={styles["main-nav__item"]} key={item.href}>
             <Link
               className={[

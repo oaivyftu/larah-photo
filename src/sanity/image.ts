@@ -4,6 +4,7 @@ export type SanityImageValue = {
   asset?: {
     url?: string;
     metadata?: {
+      lqip?: string;
       dimensions?: {
         width?: number;
         height?: number;
@@ -15,14 +16,24 @@ export type SanityImageValue = {
 
 export function resolveSanityImage(
   image: SanityImageValue | null | undefined,
-  fallback: ProjectImage,
+  field: string,
 ): ProjectImage {
-  const dimensions = image?.asset?.metadata?.dimensions;
+  const src = image?.asset?.url;
+  const alt = image?.alt?.trim();
+  const width = image?.asset?.metadata?.dimensions?.width;
+  const height = image?.asset?.metadata?.dimensions?.height;
+
+  if (!src || !alt || !width || !height) {
+    throw new Error(
+      `Sanity image "${field}" requires an asset, alt text, and dimensions.`,
+    );
+  }
 
   return {
-    src: image?.asset?.url ?? fallback.src,
-    alt: image?.alt ?? fallback.alt,
-    width: dimensions?.width ?? fallback.width,
-    height: dimensions?.height ?? fallback.height,
+    src,
+    alt,
+    width,
+    height,
+    blurDataURL: image.asset?.metadata?.lqip,
   };
 }

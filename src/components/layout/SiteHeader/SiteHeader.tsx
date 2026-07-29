@@ -1,14 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MainNav } from "@/components/navigation/MainNav/MainNav";
+import type { NavigationItem } from "@/types/navigation";
 import styles from "./SiteHeader.module.scss";
 
 type SiteHeaderProps = {
   activeHref?: string;
   hideBrand?: boolean;
+  navigationItems: NavigationItem[];
+  siteName: string;
 };
 
-export function SiteHeader({ activeHref, hideBrand = false }: SiteHeaderProps) {
+export function SiteHeader({
+  activeHref,
+  hideBrand = false,
+  navigationItems,
+  siteName,
+}: SiteHeaderProps) {
   return (
     <header className={styles["site-header"]}>
       {hideBrand ? (
@@ -21,14 +29,14 @@ export function SiteHeader({ activeHref, hideBrand = false }: SiteHeaderProps) {
           <Image
             className={styles["site-header__logo"]}
             src="/logos/logo-larah.svg"
-            alt="Larah"
+            alt={siteName}
             width={96}
             height={32}
             loading="eager"
           />
         </Link>
       )}
-      <MainNav activeHref={activeHref} />
+      <MainNav activeHref={activeHref} items={navigationItems} />
     </header>
   );
 }

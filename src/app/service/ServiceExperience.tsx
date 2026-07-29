@@ -1,10 +1,10 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import type { ServicePackage } from "@/types/service";
 import type { ServicePageContent } from "@/types/site";
 import styles from "./service.module.scss";
@@ -84,9 +84,10 @@ export function ServiceExperience({ content, services }: ServiceExperienceProps)
             </div>
 
             <div className={styles["service-row__media"]}>
-              <Image
+              <LarahImage
                 src={service.image}
                 alt={service.imageAlt}
+                blurDataURL={service.imageBlurDataURL}
                 fill
                 sizes="(max-width: 900px) calc(100vw - 48px), 31vw"
               />

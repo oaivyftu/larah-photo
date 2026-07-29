@@ -18,6 +18,7 @@ export function getProjectGalleryImages(project: Project): ProjectImage[] {
       alt: project.alt,
       width: project.width,
       height: project.height,
+      blurDataURL: project.imageBlurDataURL,
     },
   ];
 }
