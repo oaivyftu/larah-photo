@@ -6,6 +6,7 @@ export type ServicePackage = {
   features: string[];
   price: number;
   image: string;
+  imageBlurDataURL?: string;
   imageAlt: string;
   ctaHref: string;
 };

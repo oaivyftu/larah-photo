@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
 import { WorkProjectGallery } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
 import { Icon } from "@/components/ui/Icon/Icon";
@@ -38,16 +38,7 @@ export function HomeExperience({
   const rootRef = useRef<HTMLElement>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const heroProject = projects[0];
-  const heroImage =
-    content.heroImage ??
-    (heroProject
-      ? {
-          src: heroProject.image,
-          alt: heroProject.alt,
-          width: heroProject.width,
-          height: heroProject.height,
-        }
-      : content.manifestoImageOne);
+  const heroImage = content.heroImage;
 
   useGSAP(
     () => {
@@ -188,10 +179,11 @@ export function HomeExperience({
           className={styles["hero__media"]}
           data-hero-media
         >
-          <Image
+          <LarahImage
             className={styles["hero__image"]}
             src={heroImage.src}
             alt={heroImage.alt}
+            blurDataURL={heroImage.blurDataURL}
             fill
             loading="eager"
             priority
@@ -217,17 +209,19 @@ export function HomeExperience({
           <span data-manifesto-word="motion">{content.manifestoWords[2]}</span>
         </div>
         <div className={styles["manifesto__image-one"]} data-manifesto-image="one">
-          <Image
+          <LarahImage
             src={content.manifestoImageOne.src}
             alt={content.manifestoImageOne.alt}
+            blurDataURL={content.manifestoImageOne.blurDataURL}
             fill
             sizes="(max-width: 760px) 46vw, 24vw"
           />
         </div>
         <div className={styles["manifesto__image-two"]} data-manifesto-image="two">
-          <Image
+          <LarahImage
             src={content.manifestoImageTwo.src}
             alt={content.manifestoImageTwo.alt}
+            blurDataURL={content.manifestoImageTwo.blurDataURL}
             fill
             sizes="(max-width: 760px) 42vw, 20vw"
           />

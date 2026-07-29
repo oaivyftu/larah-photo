@@ -6,8 +6,9 @@ import { useGSAP } from "@gsap/react";
 import { WorkFilters } from "@/components/work/WorkFilters/WorkFilters";
 import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
 import { WorkProjectGallery } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
-import { formatWorkCategory } from "@/data/work";
 import type { Project } from "@/types/project";
+import type { WorkPageContent } from "@/types/site";
+import { formatWorkCategory } from "@/utils/formatWorkCategory";
 import styles from "./work.module.scss";
 
 gsap.registerPlugin(useGSAP);
@@ -15,10 +16,14 @@ gsap.registerPlugin(useGSAP);
 const ALL_FILTER = "all";
 
 type WorkGalleryClientProps = {
+  content: WorkPageContent;
   projects: Project[];
 };
 
-export function WorkGalleryClient({ projects }: WorkGalleryClientProps) {
+export function WorkGalleryClient({
+  content,
+  projects,
+}: WorkGalleryClientProps) {
   const rootRef = useRef<HTMLElement>(null);
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -79,8 +84,9 @@ export function WorkGalleryClient({ projects }: WorkGalleryClientProps) {
     <section className={styles["work-page"]} ref={rootRef} aria-labelledby="work-title">
       <div className={styles["work-page__hero"]}>
         <h1 className={styles["work-page__title"]} data-page-heading id="work-title">
-          <span>Recent Work&nbsp;-</span>
-          <span>Enjoy!</span>
+          {content.titleWords.map((word, index) => (
+            <span key={`${word}-${index}`}>{word}</span>
+          ))}
         </h1>
       </div>
 

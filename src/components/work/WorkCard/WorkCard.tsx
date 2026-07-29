@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import type { Project } from "@/types/project";
 import styles from "./WorkCard.module.scss";
 
@@ -20,10 +20,11 @@ export function WorkCard({
   const content = (
     <>
       <span className={styles["work-card__media"]}>
-        <Image
+        <LarahImage
           className={styles["work-card__image"]}
           src={project.image}
           alt={project.alt}
+          blurDataURL={project.imageBlurDataURL}
           width={project.width}
           height={project.height}
           sizes={

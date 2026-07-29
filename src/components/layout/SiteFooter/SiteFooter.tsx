@@ -17,7 +17,7 @@ export function SiteFooter({ settings }: SiteFooterProps) {
         </p>
         <address className={styles["site-footer__contact"]}>
           <span className={styles["site-footer__label"]}>BUSINESS ENQUIRIES</span>
-          <a href="mailto:hoanglanmotor@gmail.com">{settings.email}</a>
+          <a href={`mailto:${settings.email}`}>{settings.email}</a>
           <a href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`}>
             {settings.phone}
           </a>

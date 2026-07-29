@@ -1,7 +1,6 @@
-import Image from "next/image";
+import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { icons } from "@/constants/icons";
-import { instagramUrl } from "@/data/social";
 import type { ServicePackage } from "@/types/service";
 import styles from "./ServiceCard.module.scss";
 
@@ -24,9 +23,7 @@ export function ServiceCard({ isPriority = false, service }: ServiceCardProps) {
           </div>
           <a
             className={styles["service-card__cta"]}
-            href={instagramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={service.ctaHref}
           >
             <span>BOOK NOW</span>
             <Icon
@@ -37,10 +34,11 @@ export function ServiceCard({ isPriority = false, service }: ServiceCardProps) {
           </a>
         </div>
         <div className={styles["service-card__media"]}>
-          <Image
+          <LarahImage
             className={styles["service-card__image"]}
             src={service.image}
             alt={service.imageAlt}
+            blurDataURL={service.imageBlurDataURL}
             fill
             loading={isPriority ? "eager" : "lazy"}
             sizes="(max-width: 720px) calc(100vw - 48px), (max-width: 1180px) 42vw, 440px"

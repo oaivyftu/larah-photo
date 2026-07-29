@@ -5,15 +5,6 @@ import { Icon } from "@/components/ui/Icon/Icon";
 import { icons } from "@/constants/icons";
 import styles from "./InquiryForm.module.scss";
 
-const sessionTypes = [
-  "Graduation",
-  "Portrait",
-  "Couple",
-  "Family",
-  "Branding",
-  "Other",
-];
-
 type FormValues = {
   name: string;
   email: string;
@@ -60,7 +51,11 @@ function validateForm(values: FormValues) {
   return errors;
 }
 
-export function InquiryForm() {
+type InquiryFormProps = {
+  sessionTypes: string[];
+};
+
+export function InquiryForm({ sessionTypes }: InquiryFormProps) {
   const formId = useId();
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});

@@ -4,6 +4,7 @@ export const imageFields = `
   asset->{
     url,
     metadata {
+      lqip,
       dimensions {
         width,
         height
@@ -18,7 +19,11 @@ export const siteSettingsQuery = `*[_type == "siteSettings"][0]{
   email,
   phone,
   location,
-  footerStatement
+  footerStatement,
+  navigationItems[]{
+    label,
+    href
+  }
 }`;
 
 export const homePageQuery = `*[_type == "homePage"][0]{

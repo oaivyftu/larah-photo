@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   memo,
   useCallback,
@@ -12,6 +11,7 @@ import {
 import type Flickity from "flickity";
 import "flickity/css/flickity.css";
 import "flickity-fade/flickity-fade.css";
+import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { icons } from "@/constants/icons";
 import { Icon } from "@/components/ui/Icon/Icon";
 import type { Project, ProjectImage } from "@/types/project";
@@ -49,8 +49,9 @@ const GallerySlide = memo(function GallerySlide({
       }`}
       id={slideId}
     >
-      <Image
+      <LarahImage
         alt={image.alt}
+        blurDataURL={image.blurDataURL}
         className={styles["work-project-gallery__image"]}
         draggable={false}
         height={image.height}
