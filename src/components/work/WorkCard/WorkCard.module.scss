@@ -23,6 +23,12 @@
   overflow: hidden;
 }
 
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+  .work-card__media {
+    cursor: none;
+  }
+}
+
 .work-card__image {
   display: block;
   width: 100%;

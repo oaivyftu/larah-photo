@@ -439,6 +439,12 @@
   }
 }
 
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+  .work-project-gallery--modal .work-project-gallery__carousel {
+    cursor: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .work-project-gallery__float-nav,
   .work-project-gallery__float-close,

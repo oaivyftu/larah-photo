@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type RefObject,
 } from "react";
 import type Flickity from "flickity";
 import "flickity/css/flickity.css";
@@ -14,12 +15,18 @@ import "flickity-fade/flickity-fade.css";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { icons } from "@/constants/icons";
 import { Icon } from "@/components/ui/Icon/Icon";
+import {
+  PointerHint,
+  usePointerHint,
+} from "@/components/ui/PointerHint/PointerHint";
 import type { Project, ProjectImage } from "@/types/project";
 import styles from "./WorkProjectGallery.module.scss";
 
 const CONTROLS_IDLE_DELAY = 1600;
 const AUTO_HIDE_MEDIA =
   "(hover: hover) and (pointer: fine) and (min-width: 761px)";
+const DRAGGABLE_MEDIA =
+  "(max-width: 760px), (hover: none), (pointer: coarse)";
 
 type WorkProjectGalleryClientProps = {
   images: ProjectImage[];
@@ -55,10 +62,13 @@ const GallerySlide = memo(function GallerySlide({
         className={styles["work-project-gallery__image"]}
         draggable={false}
         height={image.height}
-        priority={index < 2}
         sizes="(max-width: 760px) 86vw, 74vw"
         src={image.src}
         width={image.width}
+        style={{
+          objectFit: "contain",
+          objectPosition: "center",
+        }}
       />
     </figure>
   );
@@ -68,6 +78,7 @@ type GalleryFloatNavProps = {
   currentIndex: number;
   isModal: boolean;
   isVisible: boolean;
+  navRef: RefObject<HTMLElement | null>;
   onClose?: () => void;
   onControlsBlur: () => void;
   onControlsFocus: () => void;
@@ -82,6 +93,7 @@ function GalleryFloatNav({
   currentIndex,
   isModal,
   isVisible,
+  navRef,
   onClose,
   onControlsBlur,
   onControlsFocus,
@@ -103,6 +115,7 @@ function GalleryFloatNav({
           ? styles["work-project-gallery__float-nav--visible"]
           : ""
       }`}
+      ref={navRef}
       onFocusCapture={onControlsFocus}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -111,6 +124,7 @@ function GalleryFloatNav({
       }}
       onPointerEnter={onControlsPointerEnter}
       onPointerLeave={onControlsPointerLeave}
+      onPointerMove={onControlsPointerEnter}
     >
       {isModal && onClose ? (
         <button
@@ -172,6 +186,7 @@ export function WorkProjectGalleryClient({
   project,
 }: WorkProjectGalleryClientProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLElement>(null);
   const flickityRef = useRef<Flickity | null>(null);
   const controlsTimerRef = useRef<number | null>(null);
   const controlsFocusedRef = useRef(false);
@@ -179,6 +194,12 @@ export function WorkProjectGalleryClient({
   const canAutoHideControlsRef = useRef(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [areControlsVisible, setAreControlsVisible] = useState(true);
+  const {
+    hidePointerHint: hideCloseHint,
+    hintRef: closeHintRef,
+    isActive: isCloseHintActive,
+    pointerHintHandlers: closeHintHandlers,
+  } = usePointerHint<HTMLDivElement>();
 
   const handleClose = useCallback(() => {
     if (isModal) {
@@ -224,8 +245,9 @@ export function WorkProjectGalleryClient({
 
   const handleControlsFocus = useCallback(() => {
     controlsFocusedRef.current = true;
+    hideCloseHint();
     keepControlsVisible();
-  }, [keepControlsVisible]);
+  }, [hideCloseHint, keepControlsVisible]);
 
   const handleControlsBlur = useCallback(() => {
     controlsFocusedRef.current = false;
@@ -234,8 +256,9 @@ export function WorkProjectGalleryClient({
 
   const handleControlsPointerEnter = useCallback(() => {
     controlsHoveredRef.current = true;
+    hideCloseHint();
     keepControlsVisible();
-  }, [keepControlsVisible]);
+  }, [hideCloseHint, keepControlsVisible]);
 
   const handleControlsPointerLeave = useCallback(() => {
     controlsHoveredRef.current = false;
@@ -243,18 +266,48 @@ export function WorkProjectGalleryClient({
   }, [scheduleControlsHide]);
 
   const handlePrevious = useCallback(() => {
+    revealControls();
     flickityRef.current?.previous(true);
-  }, []);
+  }, [revealControls]);
 
   const handleNext = useCallback(() => {
+    revealControls();
     flickityRef.current?.next(true);
-  }, []);
+  }, [revealControls]);
+
+  const handleCarouselClick = useCallback(() => {
+    if (!isModal || !window.matchMedia(AUTO_HIDE_MEDIA).matches) {
+      return;
+    }
+
+    handleClose();
+  }, [handleClose, isModal]);
+
+  const isPointerOverControls = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const controls = controlsRef.current;
+
+      if (!controls) {
+        return false;
+      }
+
+      const bounds = controls.getBoundingClientRect();
+
+      return (
+        event.clientX >= bounds.left &&
+        event.clientX <= bounds.right &&
+        event.clientY >= bounds.top &&
+        event.clientY <= bounds.bottom
+      );
+    },
+    [],
+  );
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(AUTO_HIDE_MEDIA);
 
     const syncAutoHide = () => {
-      canAutoHideControlsRef.current = mediaQuery.matches;
+      canAutoHideControlsRef.current = isModal && mediaQuery.matches;
       clearControlsTimer();
       setAreControlsVisible(true);
       scheduleControlsHide();
@@ -267,7 +320,7 @@ export function WorkProjectGalleryClient({
       mediaQuery.removeEventListener("change", syncAutoHide);
       clearControlsTimer();
     };
-  }, [clearControlsTimer, scheduleControlsHide]);
+  }, [clearControlsTimer, isModal, scheduleControlsHide]);
 
   const slideIds = useMemo(
     () =>
@@ -300,7 +353,7 @@ export function WorkProjectGalleryClient({
         cellAlign: "center",
         contain: true,
         dragThreshold: 10,
-        draggable: true,
+        draggable: window.matchMedia(DRAGGABLE_MEDIA).matches,
         // friction: 1,
         // selectedAttraction: 0.5,
         imagesLoaded: true,
@@ -436,7 +489,35 @@ export function WorkProjectGalleryClient({
         <div
           aria-label={`${project.title} image gallery`}
           className={styles["work-project-gallery__carousel"]}
+          onClick={handleCarouselClick}
           onDragStart={(event) => event.preventDefault()}
+          onPointerEnter={(event) => {
+            revealControls();
+
+            if (isModal) {
+              if (isPointerOverControls(event)) {
+                hideCloseHint();
+              } else {
+                closeHintHandlers.onPointerEnter(event);
+              }
+            }
+          }}
+          onPointerLeave={(event) => {
+            if (isModal) {
+              closeHintHandlers.onPointerLeave(event);
+            }
+          }}
+          onPointerMove={(event) => {
+            revealControls();
+
+            if (isModal) {
+              if (isPointerOverControls(event)) {
+                hideCloseHint();
+              } else {
+                closeHintHandlers.onPointerMove(event);
+              }
+            }
+          }}
           ref={carouselRef}
         >
           {images.map((image, index) => (
@@ -450,10 +531,20 @@ export function WorkProjectGalleryClient({
           ))}
         </div>
 
+        {isModal ? (
+          <PointerHint
+            active={isCloseHintActive}
+            hintRef={closeHintRef}
+            label="Close"
+            variant="close"
+          />
+        ) : null}
+
         <GalleryFloatNav
           currentIndex={currentIndex}
           isModal={isModal}
           isVisible={areControlsVisible}
+          navRef={controlsRef}
           onClose={onClose ? handleClose : undefined}
           onControlsBlur={handleControlsBlur}
           onControlsFocus={handleControlsFocus}
