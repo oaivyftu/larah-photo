@@ -29,4 +29,7 @@ export const homePage = defineType({
       type: "string",
     }),
   ],
+  preview: {
+    prepare: () => ({ title: "Home page" }),
+  },
 });

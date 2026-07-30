@@ -9,4 +9,7 @@ export const contactPage = defineType({
     titleWordsField,
     defineField({ name: "formCopy", title: "Form copy", type: "text", rows: 3 }),
   ],
+  preview: {
+    prepare: () => ({ title: "Contact page" }),
+  },
 });

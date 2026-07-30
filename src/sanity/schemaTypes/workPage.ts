@@ -6,4 +6,7 @@ export const workPage = defineType({
   title: "Work page",
   type: "document",
   fields: [titleWordsField],
+  preview: {
+    prepare: () => ({ title: "Work page" }),
+  },
 });

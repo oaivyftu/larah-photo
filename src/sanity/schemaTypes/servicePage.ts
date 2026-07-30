@@ -6,4 +6,7 @@ export const servicePage = defineType({
   title: "Service page",
   type: "document",
   fields: [titleWordsField],
+  preview: {
+    prepare: () => ({ title: "Service page" }),
+  },
 });

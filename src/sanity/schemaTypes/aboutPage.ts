@@ -15,4 +15,7 @@ export const aboutPage = defineType({
       of: [defineArrayMember({ type: "text", rows: 4 })],
     }),
   ],
+  preview: {
+    prepare: () => ({ title: "About page" }),
+  },
 });
