@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import {
   PointerHint,
@@ -10,7 +11,6 @@ import styles from "./WorkCard.module.scss";
 
 type WorkCardProps = {
   className?: string;
-  onSelectProject: (project: Project) => void;
   project: Project;
   titleSuffix?: string;
   variant?: "homepage" | "work";
@@ -18,7 +18,6 @@ type WorkCardProps = {
 
 export function WorkCard({
   className,
-  onSelectProject,
   project,
   titleSuffix = "",
   variant = "work",
@@ -47,7 +46,7 @@ export function WorkCard({
         <PointerHint
           active={isActive}
           hintRef={hintRef}
-          label="Zoom"
+          label="View"
           variant="zoom"
         />
       </span>
@@ -67,16 +66,13 @@ export function WorkCard({
       data-work-card
       data-work-category={project.category}
     >
-      <button
+      <Link
         className={styles["work-card__link"]}
-        onClick={() => {
-          hidePointerHint();
-          onSelectProject(project);
-        }}
-        type="button"
+        href={`/work/${encodeURIComponent(project.slug)}`}
+        onClick={hidePointerHint}
       >
         {content}
-      </button>
+      </Link>
     </article>
   );
 }

@@ -20,7 +20,6 @@ type WorkMasonryGridProps = {
   activeFilter?: string;
   className?: string;
   items: Project[];
-  onSelectProject: (project: Project) => void;
   titleSuffix?: string;
   variant: "homepage" | "work";
 };
@@ -38,7 +37,6 @@ export function WorkMasonryGrid({
   activeFilter = ALL_FILTER,
   className,
   items,
-  onSelectProject,
   titleSuffix,
   variant,
 }: WorkMasonryGridProps) {
@@ -176,7 +174,6 @@ export function WorkMasonryGrid({
                 styles[`work-layout__item--span-${span}`]
               }`}
               key={project.id}
-              onSelectProject={onSelectProject}
               project={project}
               titleSuffix={titleSuffix}
               variant={variant}
