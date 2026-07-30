@@ -7,6 +7,8 @@ import styles from "./PageTransition.module.scss";
 
 const TRANSITION_DURATION = 780;
 
+type TransitionState = "covered" | "covering" | "revealing" | "idle";
+
 function isModifiedClick(event: MouseEvent) {
   return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
 }
@@ -24,11 +26,12 @@ export function PageTransition() {
   const router = useRouter();
   const isStudioRoute = pathname.startsWith("/studio");
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const [state, setState] = useState<"idle" | "leaving" | "entering">("idle");
+  const [state, setState] = useState<TransitionState>("covered");
 
   useEffect(() => {
-    document.documentElement.dataset.pageTransition = "entering";
-    const enterTimeout = setTimeout(() => setState("entering"), 0);
+    document.documentElement.dataset.pageTransition = "revealing";
+    const revealTimeout = setTimeout(() => setState("revealing"), 0);
+
     const idleTimeout = setTimeout(() => {
       document.documentElement.dataset.pageTransition = "ready";
       setState("idle");
@@ -36,7 +39,7 @@ export function PageTransition() {
     }, TRANSITION_DURATION);
 
     return () => {
-      clearTimeout(enterTimeout);
+      clearTimeout(revealTimeout);
       clearTimeout(idleTimeout);
     };
   }, [pathname]);
@@ -75,8 +78,8 @@ export function PageTransition() {
 
       event.preventDefault();
       clearTimeout(timeoutRef.current);
-      document.documentElement.dataset.pageTransition = "leaving";
-      setState("leaving");
+      document.documentElement.dataset.pageTransition = "covering";
+      setState("covering");
 
       timeoutRef.current = setTimeout(() => {
         router.push(destination);
@@ -98,9 +101,7 @@ export function PageTransition() {
   return (
     <div
       aria-hidden="true"
-      className={`${styles["page-transition"]} ${
-        state === "leaving" ? styles["page-transition--leaving"] : ""
-      } ${state === "entering" ? styles["page-transition--entering"] : ""}`}
+      className={`${styles["page-transition"]} ${styles[`page-transition--${state}`]}`}
     >
       <div className={styles["page-transition__curtain"]} />
       <div className={styles["page-transition__accent"]} />
