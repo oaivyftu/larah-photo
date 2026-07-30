@@ -397,7 +397,7 @@ export function WorkProjectGalleryClient({
         initialIndex,
         pageDots: false,
         percentPosition: true,
-        prevNextButtons: true,
+        prevNextButtons: false,
         setGallerySize: false,
         freeScroll: true,
         lazyLoad: true,
