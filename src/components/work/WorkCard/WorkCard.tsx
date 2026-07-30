@@ -1,4 +1,10 @@
+"use client";
+
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
+import {
+  PointerHint,
+  usePointerHint,
+} from "@/components/ui/PointerHint/PointerHint";
 import type { Project } from "@/types/project";
 import styles from "./WorkCard.module.scss";
 
@@ -17,9 +23,14 @@ export function WorkCard({
   titleSuffix = "",
   variant = "work",
 }: WorkCardProps) {
+  const { hidePointerHint, hintRef, isActive, pointerHintHandlers } =
+    usePointerHint<HTMLSpanElement>();
   const content = (
     <>
-      <span className={styles["work-card__media"]}>
+      <span
+        className={styles["work-card__media"]}
+        {...pointerHintHandlers}
+      >
         <LarahImage
           className={styles["work-card__image"]}
           src={project.image}
@@ -32,6 +43,12 @@ export function WorkCard({
               ? "(max-width: 720px) calc(100vw - 48px), (max-width: 1100px) 45vw, 42vw"
               : "(max-width: 720px) calc(100vw - 48px), (max-width: 1080px) 50vw, 31vw"
           }
+        />
+        <PointerHint
+          active={isActive}
+          hintRef={hintRef}
+          label="Zoom"
+          variant="zoom"
         />
       </span>
       <span className={styles["work-card__title"]}>
@@ -52,7 +69,10 @@ export function WorkCard({
     >
       <button
         className={styles["work-card__link"]}
-        onClick={() => onSelectProject(project)}
+        onClick={() => {
+          hidePointerHint();
+          onSelectProject(project);
+        }}
         type="button"
       >
         {content}
