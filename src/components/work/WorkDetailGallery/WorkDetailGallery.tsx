@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import type Isotope from "isotope-layout";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
+import { Button } from "@/components/ui/Button/Button";
 import { usePointerLabel } from "@/components/ui/GlassPointer/usePointerLabel";
 import {
   getProjectGalleryImages,
@@ -146,9 +146,14 @@ export function WorkDetailGallery({
       <header className={styles["work-detail__header"]}>
         <div className={styles["work-detail__heading"]}>
           {presentation === "page" ? (
-            <Link className={styles["work-detail__back"]} href="/work">
+            <Button
+              className={styles["work-detail__back"]}
+              href="/work"
+              size="small"
+              variant="secondary"
+            >
               All work
-            </Link>
+            </Button>
           ) : null}
           <p className={styles["work-detail__eyebrow"]}>
             {formatWorkCategory(project.category)}

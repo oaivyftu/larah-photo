@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useId, useState } from "react";
+import { Button } from "@/components/ui/Button/Button";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { icons } from "@/constants/icons";
 import styles from "./InquiryForm.module.scss";
@@ -137,7 +138,10 @@ export function InquiryForm({ sessionTypes }: InquiryFormProps) {
 
       <div className={styles["inquiry-form__row"]}>
         <label className={styles["inquiry-form__field"]} htmlFor={`${formId}-name`}>
-          <span className={styles["inquiry-form__label"]}>NAME*</span>
+          <span className={styles["inquiry-form__label"]}>
+            NAME
+            <span className={styles["inquiry-form__required"]}>*</span>
+          </span>
           <input
             className={styles["inquiry-form__input"]}
             id={`${formId}-name`}
@@ -158,7 +162,10 @@ export function InquiryForm({ sessionTypes }: InquiryFormProps) {
         </label>
 
         <label className={styles["inquiry-form__field"]} htmlFor={`${formId}-email`}>
-          <span className={styles["inquiry-form__label"]}>EMAIL*</span>
+          <span className={styles["inquiry-form__label"]}>
+            EMAIL
+            <span className={styles["inquiry-form__required"]}>*</span>
+          </span>
           <input
             className={styles["inquiry-form__input"]}
             id={`${formId}-email`}
@@ -243,7 +250,10 @@ export function InquiryForm({ sessionTypes }: InquiryFormProps) {
         className={`${styles["inquiry-form__field"]} ${styles["inquiry-form__field--message"]}`}
         htmlFor={`${formId}-message`}
       >
-        <span className={styles["inquiry-form__label"]}>MESSAGE*</span>
+        <span className={styles["inquiry-form__label"]}>
+          MESSAGE
+          <span className={styles["inquiry-form__required"]}>*</span>
+        </span>
         <textarea
           className={styles["inquiry-form__textarea"]}
           id={`${formId}-message`}
@@ -278,13 +288,15 @@ export function InquiryForm({ sessionTypes }: InquiryFormProps) {
           : null}
       </div>
 
-      <button
+      <Button
         className={styles["inquiry-form__submit"]}
-        type="submit"
         disabled={status === "loading"}
+        size="medium"
+        type="submit"
+        variant="primary"
       >
         {status === "loading" ? "SENDING..." : "SUBMIT"}
-      </button>
+      </Button>
     </form>
   );
 }

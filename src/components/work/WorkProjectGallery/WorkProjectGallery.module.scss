@@ -96,7 +96,7 @@
   padding: 0;
   border: 0;
   color: #241010;
-  background: #F6F3EE;
+  background: var(--color-paper-warm);
   border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 180ms ease, transform 180ms ease;

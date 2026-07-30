@@ -19,6 +19,11 @@
   align-items: baseline;
 }
 
+.work-filters__separator {
+  color: var(--color-muted);
+  user-select: none;
+}
+
 .work-filters__button {
   border: 0;
   background: transparent;

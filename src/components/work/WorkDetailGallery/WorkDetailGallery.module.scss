@@ -33,21 +33,11 @@
 .work-detail__back {
   width: fit-content;
   margin-bottom: clamp(2rem, 4vw, 4rem);
-  font-size: var(--font-size-xs);
-  font-weight: 650;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .work-detail__back::before {
   margin-right: 0.55rem;
   content: "←";
-}
-
-.work-detail__back:hover,
-.work-detail__back:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 0.25em;
 }
 
 .work-detail__eyebrow {

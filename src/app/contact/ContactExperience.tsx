@@ -18,7 +18,7 @@ export function ContactExperience({
   content,
   sessionTypes,
 }: ContactExperienceProps) {
-  const rootRef = useRef<HTMLElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -62,7 +62,7 @@ export function ContactExperience({
   );
 
   return (
-    <main className={styles["contact"]} ref={rootRef}>
+    <div className={styles["contact"]} ref={rootRef}>
       <section className={styles["contact__layout"]} aria-labelledby="contact-title">
         <div className={styles["contact__copy"]}>
           <h1 className={styles["contact__title"]} data-page-heading id="contact-title">
@@ -76,6 +76,6 @@ export function ContactExperience({
           <InquiryForm sessionTypes={sessionTypes} />
         </div>
       </section>
-    </main>
+    </div>
   );
 }

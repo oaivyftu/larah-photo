@@ -1,3 +1,4 @@
+import { normalizeWorkCategory } from "@/utils/formatWorkCategory";
 import type { NavigationItem } from "@/types/navigation";
 import type { Project, ProjectImage, WorkPlacement } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
@@ -404,7 +405,9 @@ function mapSanityProject(project: SanityProject, index: number): Project {
     slug,
     title: requireString(project.title, `${fieldPrefix}.title`),
     meta: requireString(project.meta, `${fieldPrefix}.meta`),
-    category: requireString(project.category, `${fieldPrefix}.category`),
+    category: normalizeWorkCategory(
+      requireString(project.category, `${fieldPrefix}.category`),
+    ),
     year: requireString(project.year, `${fieldPrefix}.year`),
     location: requireString(project.location, `${fieldPrefix}.location`),
     serviceCategory: requireString(

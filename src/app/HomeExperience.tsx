@@ -1,12 +1,12 @@
 "use client";
 
 import { useRef } from "react";
-import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
+import { Button } from "@/components/ui/Button/Button";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { icons } from "@/constants/icons";
 import type { Project } from "@/types/project";
@@ -24,9 +24,9 @@ type HomeExperienceProps = {
 
 const serviceIcons: Record<string, typeof icons.portrait> = {
   "portrait-session": icons.portrait,
-  "couples-session": icons.userGroup,
-  wedding: icons.ring,
-  "wedding-package": icons.ring,
+  "couple-session": icons.userGroup,
+  "wedding-session": icons.ring,
+  "family-session": icons.family,
 };
 
 export function HomeExperience({
@@ -34,8 +34,7 @@ export function HomeExperience({
   projects,
   services,
 }: HomeExperienceProps) {
-  const rootRef = useRef<HTMLElement>(null);
-  const heroProject = projects[0];
+  const rootRef = useRef<HTMLDivElement>(null);
   const heroImage = content.heroImage;
 
   useGSAP(
@@ -158,7 +157,7 @@ export function HomeExperience({
   );
 
   return (
-    <main className={styles["home"]} ref={rootRef} aria-labelledby="home-title">
+    <div className={styles["home"]} ref={rootRef}>
       <section className={styles["hero"]}>
         <div className={styles["hero__copy"]}>
           <p className={styles["eyebrow"]} data-hero-meta>
@@ -187,16 +186,18 @@ export function HomeExperience({
             priority
             sizes="(max-width: 760px) calc(100vw - 32px), 52vw"
           />
-          <span className={styles["hero__caption"]} data-hero-meta>
-            <span>{heroProject?.title ?? "Featured Work"}</span>
-            <span>{heroProject?.meta ?? "Portfolio"}</span>
-          </span>
         </div>
 
         <div className={styles["hero__actions"]} data-hero-meta>
-          <Link data-transition-label="Work" href="/work">
+          <Button
+            data-transition-label="Work"
+            href="/work"
+            size="medium"
+            variant="secondary"
+            withIcon
+          >
             Explore Work
-          </Link>
+          </Button>
         </div>
       </section>
 
@@ -240,9 +241,15 @@ export function HomeExperience({
           variant="homepage"
         />
         <div className={styles["stack__footer"]}>
-          <Link data-transition-label="Work" href="/work">
+          <Button
+            data-transition-label="Work"
+            href="/work"
+            size="medium"
+            variant="secondary"
+            withIcon
+          >
             View all work
-          </Link>
+          </Button>
         </div>
       </section>
 
@@ -251,11 +258,7 @@ export function HomeExperience({
           <p className={styles["services__eyebrow"]} id="services-title">
             {content.servicesEyebrow}
           </p>
-          <Icon
-            className={styles["services__chevron"]}
-            decorative
-            icon={icons.chevronDown}
-          />
+          <span className={styles["services__marker"]} aria-hidden="true" />
         </div>
         <div className={styles["services__track"]} data-service-track>
           {services.map((service) => (
@@ -270,21 +273,31 @@ export function HomeExperience({
                 icon={serviceIcons[service.id] ?? icons.circle}
               />
               <h3>{service.title}</h3>
-              <p>{service.description}</p>
+              <p className={styles["service-card__desc"]}>
+                {service.description}
+              </p>
               <ul>
-                {service.features.slice(0, 4).map((feature) => (
+                {service.features.slice(0, 5).map((feature) => (
                   <li key={feature}>{feature}</li>
                 ))}
               </ul>
-              <Link data-transition-label="Contact" href={service.ctaHref}>
-                <span>From ${service.price}</span>
-                <span>Book now</span>
-                <Icon decorative icon={icons.arrowRight} />
-              </Link>
+              <p className={styles["service-card__price"]}>
+                From ${service.price}
+              </p>
+              <Button
+                className={styles["service-card__cta"]}
+                data-transition-label="Contact"
+                href={service.ctaHref}
+                size="small"
+                variant="primary"
+                withIcon
+              >
+                Book now
+              </Button>
             </article>
           ))}
         </div>
       </section>
-    </main>
+    </div>
   );
 }
