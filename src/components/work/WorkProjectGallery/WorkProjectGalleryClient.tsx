@@ -15,14 +15,15 @@ import "flickity-fade/flickity-fade.css";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { icons } from "@/constants/icons";
 import { Icon } from "@/components/ui/Icon/Icon";
-import {
-  PointerHint,
-  usePointerHint,
-} from "@/components/ui/PointerHint/PointerHint";
+import { usePointerLabel } from "@/components/ui/GlassPointer/usePointerLabel";
 import type { Project, ProjectImage } from "@/types/project";
 import styles from "./WorkProjectGallery.module.scss";
 
 const CONTROLS_IDLE_DELAY = 1600;
+// Resting on the controls earns a longer grace period, but never an exemption:
+// after clicking next/previous the cursor sits on the nav, so an exemption
+// would keep it on screen forever.
+const CONTROLS_HOVER_IDLE_DELAY = 2600;
 const AUTO_HIDE_MEDIA =
   "(hover: hover) and (pointer: fine) and (min-width: 761px)";
 const DRAGGABLE_MEDIA =
@@ -194,14 +195,13 @@ export function WorkProjectGalleryClient({
   const controlsFocusedRef = useRef(false);
   const controlsHoveredRef = useRef(false);
   const canAutoHideControlsRef = useRef(false);
+  const lastPointerPositionRef = useRef<{ x: number; y: number } | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [areControlsVisible, setAreControlsVisible] = useState(true);
   const {
-    hidePointerHint: hideCloseHint,
-    hintRef: closeHintRef,
-    isActive: isCloseHintActive,
-    pointerHintHandlers: closeHintHandlers,
-  } = usePointerHint<HTMLDivElement>();
+    hidePointerLabel: hideCloseHint,
+    pointerLabelHandlers: closeHintHandlers,
+  } = usePointerLabel<HTMLDivElement>("Close");
 
   const handleClose = useCallback(() => {
     if (isModal) {
@@ -221,18 +221,21 @@ export function WorkProjectGalleryClient({
   const scheduleControlsHide = useCallback(() => {
     clearControlsTimer();
 
-    if (
-      !canAutoHideControlsRef.current ||
-      controlsFocusedRef.current ||
-      controlsHoveredRef.current
-    ) {
+    // Keyboard focus is the only thing that pins the controls open — a focused
+    // button that fades out would strand the user mid-tab-order.
+    if (!canAutoHideControlsRef.current || controlsFocusedRef.current) {
       return;
     }
 
-    controlsTimerRef.current = window.setTimeout(() => {
-      setAreControlsVisible(false);
-      controlsTimerRef.current = null;
-    }, CONTROLS_IDLE_DELAY);
+    controlsTimerRef.current = window.setTimeout(
+      () => {
+        setAreControlsVisible(false);
+        controlsTimerRef.current = null;
+      },
+      controlsHoveredRef.current
+        ? CONTROLS_HOVER_IDLE_DELAY
+        : CONTROLS_IDLE_DELAY,
+    );
   }, [clearControlsTimer]);
 
   const revealControls = useCallback(() => {
@@ -259,8 +262,8 @@ export function WorkProjectGalleryClient({
   const handleControlsPointerEnter = useCallback(() => {
     controlsHoveredRef.current = true;
     hideCloseHint();
-    keepControlsVisible();
-  }, [hideCloseHint, keepControlsVisible]);
+    revealControls();
+  }, [hideCloseHint, revealControls]);
 
   const handleControlsPointerLeave = useCallback(() => {
     controlsHoveredRef.current = false;
@@ -289,7 +292,9 @@ export function WorkProjectGalleryClient({
     (event: React.PointerEvent<HTMLDivElement>) => {
       const controls = controlsRef.current;
 
-      if (!controls) {
+      // A hidden nav is not a surface — the "Close" hint should still show over
+      // the space it used to occupy.
+      if (!controls || !areControlsVisible) {
         return false;
       }
 
@@ -302,7 +307,7 @@ export function WorkProjectGalleryClient({
         event.clientY <= bounds.bottom
       );
     },
-    [],
+    [areControlsVisible],
   );
 
   useEffect(() => {
@@ -323,6 +328,36 @@ export function WorkProjectGalleryClient({
       clearControlsTimer();
     };
   }, [clearControlsTimer, isModal, scheduleControlsHide]);
+
+  useEffect(() => {
+    if (!isModal) {
+      return;
+    }
+
+    const handlePointerActivity = (event: PointerEvent) => {
+      const last = lastPointerPositionRef.current;
+
+      // Hiding the nav flips it to `pointer-events: none`, which can hand the
+      // cursor to the carousel underneath and fire enter events even though
+      // nothing moved. Only real movement counts as activity, otherwise the
+      // controls flicker back on the moment they hide.
+      if (last && last.x === event.clientX && last.y === event.clientY) {
+        return;
+      }
+
+      lastPointerPositionRef.current = { x: event.clientX, y: event.clientY };
+      revealControls();
+    };
+
+    window.addEventListener("pointermove", handlePointerActivity, {
+      passive: true,
+    });
+
+    return () => {
+      lastPointerPositionRef.current = null;
+      window.removeEventListener("pointermove", handlePointerActivity);
+    };
+  }, [isModal, revealControls]);
 
   const slideIds = useMemo(
     () =>
@@ -470,8 +505,6 @@ export function WorkProjectGalleryClient({
       onKeyDown={revealControls}
       onClick={isModal ? handleClose : undefined}
       onPointerDown={revealControls}
-      onPointerEnter={revealControls}
-      onPointerMove={revealControls}
     >
       <div
         aria-labelledby={
@@ -495,8 +528,6 @@ export function WorkProjectGalleryClient({
           onClick={handleCarouselClick}
           onDragStart={(event) => event.preventDefault()}
           onPointerEnter={(event) => {
-            revealControls();
-
             if (isModal) {
               if (isPointerOverControls(event)) {
                 hideCloseHint();
@@ -511,8 +542,6 @@ export function WorkProjectGalleryClient({
             }
           }}
           onPointerMove={(event) => {
-            revealControls();
-
             if (isModal) {
               if (isPointerOverControls(event)) {
                 hideCloseHint();
@@ -533,15 +562,6 @@ export function WorkProjectGalleryClient({
             />
           ))}
         </div>
-
-        {isModal ? (
-          <PointerHint
-            active={isCloseHintActive}
-            hintRef={closeHintRef}
-            label="Close"
-            variant="close"
-          />
-        ) : null}
 
         <GalleryFloatNav
           currentIndex={currentIndex}

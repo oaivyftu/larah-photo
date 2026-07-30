@@ -4,6 +4,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.scss";
 import { Montserrat } from 'next/font/google'
 import { PageTransition } from "@/components/layout/PageTransition/PageTransition";
+import { GlassPointer } from "@/components/ui/GlassPointer/GlassPointer";
 
 config.autoAddCss = false;
 
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body>
         {children}
         <PageTransition />
+        <GlassPointer />
       </body>
     </html>
   );

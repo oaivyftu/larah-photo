@@ -4,10 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type Isotope from "isotope-layout";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
-import {
-  PointerHint,
-  usePointerHint,
-} from "@/components/ui/PointerHint/PointerHint";
+import { usePointerLabel } from "@/components/ui/GlassPointer/usePointerLabel";
 import {
   getProjectGalleryImages,
   WorkProjectGallery,
@@ -37,8 +34,8 @@ function GalleryItem({
   onImageLoad,
   onSelect,
 }: GalleryItemProps) {
-  const { hidePointerHint, hintRef, isActive, pointerHintHandlers } =
-    usePointerHint<HTMLButtonElement>();
+  const { hidePointerLabel, pointerLabelHandlers } =
+    usePointerLabel<HTMLButtonElement>("Zoom");
   const isWide = image.width / image.height >= 1.15;
 
   return (
@@ -51,11 +48,11 @@ function GalleryItem({
         aria-label={`Open image ${index + 1}: ${image.alt}`}
         className={styles["work-detail__image-button"]}
         onClick={() => {
-          hidePointerHint();
+          hidePointerLabel();
           onSelect(index);
         }}
         type="button"
-        {...pointerHintHandlers}
+        {...pointerLabelHandlers}
       >
         <LarahImage
           alt={image.alt}
@@ -66,12 +63,6 @@ function GalleryItem({
           sizes="(max-width: 620px) calc(100vw - 48px), (max-width: 900px) 100vw, 66vw"
           src={image.src}
           width={image.width}
-        />
-        <PointerHint
-          active={isActive}
-          hintRef={hintRef}
-          label="Zoom"
-          variant="zoom"
         />
       </button>
     </article>
