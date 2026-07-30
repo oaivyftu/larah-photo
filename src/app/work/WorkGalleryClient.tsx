@@ -5,7 +5,6 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { WorkFilters } from "@/components/work/WorkFilters/WorkFilters";
 import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
-import { WorkProjectGallery } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
 import type { Project } from "@/types/project";
 import type { WorkPageContent } from "@/types/site";
 import { formatWorkCategory } from "@/utils/formatWorkCategory";
@@ -26,7 +25,6 @@ export function WorkGalleryClient({
 }: WorkGalleryClientProps) {
   const rootRef = useRef<HTMLElement>(null);
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const filters = useMemo(() => {
     const categories = Array.from(new Set(projects.map((project) => project.category)));
 
@@ -102,17 +100,8 @@ export function WorkGalleryClient({
         activeFilter={activeFilter}
         className={styles["work-page__grid"]}
         items={projects}
-        onSelectProject={setSelectedProject}
         variant="work"
       />
-
-      {selectedProject ? (
-        <WorkProjectGallery
-          isModal
-          onClose={() => setSelectedProject(null)}
-          project={selectedProject}
-        />
-      ) : null}
     </section>
   );
 }

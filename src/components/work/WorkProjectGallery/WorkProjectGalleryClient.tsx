@@ -30,6 +30,7 @@ const DRAGGABLE_MEDIA =
 
 type WorkProjectGalleryClientProps = {
   images: ProjectImage[];
+  initialIndex: number;
   isModal: boolean;
   onClose?: () => void;
   project: Project;
@@ -181,6 +182,7 @@ function GalleryFloatNav({
 
 export function WorkProjectGalleryClient({
   images,
+  initialIndex,
   isModal,
   onClose,
   project,
@@ -350,18 +352,19 @@ export function WorkProjectGalleryClient({
 
       const flickityOptions = {
         adaptiveHeight: false,
-        cellAlign: "center",
+        cellAlign: "left",
         contain: true,
         dragThreshold: 10,
         draggable: window.matchMedia(DRAGGABLE_MEDIA).matches,
         // friction: 1,
         // selectedAttraction: 0.5,
         imagesLoaded: true,
+        initialIndex,
         pageDots: false,
         percentPosition: true,
-        prevNextButtons: false,
+        prevNextButtons: true,
         setGallerySize: false,
-        freeScroll: false,
+        freeScroll: true,
         lazyLoad: true,
         wrapAround: true,
         fade: true,
@@ -396,7 +399,7 @@ export function WorkProjectGalleryClient({
 
       flickityRef.current = null;
     };
-  }, [images]);
+  }, [images, initialIndex]);
 
   useEffect(() => {
     if (!isModal) {

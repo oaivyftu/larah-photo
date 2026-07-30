@@ -1,13 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
-import { WorkProjectGallery } from "@/components/work/WorkProjectGallery/WorkProjectGallery";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { icons } from "@/constants/icons";
 import type { Project } from "@/types/project";
@@ -36,7 +35,6 @@ export function HomeExperience({
   services,
 }: HomeExperienceProps) {
   const rootRef = useRef<HTMLElement>(null);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const heroProject = projects[0];
   const heroImage = content.heroImage;
 
@@ -239,7 +237,6 @@ export function HomeExperience({
         <WorkMasonryGrid
           className={styles["stack__grid"]}
           items={projects}
-          onSelectProject={setSelectedProject}
           variant="homepage"
         />
         <div className={styles["stack__footer"]}>
@@ -288,14 +285,6 @@ export function HomeExperience({
           ))}
         </div>
       </section>
-
-      {selectedProject ? (
-        <WorkProjectGallery
-          isModal
-          onClose={() => setSelectedProject(null)}
-          project={selectedProject}
-        />
-      ) : null}
     </main>
   );
 }

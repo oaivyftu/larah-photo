@@ -165,11 +165,6 @@
   will-change: transform;
 }
 
-.work-project-gallery__carousel :global(.flickity-button),
-.work-project-gallery__carousel :global(.flickity-page-dots) {
-  display: none;
-}
-
 .work-project-gallery__slide {
   flex: 0 0 auto;
   height: 100%;
