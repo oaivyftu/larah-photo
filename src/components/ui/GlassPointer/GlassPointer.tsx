@@ -17,6 +17,18 @@ import styles from "./GlassPointer.module.scss";
 export function GlassPointer() {
   const pathname = usePathname();
   const pillRef = useRef<HTMLDivElement>(null);
+  const isActiveRef = useRef(false);
+  const prefersReducedMotionRef = useRef(false);
+  const frameRef = useRef<number | null>(null);
+  const previousTimeRef = useRef<number | null>(null);
+  const startAnimationRef = useRef<() => void>(() => undefined);
+  const positionRef = useRef({
+    currentX: 0,
+    currentY: 0,
+    isPositioned: false,
+    targetX: 0,
+    targetY: 0,
+  });
   const label = useSyncExternalStore(
     subscribePointerLabel,
     getPointerLabel,
@@ -24,25 +36,130 @@ export function GlassPointer() {
   );
 
   useEffect(() => {
-    function handlePointerMove(event: PointerEvent) {
+    const position = positionRef.current;
+    const motionPreference = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+
+    function paintPosition() {
       const pill = pillRef.current;
 
-      if (!pill || event.pointerType !== "mouse") {
+      if (!pill) {
         return;
       }
 
-      pill.style.setProperty("--x", `${event.clientX}px`);
-      pill.style.setProperty("--y", `${event.clientY}px`);
+      pill.style.setProperty("--x", `${position.currentX.toFixed(3)}px`);
+      pill.style.setProperty("--y", `${position.currentY.toFixed(3)}px`);
     }
 
+    function animatePosition(time: number) {
+      const previousTime = previousTimeRef.current ?? time;
+      const elapsedFrames = Math.min((time - previousTime) / (1000 / 60), 4);
+      const smoothing = 1 - Math.pow(1 - 0.14, elapsedFrames);
+
+      previousTimeRef.current = time;
+      position.currentX +=
+        (position.targetX - position.currentX) * smoothing;
+      position.currentY +=
+        (position.targetY - position.currentY) * smoothing;
+      paintPosition();
+
+      const distance =
+        Math.abs(position.targetX - position.currentX) +
+        Math.abs(position.targetY - position.currentY);
+
+      if (isActiveRef.current || distance > 0.05) {
+        frameRef.current = window.requestAnimationFrame(animatePosition);
+      } else {
+        frameRef.current = null;
+        previousTimeRef.current = null;
+      }
+    }
+
+    function startAnimation() {
+      if (
+        !prefersReducedMotionRef.current &&
+        frameRef.current === null
+      ) {
+        frameRef.current = window.requestAnimationFrame(animatePosition);
+      }
+    }
+
+    startAnimationRef.current = startAnimation;
+
+    function handleMotionPreferenceChange() {
+      prefersReducedMotionRef.current = motionPreference.matches;
+
+      if (!motionPreference.matches) {
+        return;
+      }
+
+      position.currentX = position.targetX;
+      position.currentY = position.targetY;
+      paintPosition();
+
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+        previousTimeRef.current = null;
+      }
+    }
+
+    function handlePointerMove(event: PointerEvent) {
+      if (event.pointerType !== "mouse") {
+        return;
+      }
+
+      position.targetX = event.clientX;
+      position.targetY = event.clientY;
+
+      if (!position.isPositioned) {
+        position.currentX = event.clientX;
+        position.currentY = event.clientY;
+        position.isPositioned = true;
+        paintPosition();
+      }
+
+      if (prefersReducedMotionRef.current) {
+        position.currentX = event.clientX;
+        position.currentY = event.clientY;
+        paintPosition();
+        return;
+      }
+
+      if (isActiveRef.current) {
+        startAnimation();
+      }
+    }
+
+    handleMotionPreferenceChange();
+    motionPreference.addEventListener("change", handleMotionPreferenceChange);
     window.addEventListener("pointermove", handlePointerMove, {
       passive: true,
     });
 
     return () => {
+      motionPreference.removeEventListener(
+        "change",
+        handleMotionPreferenceChange,
+      );
       window.removeEventListener("pointermove", handlePointerMove);
+
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+      }
+
+      startAnimationRef.current = () => undefined;
     };
   }, []);
+
+  useEffect(() => {
+    isActiveRef.current = label !== null;
+
+    if (label !== null) {
+      startAnimationRef.current();
+    }
+  }, [label]);
 
   if (pathname.startsWith("/studio")) {
     return null;
