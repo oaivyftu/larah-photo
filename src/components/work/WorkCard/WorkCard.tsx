@@ -59,8 +59,10 @@ export function WorkCard({
     >
       <Link
         className={styles["work-card__link"]}
+        data-modal-route
         href={`/work/${encodeURIComponent(project.slug)}`}
         onClick={hidePointerLabel}
+        scroll={false}
       >
         {content}
       </Link>

@@ -18,6 +18,7 @@ const COLUMN_SIZER_SELECTOR = `.${styles["work-detail__sizer"]}`;
 const GUTTER_SIZER_SELECTOR = `.${styles["work-detail__gutter-sizer"]}`;
 
 type WorkDetailGalleryProps = {
+  presentation?: "modal" | "page";
   project: Project;
 };
 
@@ -69,7 +70,10 @@ function GalleryItem({
   );
 }
 
-export function WorkDetailGallery({ project }: WorkDetailGalleryProps) {
+export function WorkDetailGallery({
+  presentation = "page",
+  project,
+}: WorkDetailGalleryProps) {
   const images = getProjectGalleryImages(project);
   const gridRef = useRef<HTMLDivElement>(null);
   const layoutRef = useRef<Isotope | null>(null);
@@ -133,12 +137,19 @@ export function WorkDetailGallery({ project }: WorkDetailGalleryProps) {
   }, []);
 
   return (
-    <article className={styles["work-detail"]} aria-labelledby="work-detail-title">
+    <article
+      className={`${styles["work-detail"]} ${
+        presentation === "modal" ? styles["work-detail--modal"] : ""
+      }`}
+      aria-labelledby="work-detail-title"
+    >
       <header className={styles["work-detail__header"]}>
         <div className={styles["work-detail__heading"]}>
-          <Link className={styles["work-detail__back"]} href="/work">
-            All work
-          </Link>
+          {presentation === "page" ? (
+            <Link className={styles["work-detail__back"]} href="/work">
+              All work
+            </Link>
+          ) : null}
           <p className={styles["work-detail__eyebrow"]}>
             {formatWorkCategory(project.category)}
           </p>

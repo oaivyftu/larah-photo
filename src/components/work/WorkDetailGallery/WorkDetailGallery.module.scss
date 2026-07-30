@@ -4,6 +4,14 @@
   background: var(--color-paper);
 }
 
+.work-detail--modal {
+  min-height: calc(100vh - clamp(5.4rem, 7vw, 6.3rem));
+}
+
+.work-detail--modal .work-detail__header {
+  padding-top: clamp(3rem, 6vw, 6rem);
+}
+
 .work-detail__header {
   display: grid;
   grid-template-columns:

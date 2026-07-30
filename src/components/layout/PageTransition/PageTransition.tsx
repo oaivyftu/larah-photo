@@ -21,6 +21,10 @@ function getInternalLink(target: EventTarget | null) {
   return target.closest<HTMLAnchorElement>("a[href]");
 }
 
+function isWorkDetailPath(pathname: string) {
+  return /^\/work\/[^/]+\/?$/.test(pathname);
+}
+
 export function PageTransition() {
   const pathname = usePathname();
   const router = useRouter();
@@ -29,6 +33,12 @@ export function PageTransition() {
   const [state, setState] = useState<TransitionState>("covered");
 
   useEffect(() => {
+    if (document.documentElement.dataset.modalNavigation === "true") {
+      delete document.documentElement.dataset.modalNavigation;
+      document.documentElement.dataset.pageTransition = "ready";
+      return;
+    }
+
     document.documentElement.dataset.pageTransition = "revealing";
     const revealTimeout = setTimeout(() => setState("revealing"), 0);
 
@@ -45,6 +55,23 @@ export function PageTransition() {
   }, [pathname]);
 
   useEffect(() => {
+    function handlePopState() {
+      const isGalleryContext = pathname === "/" || pathname === "/work";
+
+      if (
+        isGalleryContext &&
+        isWorkDetailPath(window.location.pathname)
+      ) {
+        document.documentElement.dataset.modalNavigation = "true";
+      }
+    }
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [pathname]);
+
+  useEffect(() => {
     function handleClick(event: MouseEvent) {
       if (event.defaultPrevented || event.button !== 0 || isModifiedClick(event)) {
         return;
@@ -53,6 +80,11 @@ export function PageTransition() {
       const link = getInternalLink(event.target);
 
       if (!link || link.target || link.hasAttribute("download")) {
+        return;
+      }
+
+      if (link.hasAttribute("data-modal-route")) {
+        document.documentElement.dataset.modalNavigation = "true";
         return;
       }
 
