@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .work-modal {
   position: fixed;
   inset: 0;
@@ -144,7 +146,7 @@
   transform: translateY(1rem);
 }
 
-@media (max-width: 680px) {
+@include media-max(680px) {
   .work-modal {
     padding-top: 0.5rem;
   }
@@ -167,7 +169,7 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+@include reduced-motion {
   .work-modal,
   .work-modal__dialog,
   .work-modal--closing,

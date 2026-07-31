@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .main-nav {
   flex: 0 0 auto;
 }
@@ -56,20 +58,20 @@
   font-weight: 600;
 }
 
-@media (prefers-reduced-motion: reduce) {
+@include reduced-motion {
   .main-nav__link,
   .main-nav__link::after {
     transition: none;
   }
 }
 
-@media (max-width: 1200px) {
+@include media-max("laptop-lg") {
   .main-nav__link {
     font-size: var(--font-size-base);
   }
 }
 
-@media (max-width: 1000px) {
+@include media-max("laptop-sm") {
   .main-nav {
     width: 100%;
     order: 3;
@@ -86,10 +88,13 @@
   }
 }
 
-@media (max-width: 560px) {
+@include media-max("phone") {
+  /* Auto columns rather than `repeat(4, …)`: the items come from Sanity, so a
+     fifth entry would otherwise drop onto a stranded second row. */
   .main-nav__list {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
     gap: 0;
     border-top: 1px solid var(--color-line-soft);
     border-bottom: 1px solid var(--color-line-soft);

@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .site-header {
   display: flex;
   min-height: var(--header-height);
@@ -28,13 +30,13 @@
   flex: 0 0 auto;
 }
 
-@media (max-width: 1200px) {
+@include media-max("laptop-lg") {
   .site-header__cta {
     font-size: var(--font-size-sm);
   }
 }
 
-@media (max-width: 1000px) {
+@include media-max("laptop-sm") {
   .site-header {
     min-height: auto;
     flex-wrap: wrap;
@@ -48,7 +50,7 @@
   }
 }
 
-@media (max-width: 720px) {
+@include media-max(720px) {
   .site-header {
     gap: 0.8rem;
     padding-bottom: 0.75rem;

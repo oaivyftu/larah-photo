@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .work-card {
   min-width: 0;
 }
@@ -23,7 +25,7 @@
   overflow: hidden;
 }
 
-@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+@include hover-fine {
   .work-card__media {
     cursor: zoom-in;
   }
@@ -79,7 +81,7 @@
   line-height: 1;
 }
 
-@media (max-width: 620px) {
+@include media-max("phone-lg") {
   .work-card--work .work-card__title {
     font-size: 1.2rem;
   }

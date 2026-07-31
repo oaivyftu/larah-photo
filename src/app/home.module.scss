@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .home {
   --home-paper: var(--color-paper);
   --home-paper-soft: var(--color-paper);
@@ -295,7 +297,7 @@
   justify-self: start;
 }
 
-@media (max-width: 900px) {
+@include media-max("tablet-lg") {
   .hero {
     grid-template-columns: 1fr;
     min-height: auto;
@@ -333,7 +335,7 @@
   }
 }
 
-@media (max-width: 620px) {
+@include media-max("phone-lg") {
   .home {
     overflow: hidden;
   }
@@ -409,7 +411,7 @@
 
 }
 
-@media (prefers-reduced-motion: reduce) {
+@include reduced-motion {
   .home *,
   .home *::before,
   .home *::after {

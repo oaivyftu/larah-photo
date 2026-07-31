@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .site-footer {
   overflow: hidden;
   background: var(--color-paper);
@@ -70,18 +72,27 @@
   flex: 0 0 auto;
 }
 
-@media (max-width: 900px) {
-  .site-footer__inner,
-  .site-footer__bar {
+@include media-max("tablet-lg") {
+  .site-footer__inner {
     grid-template-columns: 1fr;
   }
 
+  /* The bar reflows to a wrapping row rather than a single grid column: the
+     last link is pinned to column 5, which a 1fr track would strand in an
+     implicit column instead of stacking. */
+  .site-footer__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-xl);
+  }
+
   .site-footer__bar a:last-child {
+    grid-column-start: auto;
     justify-self: start;
   }
 }
 
-@media (max-width: 560px) {
+@include media-max("phone") {
   .site-footer__inner {
     gap: 2rem;
     padding-top: 3.5rem;

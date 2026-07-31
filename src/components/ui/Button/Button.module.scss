@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -119,7 +121,7 @@
   opacity: 0.5;
 }
 
-@media (prefers-reduced-motion: reduce) {
+@include reduced-motion {
   .button {
     transition: none;
   }

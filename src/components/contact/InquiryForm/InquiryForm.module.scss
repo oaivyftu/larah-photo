@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .inquiry-form {
   display: grid;
   width: 100%;
@@ -119,7 +121,7 @@
   overflow: hidden;
 }
 
-@media (max-width: 700px) {
+@include media-max("tablet-sm") {
   .inquiry-form {
     gap: var(--space-2xl);
   }
@@ -139,7 +141,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@include media-max("phone-sm") {
   .inquiry-form {
     gap: 2rem;
   }

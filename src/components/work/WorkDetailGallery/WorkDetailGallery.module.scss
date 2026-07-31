@@ -1,11 +1,13 @@
+@use "@/styles/mixins" as *;
+
 .work-detail {
-  min-height: 100vh;
+  min-height: 100svh;
   color: var(--color-ink);
   background: var(--color-paper);
 }
 
 .work-detail--modal {
-  min-height: calc(100vh - clamp(5.4rem, 7vw, 6.3rem));
+  min-height: calc(100svh - clamp(5.4rem, 7vw, 6.3rem));
 }
 
 .work-detail--modal .work-detail__header {
@@ -171,13 +173,13 @@
   outline-offset: 0.3rem;
 }
 
-@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+@include hover-fine {
   .work-detail__image-button {
     cursor: zoom-in;
   }
 }
 
-@media (max-width: 1080px) {
+@include media-max(1080px) {
   .work-detail__header {
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
   }
@@ -187,7 +189,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@include media-max("tablet-lg") {
   .work-detail__sizer,
   .work-detail__item {
     width: calc((100% - var(--detail-gap)) / 2);
@@ -198,7 +200,7 @@
   }
 }
 
-@media (max-width: 680px) {
+@include media-max(680px) {
   .work-detail__header {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -222,7 +224,7 @@
   }
 }
 
-@media (max-width: 620px) {
+@include media-max("phone-lg") {
   .work-detail__sizer,
   .work-detail__item,
   .work-detail__item--wide {
@@ -230,7 +232,7 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+@include reduced-motion {
   .work-detail__gallery--ready,
   .work-detail__image {
     transition: none;

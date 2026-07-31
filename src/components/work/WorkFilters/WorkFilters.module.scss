@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .work-filters {
   display: flex;
   flex-wrap: wrap;
@@ -50,13 +52,13 @@
   font-weight: 700;
 }
 
-@media (prefers-reduced-motion: reduce) {
+@include reduced-motion {
   .work-filters__button {
     transition: none;
   }
 }
 
-@media (max-width: 900px) {
+@include media-max("tablet-lg") {
   .work-filters {
     justify-content: flex-start;
     font-size: 0.75rem;

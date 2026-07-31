@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .glass-pointer {
   position: fixed;
   z-index: 1000;
@@ -102,13 +104,13 @@
   pointer-events: none;
 }
 
-@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+@include hover-fine {
   .glass-pointer {
     display: flex;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+@include reduced-motion {
   .glass-pointer {
     transition: none;
   }

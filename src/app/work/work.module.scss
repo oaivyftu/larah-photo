@@ -1,6 +1,8 @@
+@use "@/styles/mixins" as *;
+
 .work-page {
   position: relative;
-  min-height: 100vh;
+  min-height: 100svh;
   overflow: clip;
   background: var(--color-paper);
   color: var(--color-ink);
@@ -51,7 +53,7 @@
   padding-bottom: clamp(4rem, 8vw, 7rem);
 }
 
-@media (max-width: 900px) {
+@include media-max("tablet-lg") {
   .work-page__hero {
     padding-top: clamp(3rem, 11vw, 5rem);
   }
@@ -62,7 +64,7 @@
   }
 }
 
-@media (max-width: 560px) {
+@include media-max("phone") {
   .work-page__hero {
     padding: 3rem 0 1rem;
   }

@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .page-transition {
   position: fixed;
   inset: 0;
@@ -82,13 +84,13 @@
   display: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
+@include reduced-motion {
   .page-transition {
     display: none;
   }
 }
 
-@media (max-width: 560px) {
+@include media-max("phone") {
   .page-transition__accent {
     height: 0.32rem;
   }

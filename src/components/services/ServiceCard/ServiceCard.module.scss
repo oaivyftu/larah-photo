@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .service-card {
   display: grid;
   max-width: var(--container-max);
@@ -116,7 +118,7 @@
   line-height: 1.2;
 }
 
-@media (max-width: 1180px) {
+@include media-max(1180px) {
   .service-card {
     grid-template-columns: 3rem minmax(0, 1fr);
     gap: var(--space-2xl);
@@ -137,7 +139,7 @@
   }
 }
 
-@media (max-width: 760px) {
+@include media-max("tablet") {
   .service-card {
     grid-template-columns: 1fr;
     gap: var(--space-lg);
@@ -159,7 +161,7 @@
   }
 }
 
-@media (max-width: 520px) {
+@include media-max(520px) {
   .service-card__index,
   .service-card__title {
     font-size: 2rem;

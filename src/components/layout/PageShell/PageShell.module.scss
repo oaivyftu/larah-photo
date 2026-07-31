@@ -1,5 +1,5 @@
 .page-shell {
-  min-height: 100vh;
+  min-height: 100svh;
   color: var(--color-ink);
   background: var(--color-paper);
 }
@@ -9,20 +9,13 @@
   overflow: clip;
 }
 
-.page-shell__main--home {
-}
-
-.page-shell__main--work {
-}
-
-.page-shell__main--project {
-}
-
-.page-shell__main--about {
-}
-
-.page-shell__main--service {
-}
-
+/* Per-page hooks: the class is applied by PageShell for styling and for
+   test/analytics targeting, so the empty rules are kept as declared anchors. */
+.page-shell__main--home,
+.page-shell__main--work,
+.page-shell__main--project,
+.page-shell__main--about,
+.page-shell__main--service,
 .page-shell__main--contact {
+  display: block;
 }
