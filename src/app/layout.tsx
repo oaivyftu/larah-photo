@@ -1,21 +1,26 @@
 import type { Metadata } from "next";
-import { config } from "@fortawesome/fontawesome-svg-core";
-import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.scss";
 import { Montserrat } from 'next/font/google'
 import { PageTransition } from "@/components/layout/PageTransition/PageTransition";
 import { GlassPointer } from "@/components/ui/GlassPointer/GlassPointer";
-
-config.autoAddCss = false;
+import { isIndexable, siteUrl } from "@/constants/seo";
 
 const montserrat = Montserrat({
   subsets: ['latin']
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
   title: "Larah Photo",
   description: "Photography portfolio website.",
+  robots: isIndexable
+    ? undefined
+    : {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: { index: false, follow: false, noimageindex: true },
+      },
 };
 
 export default function RootLayout({

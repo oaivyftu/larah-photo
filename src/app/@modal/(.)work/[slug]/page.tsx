@@ -9,6 +9,16 @@ type InterceptedWorkDetailPageProps = {
   }>;
 };
 
+// Without this the modal is rendered on demand, so every card click refetches
+// every project — and their whole galleries — from Sanity.
+export async function generateStaticParams() {
+  const projects = await getWorkProjects();
+
+  return projects.map((project) => ({
+    slug: project.slug,
+  }));
+}
+
 export default async function InterceptedWorkDetailPage({
   params,
 }: InterceptedWorkDetailPageProps) {

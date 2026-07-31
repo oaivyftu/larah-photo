@@ -1,0 +1,12 @@
+// Mirrors the box Font Awesome's stylesheet used to give `.svg-inline--fa`, so
+// the call sites that size icons with `width: auto` + an explicit `height`
+// keep resolving the same way. The class also outranks the element-level
+// `svg { display: block }` in globals.
+.icon {
+  box-sizing: content-box;
+  display: inline-block;
+  width: 1.25em;
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+}
