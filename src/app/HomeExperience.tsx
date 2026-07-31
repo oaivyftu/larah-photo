@@ -192,15 +192,6 @@ export function HomeExperience({
         </div>
       </section>
 
-      <section className={styles["discover"]} aria-labelledby="discover-title">
-        <h2 className={styles["discover__title"]} id="discover-title">
-          {projectCount} {projectCount === 1 ? "Project" : "Projects"}
-          <br />
-          Discover more
-        </h2>
-        <span className={styles["section-marker"]} aria-hidden="true" />
-      </section>
-
       <section className={styles["manifesto"]} data-manifesto>
         <div className={styles["manifesto__words"]} aria-hidden="true">
           <span data-manifesto-word="light">{content.manifestoWords[0]}</span>
@@ -232,9 +223,15 @@ export function HomeExperience({
         data-stack-section
         aria-label={content.selectedWorkEyebrow}
       >
-        <div className={styles["stack__header"]}>
-          <p className={styles["eyebrow"]}>{content.selectedWorkEyebrow}</p>
+        <div className={styles["discover"]}>
+          <h2 className={styles["discover__title"]}>
+            {projectCount} {projectCount === 1 ? "Project" : "Projects"}
+            <br />
+            Discover more
+          </h2>
+          <span className={styles["section-marker"]} aria-hidden="true" />
         </div>
+
         <WorkMasonryGrid
           className={styles["stack__grid"]}
           items={projects}

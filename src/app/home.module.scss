@@ -187,17 +187,9 @@
 
 .stack {
   position: relative;
-  padding: clamp(4rem, 8vw, 7rem) 0 clamp(2rem, 5vw, 4rem);
+  padding: 0 0 clamp(2rem, 5vw, 4rem);
   background: var(--home-paper-soft);
   overflow: visible;
-}
-
-.stack__header {
-  display: grid;
-  gap: clamp(1rem, 3vw, 2rem);
-  align-items: end;
-  width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
-  margin: 0 auto clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .stack__grid {
@@ -309,17 +301,13 @@
   }
 
   .stack {
-    padding: clamp(4rem, 9vw, 7rem) var(--page-gutter);
+    padding: 0 var(--page-gutter) clamp(4rem, 9vw, 7rem);
   }
 
-  .stack__header,
+  .discover,
   .stack__grid,
   .stack__footer {
     width: auto;
-  }
-
-  .stack__header {
-    grid-template-columns: 1fr;
   }
 
   .services {
@@ -390,7 +378,6 @@
   }
 
   .stack {
-    padding-top: 4rem;
     padding-bottom: 4rem;
   }
 
