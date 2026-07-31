@@ -2,7 +2,6 @@
 
 .about {
   overflow: clip;
-  background: var(--color-paper);
   color: var(--color-ink);
 }
 
@@ -54,14 +53,17 @@
 .about__media {
   position: relative;
   width: 100%;
-  height: 100%;
-  aspect-ratio: 1.5 / 1;
+  height: auto;
   margin-top: clamp(0.5rem, 0.8vw, 1rem);
-  background: var(--color-line-soft);
+}
+
+.about__media-visual {
+  width: 100%;
 }
 
 .about__media img {
-  object-fit: cover;
+  object-fit: contain;
+  height: auto;
 }
 
 .about__media figcaption {
@@ -76,6 +78,10 @@
   line-height: 0.95;
   text-transform: uppercase;
   mix-blend-mode: difference;
+}
+
+.about__media figcaption > span {
+  display: inline-block;
 }
 
 @include media-max("tablet-lg") {

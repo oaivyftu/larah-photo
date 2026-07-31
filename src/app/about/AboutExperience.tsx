@@ -30,7 +30,7 @@ export function AboutExperience({ content }: AboutExperienceProps) {
           ease: "power4.out",
         })
         .from(
-          "[data-about-copy] p, [data-about-media]",
+          "[data-about-copy] p, [data-about-media-visual]",
           {
             y: 34,
             opacity: 0,
@@ -41,7 +41,7 @@ export function AboutExperience({ content }: AboutExperienceProps) {
           "-=0.42",
         )
         .from(
-          "[data-about-logo]",
+          "[data-about-logo-motion]",
           {
             x: -34,
             opacity: 0,
@@ -49,7 +49,10 @@ export function AboutExperience({ content }: AboutExperienceProps) {
             ease: "power3.out",
           },
           "-=0.48",
-        );
+        )
+        .set("[data-about-media-visual], [data-about-logo-motion]", {
+          clearProps: "transform,opacity",
+        });
 
       const playIntro = () => intro.play(0);
 
@@ -82,15 +85,24 @@ export function AboutExperience({ content }: AboutExperienceProps) {
         </div>
 
         <figure className={styles["about__media"]} data-about-media>
-          <LarahImage
-            src={content.portraitOne.src}
-            alt={content.portraitOne.alt}
-            blurDataURL={content.portraitOne.blurDataURL}
-            fill
-            priority
-            sizes="(max-width: 900px) calc(100vw - 48px), 42vw"
-          />
-          <figcaption data-about-logo>LARAH</figcaption>
+          <div
+            className={styles["about__media-visual"]}
+            data-about-media-visual
+          >
+            <LarahImage
+              preload
+              src={content.portraitOne.src}
+              alt={content.portraitOne.alt}
+              placeholder="blur"
+              blurDataURL={content.portraitOne.blurDataURL}
+              width={content.portraitOne.width}
+              height={content.portraitOne.height}
+              sizes="(max-width: 900px) calc(100vw - 48px), 42vw"
+            />
+          </div>
+          <figcaption data-about-logo>
+            <span data-about-logo-motion>LARAH</span>
+          </figcaption>
         </figure>
       </section>
     </div>
