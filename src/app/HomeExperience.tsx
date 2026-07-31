@@ -18,6 +18,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type HomeExperienceProps = {
   content: HomePageContent;
+  projectCount: number;
   projects: Project[];
   services: ServicePackage[];
 };
@@ -31,6 +32,7 @@ const serviceIcons: Record<string, typeof icons.portrait> = {
 
 export function HomeExperience({
   content,
+  projectCount,
   projects,
   services,
 }: HomeExperienceProps) {
@@ -187,18 +189,15 @@ export function HomeExperience({
             sizes="(max-width: 760px) calc(100vw - 32px), 52vw"
           />
         </div>
+      </section>
 
-        <div className={styles["hero__actions"]} data-hero-meta>
-          <Button
-            data-transition-label="Work"
-            href="/work"
-            size="medium"
-            variant="secondary"
-            withIcon
-          >
-            Explore Work
-          </Button>
-        </div>
+      <section className={styles["discover"]} aria-labelledby="discover-title">
+        <h2 className={styles["discover__title"]} id="discover-title">
+          {projectCount} {projectCount === 1 ? "Project" : "Projects"}
+          <br />
+          Discover more
+        </h2>
+        <span className={styles["section-marker"]} aria-hidden="true" />
       </section>
 
       <section className={styles["manifesto"]} data-manifesto>
@@ -258,7 +257,7 @@ export function HomeExperience({
           <p className={styles["services__eyebrow"]} id="services-title">
             {content.servicesEyebrow}
           </p>
-          <span className={styles["services__marker"]} aria-hidden="true" />
+          <span className={styles["section-marker"]} aria-hidden="true" />
         </div>
         <div className={styles["services__track"]} data-service-track>
           {services.map((service) => (

@@ -76,6 +76,12 @@ export function WorkDetailModal({
 
   function handleKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
     if (event.key === "Escape") {
+      // The image lightbox sits on top of this panel and owns Escape while it
+      // is open — closing the panel underneath it would skip a level.
+      if (document.documentElement.dataset.imageLightbox === "true") {
+        return;
+      }
+
       event.preventDefault();
       closeModal();
       return;

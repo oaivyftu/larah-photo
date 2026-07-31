@@ -86,6 +86,7 @@
   transition:
     color 220ms ease,
     background-color 220ms ease,
+    opacity 220ms ease,
     transform 220ms ease;
 }
 
@@ -118,6 +119,15 @@
 .work-modal__close:focus-visible {
   outline: 2px solid var(--color-paper);
   outline-offset: 0.25rem;
+}
+
+/* While the image lightbox is open it renders its own close control. Leaving
+   this one on screen reads as the lightbox's close button but dismisses the
+   whole panel. */
+:global(html[data-image-lightbox="true"]) .work-modal__close {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(0.75rem);
 }
 
 .work-modal--closing {

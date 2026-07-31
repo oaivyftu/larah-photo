@@ -202,22 +202,27 @@
 
 .work-project-gallery__float-nav {
   --float-nav-height: 70px;
+  --float-nav-inner: 50px;
+  --float-nav-gap: 10px;
   --float-nav-radius: 8px;
+  --float-nav-icon: 24px;
   position: fixed;
   z-index: 4;
   right: 0;
-  bottom: max(clamp(1rem, 2vw, 1.8rem), env(safe-area-inset-bottom));
+  bottom: max(30px, env(safe-area-inset-bottom));
   left: 0;
   display: flex;
-  gap: 8px;
-  align-items: stretch;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
   width: fit-content;
+  max-width: calc(100% - 2rem);
   height: var(--float-nav-height);
   margin: 0 auto;
   color: #fff;
   opacity: 0;
   pointer-events: none;
-  transform: translate3d(0, 10px, 0);
+  transform: translate3d(0, 12px, 0);
   transition:
     opacity 280ms ease,
     transform 280ms ease;
@@ -229,25 +234,29 @@
   transform: translate3d(0, 0, 0);
 }
 
+/* Liquid-glass surfaces: a translucent pane, a top-lit tint, and an inset
+   bevel that reads as a rim of thick glass. */
 .work-project-gallery__float-close,
-.work-project-gallery__float-controls {
+.work-project-gallery__float-container {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(12, 12, 12, 0.58);
-  border-radius: var(--float-nav-radius);
+  border: 0;
+  background: rgba(12, 12, 12, 0.3);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.42),
-    inset 1px 0 0 rgba(255, 255, 255, 0.08),
-    inset -1px 0 0 rgba(0, 0, 0, 0.24),
-    0 8px 24px rgba(0, 0, 0, 0.22);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 1.8px 3px 0 -2px rgba(255, 255, 255, 0.34),
+    inset -2px -2px 0 -2px rgba(255, 255, 255, 0.3),
+    inset -3px -8px 1px -6px rgba(255, 255, 255, 0.22),
+    inset 0 3px 4px -2px rgba(0, 0, 0, 0.08),
+    inset -0.3px -1px 4px rgba(0, 0, 0, 0.05),
+    0 1px 5px rgba(0, 0, 0, 0.04),
+    0 6px 12px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(6px) saturate(180%);
+  -webkit-backdrop-filter: blur(6px) saturate(180%);
 }
 
 .work-project-gallery__float-close::before,
-.work-project-gallery__float-controls::before {
+.work-project-gallery__float-container::before {
   position: absolute;
   z-index: 0;
   inset: 0;
@@ -255,89 +264,200 @@
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.1),
-    transparent 42%,
-    rgba(0, 0, 0, 0.08)
+    rgba(255, 255, 255, 0.11),
+    rgba(255, 255, 255, 0.04) 32%,
+    rgba(0, 0, 0, 0.02)
   );
 }
 
 .work-project-gallery__float-close {
-  display: grid;
-  flex: 0 0 var(--float-nav-height);
-  width: var(--float-nav-height);
-  padding: 0;
-  place-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  height: var(--float-nav-height);
+  min-width: var(--float-nav-height);
+  padding: 0 calc((var(--float-nav-height) - var(--float-nav-icon)) / 2);
   color: inherit;
+  border-radius: 999px;
   cursor: pointer;
+  transition:
+    background-color 220ms ease,
+    min-width 350ms cubic-bezier(0.104, 0.204, 0.492, 1);
 }
 
-.work-project-gallery__float-close svg,
-.work-project-gallery__float-button svg {
-  position: relative;
-  z-index: 1;
-  width: 0.78rem;
-  height: 0.78rem;
-}
-
-.work-project-gallery__float-controls {
-  display: grid;
-  grid-template-columns: 90px repeat(2, 56px);
-  height: 100%;
-}
-
-.work-project-gallery__float-counter {
+.work-project-gallery__float-close-content {
   position: relative;
   z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-width: 0;
-  font-size: 0.68rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
 }
 
-.work-project-gallery__float-separator {
-  margin: 0 0.42rem;
-  color: rgba(255, 255, 255, 0.56);
+.work-project-gallery__float-close-icon {
+  flex: 0 0 auto;
+  width: var(--float-nav-icon);
+  height: var(--float-nav-icon);
+}
+
+/* Collapsed to a zero-width grid track so the label unfurls instead of
+   popping, mirroring the reference nav's expanding pill. */
+.work-project-gallery__float-close-label {
+  display: grid;
+  grid-template-columns: 0fr;
+  margin-right: 0;
+  opacity: 0;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    grid-template-columns 350ms cubic-bezier(0.104, 0.204, 0.492, 1),
+    margin-right 350ms cubic-bezier(0.104, 0.204, 0.492, 1),
+    opacity 240ms ease;
+}
+
+.work-project-gallery__float-close-label span {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.work-project-gallery__float-close:hover .work-project-gallery__float-close-label,
+.work-project-gallery__float-close:focus-visible
+  .work-project-gallery__float-close-label {
+  grid-template-columns: 1fr;
+  margin-right: 0.6rem;
+  opacity: 1;
+}
+
+.work-project-gallery__float-container {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  min-width: 0;
+  height: var(--float-nav-height);
+  padding: 10px;
+  border-radius: var(--float-nav-radius);
+}
+
+.work-project-gallery__float-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: var(--float-nav-gap);
+  align-items: center;
+  min-width: 0;
+}
+
+.work-project-gallery__float-thumb {
+  position: relative;
+  flex: 0 0 auto;
+  display: block;
+  width: var(--float-nav-inner);
+  height: var(--float-nav-inner);
+  overflow: hidden;
+  background: rgba(12, 12, 12, 0.22);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 2px 1px 0 -1px rgba(255, 255, 255, 0.34),
+    inset -1.5px -1px 0 -1px rgba(255, 255, 255, 0.3),
+    inset -2px -6px 1px -5px rgba(255, 255, 255, 0.22),
+    0 3px 6px rgba(0, 0, 0, 0.03);
+}
+
+.work-project-gallery__float-thumb-image {
+  object-fit: cover;
+  animation: float-thumb-in 320ms ease both;
+}
+
+.work-project-gallery__float-main {
+  display: grid;
+  min-width: 0;
+  justify-items: center;
+  text-align: center;
+}
+
+.work-project-gallery__float-sub-label {
+  max-width: 14rem;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.work-project-gallery__float-title {
+  margin-top: 0.15rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.work-project-gallery__float-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 5px;
+  align-items: center;
 }
 
 .work-project-gallery__float-button {
-  position: relative;
-  z-index: 1;
   display: grid;
-  min-width: 0;
+  width: 36px;
+  height: 24px;
   padding: 0;
   place-items: center;
   border: 0;
-  border-left: 1px solid rgba(255, 255, 255, 0.11);
   color: inherit;
-  background: transparent;
+  background: rgba(12, 12, 12, 0.17);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 2px 1px 0 -1px rgba(255, 255, 255, 0.34),
+    inset -1.5px -1px 0 -1px rgba(255, 255, 255, 0.3),
+    inset -2px -6px 1px -5px rgba(255, 255, 255, 0.22),
+    0 3px 6px rgba(0, 0, 0, 0.03);
   cursor: pointer;
-}
-
-.work-project-gallery__float-close,
-.work-project-gallery__float-button {
   transition:
     color 180ms ease,
     background-color 180ms ease;
 }
 
+.work-project-gallery__float-arrow-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.work-project-gallery__float-close-icon,
+.work-project-gallery__float-arrow-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .work-project-gallery__float-close:hover,
-.work-project-gallery__float-button:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.12);
+.work-project-gallery__float-button:hover {
+  background-color: rgba(255, 255, 255, 0.14);
 }
 
 .work-project-gallery__float-close:focus-visible,
 .work-project-gallery__float-button:focus-visible {
   outline: 1px solid rgba(255, 255, 255, 0.92);
-  outline-offset: -4px;
+  outline-offset: 2px;
 }
 
-.work-project-gallery__float-button:disabled {
-  color: rgba(255, 255, 255, 0.3);
-  cursor: default;
+@keyframes float-thumb-in {
+  from {
+    opacity: 0;
+  }
 }
 
 @media (max-width: 1100px) {
@@ -402,25 +522,39 @@
   }
 
   .work-project-gallery__float-nav {
-    --float-nav-height: 50px;
+    --float-nav-height: 56px;
+    --float-nav-inner: 40px;
+    --float-nav-gap: 8px;
     --float-nav-radius: 6px;
-    bottom: max(12px, env(safe-area-inset-bottom));
-    gap: 6px;
+    --float-nav-icon: 20px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    gap: 4px;
     opacity: 1;
     pointer-events: auto;
     transform: translate3d(0, 0, 0);
   }
 
-  .work-project-gallery__float-controls {
-    grid-template-columns: 76px repeat(2, 44px);
+  .work-project-gallery__float-container {
+    padding: 8px;
   }
 
-  .work-project-gallery__float-counter {
+  .work-project-gallery__float-sub-label {
+    max-width: 9rem;
     font-size: 0.625rem;
   }
 
-  .work-project-gallery__float-separator {
-    margin: 0 0.34rem;
+  .work-project-gallery__float-title {
+    font-size: 0.875rem;
+  }
+
+  .work-project-gallery__float-button {
+    width: 32px;
+    height: 22px;
+  }
+
+  .work-project-gallery__float-arrow-icon {
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -441,7 +575,12 @@
 @media (prefers-reduced-motion: reduce) {
   .work-project-gallery__float-nav,
   .work-project-gallery__float-close,
+  .work-project-gallery__float-close-label,
   .work-project-gallery__float-button {
     transition: none;
+  }
+
+  .work-project-gallery__float-thumb-image {
+    animation: none;
   }
 }
