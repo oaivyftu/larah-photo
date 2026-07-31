@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .service {
   overflow: clip;
   background: var(--color-paper);
@@ -41,9 +43,13 @@
   padding-bottom: clamp(7rem, 9.5vw, 11rem);
 }
 
+/* The four intrinsic minimums plus three gaps need ~1230px of viewport, so the
+   pricing column used to spill past the right edge between the old 1100px
+   breakpoint and ~1230px. `minmax(0, …)` keeps the row inside the frame at any
+   width and the three-column fallback now starts where the minimums give out. */
 .service-row {
   display: grid;
-  grid-template-columns: 5.5rem minmax(16rem, 0.88fr) minmax(23rem, 1.2fr) minmax(16rem, 0.78fr);
+  grid-template-columns: 5.5rem minmax(0, 0.88fr) minmax(0, 1.2fr) minmax(0, 0.78fr);
   gap: clamp(2.4rem, 5vw, 6rem);
   align-items: start;
 }
@@ -83,13 +89,10 @@
   max-width: 22rem;
 }
 
-.service-row__summary a {
+.service-row__cta {
   align-self: end;
+  justify-self: start;
   margin-top: auto;
-  font-size: clamp(0.9rem, 1.05vw, 1.05rem);
-  font-weight: 700;
-  letter-spacing: 0;
-  line-height: 1;
 }
 
 .service-row__media {
@@ -131,9 +134,9 @@
   line-height: 1;
 }
 
-@media (max-width: 1100px) {
+@include media-max("desktop") {
   .service-row {
-    grid-template-columns: 4.5rem minmax(14rem, 1fr) minmax(18rem, 1.1fr);
+    grid-template-columns: 4.5rem minmax(0, 1fr) minmax(0, 1.1fr);
   }
 
   .service-row__details {
@@ -142,7 +145,7 @@
   }
 }
 
-@media (max-width: 760px) {
+@include media-max("tablet") {
   .service__header {
     padding: 3.5rem 0 2.8rem;
   }

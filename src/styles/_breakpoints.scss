@@ -1,15 +1,28 @@
-$breakpoint-xs: 360px;
-$breakpoint-sm: 480px;
-$breakpoint-md: 720px;
-$breakpoint-lg: 1024px;
-$breakpoint-xl: 1200px;
-$breakpoint-2xl: 1440px;
+// Desktop-first scale: every layout query in the app is a `max-width` stop, so
+// these name the width at which a layout stops fitting rather than a device.
+$breakpoint-phone-sm: 480px; // narrow phones — single-column forms
+$breakpoint-phone: 560px; // phones — nav collapses to a bar
+$breakpoint-phone-lg: 620px; // large phones — masonry drops to one column
+$breakpoint-tablet-sm: 700px; // small tablets / phone landscape
+$breakpoint-tablet: 760px; // tablets — hover affordances stop applying
+$breakpoint-tablet-lg: 900px; // large tablets — two-column layouts stack
+$breakpoint-laptop-sm: 1000px; // small laptops — header stacks
+$breakpoint-laptop: 1100px;
+$breakpoint-laptop-lg: 1200px;
+$breakpoint-desktop: 1240px; // widest layouts (4-column service rows) fit here
+
+// Above this the pointer is assumed to be a mouse; paired with `hover-fine`.
+$breakpoint-hover-min: $breakpoint-tablet + 1px;
 
 $breakpoints: (
-  "xs": $breakpoint-xs,
-  "sm": $breakpoint-sm,
-  "md": $breakpoint-md,
-  "lg": $breakpoint-lg,
-  "xl": $breakpoint-xl,
-  "2xl": $breakpoint-2xl,
+  "phone-sm": $breakpoint-phone-sm,
+  "phone": $breakpoint-phone,
+  "phone-lg": $breakpoint-phone-lg,
+  "tablet-sm": $breakpoint-tablet-sm,
+  "tablet": $breakpoint-tablet,
+  "tablet-lg": $breakpoint-tablet-lg,
+  "laptop-sm": $breakpoint-laptop-sm,
+  "laptop": $breakpoint-laptop,
+  "laptop-lg": $breakpoint-laptop-lg,
+  "desktop": $breakpoint-desktop,
 );

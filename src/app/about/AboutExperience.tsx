@@ -14,7 +14,7 @@ type AboutExperienceProps = {
 };
 
 export function AboutExperience({ content }: AboutExperienceProps) {
-  const rootRef = useRef<HTMLElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -68,7 +68,7 @@ export function AboutExperience({ content }: AboutExperienceProps) {
   );
 
   return (
-    <main className={styles["about"]} ref={rootRef}>
+    <div className={styles["about"]} ref={rootRef}>
       <section className={styles["about__intro"]} aria-labelledby="about-title">
         <div className={styles["about__copy"]} data-about-copy>
           <h1 className={styles["about__title"]} data-page-heading id="about-title">
@@ -93,6 +93,6 @@ export function AboutExperience({ content }: AboutExperienceProps) {
           <figcaption data-about-logo>LARAH</figcaption>
         </figure>
       </section>
-    </main>
+    </div>
   );
 }

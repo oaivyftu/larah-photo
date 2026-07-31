@@ -1,0 +1,203 @@
+@use "@/styles/mixins" as *;
+
+.work-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  padding-top: clamp(0.9rem, 2vw, 1.8rem);
+  overflow: hidden;
+  background: rgb(18 18 18 / 68%);
+  animation: modal-backdrop-in 420ms ease both;
+  overscroll-behavior: contain;
+}
+
+.work-modal__dialog {
+  height: 100%;
+  animation: modal-sheet-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.work-modal__document {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: 0.9rem 0.9rem 0 0;
+  background: var(--color-paper);
+  box-shadow: 0 -1.2rem 4rem rgb(0 0 0 / 18%);
+  overscroll-behavior: contain;
+}
+
+.work-modal__bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 4.5rem;
+  padding: 0 var(--page-gutter);
+  border-bottom: 1px solid var(--color-line-soft);
+  background: color-mix(in srgb, var(--color-paper) 92%, transparent);
+  backdrop-filter: blur(16px);
+}
+
+.work-modal__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  font-size: var(--font-size-xs);
+  line-height: 1;
+}
+
+.work-modal__identity strong {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.work-modal__identity span {
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.work-modal__hint {
+  color: var(--color-muted);
+  font-size: var(--font-size-2xs);
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.work-modal__close {
+  position: fixed;
+  right: clamp(1rem, 2vw, 2rem);
+  bottom: clamp(1rem, 2vw, 2rem);
+  z-index: 8;
+  display: grid;
+  width: clamp(3.5rem, 5vw, 4.25rem);
+  aspect-ratio: 1;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0.65rem;
+  color: var(--color-paper);
+  background: var(--color-ink);
+  box-shadow: 0 0.8rem 2.5rem rgb(0 0 0 / 22%);
+  cursor: pointer;
+  transition:
+    color 220ms ease,
+    background-color 220ms ease,
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.work-modal__close span,
+.work-modal__close span::after {
+  width: 1.35rem;
+  height: 1px;
+  background: currentColor;
+}
+
+.work-modal__close span {
+  position: relative;
+  display: block;
+  transform: rotate(45deg);
+}
+
+.work-modal__close span::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  transform: rotate(90deg);
+}
+
+.work-modal__close:hover {
+  color: var(--color-ink);
+  background: var(--color-paper);
+  transform: rotate(4deg);
+}
+
+.work-modal__close:focus-visible {
+  outline: 2px solid var(--color-paper);
+  outline-offset: 0.25rem;
+}
+
+/* While the image lightbox is open it renders its own close control. Leaving
+   this one on screen reads as the lightbox's close button but dismisses the
+   whole panel. */
+:global(html[data-image-lightbox="true"]) .work-modal__close {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(0.75rem);
+}
+
+.work-modal--closing {
+  animation: modal-backdrop-out 360ms ease both;
+}
+
+.work-modal--closing .work-modal__dialog {
+  animation: modal-sheet-out 360ms cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+
+.work-modal--closing .work-modal__close {
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(1rem);
+}
+
+@include media-max(680px) {
+  .work-modal {
+    padding-top: 0.5rem;
+  }
+
+  .work-modal__document {
+    border-radius: 0.65rem 0.65rem 0 0;
+  }
+
+  .work-modal__bar {
+    min-height: 3.75rem;
+  }
+
+  .work-modal__hint {
+    display: none;
+  }
+
+  .work-modal__close {
+    width: 3.5rem;
+    border-radius: 50%;
+  }
+}
+
+@include reduced-motion {
+  .work-modal,
+  .work-modal__dialog,
+  .work-modal--closing,
+  .work-modal--closing .work-modal__dialog {
+    animation-duration: 1ms;
+  }
+}
+
+@keyframes modal-backdrop-in {
+  from {
+    background: rgb(18 18 18 / 0%);
+  }
+}
+
+@keyframes modal-backdrop-out {
+  to {
+    background: rgb(18 18 18 / 0%);
+  }
+}
+
+@keyframes modal-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes modal-sheet-out {
+  to {
+    transform: translateY(100%);
+  }
+}

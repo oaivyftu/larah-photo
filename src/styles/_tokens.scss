@@ -1,11 +1,15 @@
 :root {
   /* Color */
   --color-paper: #ffffff;
+  --color-paper-warm: #f6f3ee;
   --color-ink: #111111;
   --color-ink-soft: #1f1f1f;
-  --color-muted: #8d8d8d;
+  --color-muted: #8e8e93;
+  --color-accent: #ff383c;
   --color-line: #111111;
   --color-line-soft: #d8d8d8;
+  --color-divider: #505050;
+  --divider-hairline: 0.5px;
 
   /* Typography */
   --font-sans: "Montserrat", Arial, Helvetica, sans-serif;
@@ -32,7 +36,7 @@
   --page-gutter: clamp(var(--page-gutter-min), 2.777vw, var(--page-gutter-max));
   --container-max: 85rem;
   --frame-max: 90rem;
-  --header-height: 4.5rem;
+  --header-height: 5.25rem;
 
   /* Spacing */
   --space-2xs: 0.25rem;

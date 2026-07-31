@@ -1,5 +1,44 @@
+@use "sass:map";
+@use "breakpoints" as bp;
+
+// Accepts either a key from `$breakpoints` ("tablet-lg") or a raw length.
+@function resolve($width) {
+  @if map.has-key(bp.$breakpoints, $width) {
+    @return map.get(bp.$breakpoints, $width);
+  }
+
+  @return $width;
+}
+
 @mixin media-min($width) {
-  @media (min-width: $width) {
+  @media (min-width: resolve($width)) {
+    @content;
+  }
+}
+
+// Desktop-first: the app's layouts are authored wide and narrowed from there.
+@mixin media-max($width) {
+  @media (max-width: resolve($width)) {
+    @content;
+  }
+}
+
+// Mouse-driven pointers only — guards hover states, custom cursors and the
+// glass pointer so they never apply on touch.
+@mixin hover-fine {
+  @media (hover: hover) and (pointer: fine) and (min-width: bp.$breakpoint-hover-min) {
+    @content;
+  }
+}
+
+@mixin touch {
+  @media (hover: none), (pointer: coarse) {
+    @content;
+  }
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
     @content;
   }
 }

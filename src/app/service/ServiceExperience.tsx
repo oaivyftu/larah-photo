@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { Button } from "@/components/ui/Button/Button";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import type { ServicePackage } from "@/types/service";
 import type { ServicePageContent } from "@/types/site";
@@ -17,7 +17,7 @@ type ServiceExperienceProps = {
 };
 
 export function ServiceExperience({ content, services }: ServiceExperienceProps) {
-  const rootRef = useRef<HTMLElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -61,7 +61,7 @@ export function ServiceExperience({ content, services }: ServiceExperienceProps)
   );
 
   return (
-    <main className={styles["service"]} ref={rootRef}>
+    <div className={styles["service"]} ref={rootRef}>
       <section className={styles["service__header"]} aria-labelledby="service-title">
         <h1 className={styles["service__title"]} data-page-heading id="service-title">
           {content.titleWords.map((word, index) => (
@@ -78,9 +78,16 @@ export function ServiceExperience({ content, services }: ServiceExperienceProps)
             <div className={styles["service-row__summary"]}>
               <h2>{service.title}</h2>
               <p>{service.description}</p>
-              <Link data-transition-label="Contact" href={service.ctaHref}>
-                BOOK NOW <span aria-hidden="true">&#8594;</span>
-              </Link>
+              <Button
+                className={styles["service-row__cta"]}
+                data-transition-label="Contact"
+                href={service.ctaHref}
+                size="small"
+                variant="primary"
+                withIcon
+              >
+                Book now
+              </Button>
             </div>
 
             <div className={styles["service-row__media"]}>
@@ -107,6 +114,6 @@ export function ServiceExperience({ content, services }: ServiceExperienceProps)
           </article>
         ))}
       </section>
-    </main>
+    </div>
   );
 }

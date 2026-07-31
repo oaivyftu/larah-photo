@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .work-filters {
   display: flex;
   flex-wrap: wrap;
@@ -17,6 +19,11 @@
   flex-wrap: wrap;
   gap: 0.45rem;
   align-items: baseline;
+}
+
+.work-filters__separator {
+  color: var(--color-muted);
+  user-select: none;
 }
 
 .work-filters__button {
@@ -45,13 +52,13 @@
   font-weight: 700;
 }
 
-@media (prefers-reduced-motion: reduce) {
+@include reduced-motion {
   .work-filters__button {
     transition: none;
   }
 }
 
-@media (max-width: 900px) {
+@include media-max("tablet-lg") {
   .work-filters {
     justify-content: flex-start;
     font-size: 0.75rem;

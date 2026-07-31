@@ -28,10 +28,8 @@ export const homePage = defineType({
       title: "Services eyebrow",
       type: "string",
     }),
-    defineField({
-      name: "servicesTitle",
-      title: "Services title",
-      type: "string",
-    }),
   ],
+  preview: {
+    prepare: () => ({ title: "Home page" }),
+  },
 });

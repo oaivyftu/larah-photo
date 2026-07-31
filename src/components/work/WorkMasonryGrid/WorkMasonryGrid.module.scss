@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .work-layout {
   --work-columns: 12;
   --work-gap-x: 1.25rem;
@@ -187,7 +189,7 @@
   --work-gap-y: clamp(2.5rem, 4.7vw, 5.25rem);
 }
 
-@media (prefers-reduced-motion: reduce) {
+@include reduced-motion {
   .work-layout__item {
     transition: none;
   }
@@ -203,7 +205,7 @@
   }
 }
 
-@media (max-width: 1180px) {
+@include media-max(1180px) {
   .work-layout--homepage {
     --work-columns: 2;
   }
@@ -237,7 +239,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@include media-max("tablet-lg") {
   .work-layout--work {
     --work-columns: 2;
   }
@@ -255,7 +257,7 @@
   }
 }
 
-@media (max-width: 720px) {
+@include media-max(720px) {
   .work-layout {
     --work-columns: 1;
   }

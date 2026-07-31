@@ -4,6 +4,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.scss";
 import { Montserrat } from 'next/font/google'
 import { PageTransition } from "@/components/layout/PageTransition/PageTransition";
+import { GlassPointer } from "@/components/ui/GlassPointer/GlassPointer";
 
 config.autoAddCss = false;
 
@@ -19,8 +20,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   return (
     <html
@@ -30,7 +33,9 @@ export default function RootLayout({
     >
       <body>
         {children}
+        {modal}
         <PageTransition />
+        <GlassPointer />
       </body>
     </html>
   );

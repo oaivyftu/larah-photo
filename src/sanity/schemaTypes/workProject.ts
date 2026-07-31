@@ -29,16 +29,8 @@ export const workProject = defineType({
     }),
     defineField({ name: "meta", title: "Card meta", type: "string" }),
     defineField({ name: "category", title: "Category", type: "string" }),
-    defineField({
-      name: "tags",
-      title: "Tags",
-      type: "array",
-      of: [defineArrayMember({ type: "string" })],
-    }),
     defineField({ name: "year", title: "Year", type: "string" }),
     defineField({ name: "location", title: "Location", type: "string" }),
-    defineField({ name: "clientSubject", title: "Subject", type: "string" }),
-    defineField({ name: "serviceCategory", title: "Service category", type: "string" }),
     defineField({ name: "description", title: "Description", type: "text", rows: 4 }),
     imageField("cardImage", "Card image"),
     defineField({ name: "featured", title: "Featured", type: "boolean" }),
@@ -58,10 +50,25 @@ export const workProject = defineType({
     defineField({
       name: "images",
       title: "Gallery images",
+      description:
+        "Drag and drop multiple image files here to upload the whole gallery at once.",
       type: "array",
       of: [
         defineArrayMember({
+          type: "image",
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: "alt",
+              title: "Alt text",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+          ],
+        }),
+        defineArrayMember({
           type: "object",
+          title: "Legacy gallery image",
           fields: [
             imageField("image", "Image"),
           ],

@@ -1,5 +1,4 @@
 export const imageFields = `
-  _type,
   alt,
   asset->{
     url,
@@ -34,46 +33,26 @@ export const homePageQuery = `*[_type == "homePage"][0]{
   manifestoImageOne{${imageFields}},
   manifestoImageTwo{${imageFields}},
   selectedWorkEyebrow,
-  servicesEyebrow,
-  servicesTitle
+  servicesEyebrow
 }`;
 
 export const workPageQuery = `*[_type == "workPage"][0]{
-  eyebrow,
-  titleWords,
-  indexLabel
+  titleWords
 }`;
 
 export const aboutPageQuery = `*[_type == "aboutPage"][0]{
-  eyebrow,
   titleWords,
-  largeText,
   portraitOne{${imageFields}},
-  portraitTwo{${imageFields}},
-  notes,
   story
 }`;
 
 export const contactPageQuery = `*[_type == "contactPage"][0]{
-  eyebrow,
   titleWords,
-  largeText,
-  fastestRouteLabel,
-  fastestRouteTitle,
-  locationLabel,
-  locationTitle,
-  locationDescription,
-  image{${imageFields}},
-  formEyebrow,
-  formTitle,
   formCopy
 }`;
 
 export const servicePageQuery = `*[_type == "servicePage"][0]{
-  eyebrow,
-  titleWords,
-  image{${imageFields}},
-  imageCopy
+  titleWords
 }`;
 
 export const servicesQuery = `*[_type == "servicePackage"] | order(index asc, title asc){
@@ -94,10 +73,8 @@ export const projectsQuery = `*[_type == "workProject"] | order(featuredOrder as
   title,
   meta,
   category,
-  tags,
   year,
   location,
-  clientSubject,
   serviceCategory,
   description,
   cardImage{${imageFields}},
@@ -106,6 +83,7 @@ export const projectsQuery = `*[_type == "workProject"] | order(featuredOrder as
   homepageSpan,
   workSpan,
   images[]{
+    ${imageFields},
     image{${imageFields}}
   }
 }`;

@@ -20,6 +20,9 @@
 # production
 /build
 
+# local Sanity dataset snapshots
+/.sanity-backups/
+
 # misc
 .DS_Store
 *.pem

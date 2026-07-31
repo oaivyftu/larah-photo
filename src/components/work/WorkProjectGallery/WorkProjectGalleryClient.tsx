@@ -7,22 +7,22 @@ import {
   useMemo,
   useRef,
   useState,
+  type FocusEvent as ReactFocusEvent,
   type RefObject,
 } from "react";
 import type Flickity from "flickity";
 import "flickity/css/flickity.css";
 import "flickity-fade/flickity-fade.css";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
-import { icons } from "@/constants/icons";
-import { Icon } from "@/components/ui/Icon/Icon";
-import {
-  PointerHint,
-  usePointerHint,
-} from "@/components/ui/PointerHint/PointerHint";
+import { usePointerLabel } from "@/components/ui/GlassPointer/usePointerLabel";
 import type { Project, ProjectImage } from "@/types/project";
 import styles from "./WorkProjectGallery.module.scss";
 
 const CONTROLS_IDLE_DELAY = 1600;
+// Resting on the controls earns a longer grace period, but never an exemption:
+// after clicking next/previous the cursor sits on the nav, so an exemption
+// would keep it on screen forever.
+const CONTROLS_HOVER_IDLE_DELAY = 2600;
 const AUTO_HIDE_MEDIA =
   "(hover: hover) and (pointer: fine) and (min-width: 761px)";
 const DRAGGABLE_MEDIA =
@@ -75,22 +75,62 @@ const GallerySlide = memo(function GallerySlide({
   );
 });
 
+function NavCloseIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className={styles["work-project-gallery__float-close-icon"]}
+      viewBox="0 0 24 24"
+    >
+      <path d="M5,5l14,14" />
+      <path d="M19,5L5,19" />
+    </svg>
+  );
+}
+
+function NavArrowIcon({ direction }: { direction: "previous" | "next" }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={styles["work-project-gallery__float-arrow-icon"]}
+      viewBox="0 0 16 16"
+    >
+      {direction === "previous" ? (
+        <>
+          <path d="M3,8h10" />
+          <path d="M6,5l-3,3" />
+          <path d="M3,8l3,3" />
+        </>
+      ) : (
+        <>
+          <path d="M13,8H3" />
+          <path d="M10,5l3,3" />
+          <path d="M10,11l3-3" />
+        </>
+      )}
+    </svg>
+  );
+}
+
 type GalleryFloatNavProps = {
+  currentImage: ProjectImage | undefined;
   currentIndex: number;
   isModal: boolean;
   isVisible: boolean;
   navRef: RefObject<HTMLElement | null>;
   onClose?: () => void;
   onControlsBlur: () => void;
-  onControlsFocus: () => void;
+  onControlsFocus: (event: ReactFocusEvent<HTMLElement>) => void;
   onControlsPointerEnter: () => void;
   onControlsPointerLeave: () => void;
   onNext: () => void;
   onPrevious: () => void;
+  subLabel: string;
   total: number;
 };
 
 function GalleryFloatNav({
+  currentImage,
   currentIndex,
   isModal,
   isVisible,
@@ -102,6 +142,7 @@ function GalleryFloatNav({
   onControlsPointerLeave,
   onNext,
   onPrevious,
+  subLabel,
   total,
 }: GalleryFloatNavProps) {
   const currentLabel = String(currentIndex + 1).padStart(2, "0");
@@ -127,6 +168,64 @@ function GalleryFloatNav({
       onPointerLeave={onControlsPointerLeave}
       onPointerMove={onControlsPointerEnter}
     >
+      <div className={styles["work-project-gallery__float-container"]}>
+        <div className={styles["work-project-gallery__float-body"]}>
+          <span className={styles["work-project-gallery__float-thumb"]}>
+            {currentImage ? (
+              <LarahImage
+                alt=""
+                className={styles["work-project-gallery__float-thumb-image"]}
+                draggable={false}
+                fill
+                key={currentIndex}
+                sizes="70px"
+                src={currentImage.src}
+              />
+            ) : null}
+          </span>
+
+          <p className={styles["work-project-gallery__float-main"]}>
+            <span className={styles["work-project-gallery__float-sub-label"]}>
+              {subLabel}
+            </span>
+            <span
+              aria-hidden="true"
+              className={styles["work-project-gallery__float-title"]}
+            >
+              {currentLabel} / {totalLabel}
+            </span>
+            <span
+              aria-atomic="true"
+              aria-live="polite"
+              className={styles["work-project-gallery__sr-only"]}
+            >
+              Image {currentIndex + 1} of {total}
+            </span>
+          </p>
+
+          {hasMultipleSlides ? (
+            <span className={styles["work-project-gallery__float-actions"]}>
+              <button
+                aria-label="Previous image"
+                className={styles["work-project-gallery__float-button"]}
+                onClick={onPrevious}
+                type="button"
+              >
+                <NavArrowIcon direction="previous" />
+              </button>
+              <button
+                aria-label="Next image"
+                className={styles["work-project-gallery__float-button"]}
+                onClick={onNext}
+                type="button"
+              >
+                <NavArrowIcon direction="next" />
+              </button>
+            </span>
+          ) : null}
+        </div>
+      </div>
+
       {isModal && onClose ? (
         <button
           aria-label="Close gallery"
@@ -134,48 +233,17 @@ function GalleryFloatNav({
           onClick={onClose}
           type="button"
         >
-          <Icon decorative icon={icons.close} />
+          <span className={styles["work-project-gallery__float-close-content"]}>
+            <span
+              aria-hidden="true"
+              className={styles["work-project-gallery__float-close-label"]}
+            >
+              <span>Close</span>
+            </span>
+            <NavCloseIcon />
+          </span>
         </button>
       ) : null}
-
-      <div className={styles["work-project-gallery__float-controls"]}>
-        <p
-          aria-atomic="true"
-          aria-live="polite"
-          className={styles["work-project-gallery__float-counter"]}
-        >
-          <span aria-hidden="true">{currentLabel}</span>
-          <span
-            aria-hidden="true"
-            className={styles["work-project-gallery__float-separator"]}
-          >
-            -
-          </span>
-          <span aria-hidden="true">{totalLabel}</span>
-          <span className={styles["work-project-gallery__sr-only"]}>
-            Image {currentIndex + 1} of {total}
-          </span>
-        </p>
-
-        <button
-          aria-label="Previous image"
-          className={styles["work-project-gallery__float-button"]}
-          disabled={!hasMultipleSlides}
-          onClick={onPrevious}
-          type="button"
-        >
-          <Icon decorative icon={icons.chevronLeft} />
-        </button>
-        <button
-          aria-label="Next image"
-          className={styles["work-project-gallery__float-button"]}
-          disabled={!hasMultipleSlides}
-          onClick={onNext}
-          type="button"
-        >
-          <Icon decorative icon={icons.chevronRight} />
-        </button>
-      </div>
     </nav>
   );
 }
@@ -194,14 +262,13 @@ export function WorkProjectGalleryClient({
   const controlsFocusedRef = useRef(false);
   const controlsHoveredRef = useRef(false);
   const canAutoHideControlsRef = useRef(false);
+  const lastPointerPositionRef = useRef<{ x: number; y: number } | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [areControlsVisible, setAreControlsVisible] = useState(true);
   const {
-    hidePointerHint: hideCloseHint,
-    hintRef: closeHintRef,
-    isActive: isCloseHintActive,
-    pointerHintHandlers: closeHintHandlers,
-  } = usePointerHint<HTMLDivElement>();
+    hidePointerLabel: hideCloseHint,
+    pointerLabelHandlers: closeHintHandlers,
+  } = usePointerLabel<HTMLDivElement>("Close");
 
   const handleClose = useCallback(() => {
     if (isModal) {
@@ -221,18 +288,21 @@ export function WorkProjectGalleryClient({
   const scheduleControlsHide = useCallback(() => {
     clearControlsTimer();
 
-    if (
-      !canAutoHideControlsRef.current ||
-      controlsFocusedRef.current ||
-      controlsHoveredRef.current
-    ) {
+    // Keyboard focus is the only thing that pins the controls open — a focused
+    // button that fades out would strand the user mid-tab-order.
+    if (!canAutoHideControlsRef.current || controlsFocusedRef.current) {
       return;
     }
 
-    controlsTimerRef.current = window.setTimeout(() => {
-      setAreControlsVisible(false);
-      controlsTimerRef.current = null;
-    }, CONTROLS_IDLE_DELAY);
+    controlsTimerRef.current = window.setTimeout(
+      () => {
+        setAreControlsVisible(false);
+        controlsTimerRef.current = null;
+      },
+      controlsHoveredRef.current
+        ? CONTROLS_HOVER_IDLE_DELAY
+        : CONTROLS_IDLE_DELAY,
+    );
   }, [clearControlsTimer]);
 
   const revealControls = useCallback(() => {
@@ -245,11 +315,26 @@ export function WorkProjectGalleryClient({
     setAreControlsVisible(true);
   }, [clearControlsTimer]);
 
-  const handleControlsFocus = useCallback(() => {
-    controlsFocusedRef.current = true;
-    hideCloseHint();
-    keepControlsVisible();
-  }, [hideCloseHint, keepControlsVisible]);
+  const handleControlsFocus = useCallback(
+    (event: ReactFocusEvent<HTMLElement>) => {
+      // Clicking next/previous also focuses the button. Treating that as
+      // "pinned" would clear the idle timer for good, so only keyboard focus
+      // (`:focus-visible`) keeps the controls on screen.
+      const isKeyboardFocus =
+        event.target instanceof HTMLElement &&
+        event.target.matches(":focus-visible");
+
+      controlsFocusedRef.current = isKeyboardFocus;
+      hideCloseHint();
+
+      if (isKeyboardFocus) {
+        keepControlsVisible();
+      } else {
+        revealControls();
+      }
+    },
+    [hideCloseHint, keepControlsVisible, revealControls],
+  );
 
   const handleControlsBlur = useCallback(() => {
     controlsFocusedRef.current = false;
@@ -259,8 +344,8 @@ export function WorkProjectGalleryClient({
   const handleControlsPointerEnter = useCallback(() => {
     controlsHoveredRef.current = true;
     hideCloseHint();
-    keepControlsVisible();
-  }, [hideCloseHint, keepControlsVisible]);
+    revealControls();
+  }, [hideCloseHint, revealControls]);
 
   const handleControlsPointerLeave = useCallback(() => {
     controlsHoveredRef.current = false;
@@ -289,7 +374,9 @@ export function WorkProjectGalleryClient({
     (event: React.PointerEvent<HTMLDivElement>) => {
       const controls = controlsRef.current;
 
-      if (!controls) {
+      // A hidden nav is not a surface — the "Close" hint should still show over
+      // the space it used to occupy.
+      if (!controls || !areControlsVisible) {
         return false;
       }
 
@@ -302,7 +389,7 @@ export function WorkProjectGalleryClient({
         event.clientY <= bounds.bottom
       );
     },
-    [],
+    [areControlsVisible],
   );
 
   useEffect(() => {
@@ -323,6 +410,36 @@ export function WorkProjectGalleryClient({
       clearControlsTimer();
     };
   }, [clearControlsTimer, isModal, scheduleControlsHide]);
+
+  useEffect(() => {
+    if (!isModal) {
+      return;
+    }
+
+    const handlePointerActivity = (event: PointerEvent) => {
+      const last = lastPointerPositionRef.current;
+
+      // Hiding the nav flips it to `pointer-events: none`, which can hand the
+      // cursor to the carousel underneath and fire enter events even though
+      // nothing moved. Only real movement counts as activity, otherwise the
+      // controls flicker back on the moment they hide.
+      if (last && last.x === event.clientX && last.y === event.clientY) {
+        return;
+      }
+
+      lastPointerPositionRef.current = { x: event.clientX, y: event.clientY };
+      revealControls();
+    };
+
+    window.addEventListener("pointermove", handlePointerActivity, {
+      passive: true,
+    });
+
+    return () => {
+      lastPointerPositionRef.current = null;
+      window.removeEventListener("pointermove", handlePointerActivity);
+    };
+  }, [isModal, revealControls]);
 
   const slideIds = useMemo(
     () =>
@@ -362,7 +479,7 @@ export function WorkProjectGalleryClient({
         initialIndex,
         pageDots: false,
         percentPosition: true,
-        prevNextButtons: true,
+        prevNextButtons: false,
         setGallerySize: false,
         freeScroll: true,
         lazyLoad: true,
@@ -408,6 +525,9 @@ export function WorkProjectGalleryClient({
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // Lets any surrounding shell (the work detail panel) stand down while the
+    // lightbox owns the screen — two competing close affordances read as one.
+    document.documentElement.dataset.imageLightbox = "true";
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.defaultPrevented) {
@@ -448,6 +568,7 @@ export function WorkProjectGalleryClient({
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      delete document.documentElement.dataset.imageLightbox;
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [
@@ -470,8 +591,6 @@ export function WorkProjectGalleryClient({
       onKeyDown={revealControls}
       onClick={isModal ? handleClose : undefined}
       onPointerDown={revealControls}
-      onPointerEnter={revealControls}
-      onPointerMove={revealControls}
     >
       <div
         aria-labelledby={
@@ -495,8 +614,6 @@ export function WorkProjectGalleryClient({
           onClick={handleCarouselClick}
           onDragStart={(event) => event.preventDefault()}
           onPointerEnter={(event) => {
-            revealControls();
-
             if (isModal) {
               if (isPointerOverControls(event)) {
                 hideCloseHint();
@@ -511,8 +628,6 @@ export function WorkProjectGalleryClient({
             }
           }}
           onPointerMove={(event) => {
-            revealControls();
-
             if (isModal) {
               if (isPointerOverControls(event)) {
                 hideCloseHint();
@@ -534,16 +649,8 @@ export function WorkProjectGalleryClient({
           ))}
         </div>
 
-        {isModal ? (
-          <PointerHint
-            active={isCloseHintActive}
-            hintRef={closeHintRef}
-            label="Close"
-            variant="close"
-          />
-        ) : null}
-
         <GalleryFloatNav
+          currentImage={images[currentIndex]}
           currentIndex={currentIndex}
           isModal={isModal}
           isVisible={areControlsVisible}
@@ -555,6 +662,7 @@ export function WorkProjectGalleryClient({
           onControlsPointerLeave={handleControlsPointerLeave}
           onNext={handleNext}
           onPrevious={handlePrevious}
+          subLabel={project.title}
           total={images.length}
         />
       </div>

@@ -1,0 +1,128 @@
+@use "@/styles/mixins" as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    opacity 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 0.25rem;
+}
+
+.button__icon {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+/* Primary — filled ink block, inverse label */
+.button--primary {
+  background: var(--color-ink);
+  color: var(--color-paper-warm);
+}
+
+.button--primary:hover,
+.button--primary:focus-visible {
+  opacity: 0.82;
+}
+
+/* Secondary — bare label with trailing arrow */
+.button--secondary {
+  padding: 0;
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.button--secondary:hover,
+.button--secondary:focus-visible {
+  opacity: 0.62;
+}
+
+/* Sizes — primary */
+.button--primary.button--small {
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  font-size: clamp(0.875rem, 1.11vw, 1rem);
+  line-height: 1.25;
+}
+
+.button--primary.button--small .button__icon {
+  height: 0.75rem;
+}
+
+.button--primary.button--medium {
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: clamp(1rem, 1.39vw, 1.25rem);
+  line-height: 1.2;
+}
+
+.button--primary.button--medium .button__icon {
+  height: 0.875rem;
+}
+
+.button--primary.button--large {
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: clamp(1.15rem, 1.67vw, 1.5rem);
+  line-height: 1.2;
+}
+
+.button--primary.button--large .button__icon {
+  height: 1rem;
+}
+
+/* Sizes — secondary */
+.button--secondary.button--small {
+  gap: 0.25rem;
+  font-size: clamp(0.875rem, 1.11vw, 1rem);
+  line-height: 1.25;
+}
+
+.button--secondary.button--small .button__icon {
+  height: 0.75rem;
+}
+
+.button--secondary.button--medium {
+  gap: 0.25rem;
+  font-size: clamp(1rem, 1.39vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.button--secondary.button--medium .button__icon {
+  height: 0.875rem;
+}
+
+.button--secondary.button--large {
+  gap: 0.25rem;
+  font-size: clamp(1.15rem, 1.67vw, 1.5rem);
+  line-height: 1.4;
+}
+
+.button--secondary.button--large .button__icon {
+  height: 1rem;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@include reduced-motion {
+  .button {
+    transition: none;
+  }
+}

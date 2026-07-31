@@ -1,3 +1,4 @@
+import { normalizeWorkCategory } from "@/utils/formatWorkCategory";
 import type { NavigationItem } from "@/types/navigation";
 import type { Project, ProjectImage, WorkPlacement } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
@@ -42,45 +43,25 @@ type SanityHomePage = {
   manifestoImageTwo?: SanityImageValue;
   selectedWorkEyebrow?: string;
   servicesEyebrow?: string;
-  servicesTitle?: string;
 };
 
 type SanityAboutPage = {
-  eyebrow?: string;
   titleWords?: string[];
-  largeText?: string;
   portraitOne?: SanityImageValue;
-  portraitTwo?: SanityImageValue;
-  notes?: string[];
   story?: string[];
 };
 
 type SanityWorkPage = {
-  eyebrow?: string;
   titleWords?: string[];
-  indexLabel?: string;
 };
 
 type SanityContactPage = {
-  eyebrow?: string;
   titleWords?: string[];
-  largeText?: string;
-  fastestRouteLabel?: string;
-  fastestRouteTitle?: string;
-  locationLabel?: string;
-  locationTitle?: string;
-  locationDescription?: string;
-  image?: SanityImageValue;
-  formEyebrow?: string;
-  formTitle?: string;
   formCopy?: string;
 };
 
 type SanityServicePage = {
-  eyebrow?: string;
   titleWords?: string[];
-  image?: SanityImageValue;
-  imageCopy?: string;
 };
 
 type SanityService = {
@@ -101,18 +82,15 @@ type SanityProject = {
   title?: string;
   meta?: string;
   category?: string;
-  tags?: string[];
   year?: string;
   location?: string;
-  clientSubject?: string;
-  serviceCategory?: string;
   description?: string;
   cardImage?: SanityImageValue;
   featured?: boolean;
   featuredOrder?: number;
   homepageSpan?: string;
   workSpan?: string;
-  images?: Array<{
+  images?: Array<SanityImageValue & {
     image?: SanityImageValue;
   }>;
 };
@@ -173,19 +151,6 @@ function requireDocument<T>(value: T | null, label: string): T {
   return value;
 }
 
-function getInstagramDisplayUrl(url: string) {
-  return url.replace(/^https?:\/\//, "");
-}
-
-function getInstagramHandle(displayUrl: string) {
-  const handle = displayUrl
-    .replace(/^www\./, "")
-    .replace(/^instagram\.com\//, "")
-    .replace(/\/$/, "");
-
-  return `@${handle}`;
-}
-
 export async function getSiteSettings(): Promise<SiteSettings> {
   const settings = requireDocument(
     await fetchSanity<SanitySiteSettings | null>(
@@ -198,7 +163,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     settings.instagramUrl,
     "siteSettings.instagramUrl",
   );
-  const instagramDisplayUrl = getInstagramDisplayUrl(instagramUrl);
   const navigationItems = requireValue(
     settings.navigationItems,
     "siteSettings.navigationItems",
@@ -213,8 +177,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   return {
     name: requireString(settings.name, "siteSettings.name"),
     instagramUrl,
-    instagramDisplayUrl,
-    instagramHandle: getInstagramHandle(instagramDisplayUrl),
     email: requireString(settings.email, "siteSettings.email"),
     phone: requireString(settings.phone, "siteSettings.phone"),
     location: requireString(settings.location, "siteSettings.location"),
@@ -276,10 +238,6 @@ export async function getHomePage(): Promise<HomePageContent> {
       page.servicesEyebrow,
       "homePage.servicesEyebrow",
     ),
-    servicesTitle: requireString(
-      page.servicesTitle,
-      "homePage.servicesTitle",
-    ),
   };
 }
 
@@ -290,18 +248,11 @@ export async function getAboutPage(): Promise<AboutPageContent> {
   );
 
   return {
-    eyebrow: requireString(page.eyebrow, "aboutPage.eyebrow"),
     titleWords: requireStringArray(page.titleWords, "aboutPage.titleWords"),
-    largeText: requireString(page.largeText, "aboutPage.largeText"),
     portraitOne: resolveSanityImage(
       page.portraitOne,
       "aboutPage.portraitOne",
     ),
-    portraitTwo: resolveSanityImage(
-      page.portraitTwo,
-      "aboutPage.portraitTwo",
-    ),
-    notes: requireStringArray(page.notes, "aboutPage.notes"),
     story: requireStringArray(page.story, "aboutPage.story"),
   };
 }
@@ -313,9 +264,7 @@ export async function getWorkPage(): Promise<WorkPageContent> {
   );
 
   return {
-    eyebrow: requireString(page.eyebrow, "workPage.eyebrow"),
     titleWords: requireStringArray(page.titleWords, "workPage.titleWords"),
-    indexLabel: requireString(page.indexLabel, "workPage.indexLabel"),
   };
 }
 
@@ -329,35 +278,7 @@ export async function getContactPage(): Promise<ContactPageContent> {
   );
 
   return {
-    eyebrow: requireString(page.eyebrow, "contactPage.eyebrow"),
     titleWords: requireStringArray(page.titleWords, "contactPage.titleWords"),
-    largeText: requireString(page.largeText, "contactPage.largeText"),
-    fastestRouteLabel: requireString(
-      page.fastestRouteLabel,
-      "contactPage.fastestRouteLabel",
-    ),
-    fastestRouteTitle: requireString(
-      page.fastestRouteTitle,
-      "contactPage.fastestRouteTitle",
-    ),
-    locationLabel: requireString(
-      page.locationLabel,
-      "contactPage.locationLabel",
-    ),
-    locationTitle: requireString(
-      page.locationTitle,
-      "contactPage.locationTitle",
-    ),
-    locationDescription: requireString(
-      page.locationDescription,
-      "contactPage.locationDescription",
-    ),
-    image: resolveSanityImage(page.image, "contactPage.image"),
-    formEyebrow: requireString(
-      page.formEyebrow,
-      "contactPage.formEyebrow",
-    ),
-    formTitle: requireString(page.formTitle, "contactPage.formTitle"),
     formCopy: requireString(page.formCopy, "contactPage.formCopy"),
   };
 }
@@ -372,12 +293,7 @@ export async function getServicePage(): Promise<ServicePageContent> {
   );
 
   return {
-    eyebrow: requireString(page.eyebrow, "servicePage.eyebrow"),
     titleWords: requireStringArray(page.titleWords, "servicePage.titleWords"),
-    image: page.image?.asset?.url
-      ? resolveSanityImage(page.image, "servicePage.image")
-      : undefined,
-    imageCopy: requireString(page.imageCopy, "servicePage.imageCopy"),
   };
 }
 
@@ -478,8 +394,12 @@ function mapSanityProject(project: SanityProject, index: number): Project {
     project.cardImage,
     `${fieldPrefix}.cardImage`,
   );
-  const images: ProjectImage[] = (project.images ?? []).map((item, imageIndex) =>
-    resolveSanityImage(item.image, `${fieldPrefix}.images[${imageIndex}].image`),
+  const images: ProjectImage[] = (project.images ?? []).map(
+    (item, imageIndex) =>
+      resolveSanityImage(
+        item.image ?? item,
+        `${fieldPrefix}.images[${imageIndex}]`,
+      ),
   );
   const featured = project.featured === true;
 
@@ -488,18 +408,11 @@ function mapSanityProject(project: SanityProject, index: number): Project {
     slug,
     title: requireString(project.title, `${fieldPrefix}.title`),
     meta: requireString(project.meta, `${fieldPrefix}.meta`),
-    category: requireString(project.category, `${fieldPrefix}.category`),
-    tags: requireStringArray(project.tags, `${fieldPrefix}.tags`),
+    category: normalizeWorkCategory(
+      requireString(project.category, `${fieldPrefix}.category`),
+    ),
     year: requireString(project.year, `${fieldPrefix}.year`),
     location: requireString(project.location, `${fieldPrefix}.location`),
-    clientSubject: requireString(
-      project.clientSubject,
-      `${fieldPrefix}.clientSubject`,
-    ),
-    serviceCategory: requireString(
-      project.serviceCategory,
-      `${fieldPrefix}.serviceCategory`,
-    ),
     description: requireString(
       project.description,
       `${fieldPrefix}.description`,
@@ -507,17 +420,14 @@ function mapSanityProject(project: SanityProject, index: number): Project {
     image: cardImage.src,
     imageBlurDataURL: cardImage.blurDataURL,
     alt: cardImage.alt,
-    imageAlt: cardImage.alt,
     width: cardImage.width,
     height: cardImage.height,
     featured,
     placement: {
-      featured,
       featuredOrder: project.featuredOrder,
       homepageSpan: parseSpan(project.homepageSpan),
       workSpan: parseSpan(project.workSpan) as WorkPlacement["workSpan"],
     },
-    coverImage: cardImage.src,
     images,
   };
 }

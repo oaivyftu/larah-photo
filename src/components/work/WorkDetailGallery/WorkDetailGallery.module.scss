@@ -1,7 +1,17 @@
+@use "@/styles/mixins" as *;
+
 .work-detail {
-  min-height: 100vh;
+  min-height: 100svh;
   color: var(--color-ink);
   background: var(--color-paper);
+}
+
+.work-detail--modal {
+  min-height: calc(100svh - clamp(5.4rem, 7vw, 6.3rem));
+}
+
+.work-detail--modal .work-detail__header {
+  padding-top: clamp(3rem, 6vw, 6rem);
 }
 
 .work-detail__header {
@@ -25,21 +35,11 @@
 .work-detail__back {
   width: fit-content;
   margin-bottom: clamp(2rem, 4vw, 4rem);
-  font-size: var(--font-size-xs);
-  font-weight: 650;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .work-detail__back::before {
   margin-right: 0.55rem;
   content: "←";
-}
-
-.work-detail__back:hover,
-.work-detail__back:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 0.25em;
 }
 
 .work-detail__eyebrow {
@@ -173,13 +173,13 @@
   outline-offset: 0.3rem;
 }
 
-@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+@include hover-fine {
   .work-detail__image-button {
-    cursor: none;
+    cursor: zoom-in;
   }
 }
 
-@media (max-width: 1080px) {
+@include media-max(1080px) {
   .work-detail__header {
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
   }
@@ -189,7 +189,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@include media-max("tablet-lg") {
   .work-detail__sizer,
   .work-detail__item {
     width: calc((100% - var(--detail-gap)) / 2);
@@ -200,7 +200,7 @@
   }
 }
 
-@media (max-width: 680px) {
+@include media-max(680px) {
   .work-detail__header {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -224,7 +224,7 @@
   }
 }
 
-@media (max-width: 620px) {
+@include media-max("phone-lg") {
   .work-detail__sizer,
   .work-detail__item,
   .work-detail__item--wide {
@@ -232,7 +232,7 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+@include reduced-motion {
   .work-detail__gallery--ready,
   .work-detail__image {
     transition: none;

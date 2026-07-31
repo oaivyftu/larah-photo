@@ -1,12 +1,19 @@
+@use "@/styles/mixins" as *;
+
 .contact {
   overflow: clip;
   background: var(--color-paper);
   color: var(--color-ink);
 }
 
+/* `minmax(0, …)` rather than the copy/form intrinsic minimums (24rem / 30rem):
+   those two plus the gap need ~1010px of viewport, so anything narrower pushed
+   the form past the right edge where `overflow: clip` swallowed it. The columns
+   stack at `laptop-sm` instead, which is where those minimums give out — iPad
+   landscape (1024px) still gets the intended two-column split. */
 .contact__layout {
   display: grid;
-  grid-template-columns: minmax(24rem, 0.82fr) minmax(30rem, 1fr);
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr);
   gap: clamp(5rem, 10.5vw, 14rem);
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
@@ -53,7 +60,7 @@
   padding-top: clamp(0.1rem, 0.6vw, 0.7rem);
 }
 
-@media (max-width: 900px) {
+@include media-max("laptop-sm") {
   .contact__layout {
     grid-template-columns: 1fr;
     gap: 3.4rem;
@@ -65,7 +72,7 @@
   }
 }
 
-@media (max-width: 560px) {
+@include media-max("phone") {
   .contact__title {
     font-size: clamp(2.2rem, 12vw, 3.4rem);
   }

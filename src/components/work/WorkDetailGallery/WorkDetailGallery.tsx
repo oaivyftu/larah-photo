@@ -1,13 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import type Isotope from "isotope-layout";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
-import {
-  PointerHint,
-  usePointerHint,
-} from "@/components/ui/PointerHint/PointerHint";
+import { Button } from "@/components/ui/Button/Button";
+import { usePointerLabel } from "@/components/ui/GlassPointer/usePointerLabel";
 import {
   getProjectGalleryImages,
   WorkProjectGallery,
@@ -21,6 +18,7 @@ const COLUMN_SIZER_SELECTOR = `.${styles["work-detail__sizer"]}`;
 const GUTTER_SIZER_SELECTOR = `.${styles["work-detail__gutter-sizer"]}`;
 
 type WorkDetailGalleryProps = {
+  presentation?: "modal" | "page";
   project: Project;
 };
 
@@ -37,8 +35,8 @@ function GalleryItem({
   onImageLoad,
   onSelect,
 }: GalleryItemProps) {
-  const { hidePointerHint, hintRef, isActive, pointerHintHandlers } =
-    usePointerHint<HTMLButtonElement>();
+  const { hidePointerLabel, pointerLabelHandlers } =
+    usePointerLabel<HTMLButtonElement>("Zoom");
   const isWide = image.width / image.height >= 1.15;
 
   return (
@@ -51,11 +49,11 @@ function GalleryItem({
         aria-label={`Open image ${index + 1}: ${image.alt}`}
         className={styles["work-detail__image-button"]}
         onClick={() => {
-          hidePointerHint();
+          hidePointerLabel();
           onSelect(index);
         }}
         type="button"
-        {...pointerHintHandlers}
+        {...pointerLabelHandlers}
       >
         <LarahImage
           alt={image.alt}
@@ -67,18 +65,15 @@ function GalleryItem({
           src={image.src}
           width={image.width}
         />
-        <PointerHint
-          active={isActive}
-          hintRef={hintRef}
-          label="Zoom"
-          variant="zoom"
-        />
       </button>
     </article>
   );
 }
 
-export function WorkDetailGallery({ project }: WorkDetailGalleryProps) {
+export function WorkDetailGallery({
+  presentation = "page",
+  project,
+}: WorkDetailGalleryProps) {
   const images = getProjectGalleryImages(project);
   const gridRef = useRef<HTMLDivElement>(null);
   const layoutRef = useRef<Isotope | null>(null);
@@ -142,12 +137,24 @@ export function WorkDetailGallery({ project }: WorkDetailGalleryProps) {
   }, []);
 
   return (
-    <article className={styles["work-detail"]} aria-labelledby="work-detail-title">
+    <article
+      className={`${styles["work-detail"]} ${
+        presentation === "modal" ? styles["work-detail--modal"] : ""
+      }`}
+      aria-labelledby="work-detail-title"
+    >
       <header className={styles["work-detail__header"]}>
         <div className={styles["work-detail__heading"]}>
-          <Link className={styles["work-detail__back"]} href="/work">
-            All work
-          </Link>
+          {presentation === "page" ? (
+            <Button
+              className={styles["work-detail__back"]}
+              href="/work"
+              size="small"
+              variant="secondary"
+            >
+              All work
+            </Button>
+          ) : null}
           <p className={styles["work-detail__eyebrow"]}>
             {formatWorkCategory(project.category)}
           </p>
@@ -170,8 +177,8 @@ export function WorkDetailGallery({ project }: WorkDetailGalleryProps) {
             <dd>{project.location}</dd>
           </div>
           <div>
-            <dt>Service</dt>
-            <dd>{project.serviceCategory}</dd>
+            <dt>Category</dt>
+            <dd>{project.category}</dd>
           </div>
           <div>
             <dt>Images</dt>

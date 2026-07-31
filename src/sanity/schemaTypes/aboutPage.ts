@@ -6,17 +6,8 @@ export const aboutPage = defineType({
   title: "About page",
   type: "document",
   fields: [
-    defineField({ name: "eyebrow", title: "Eyebrow", type: "string" }),
     titleWordsField,
-    defineField({ name: "largeText", title: "Large pinned text", type: "string" }),
     imageField("portraitOne", "Portrait one"),
-    imageField("portraitTwo", "Portrait two"),
-    defineField({
-      name: "notes",
-      title: "Notes",
-      type: "array",
-      of: [defineArrayMember({ type: "string" })],
-    }),
     defineField({
       name: "story",
       title: "Story paragraphs",
@@ -24,4 +15,7 @@ export const aboutPage = defineType({
       of: [defineArrayMember({ type: "text", rows: 4 })],
     }),
   ],
+  preview: {
+    prepare: () => ({ title: "About page" }),
+  },
 });
