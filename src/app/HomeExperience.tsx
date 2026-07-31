@@ -28,6 +28,7 @@ const serviceIcons: Record<string, typeof icons.portrait> = {
   "couple-session": icons.userGroup,
   "wedding-session": icons.ring,
   "family-session": icons.family,
+  "graduation-session": icons.graduation
 };
 
 export function HomeExperience({
