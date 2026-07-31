@@ -20,7 +20,6 @@ export type Project = {
   category: string;
   year: string;
   location: string;
-  serviceCategory: string;
   description: string;
   image: string;
   imageBlurDataURL?: string;

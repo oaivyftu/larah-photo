@@ -177,8 +177,8 @@ export function WorkDetailGallery({
             <dd>{project.location}</dd>
           </div>
           <div>
-            <dt>Service</dt>
-            <dd>{project.serviceCategory}</dd>
+            <dt>Category</dt>
+            <dd>{project.category}</dd>
           </div>
           <div>
             <dt>Images</dt>

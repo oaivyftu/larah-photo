@@ -84,14 +84,13 @@ type SanityProject = {
   category?: string;
   year?: string;
   location?: string;
-  serviceCategory?: string;
   description?: string;
   cardImage?: SanityImageValue;
   featured?: boolean;
   featuredOrder?: number;
   homepageSpan?: string;
   workSpan?: string;
-  images?: Array<{
+  images?: Array<SanityImageValue & {
     image?: SanityImageValue;
   }>;
 };
@@ -395,8 +394,12 @@ function mapSanityProject(project: SanityProject, index: number): Project {
     project.cardImage,
     `${fieldPrefix}.cardImage`,
   );
-  const images: ProjectImage[] = (project.images ?? []).map((item, imageIndex) =>
-    resolveSanityImage(item.image, `${fieldPrefix}.images[${imageIndex}].image`),
+  const images: ProjectImage[] = (project.images ?? []).map(
+    (item, imageIndex) =>
+      resolveSanityImage(
+        item.image ?? item,
+        `${fieldPrefix}.images[${imageIndex}]`,
+      ),
   );
   const featured = project.featured === true;
 
@@ -410,10 +413,6 @@ function mapSanityProject(project: SanityProject, index: number): Project {
     ),
     year: requireString(project.year, `${fieldPrefix}.year`),
     location: requireString(project.location, `${fieldPrefix}.location`),
-    serviceCategory: requireString(
-      project.serviceCategory,
-      `${fieldPrefix}.serviceCategory`,
-    ),
     description: requireString(
       project.description,
       `${fieldPrefix}.description`,
