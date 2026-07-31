@@ -89,7 +89,6 @@ type SanityProject = {
   featured?: boolean;
   featuredOrder?: number;
   homepageSpan?: string;
-  workSpan?: string;
   images?: SanityImageValue[];
 };
 
@@ -421,7 +420,6 @@ function mapSanityProject(project: SanityProject, index: number): Project {
     placement: {
       featuredOrder: project.featuredOrder,
       homepageSpan: parseSpan(project.homepageSpan),
-      workSpan: parseSpan(project.workSpan) as WorkPlacement["workSpan"],
     },
     images,
   };

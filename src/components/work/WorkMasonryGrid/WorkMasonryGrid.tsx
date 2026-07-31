@@ -14,6 +14,7 @@ const SKELETON_COLUMNS = [
   ["tall", "short"],
   ["medium", "tall"],
   ["short", "medium"],
+  ["medium", "short"],
 ] as const;
 
 type WorkMasonryGridProps = {
@@ -24,13 +25,9 @@ type WorkMasonryGridProps = {
   variant: "homepage" | "work";
 };
 
-function getSpan(project: Project, variant: WorkMasonryGridProps["variant"]) {
-  const span =
-    variant === "homepage"
-      ? project.placement?.homepageSpan
-      : project.placement?.workSpan;
-
-  return span ?? (variant === "homepage" ? 4 : 3);
+// Only the homepage collage spans columns; the work index is uniform-width.
+function getHomepageSpan(project: Project) {
+  return project.placement?.homepageSpan ?? 4;
 }
 
 export function WorkMasonryGrid({
@@ -166,13 +163,14 @@ export function WorkMasonryGrid({
           aria-hidden="true"
         />
         {sortedItems.map((project) => {
-          const span = getSpan(project, variant);
+          const spanClass =
+            variant === "homepage"
+              ? styles[`work-layout__item--span-${getHomepageSpan(project)}`]
+              : "";
 
           return (
             <WorkCard
-              className={`${styles["work-layout__item"]} ${
-                styles[`work-layout__item--span-${span}`]
-              }`}
+              className={`${styles["work-layout__item"]} ${spanClass}`}
               key={project.id}
               project={project}
               titleSuffix={titleSuffix}

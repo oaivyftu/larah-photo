@@ -37,14 +37,9 @@ function GalleryItem({
 }: GalleryItemProps) {
   const { hidePointerLabel, pointerLabelHandlers } =
     usePointerLabel<HTMLButtonElement>("Zoom");
-  const isWide = image.width / image.height >= 1.15;
 
   return (
-    <article
-      className={`${styles["work-detail__item"]} ${
-        isWide ? styles["work-detail__item--wide"] : ""
-      }`}
-    >
+    <article className={styles["work-detail__item"]}>
       <button
         aria-label={`Open image ${index + 1}: ${image.alt}`}
         className={styles["work-detail__image-button"]}
@@ -61,7 +56,7 @@ function GalleryItem({
           className={styles["work-detail__image"]}
           height={image.height}
           onLoad={onImageLoad}
-          sizes="(max-width: 620px) calc(100vw - 48px), (max-width: 900px) 100vw, 66vw"
+          sizes="(max-width: 767px) 47vw, (max-width: 1023px) 31vw, 23vw"
           src={image.src}
           width={image.width}
         />

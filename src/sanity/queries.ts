@@ -81,7 +81,6 @@ export const projectsQuery = `*[_type == "workProject"] | order(featuredOrder as
   featured,
   featuredOrder,
   homepageSpan,
-  workSpan,
   images[]{
     ${imageFields}
   }

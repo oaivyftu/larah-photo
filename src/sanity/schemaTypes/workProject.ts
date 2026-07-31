@@ -42,12 +42,6 @@ export const workProject = defineType({
       options: { list: spanOptions },
     }),
     defineField({
-      name: "workSpan",
-      title: "Work span",
-      type: "string",
-      options: { list: spanOptions.slice(0, 7) },
-    }),
-    defineField({
       name: "images",
       title: "Gallery images",
       description:
