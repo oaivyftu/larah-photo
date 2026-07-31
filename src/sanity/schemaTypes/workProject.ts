@@ -66,19 +66,6 @@ export const workProject = defineType({
             }),
           ],
         }),
-        defineArrayMember({
-          type: "object",
-          title: "Legacy gallery image",
-          fields: [
-            imageField("image", "Image"),
-          ],
-          preview: {
-            select: {
-              title: "image.alt",
-              media: "image",
-            },
-          },
-        }),
       ],
     }),
   ],

@@ -90,9 +90,7 @@ type SanityProject = {
   featuredOrder?: number;
   homepageSpan?: string;
   workSpan?: string;
-  images?: Array<SanityImageValue & {
-    image?: SanityImageValue;
-  }>;
+  images?: SanityImageValue[];
 };
 
 async function fetchSanity<T>(query: string, label: string): Promise<T> {
@@ -396,10 +394,7 @@ function mapSanityProject(project: SanityProject, index: number): Project {
   );
   const images: ProjectImage[] = (project.images ?? []).map(
     (item, imageIndex) =>
-      resolveSanityImage(
-        item.image ?? item,
-        `${fieldPrefix}.images[${imageIndex}]`,
-      ),
+      resolveSanityImage(item, `${fieldPrefix}.images[${imageIndex}]`),
   );
   const featured = project.featured === true;
 
