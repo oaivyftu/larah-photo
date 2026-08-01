@@ -29,7 +29,7 @@ Managed content:
 - Work projects: slug, category, metadata, card image, hero image, gallery images
 - Service packages: package title, description, features, price, CTA
 - About page: title, portraits, notes, story paragraphs
-- Contact page: title, cards, contact image, inquiry copy
+- Contact page: title and supporting copy
 
 Create or connect a Sanity project:
 
@@ -58,21 +58,6 @@ npm run dev
 Sanity is the required content source for page copy, navigation, site settings,
 services, and work projects. The website reports a configuration or content
 error when required Sanity data is unavailable.
-
-## Contact Form Email
-
-The booking inquiry form sends email from the server through Resend. Add these
-environment variables locally and in production:
-
-```bash
-RESEND_API_KEY=your_resend_api_key
-CONTACT_FROM_EMAIL="Larah Photo <inquiries@your-verified-domain.com>"
-CONTACT_TO_EMAIL=hello@example.com
-```
-
-`CONTACT_FROM_EMAIL` must use a domain verified in Resend. `CONTACT_TO_EMAIL` is
-the inbox that should receive session inquiries. The Instagram URL is managed in
-the Sanity `Site settings` document.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

@@ -37,7 +37,6 @@ export type AboutPageContent = {
 
 export type ContactPageContent = {
   titleWords: string[];
-  formCopy: string;
 };
 
 export type ServicePageContent = {

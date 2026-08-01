@@ -50,17 +50,12 @@ export const aboutPageQuery = `*[_type == "aboutPage"][0]{
 }`;
 
 export const contactPageQuery = `*[_type == "contactPage"][0]{
-  titleWords,
-  formCopy
+  titleWords
 }`;
 
 export const servicePageQuery = `*[_type == "servicePage"][0]{
   titleWords
 }`;
-
-/* Just the titles — the contact route validates the submitted session type
-   against these and has no use for the rest of the document. */
-export const serviceTitlesQuery = `*[_type == "servicePackage"].title`;
 
 export const servicesQuery = `*[_type == "servicePackage"] | order(index asc, title asc){
   _id,

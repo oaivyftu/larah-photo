@@ -1,18 +1,22 @@
 import { PageShell } from "@/components/layout/PageShell/PageShell";
-import { getContactPage, getServices } from "@/sanity/fetchers";
+import { getContactPage, getSiteSettings } from "@/sanity/fetchers";
 import { ContactExperience } from "./ContactExperience";
 
 export default async function ContactPage() {
-  const [content, services] = await Promise.all([
+  const [content, settings] = await Promise.all([
     getContactPage(),
-    getServices(),
+    getSiteSettings(),
   ]);
 
   return (
     <PageShell variant="contact">
       <ContactExperience
+        contactDetails={{
+          email: settings.email,
+          instagramUrl: settings.instagramUrl,
+          phone: settings.phone,
+        }}
         content={content}
-        sessionTypes={services.map((service) => service.title)}
       />
     </PageShell>
   );
