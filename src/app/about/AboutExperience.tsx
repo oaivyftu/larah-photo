@@ -4,6 +4,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
+import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
 import type { AboutPageContent } from "@/types/site";
 import styles from "./about.module.scss";
 
@@ -74,11 +75,11 @@ export function AboutExperience({ content }: AboutExperienceProps) {
     <div className={styles["about"]} ref={rootRef}>
       <section className={styles["about__intro"]} aria-labelledby="about-title">
         <div className={styles["about__copy"]} data-about-copy>
-          <h1 className={styles["about__title"]} data-page-heading id="about-title">
-            {content.titleWords.map((word, index) => (
-              <span key={`${word}-${index}`}>{word}</span>
-            ))}
-          </h1>
+          <PageHeading
+            className={styles["about__title"]}
+            id="about-title"
+            words={content.titleWords}
+          />
           {content.story.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}

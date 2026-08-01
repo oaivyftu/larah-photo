@@ -12,29 +12,10 @@
   margin: 0 auto;
 }
 
+/* Figma: the title sits 58px under the header with 32px of air before the first
+   service row — the same rhythm the work page's hero already uses. */
 .service__header {
-  padding: clamp(5rem, 8vw, 9.5rem) 0 clamp(3.4rem, 5.2vw, 6.2rem);
-}
-
-.service__title {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.28em;
-  align-items: baseline;
-  font-size: clamp(2.15rem, 3.15vw, 3.85rem);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1.02;
-}
-
-.service__title > span {
-  display: inline-block;
-  overflow: hidden;
-  padding-bottom: 0.08em;
-}
-
-.service__title > span:last-child {
-  font-family: var(--font-serif);
+  padding: clamp(2rem, 4.03vw, 3.625rem) 0 clamp(1.5rem, 2.22vw, 2rem);
 }
 
 .service__list {
@@ -147,7 +128,7 @@
 
 @include media-max("tablet") {
   .service__header {
-    padding: 3.5rem 0 2.8rem;
+    padding: 2rem 0 1.5rem;
   }
 
   .service__list {

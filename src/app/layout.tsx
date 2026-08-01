@@ -5,8 +5,11 @@ import { PageTransition } from "@/components/layout/PageTransition/PageTransitio
 import { GlassPointer } from "@/components/ui/GlassPointer/GlassPointer";
 import { isIndexable, siteUrl } from "@/constants/seo";
 
+// Exposed as a CSS variable so `--font-sans` can point at the hashed family
+// `next/font` generates — naming "Montserrat" directly resolves to nothing.
 const montserrat = Montserrat({
-  subsets: ['latin']
+  subsets: ['latin'],
+  variable: '--font-montserrat',
 })
 
 export const metadata: Metadata = {
@@ -33,7 +36,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={montserrat.className}
+      className={montserrat.variable}
       data-scroll-behavior="smooth"
     >
       <body>

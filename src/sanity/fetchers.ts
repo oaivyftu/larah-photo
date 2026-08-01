@@ -19,6 +19,7 @@ import {
   homePageQuery,
   projectsQuery,
   servicePageQuery,
+  serviceTitlesQuery,
   servicesQuery,
   siteSettingsQuery,
   workPageQuery,
@@ -341,6 +342,15 @@ export async function getServices(): Promise<ServicePackage[]> {
       ),
     };
   });
+}
+
+export async function getServiceTitles(): Promise<string[]> {
+  const titles = await fetchSanity<(string | null)[]>(
+    serviceTitlesQuery,
+    "service titles",
+  );
+
+  return titles.filter((title): title is string => Boolean(title?.trim()));
 }
 
 export async function getWorkProjects(): Promise<Project[]> {

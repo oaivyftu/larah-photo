@@ -21,25 +21,7 @@
 }
 
 .about__title {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.28em;
-  align-items: baseline;
   margin-bottom: clamp(1.5rem, 2vw, 2.2rem);
-  font-size: clamp(2.1rem, 3.15vw, 3.85rem);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1.02;
-}
-
-.about__title > span {
-  display: inline-block;
-  overflow: hidden;
-  padding-bottom: 0.08em;
-}
-
-.about__title > span:last-child {
-  font-family: var(--font-serif);
 }
 
 .about__copy p {
@@ -103,10 +85,6 @@
 @include media-max("phone") {
   .about__intro {
     padding-top: 3rem;
-  }
-
-  .about__title {
-    font-size: clamp(2rem, 10vw, 3rem);
   }
 
   .about__copy p {

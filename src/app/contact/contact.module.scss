@@ -6,78 +6,51 @@
   color: var(--color-ink);
 }
 
-/* `minmax(0, …)` rather than the copy/form intrinsic minimums (24rem / 30rem):
-   those two plus the gap need ~1010px of viewport, so anything narrower pushed
-   the form past the right edge where `overflow: clip` swallowed it. The columns
-   stack at `laptop-sm` instead, which is where those minimums give out — iPad
-   landscape (1024px) still gets the intended two-column split. */
+/* Figma splits the 1360px frame into a 440px copy column, a 251px gutter and a
+   669px form column, with 24px of air above and below. The `fr` ratio keeps
+   that split at any width; the columns stack once their intrinsic minimums
+   give out, which is around `laptop-sm`. */
 .contact__layout {
   display: grid;
-  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr);
-  gap: clamp(5rem, 10.5vw, 14rem);
+  grid-template-columns: minmax(0, 440fr) minmax(0, 669fr);
+  gap: clamp(2.5rem, 17.43vw, 15.6875rem);
+  align-items: start;
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
-  padding: clamp(7rem, 10.5vw, 12.6rem) 0 clamp(5rem, 7.1vw, 8rem);
+  padding: clamp(1rem, 1.67vw, 1.5rem) 0;
 }
 
+/* The statement is pinned to the bottom of the 405px copy column, level with
+   the form's message field. */
 .contact__copy {
   display: grid;
-  min-height: clamp(30rem, 34vw, 41rem);
+  min-height: clamp(18rem, 28.13vw, 25.3125rem);
   align-content: space-between;
-  gap: 4rem;
+  gap: var(--space-3xl);
 }
 
-.contact__title {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.28em;
-  align-items: baseline;
-  font-size: clamp(2.5rem, 4.15vw, 5.2rem);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1;
-}
-
-.contact__title > span {
-  display: inline-block;
-  overflow: hidden;
-  padding-bottom: 0.08em;
-}
-
-.contact__title > span:last-child {
-  font-family: var(--font-serif);
-}
-
-.contact__copy p {
-  max-width: 46rem;
-  font-size: clamp(1.48rem, 1.85vw, 2rem);
+.contact__statement {
+  max-width: 27.5rem;
+  font-size: clamp(1rem, 1.39vw, 1.25rem);
   font-weight: 500;
   letter-spacing: 0;
-  line-height: 1.14;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .contact__form {
-  padding-top: clamp(0.1rem, 0.6vw, 0.7rem);
+  min-width: 0;
 }
 
 @include media-max("laptop-sm") {
   .contact__layout {
     grid-template-columns: 1fr;
-    gap: 3.4rem;
-    padding: clamp(3.5rem, 10vw, 5rem) 0 clamp(4rem, 10vw, 6rem);
+    gap: var(--space-2xl);
+    padding: clamp(2rem, 6vw, 3rem) 0 clamp(3rem, 8vw, 4rem);
   }
 
   .contact__copy {
     min-height: auto;
-  }
-}
-
-@include media-max("phone") {
-  .contact__title {
-    font-size: clamp(2.2rem, 12vw, 3.4rem);
-  }
-
-  .contact__copy p {
-    font-size: clamp(1.2rem, 6vw, 1.55rem);
+    gap: var(--space-lg);
   }
 }

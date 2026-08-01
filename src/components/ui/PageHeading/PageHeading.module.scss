@@ -1,0 +1,26 @@
+/* Figma "— Enjoy!" page title: Montserrat Regular 32px at the 1440 frame, with
+   the closing word in the serif face. `2.22vw` is that 32px expressed against
+   the frame, so the heading keeps its proportion down to the 24px floor. */
+.page-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28em;
+  align-items: baseline;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: clamp(1.5rem, 2.22vw, 2rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.22;
+}
+
+/* `overflow: hidden` is the mask each word slides out of during the intro. */
+.page-heading > span {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+
+.page-heading > span:last-child {
+  font-family: var(--font-serif);
+}
