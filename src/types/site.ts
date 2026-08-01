@@ -12,9 +12,12 @@ export type SiteSettings = {
 };
 
 export type HomePageContent = {
-  eyebrow: string;
-  titleWords: string[];
+  heroTagline: string;
+  heroPortraitImage: ProjectImage;
   heroImage: ProjectImage;
+  heroBrandmark: string;
+  heroCtaLabel: string;
+  heroCtaHref: string;
   manifestoWords: [string, string, string];
   manifestoImageOne: ProjectImage;
   manifestoImageTwo: ProjectImage;

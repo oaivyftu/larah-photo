@@ -36,9 +36,12 @@ type SanitySiteSettings = {
 };
 
 type SanityHomePage = {
-  eyebrow?: string;
-  titleWords?: string[];
+  heroTagline?: string;
+  heroPortraitImage?: SanityImageValue;
   heroImage?: SanityImageValue;
+  heroBrandmark?: string;
+  heroCtaLabel?: string;
+  heroCtaHref?: string;
   manifestoWords?: string[];
   manifestoImageOne?: SanityImageValue;
   manifestoImageTwo?: SanityImageValue;
@@ -212,9 +215,15 @@ export async function getHomePage(): Promise<HomePageContent> {
   }
 
   return {
-    eyebrow: requireString(page.eyebrow, "homePage.eyebrow"),
-    titleWords: requireStringArray(page.titleWords, "homePage.titleWords"),
+    heroTagline: requireString(page.heroTagline, "homePage.heroTagline"),
+    heroPortraitImage: resolveSanityImage(
+      page.heroPortraitImage,
+      "homePage.heroPortraitImage",
+    ),
     heroImage: resolveSanityImage(page.heroImage, "homePage.heroImage"),
+    heroBrandmark: requireString(page.heroBrandmark, "homePage.heroBrandmark"),
+    heroCtaLabel: requireString(page.heroCtaLabel, "homePage.heroCtaLabel"),
+    heroCtaHref: requireString(page.heroCtaHref, "homePage.heroCtaHref"),
     manifestoWords: [
       manifestoWords[0],
       manifestoWords[1],

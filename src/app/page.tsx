@@ -3,17 +3,20 @@ import {
   getFeaturedWorkProjects,
   getHomePage,
   getServices,
+  getSiteSettings,
   getWorkProjects,
 } from "@/sanity/fetchers";
 import { HomeExperience } from "./HomeExperience";
 
 export default async function Home() {
-  const [homePage, projects, allProjects, services] = await Promise.all([
-    getHomePage(),
-    getFeaturedWorkProjects(),
-    getWorkProjects(),
-    getServices(),
-  ]);
+  const [homePage, settings, projects, allProjects, services] =
+    await Promise.all([
+      getHomePage(),
+      getSiteSettings(),
+      getFeaturedWorkProjects(),
+      getWorkProjects(),
+      getServices(),
+    ]);
 
   return (
     <PageShell variant="home">
@@ -22,6 +25,7 @@ export default async function Home() {
         projectCount={allProjects.length}
         projects={projects.slice(0, 7)}
         services={services}
+        siteName={settings.name}
       />
     </PageShell>
   );

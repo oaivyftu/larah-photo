@@ -26,9 +26,12 @@ export const siteSettingsQuery = `*[_type == "siteSettings"][0]{
 }`;
 
 export const homePageQuery = `*[_type == "homePage"][0]{
-  eyebrow,
-  titleWords,
+  heroTagline,
+  heroPortraitImage{${imageFields}},
   heroImage{${imageFields}},
+  heroBrandmark,
+  heroCtaLabel,
+  heroCtaHref,
   manifestoWords,
   manifestoImageOne{${imageFields}},
   manifestoImageTwo{${imageFields}},
