@@ -3,6 +3,8 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { playOnPageReady } from "@/utils/playOnPageReady";
+import { InquiryForm } from "@/components/contact/InquiryForm/InquiryForm";
 import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
 import type { ContactPageContent, SiteSettings } from "@/types/site";
 import styles from "./contact.module.scss";
@@ -36,7 +38,12 @@ export function ContactExperience({
 
   useGSAP(
     () => {
-      const intro = gsap.timeline({ paused: true });
+      const mm = gsap.matchMedia();
+
+      // Under `reduce` the timeline is never built, so nothing is parked at
+      // `opacity: 0` and the page renders at its natural state right away.
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const intro = gsap.timeline({ paused: true });
 
       intro
         .from("[data-page-heading] > span", {
@@ -59,18 +66,15 @@ export function ContactExperience({
           "-=0.42",
         );
 
-      const playIntro = () => intro.play(0);
+        const stopWaitingForPage = playOnPageReady(() => intro.play(0));
 
-      if (document.documentElement.dataset.pageTransition === "ready") {
-        requestAnimationFrame(playIntro);
-      } else {
-        window.addEventListener("larah:page-ready", playIntro, { once: true });
-      }
+        return () => {
+          stopWaitingForPage();
+          intro.kill();
+        };
+      });
 
-      return () => {
-        window.removeEventListener("larah:page-ready", playIntro);
-        intro.kill();
-      };
+      return () => mm.revert();
     },
     { scope: rootRef },
   );

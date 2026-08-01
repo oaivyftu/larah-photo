@@ -60,6 +60,16 @@
   grid-column-start: 5;
 }
 
+/* Footer links render at 12–18px tall on their own; the bar and the contact
+   columns both have room to spare, so the links take the 24px minimum target
+   height directly rather than via an overlay (WCAG 2.5.8). */
+.site-footer__bar a,
+.site-footer__contact a {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+}
+
 .site-footer__back-to-top {
   display: inline-flex;
   gap: var(--space-xs);

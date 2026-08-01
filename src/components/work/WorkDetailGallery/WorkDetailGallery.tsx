@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type Isotope from "isotope-layout";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { Button } from "@/components/ui/Button/Button";
@@ -131,12 +131,18 @@ export function WorkDetailGallery({
     };
   }, []);
 
+  // As a modal this sits on top of a page that already owns the document's
+  // single `<h1>`, and the same component can be mounted twice (page behind,
+  // modal in front) — so both the level and the id have to adapt.
+  const titleId = useId();
+  const TitleTag = presentation === "modal" ? "h2" : "h1";
+
   return (
     <article
       className={`${styles["work-detail"]} ${
         presentation === "modal" ? styles["work-detail--modal"] : ""
       }`}
-      aria-labelledby="work-detail-title"
+      aria-labelledby={titleId}
     >
       <header className={styles["work-detail__header"]}>
         <div className={styles["work-detail__heading"]}>
@@ -153,9 +159,9 @@ export function WorkDetailGallery({
           <p className={styles["work-detail__eyebrow"]}>
             {formatWorkCategory(project.category)}
           </p>
-          <h1 className={styles["work-detail__title"]} id="work-detail-title">
+          <TitleTag className={styles["work-detail__title"]} id={titleId}>
             {project.title}
-          </h1>
+          </TitleTag>
         </div>
 
         <p className={styles["work-detail__description"]}>

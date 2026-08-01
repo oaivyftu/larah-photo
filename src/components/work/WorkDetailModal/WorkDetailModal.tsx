@@ -150,20 +150,25 @@ export function WorkDetailModal({
   }
 
   return (
+    // `role="dialog"` sits on the outer wrapper rather than the sheet inside it
+    // so that the close button — which is `position: fixed` and therefore
+    // cannot be nested in the sheet without inheriting its slide animation —
+    // still counts as part of the dialog.
     <div
+      aria-labelledby={titleId}
+      // The lightbox stacks its own `aria-modal` dialog on top. Two nested
+      // modal dialogs leave assistive tech guessing which one confines the
+      // user, so this one stands down while the lightbox is open.
+      aria-modal={isLightboxOpen ? undefined : true}
       className={`${styles["work-modal"]} ${
         isClosing ? styles["work-modal--closing"] : ""
       }`}
       data-work-modal
       onKeyDown={handleKeyDown}
       onPointerDown={handleBackdropPointerDown}
+      role="dialog"
     >
-      <div
-        aria-labelledby={titleId}
-        aria-modal="true"
-        className={styles["work-modal__dialog"]}
-        role="dialog"
-      >
+      <div className={styles["work-modal__dialog"]}>
         <div className={styles["work-modal__document"]}>
           <header className={styles["work-modal__bar"]}>
             <div className={styles["work-modal__identity"]}>
