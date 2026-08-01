@@ -27,6 +27,14 @@ const AUTO_HIDE_MEDIA =
   "(hover: hover) and (pointer: fine) and (min-width: 761px)";
 const DRAGGABLE_MEDIA =
   "(max-width: 760px), (hover: none), (pointer: coarse)";
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
 
 type WorkProjectGalleryClientProps = {
   images: ProjectImage[];
@@ -257,6 +265,7 @@ export function WorkProjectGalleryClient({
 }: WorkProjectGalleryClientProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const flickityRef = useRef<Flickity | null>(null);
   const controlsTimerRef = useRef<number | null>(null);
   const controlsFocusedRef = useRef(false);
@@ -518,6 +527,88 @@ export function WorkProjectGalleryClient({
     };
   }, [images, initialIndex]);
 
+  // Focus containment lives in its own effect: the effect below re-runs
+  // whenever `onClose` is re-created by the parent, which would otherwise yank
+  // focus back to the panel on every render.
+  useEffect(() => {
+    if (!isModal) {
+      return;
+    }
+
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    // Focusing the panel — rather than a control inside it — lets the dialog
+    // announce its own name before the user starts tabbing.
+    panelRef.current?.focus({ preventScroll: true });
+
+    const handleTabKey = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || event.defaultPrevented) {
+        return;
+      }
+
+      const panel = panelRef.current;
+
+      if (!panel) {
+        return;
+      }
+
+      const focusableElements = Array.from(
+        panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ).filter((element) => element.getClientRects().length > 0);
+
+      if (!focusableElements.length) {
+        event.preventDefault();
+        panel.focus({ preventScroll: true });
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      // The lightbox mounts inside the work detail panel, so focus can legally
+      // be sitting outside it when it opens — pull it back in on first Tab.
+      if (
+        !(activeElement instanceof HTMLElement) ||
+        !panel.contains(activeElement)
+      ) {
+        event.preventDefault();
+        (event.shiftKey ? lastElement : firstElement).focus();
+        return;
+      }
+
+      if (event.shiftKey && activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleTabKey);
+
+    return () => {
+      document.removeEventListener("keydown", handleTabKey);
+
+      if (!previouslyFocused?.isConnected) {
+        return;
+      }
+
+      // The panel underneath marks its own close button `inert` while this
+      // lightbox is open, and only clears that on a later render. Focusing a
+      // still-`inert` element fails silently and drops focus to <body> — a real
+      // path, since Safari does not focus a button on click, which leaves that
+      // close button as the element to restore to. Clearing the attribute here
+      // is safe: the lightbox is unmounting, so the next render clears it too.
+      previouslyFocused.removeAttribute("inert");
+      previouslyFocused.focus({ preventScroll: true });
+    };
+  }, [isModal]);
+
   useEffect(() => {
     if (!isModal) {
       return;
@@ -599,7 +690,9 @@ export function WorkProjectGalleryClient({
         aria-modal={isModal ? true : undefined}
         className={styles["work-project-gallery__panel"]}
         onClick={isModal ? (event) => event.stopPropagation() : undefined}
+        ref={panelRef}
         role={isModal ? "dialog" : undefined}
+        tabIndex={isModal ? -1 : undefined}
       >
         <h2
           className={styles["work-project-gallery__sr-only"]}

@@ -30,12 +30,18 @@ export function PageTransition() {
   const router = useRouter();
   const isStudioRoute = pathname.startsWith("/studio");
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // The first pass is the initial page load, not a navigation — moving focus or
+  // announcing there would talk over the screen reader reading the new page.
+  const hasNavigatedRef = useRef(false);
   const [state, setState] = useState<TransitionState>("covered");
+  const [routeAnnouncement, setRouteAnnouncement] = useState("");
 
   useEffect(() => {
     if (document.documentElement.dataset.modalNavigation === "true") {
       delete document.documentElement.dataset.modalNavigation;
       document.documentElement.dataset.pageTransition = "ready";
+      // The modal owns focus and announces itself; the underlying page has not
+      // actually changed, so this must not count as a navigation.
       return;
     }
 
@@ -46,6 +52,18 @@ export function PageTransition() {
       document.documentElement.dataset.pageTransition = "ready";
       setState("idle");
       window.dispatchEvent(new CustomEvent("larah:page-ready"));
+
+      if (hasNavigatedRef.current) {
+        // Next.js leaves focus on <body> after a client-side navigation, so a
+        // keyboard user would resume tabbing from the top of the document with
+        // no signal that the page changed.
+        document
+          .querySelector<HTMLElement>("#main-content")
+          ?.focus({ preventScroll: true });
+        setRouteAnnouncement(document.title);
+      }
+
+      hasNavigatedRef.current = true;
     }, TRANSITION_DURATION);
 
     return () => {
@@ -131,20 +149,31 @@ export function PageTransition() {
   }
 
   return (
-    <div
-      aria-hidden="true"
-      className={`${styles["page-transition"]} ${styles[`page-transition--${state}`]}`}
-    >
-      <div className={styles["page-transition__curtain"]} />
-      <div className={styles["page-transition__accent"]} />
-      <Image
-        className={styles["page-transition__logo"]}
-        src="/logos/logo-larah.svg"
-        alt=""
-        width={220}
-        height={74}
-        priority
-      />
-    </div>
+    <>
+      <div
+        aria-atomic="true"
+        aria-live="polite"
+        className={styles["page-transition__announcer"]}
+        role="status"
+      >
+        {routeAnnouncement}
+      </div>
+
+      <div
+        aria-hidden="true"
+        className={`${styles["page-transition"]} ${styles[`page-transition--${state}`]}`}
+      >
+        <div className={styles["page-transition__curtain"]} />
+        <div className={styles["page-transition__accent"]} />
+        <Image
+          className={styles["page-transition__logo"]}
+          src="/logos/logo-larah.svg"
+          alt=""
+          width={220}
+          height={74}
+          priority
+        />
+      </div>
+    </>
   );
 }

@@ -39,6 +39,7 @@ export function WorkDetailModal({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [isClosing, setIsClosing] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const closeModal = useCallback(() => {
     if (isClosing) {
@@ -58,11 +59,16 @@ export function WorkDetailModal({
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : null;
+    // The modal renders in the `modal` parallel slot, a sibling of the page
+    // shell rather than a descendant — so the whole page behind it can be made
+    // inert in one go without touching the dialog itself.
+    const pageShell = document.querySelector<HTMLElement>("[data-page-shell]");
     const markModalNavigation = () => {
       document.documentElement.dataset.modalNavigation = "true";
     };
 
     document.body.style.overflow = "hidden";
+    pageShell?.setAttribute("inert", "");
     closeButtonRef.current?.focus({ preventScroll: true });
     window.addEventListener("popstate", markModalNavigation);
 
@@ -70,8 +76,31 @@ export function WorkDetailModal({
       clearTimeout(closeTimeoutRef.current);
       document.body.style.overflow = previousBodyOverflow;
       window.removeEventListener("popstate", markModalNavigation);
+      // Order matters: focus cannot land inside an inert subtree, so the page
+      // has to be released before the trigger is restored.
+      pageShell?.removeAttribute("inert");
       previouslyFocused?.focus({ preventScroll: true });
     };
+  }, []);
+
+  // The lightbox stacks on top of this panel and renders its own close control.
+  // While it owns the screen this button is faded out and click-blocked, but it
+  // would still be tabbable and Enter-activatable — closing the wrong level.
+  useEffect(() => {
+    const root = document.documentElement;
+    const syncLightboxState = () => {
+      setIsLightboxOpen(root.dataset.imageLightbox === "true");
+    };
+
+    syncLightboxState();
+
+    const observer = new MutationObserver(syncLightboxState);
+    observer.observe(root, {
+      attributeFilter: ["data-image-lightbox"],
+      attributes: true,
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   function handleKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
@@ -153,6 +182,7 @@ export function WorkDetailModal({
       <button
         aria-label={`Close ${project.title} project preview`}
         className={styles["work-modal__close"]}
+        inert={isLightboxOpen}
         onClick={closeModal}
         ref={closeButtonRef}
         type="button"

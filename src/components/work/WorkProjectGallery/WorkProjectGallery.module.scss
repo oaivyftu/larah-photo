@@ -32,6 +32,12 @@
   min-height: 100%;
 }
 
+/* The panel takes focus programmatically when the lightbox opens so the dialog
+   announces itself; a ring around the whole surface would just read as noise. */
+.work-project-gallery__panel:focus {
+  outline: none;
+}
+
 .work-project-gallery__header {
   display: grid;
   grid-template-columns: minmax(25rem, 1.25fr) minmax(25rem, 0.9fr) auto;

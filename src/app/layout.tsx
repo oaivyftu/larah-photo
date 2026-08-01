@@ -14,7 +14,12 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Larah Photo",
+  // Each route sets its own `title`; the template appends the brand so every
+  // page gets a distinct, self-describing document title (WCAG 2.4.2).
+  title: {
+    default: "Larah Photo",
+    template: "%s | Larah Photo",
+  },
   description: "Photography portfolio website.",
   robots: isIndexable
     ? undefined
