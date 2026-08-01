@@ -19,6 +19,7 @@ import {
   homePageQuery,
   projectsQuery,
   servicePageQuery,
+  serviceTitlesQuery,
   servicesQuery,
   siteSettingsQuery,
   workPageQuery,
@@ -35,9 +36,12 @@ type SanitySiteSettings = {
 };
 
 type SanityHomePage = {
-  eyebrow?: string;
-  titleWords?: string[];
+  heroTagline?: string;
+  heroPortraitImage?: SanityImageValue;
   heroImage?: SanityImageValue;
+  heroBrandmark?: string;
+  heroCtaLabel?: string;
+  heroCtaHref?: string;
   manifestoWords?: string[];
   manifestoImageOne?: SanityImageValue;
   manifestoImageTwo?: SanityImageValue;
@@ -89,10 +93,7 @@ type SanityProject = {
   featured?: boolean;
   featuredOrder?: number;
   homepageSpan?: string;
-  workSpan?: string;
-  images?: Array<SanityImageValue & {
-    image?: SanityImageValue;
-  }>;
+  images?: SanityImageValue[];
 };
 
 async function fetchSanity<T>(query: string, label: string): Promise<T> {
@@ -214,9 +215,15 @@ export async function getHomePage(): Promise<HomePageContent> {
   }
 
   return {
-    eyebrow: requireString(page.eyebrow, "homePage.eyebrow"),
-    titleWords: requireStringArray(page.titleWords, "homePage.titleWords"),
+    heroTagline: requireString(page.heroTagline, "homePage.heroTagline"),
+    heroPortraitImage: resolveSanityImage(
+      page.heroPortraitImage,
+      "homePage.heroPortraitImage",
+    ),
     heroImage: resolveSanityImage(page.heroImage, "homePage.heroImage"),
+    heroBrandmark: requireString(page.heroBrandmark, "homePage.heroBrandmark"),
+    heroCtaLabel: requireString(page.heroCtaLabel, "homePage.heroCtaLabel"),
+    heroCtaHref: requireString(page.heroCtaHref, "homePage.heroCtaHref"),
     manifestoWords: [
       manifestoWords[0],
       manifestoWords[1],
@@ -346,6 +353,15 @@ export async function getServices(): Promise<ServicePackage[]> {
   });
 }
 
+export async function getServiceTitles(): Promise<string[]> {
+  const titles = await fetchSanity<(string | null)[]>(
+    serviceTitlesQuery,
+    "service titles",
+  );
+
+  return titles.filter((title): title is string => Boolean(title?.trim()));
+}
+
 export async function getWorkProjects(): Promise<Project[]> {
   const projects = await fetchSanity<SanityProject[]>(
     projectsQuery,
@@ -396,10 +412,7 @@ function mapSanityProject(project: SanityProject, index: number): Project {
   );
   const images: ProjectImage[] = (project.images ?? []).map(
     (item, imageIndex) =>
-      resolveSanityImage(
-        item.image ?? item,
-        `${fieldPrefix}.images[${imageIndex}]`,
-      ),
+      resolveSanityImage(item, `${fieldPrefix}.images[${imageIndex}]`),
   );
   const featured = project.featured === true;
 
@@ -426,7 +439,6 @@ function mapSanityProject(project: SanityProject, index: number): Project {
     placement: {
       featuredOrder: project.featuredOrder,
       homepageSpan: parseSpan(project.homepageSpan),
-      workSpan: parseSpan(project.workSpan) as WorkPlacement["workSpan"],
     },
     images,
   };

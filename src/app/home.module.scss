@@ -4,92 +4,134 @@
   --home-paper: var(--color-paper);
   --home-paper-soft: var(--color-paper);
   --home-ink: var(--color-ink);
-  --home-muted: var(--color-muted);
   --home-line: var(--color-line-soft);
   color: var(--home-ink);
   background: var(--home-paper);
   overflow: clip;
 }
 
-.eyebrow {
-  color: var(--home-muted);
-  font-size: clamp(0.68rem, 0.78vw, 0.82rem);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
+/* Hero — two 20px-gapped columns across the 1360px content frame. The left
+   column sets the 577px row height (logo 91 + 59 + portrait 427); the right
+   column hangs its 591px block off the right edge and top-aligns inside it. */
 .hero {
-  position: relative;
   display: grid;
-  min-height: calc(100svh - var(--header-height));
-  grid-template-columns: minmax(0, 0.95fr) minmax(22rem, 0.82fr);
-  gap: clamp(1.5rem, 4vw, 4rem);
-  align-items: center;
+  grid-template-columns: 670fr 669fr;
+  gap: 1.25rem;
+  align-items: start;
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
-  padding: clamp(2.5rem, 5vw, 5rem) 0 clamp(1.5rem, 3vw, 3rem);
+  padding: 1.25rem 0 clamp(2.5rem, 5.56vw, 5rem);
 }
 
-.hero__copy {
+.hero__intro {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: clamp(1.5rem, 4.1vw, 3.6875rem);
+}
+
+.hero__logo {
+  width: min(17.0625rem, 40.75%);
+  height: auto;
+}
+
+.hero__intro-body {
   display: grid;
-  gap: clamp(1.2rem, 2vw, 1.8rem);
+  grid-template-columns: 326fr 324fr;
+  align-items: end;
+  gap: 1.25rem;
 }
 
-.hero__title {
-  max-width: 52rem;
-  font-family: var(--font-serif);
-  font-size: clamp(3.8rem, 8.6vw, 8.6rem);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 0.82;
-}
-
-.hero__word-wrap {
-  display: inline-block;
-  overflow: hidden;
-  padding-right: 0.08em;
-}
-
-.hero__word-wrap:not(:last-child) {
-  margin-right: 0.11em;
-}
-
-.hero__word-wrap span {
-  display: inline-block;
-}
-
-.hero__media {
+.hero__portrait,
+.hero__feature-media {
   position: relative;
-  display: block;
-  min-height: clamp(32rem, 74svh, 48rem);
   overflow: hidden;
-  border-radius: 0.3rem;
   background: var(--color-ink);
-  color: var(--home-paper-soft);
+  /* The load-in tween runs `from` an inset clip, so declare the resting state. */
   clip-path: inset(0 0 0 0);
 }
 
-.hero__image {
+.hero__portrait {
+  aspect-ratio: 326 / 427;
+}
+
+.hero__portrait img,
+.hero__feature-media img {
   object-fit: cover;
 }
 
-.hero__caption {
-  position: absolute;
-  right: 1rem;
-  bottom: 1rem;
-  left: 1rem;
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid var(--color-line-soft);
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  line-height: 1;
+/* `difference` against the paper prints near-black, and inverts wherever the
+   type crosses a photograph — the same trick the design uses on the brandmark. */
+.hero__tagline {
+  min-width: 0;
+  color: var(--color-paper-warm);
+  font-size: clamp(1rem, 1.39vw, 1.25rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
   text-transform: uppercase;
+  mix-blend-mode: difference;
+}
+
+/* `top` rather than the default baseline: an overflow-clipped inline-block
+   baselines off its bottom edge, which would deepen every line box by a
+   descender and stretch the three-line block past the portrait it sits on. */
+.hero__word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.hero__word:not(:last-child) {
+  margin-right: 0.25em;
+}
+
+.hero__word span {
+  display: inline-block;
+}
+
+.hero__feature {
+  display: flex;
+  width: 88.34%;
+  flex-direction: column;
+  gap: 1.25rem;
+  justify-self: end;
+}
+
+/* Wraps the media alone, so the brandmark's percentage offsets resolve against
+   the photo rather than the photo plus the link beneath it. */
+.hero__feature-frame {
+  position: relative;
+}
+
+.hero__feature-media {
+  aspect-ratio: 3 / 2;
+}
+
+.hero__brandmark {
+  position: absolute;
+  top: 41.62%;
+  left: 0.76%;
+  color: var(--color-paper-warm);
+  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  mix-blend-mode: difference;
+  /* GSAP owns `transform` on the inner span (and clears `translate` when it
+     does), so the centring lives one level up where nothing overwrites it. */
+  transform: translateX(-50%);
+}
+
+.hero__brandmark span {
+  display: inline-block;
+}
+
+.hero__cta {
+  align-self: start;
 }
 
 /* Shared section header used by "Discover more" and "Services" — both are
@@ -187,17 +229,9 @@
 
 .stack {
   position: relative;
-  padding: clamp(4rem, 8vw, 7rem) 0 clamp(2rem, 5vw, 4rem);
+  padding: 0 0 clamp(2rem, 5vw, 4rem);
   background: var(--home-paper-soft);
   overflow: visible;
-}
-
-.stack__header {
-  display: grid;
-  gap: clamp(1rem, 3vw, 2rem);
-  align-items: end;
-  width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
-  margin: 0 auto clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .stack__grid {
@@ -299,27 +333,41 @@
 
 @include media-max("tablet-lg") {
   .hero {
-    grid-template-columns: 1fr;
-    min-height: auto;
-    padding-top: clamp(2rem, 8vw, 4rem);
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 3rem);
+    padding-bottom: clamp(2.5rem, 6vw, 4rem);
   }
 
-  .hero__media {
-    min-height: clamp(25rem, 78svh, 40rem);
+  .hero__logo {
+    width: min(17.0625rem, 55%);
+  }
+
+  /* The intro now spans the full frame, so cap the portrait instead of letting
+     it keep half of it — otherwise it towers over the tagline beside it. */
+  .hero__intro-body {
+    grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  }
+
+  .hero__feature {
+    width: 100%;
+  }
+
+  /* Once the photo runs the full width there is no paper left of it for the
+     brandmark to hang over, so it tucks inside the frame instead. */
+  .hero__brandmark {
+    left: var(--space-md);
+    text-align: left;
+    transform: none;
   }
 
   .stack {
-    padding: clamp(4rem, 9vw, 7rem) var(--page-gutter);
+    padding: 0 var(--page-gutter) clamp(4rem, 9vw, 7rem);
   }
 
-  .stack__header,
+  .discover,
   .stack__grid,
   .stack__footer {
     width: auto;
-  }
-
-  .stack__header {
-    grid-template-columns: 1fr;
   }
 
   .services {
@@ -340,19 +388,13 @@
     overflow: hidden;
   }
 
-  .hero__title {
-    font-size: clamp(3.15rem, 17vw, 5.1rem);
-    line-height: 0.84;
+  .hero__intro-body {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
   }
 
-  .hero__media {
-    min-height: 0;
-    aspect-ratio: 4 / 5;
-  }
-
-  .hero__caption {
-    flex-direction: column;
-    gap: 0.4rem;
+  .hero__portrait {
+    width: min(100%, 20rem);
   }
 
   .manifesto {
@@ -390,7 +432,6 @@
   }
 
   .stack {
-    padding-top: 4rem;
     padding-bottom: 4rem;
   }
 

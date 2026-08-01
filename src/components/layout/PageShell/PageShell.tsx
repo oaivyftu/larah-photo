@@ -24,6 +24,9 @@ export async function PageShell({ children, variant }: PageShellProps) {
     <div className={styles["page-shell"]} id="top">
       <SiteHeader
         activeHref={activeHrefByVariant[variant]}
+        /* The home hero carries the full-size logo mark, so the nav drops its
+           own brand there rather than showing it twice. */
+        hideBrand={variant === "home"}
         instagramUrl={settings.instagramUrl}
         navigationItems={settings.navigationItems}
         siteName={settings.name}

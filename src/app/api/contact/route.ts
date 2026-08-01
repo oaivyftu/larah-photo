@@ -1,20 +1,14 @@
 import { Resend } from "resend";
-
-const sessionTypes = new Set([
-  "Graduation",
-  "Portrait",
-  "Couple",
-  "Family",
-  "Branding",
-  "Other",
-]);
+import { getServiceTitles } from "@/sanity/fetchers";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const maxFieldLength = 200;
+const maxMessageLength = 4000;
 
 type ContactPayload = {
   name?: unknown;
   email?: unknown;
-  phone?: unknown;
   sessionType?: unknown;
   preferredDate?: unknown;
   preferredLocation?: unknown;
@@ -22,8 +16,14 @@ type ContactPayload = {
   website?: unknown;
 };
 
-function readString(value: unknown) {
-  return typeof value === "string" ? value.trim() : "";
+function readString(value: unknown, maxLength = maxFieldLength) {
+  return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+/* Keeps newlines out of the subject line, where they would let a submitted
+   name inject extra mail headers. */
+function singleLine(value: string) {
+  return value.replace(/\s+/g, " ");
 }
 
 function escapeHtml(value: string) {
@@ -37,6 +37,21 @@ function escapeHtml(value: string) {
 
 function formatLine(label: string, value: string) {
   return `${label}: ${value || "Not provided"}`;
+}
+
+/**
+ * The session types offered are the `servicePackage` titles the form was built
+ * from, so the allowed values are read back from Sanity rather than restated
+ * here — a local list would silently reject every service renamed in Studio.
+ * If Sanity is unreachable the field falls back to a presence check, so a CMS
+ * blip costs the inquiry its validation rather than losing it outright.
+ */
+async function isKnownSessionType(sessionType: string) {
+  try {
+    return (await getServiceTitles()).includes(sessionType);
+  } catch {
+    return Boolean(sessionType);
+  }
 }
 
 export async function POST(request: Request) {
@@ -56,13 +71,17 @@ export async function POST(request: Request) {
 
   const name = readString(payload.name);
   const email = readString(payload.email);
-  const phone = readString(payload.phone);
   const sessionType = readString(payload.sessionType);
   const preferredDate = readString(payload.preferredDate);
   const preferredLocation = readString(payload.preferredLocation);
-  const message = readString(payload.message);
+  const message = readString(payload.message, maxMessageLength);
 
-  if (!name || !email || !emailPattern.test(email) || !sessionTypes.has(sessionType) || !message) {
+  if (
+    !name ||
+    !email ||
+    !emailPattern.test(email) ||
+    !(await isKnownSessionType(sessionType))
+  ) {
     return Response.json({ error: "Please check the required fields." }, { status: 400 });
   }
 
@@ -81,13 +100,12 @@ export async function POST(request: Request) {
   const inquiryLines = [
     formatLine("Name", name),
     formatLine("Email", email),
-    formatLine("Phone", phone),
     formatLine("Session type", sessionType),
     formatLine("Preferred date", preferredDate),
     formatLine("Preferred location", preferredLocation),
     "",
     "Message:",
-    message,
+    message || "Not provided",
   ];
 
   try {
@@ -95,18 +113,17 @@ export async function POST(request: Request) {
       from: fromEmail,
       to: toEmail,
       replyTo: email,
-      subject: `New ${sessionType} inquiry from ${name}`,
+      subject: singleLine(`New ${sessionType} inquiry from ${name}`),
       text: inquiryLines.join("\n"),
       html: `
         <h1>New photography inquiry</h1>
         <p><strong>Name:</strong> ${escapeHtml(name)}</p>
         <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-        <p><strong>Phone:</strong> ${escapeHtml(phone || "Not provided")}</p>
         <p><strong>Session type:</strong> ${escapeHtml(sessionType)}</p>
         <p><strong>Preferred date:</strong> ${escapeHtml(preferredDate || "Not provided")}</p>
         <p><strong>Preferred location:</strong> ${escapeHtml(preferredLocation || "Not provided")}</p>
         <p><strong>Message:</strong></p>
-        <p>${escapeHtml(message).replace(/\n/g, "<br />")}</p>
+        <p>${escapeHtml(message || "Not provided").replace(/\n/g, "<br />")}</p>
       `,
     });
   } catch {

@@ -2,15 +2,15 @@
 
 import { FormEvent, useId, useState } from "react";
 import { Button } from "@/components/ui/Button/Button";
-import { Icon } from "@/components/ui/Icon/Icon";
-import { icons } from "@/constants/icons";
+import { Input, Select, Textarea } from "@/components/ui/Input/Input";
 import styles from "./InquiryForm.module.scss";
 
 type FormValues = {
   name: string;
   email: string;
-  phone: string;
   sessionType: string;
+  preferredDate: string;
+  preferredLocation: string;
   message: string;
   website: string;
 };
@@ -20,8 +20,9 @@ type FormErrors = Partial<Record<keyof FormValues, string>>;
 const initialValues: FormValues = {
   name: "",
   email: "",
-  phone: "",
   sessionType: "",
+  preferredDate: "",
+  preferredLocation: "",
   message: "",
   website: "",
 };
@@ -43,10 +44,6 @@ function validateForm(values: FormValues) {
 
   if (!values.sessionType) {
     errors.sessionType = "Please choose a session type.";
-  }
-
-  if (!values.message.trim()) {
-    errors.message = "Please tell me a little about your vision.";
   }
 
   return errors;
@@ -136,167 +133,99 @@ export function InquiryForm({ sessionTypes }: InquiryFormProps) {
         />
       </div>
 
-      <div className={styles["inquiry-form__row"]}>
-        <label className={styles["inquiry-form__field"]} htmlFor={`${formId}-name`}>
-          <span className={styles["inquiry-form__label"]}>
-            NAME
-            <span className={styles["inquiry-form__required"]}>*</span>
-          </span>
-          <input
-            className={styles["inquiry-form__input"]}
-            id={`${formId}-name`}
-            name="name"
-            type="text"
+      <div className={styles["inquiry-form__fields"]}>
+        <div className={styles["inquiry-form__row"]}>
+          <Input
             autoComplete="name"
-            value={values.name}
+            error={errors.name}
+            id={`${formId}-name`}
+            label="Name"
+            name="name"
             onChange={(event) => updateValue("name", event.target.value)}
-            aria-invalid={Boolean(errors.name)}
-            aria-describedby={errors.name ? `${formId}-name-error` : undefined}
             required
+            type="text"
+            value={values.name}
           />
-          {errors.name ? (
-            <span className={styles["inquiry-form__error"]} id={`${formId}-name-error`}>
-              {errors.name}
-            </span>
-          ) : null}
-        </label>
-
-        <label className={styles["inquiry-form__field"]} htmlFor={`${formId}-email`}>
-          <span className={styles["inquiry-form__label"]}>
-            EMAIL
-            <span className={styles["inquiry-form__required"]}>*</span>
-          </span>
-          <input
-            className={styles["inquiry-form__input"]}
-            id={`${formId}-email`}
-            name="email"
-            type="email"
+          <Input
             autoComplete="email"
-            value={values.email}
+            error={errors.email}
+            id={`${formId}-email`}
+            label="Email"
+            name="email"
             onChange={(event) => updateValue("email", event.target.value)}
-            aria-invalid={Boolean(errors.email)}
-            aria-describedby={errors.email ? `${formId}-email-error` : undefined}
             required
+            type="email"
+            value={values.email}
           />
-          {errors.email ? (
-            <span
-              className={styles["inquiry-form__error"]}
-              id={`${formId}-email-error`}
-            >
-              {errors.email}
-            </span>
-          ) : null}
-        </label>
-      </div>
+        </div>
 
-      <div className={styles["inquiry-form__row"]}>
-        <label
-          className={styles["inquiry-form__field"]}
-          htmlFor={`${formId}-session-type`}
-        >
-          <span className={styles["inquiry-form__label"]}>SERVICE</span>
-          <select
-            className={styles["inquiry-form__select"]}
-            id={`${formId}-session-type`}
-            name="sessionType"
-            value={values.sessionType}
-            onChange={(event) => updateValue("sessionType", event.target.value)}
-            aria-invalid={Boolean(errors.sessionType)}
-            aria-describedby={
-              errors.sessionType ? `${formId}-session-type-error` : undefined
-            }
-            required
-          >
-            <option value="">Select a session</option>
-            {sessionTypes.map((sessionType) => (
-              <option key={sessionType} value={sessionType}>
-                {sessionType}
-              </option>
-            ))}
-          </select>
-          <Icon
-            className={styles["inquiry-form__select-icon"]}
-            decorative
-            icon={icons.chevronDown}
-          />
-          {errors.sessionType ? (
-            <span
-              className={styles["inquiry-form__error"]}
-              id={`${formId}-session-type-error`}
-            >
-              {errors.sessionType}
-            </span>
-          ) : null}
-        </label>
-
-        <label
-          className={styles["inquiry-form__field"]}
-          htmlFor={`${formId}-phone`}
-        >
-          <span className={styles["inquiry-form__label"]}>🇨🇦 PHONE NUMBER</span>
-          <input
-            className={styles["inquiry-form__input"]}
-            id={`${formId}-phone`}
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            value={values.phone}
-            onChange={(event) => updateValue("phone", event.target.value)}
-          />
-        </label>
-      </div>
-
-      <label
-        className={`${styles["inquiry-form__field"]} ${styles["inquiry-form__field--message"]}`}
-        htmlFor={`${formId}-message`}
-      >
-        <span className={styles["inquiry-form__label"]}>
-          MESSAGE
-          <span className={styles["inquiry-form__required"]}>*</span>
-        </span>
-        <textarea
-          className={styles["inquiry-form__textarea"]}
-          id={`${formId}-message`}
-          name="message"
-          value={values.message}
-          onChange={(event) => updateValue("message", event.target.value)}
-          aria-invalid={Boolean(errors.message)}
-          aria-describedby={errors.message ? `${formId}-message-error` : undefined}
+        <Select
+          error={errors.sessionType}
+          id={`${formId}-session-type`}
+          label="Session type"
+          name="sessionType"
+          onChange={(event) => updateValue("sessionType", event.target.value)}
+          options={sessionTypes}
+          placeholder="Select a session"
           required
+          value={values.sessionType}
         />
-        {errors.message ? (
-          <span
-            className={styles["inquiry-form__error"]}
-            id={`${formId}-message-error`}
-          >
-            {errors.message}
-          </span>
-        ) : null}
-      </label>
 
-      <div
-        className={styles["inquiry-form__message"]}
-        id={messageId}
-        role="status"
-        aria-live="polite"
-      >
-        {status === "success"
-          ? "Thank you — your inquiry has been sent. I’ll get back to you within 24–48 hours."
-          : null}
-        {status === "error" && Object.keys(errors).length === 0
-          ? "Something went wrong while sending your inquiry. Please try again."
-          : null}
+        <div className={styles["inquiry-form__row"]}>
+          <Input
+            id={`${formId}-preferred-date`}
+            label="Preferred date"
+            name="preferredDate"
+            onChange={(event) => updateValue("preferredDate", event.target.value)}
+            type="date"
+            value={values.preferredDate}
+          />
+          <Input
+            id={`${formId}-preferred-location`}
+            label="Preferred location"
+            name="preferredLocation"
+            onChange={(event) =>
+              updateValue("preferredLocation", event.target.value)
+            }
+            type="text"
+            value={values.preferredLocation}
+          />
+        </div>
       </div>
 
-      <Button
-        className={styles["inquiry-form__submit"]}
-        disabled={status === "loading"}
-        size="medium"
-        type="submit"
-        variant="primary"
-      >
-        {status === "loading" ? "SENDING..." : "SUBMIT"}
-      </Button>
+      <Textarea
+        id={`${formId}-message`}
+        label="Message / tell me about your vision"
+        name="message"
+        onChange={(event) => updateValue("message", event.target.value)}
+        value={values.message}
+      />
+
+      <div className={styles["inquiry-form__actions"]}>
+        <Button
+          className={styles["inquiry-form__submit"]}
+          disabled={status === "loading"}
+          size="medium"
+          type="submit"
+          variant="primary"
+        >
+          {status === "loading" ? "Sending…" : "Send Inquiry"}
+        </Button>
+
+        <p
+          className={styles["inquiry-form__message"]}
+          id={messageId}
+          role="status"
+          aria-live="polite"
+        >
+          {status === "success"
+            ? "Thank you — your inquiry has been sent. I’ll get back to you within 24–48 hours."
+            : null}
+          {status === "error" && Object.keys(errors).length === 0
+            ? "Something went wrong while sending your inquiry. Please try again."
+            : null}
+        </p>
+      </div>
     </form>
   );
 }

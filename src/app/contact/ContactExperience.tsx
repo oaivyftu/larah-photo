@@ -4,6 +4,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { InquiryForm } from "@/components/contact/InquiryForm/InquiryForm";
+import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
 import type { ContactPageContent } from "@/types/site";
 import styles from "./contact.module.scss";
 
@@ -65,12 +66,10 @@ export function ContactExperience({
     <div className={styles["contact"]} ref={rootRef}>
       <section className={styles["contact__layout"]} aria-labelledby="contact-title">
         <div className={styles["contact__copy"]}>
-          <h1 className={styles["contact__title"]} data-page-heading id="contact-title">
-            {content.titleWords.map((word, index) => (
-              <span key={`${word}-${index}`}>{word}</span>
-            ))}
-          </h1>
-          <p data-contact-statement>{content.formCopy}</p>
+          <PageHeading id="contact-title" words={content.titleWords} />
+          <p className={styles["contact__statement"]} data-contact-statement>
+            {content.formCopy}
+          </p>
         </div>
         <div className={styles["contact__form"]} data-contact-form id="book">
           <InquiryForm sessionTypes={sessionTypes} />

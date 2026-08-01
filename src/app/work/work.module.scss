@@ -12,32 +12,9 @@
   display: block;
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
-  padding: clamp(2.6rem, 4.4vw, 5rem) 0 clamp(1.7rem, 2.5vw, 2.4rem);
-}
-
-.work-page__title {
-  display: flex;
-  gap: 0.28em;
-  align-items: baseline;
-  max-width: none;
-  font-size: clamp(1.45rem, 1.75vw, 2rem);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1;
-}
-
-.work-page__title > span {
-  display: inline-block;
-  overflow: hidden;
-  padding-bottom: 0.08em;
-}
-
-.work-page__title > span:last-child {
-  font-family: var(--font-serif);
-}
-
-.work-page__title > span > span {
-  display: inline-block;
+  /* Figma sits the title 28px under the header, with the filters riding the
+     same row (see the toolbar's negative top margin below). */
+  padding: clamp(1rem, 1.94vw, 1.75rem) 0 clamp(1.7rem, 2.5vw, 2.4rem);
 }
 
 .work-page__toolbar {
@@ -67,11 +44,6 @@
 @include media-max("phone") {
   .work-page__hero {
     padding: 3rem 0 1rem;
-  }
-
-  .work-page__title {
-    flex-wrap: wrap;
-    font-size: clamp(1.6rem, 8vw, 2.4rem);
   }
 
   .work-page__grid {

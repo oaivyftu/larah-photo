@@ -2,7 +2,6 @@
 
 .about {
   overflow: clip;
-  background: var(--color-paper);
   color: var(--color-ink);
 }
 
@@ -22,25 +21,7 @@
 }
 
 .about__title {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.28em;
-  align-items: baseline;
   margin-bottom: clamp(1.5rem, 2vw, 2.2rem);
-  font-size: clamp(2.1rem, 3.15vw, 3.85rem);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1.02;
-}
-
-.about__title > span {
-  display: inline-block;
-  overflow: hidden;
-  padding-bottom: 0.08em;
-}
-
-.about__title > span:last-child {
-  font-family: var(--font-serif);
 }
 
 .about__copy p {
@@ -54,14 +35,17 @@
 .about__media {
   position: relative;
   width: 100%;
-  height: 100%;
-  aspect-ratio: 1.5 / 1;
+  height: auto;
   margin-top: clamp(0.5rem, 0.8vw, 1rem);
-  background: var(--color-line-soft);
+}
+
+.about__media-visual {
+  width: 100%;
 }
 
 .about__media img {
-  object-fit: cover;
+  object-fit: contain;
+  height: auto;
 }
 
 .about__media figcaption {
@@ -76,6 +60,10 @@
   line-height: 0.95;
   text-transform: uppercase;
   mix-blend-mode: difference;
+}
+
+.about__media figcaption > span {
+  display: inline-block;
 }
 
 @include media-max("tablet-lg") {
@@ -97,10 +85,6 @@
 @include media-max("phone") {
   .about__intro {
     padding-top: 3rem;
-  }
-
-  .about__title {
-    font-size: clamp(2rem, 10vw, 3rem);
   }
 
   .about__copy p {

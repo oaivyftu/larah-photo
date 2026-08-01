@@ -1,41 +1,59 @@
-import {
-  faArrowRight,
-  faArrowUp,
-  faChevronDown,
-  faChevronLeft,
-  faChevronRight,
-  faEnvelope,
-  faMinus,
-  faPeopleRoof,
-  faPhone,
-  faPlus,
-  faRing,
-  faUser,
-  faUserGroup,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
-import { faCircle } from "@fortawesome/free-regular-svg-icons";
-import {
-  faFacebook,
-  faInstagram,
-} from "@fortawesome/free-brands-svg-icons";
+export type IconDefinition = {
+  /** Font Awesome name the path was lifted from — kept so the source is traceable. */
+  name: string;
+  viewBox: string;
+  path: string;
+};
 
+/**
+ * Path data copied verbatim from Font Awesome 7 Free (solid, except `circle`
+ * which is regular). Only the icons the site actually renders live here —
+ * adding one means pasting its path rather than pulling in an icon package.
+ */
 export const icons = {
-  arrowRight: faArrowRight,
-  arrowUp: faArrowUp,
-  chevronDown: faChevronDown,
-  chevronLeft: faChevronLeft,
-  chevronRight: faChevronRight,
-  close: faXmark,
-  email: faEnvelope,
-  facebook: faFacebook,
-  family: faPeopleRoof,
-  instagram: faInstagram,
-  minus: faMinus,
-  phone: faPhone,
-  plus: faPlus,
-  portrait: faUser,
-  ring: faRing,
-  userGroup: faUserGroup,
-  circle: faCircle,
-} as const;
+  arrowRight: {
+    name: "arrow-right",
+    viewBox: "0 0 512 512",
+    path: "M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l370.7 0-105.4 105.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z",
+  },
+  arrowUp: {
+    name: "arrow-up",
+    viewBox: "0 0 384 512",
+    path: "M214.6 9.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 480c0 17.7 14.3 32 32 32s32-14.3 32-32l0-370.7 105.4 105.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z",
+  },
+  chevronDown: {
+    name: "chevron-down",
+    viewBox: "0 0 448 512",
+    path: "M201.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 338.7 54.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z",
+  },
+  circle: {
+    name: "circle",
+    viewBox: "0 0 512 512",
+    path: "M464 256a208 208 0 1 0 -416 0 208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0 256 256 0 1 1 -512 0z",
+  },
+  family: {
+    name: "people-roof",
+    viewBox: "0 0 576 512",
+    path: "M302.3-12.6c-9-4.5-19.6-4.5-28.6 0l-256 128C1.9 123.3-4.5 142.5 3.4 158.3s27.1 22.2 42.9 14.3L288 51.8 529.7 172.6c15.8 7.9 35 1.5 42.9-14.3s1.5-35-14.3-42.9l-256-128zM288 272a56 56 0 1 0 0-112 56 56 0 1 0 0 112zm0 48c-53 0-96 43-96 96l0 32c0 17.7 14.3 32 32 32l128 0c17.7 0 32-14.3 32-32l0-32c0-53-43-96-96-96zM160 256a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm352 0a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM112 336c-44.2 0-80 35.8-80 80l0 33.1c0 17 13.8 30.9 30.9 30.9l87.8 0c-4.3-9.8-6.7-20.6-6.7-32l0-48c0-18.4 3.5-36 9.8-52.2-12.2-7.5-26.5-11.8-41.8-11.8zM425.4 480l87.8 0c17 0 30.9-13.8 30.9-30.9l0-33.1c0-44.2-35.8-80-80-80-15.3 0-29.6 4.3-41.8 11.8 6.3 16.2 9.8 33.8 9.8 52.2l0 48c0 11.4-2.4 22.2-6.7 32z",
+  },
+  portrait: {
+    name: "user",
+    viewBox: "0 0 448 512",
+    path: "M224 248a120 120 0 1 0 0-240 120 120 0 1 0 0 240zm-29.7 56C95.8 304 16 383.8 16 482.3 16 498.7 29.3 512 45.7 512l356.6 0c16.4 0 29.7-13.3 29.7-29.7 0-98.5-79.8-178.3-178.3-178.3l-59.4 0z",
+  },
+  ring: {
+    name: "ring",
+    viewBox: "0 0 512 512",
+    path: "M64 208c0 7.8 4.4 18.7 17.1 30.3 45.4-24.2 107.7-38.3 174.9-38.3s129.5 14.1 174.9 38.3c12.8-11.6 17.1-22.5 17.1-30.3 0-12.3-10.8-32-47.9-50.6-35.2-17.6-86.1-29.4-144.1-29.4s-108.9 11.8-144.1 29.4C74.8 176 64 195.7 64 208zm192 40c-47 0-89.3 7.6-122.9 19.7 33.2 12.4 75.7 20.3 122.9 20.3s89.7-7.8 122.9-20.3C345.3 255.6 303 248 256 248zM0 208C0 158.4 39.4 122.2 83.3 100.2 129.1 77.3 190.3 64 256 64s126.9 13.3 172.7 36.2c43.9 22 83.3 58.2 83.3 107.8l0 96c0 49.6-39.4 85.8-83.3 107.8-45.9 22.9-107 36.2-172.7 36.2S129.1 434.7 83.3 411.8C39.4 389.8 0 353.6 0 304l0-96z",
+  },
+  userGroup: {
+    name: "user-group",
+    viewBox: "0 0 576 512",
+    path: "M64 128a112 112 0 1 1 224 0 112 112 0 1 1 -224 0zM0 464c0-97.2 78.8-176 176-176s176 78.8 176 176l0 6c0 23.2-18.8 42-42 42L42 512c-23.2 0-42-18.8-42-42l0-6zM432 64a96 96 0 1 1 0 192 96 96 0 1 1 0-192zm0 240c79.5 0 144 64.5 144 144l0 22.4c0 23-18.6 41.6-41.6 41.6l-144.8 0c6.6-12.5 10.4-26.8 10.4-42l0-6c0-51.5-17.4-98.9-46.5-136.7 22.6-14.7 49.6-23.3 78.5-23.3z",
+  },
+  graduation: {
+    name: "graduation",
+    viewBox: "0 0 640 640",
+    path: "M337.3 51C325.9 48.7 314.2 48.7 302.8 51L115.3 88.5C104.1 90.7 96 100.6 96 112C96 122.3 102.5 131.3 112 134.6L112 208L96.3 286.6C96.1 287.5 96 288.5 96 289.5C96 297.5 102.5 304.1 110.6 304.1L145.5 304.1C153.5 304.1 160.1 297.6 160.1 289.5C160.1 288.5 160 287.6 159.8 286.6L144 208L144 141.3L192 150.9L192 208C192 278.7 249.3 336 320 336C390.7 336 448 278.7 448 208L448 150.9L524.7 135.6C535.9 133.3 544 123.4 544 112C544 100.6 535.9 90.7 524.7 88.5L337.3 51zM320 288C275.8 288 240 252.2 240 208L400 208C400 252.2 364.2 288 320 288zM216.1 384.1C154.7 412.3 112 474.3 112 546.3C112 562.7 125.3 576 141.7 576L296 576L296 430L238.6 387C232.1 382.1 223.4 380.8 216 384.2zM344 576L498.3 576C514.7 576 528 562.7 528 546.3C528 474.3 485.3 412.3 423.9 384.2C416.5 380.8 407.8 382.1 401.3 387L343.9 430L343.9 576z"
+  }
+} satisfies Record<string, IconDefinition>;

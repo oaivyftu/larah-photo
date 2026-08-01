@@ -1,0 +1,120 @@
+@use "@/styles/mixins" as *;
+
+/* Figma "Input" component: a 14px label over an underlined control, with a
+   12px message slot below. The underline carries the state — muted at rest,
+   ink once the field holds a value, accent while it is in error. */
+.input {
+  display: grid;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+.input__control {
+  display: grid;
+  gap: var(--space-xs);
+  padding-bottom: var(--space-2xs);
+  border-bottom: 1px solid var(--color-muted);
+}
+
+.input__label {
+  display: flex;
+  gap: 0.125rem;
+  align-items: flex-start;
+  color: var(--color-ink);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.input__required {
+  color: var(--color-accent);
+}
+
+.input__value {
+  display: flex;
+  gap: var(--space-2xs);
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.input__field {
+  width: 100%;
+  min-width: 0;
+  min-height: 1.0625rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.2;
+  outline: none;
+}
+
+/* Resting state: the value slot reads as placeholder copy until it holds
+   something. Covers `select` and `date`, which have no `::placeholder`. */
+.input:not([data-filled]) .input__field {
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.input__field::placeholder {
+  color: var(--color-muted);
+  font-weight: 500;
+  opacity: 1;
+}
+
+.input__field:is(select) {
+  appearance: none;
+  cursor: pointer;
+}
+
+/* Fixed 85px area, as drawn — no resize grabber in the design. */
+.input__field--area {
+  min-height: 5.3125rem;
+  resize: none;
+}
+
+.input__icon {
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: 0 0 auto;
+  color: var(--color-ink);
+  pointer-events: none;
+}
+
+.input__error {
+  min-height: 0.9375rem;
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+.input[data-filled] .input__control {
+  border-bottom-color: var(--color-ink);
+}
+
+.input[data-invalid] .input__control {
+  border-bottom-color: var(--color-accent);
+}
+
+.input[data-invalid] .input__field {
+  color: var(--color-accent);
+}
+
+.input__control:focus-within {
+  border-bottom-color: var(--color-ink);
+}
+
+@include media-max("phone-sm") {
+  .input__field {
+    min-height: 1.75rem;
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -21,6 +22,7 @@ type HomeExperienceProps = {
   projectCount: number;
   projects: Project[];
   services: ServicePackage[];
+  siteName: string;
 };
 
 const serviceIcons: Record<string, typeof icons.portrait> = {
@@ -28,6 +30,7 @@ const serviceIcons: Record<string, typeof icons.portrait> = {
   "couple-session": icons.userGroup,
   "wedding-session": icons.ring,
   "family-session": icons.family,
+  "graduation-session": icons.graduation
 };
 
 export function HomeExperience({
@@ -35,9 +38,10 @@ export function HomeExperience({
   projectCount,
   projects,
   services,
+  siteName,
 }: HomeExperienceProps) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const heroImage = content.heroImage;
+  const taglineWords = content.heroTagline.split(/\s+/);
 
   useGSAP(
     () => {
@@ -161,43 +165,74 @@ export function HomeExperience({
   return (
     <div className={styles["home"]} ref={rootRef}>
       <section className={styles["hero"]}>
-        <div className={styles["hero__copy"]}>
-          <p className={styles["eyebrow"]} data-hero-meta>
-            {content.eyebrow}
-          </p>
-          <h1 className={styles["hero__title"]} id="home-title">
-            {content.titleWords.map((word) => (
-              <span className={styles["hero__word-wrap"]} key={word}>
-                <span data-hero-word>{word}</span>
-              </span>
-            ))}
-          </h1>
-        </div>
-
-        <div
-          className={styles["hero__media"]}
-          data-hero-media
-        >
-          <LarahImage
-            className={styles["hero__image"]}
-            src={heroImage.src}
-            alt={heroImage.alt}
-            blurDataURL={heroImage.blurDataURL}
-            fill
+        <div className={styles["hero__intro"]}>
+          <Image
+            className={styles["hero__logo"]}
+            src="/logos/logo-larah.svg"
+            alt={siteName}
+            width={273}
+            height={91}
             loading="eager"
             priority
-            sizes="(max-width: 760px) calc(100vw - 32px), 52vw"
+            data-hero-meta
           />
-        </div>
-      </section>
 
-      <section className={styles["discover"]} aria-labelledby="discover-title">
-        <h2 className={styles["discover__title"]} id="discover-title">
-          {projectCount} {projectCount === 1 ? "Project" : "Projects"}
-          <br />
-          Discover more
-        </h2>
-        <span className={styles["section-marker"]} aria-hidden="true" />
+          <div className={styles["hero__intro-body"]}>
+            <div className={styles["hero__portrait"]} data-hero-media>
+              <LarahImage
+                src={content.heroPortraitImage.src}
+                alt={content.heroPortraitImage.alt}
+                blurDataURL={content.heroPortraitImage.blurDataURL}
+                fill
+                loading="eager"
+                priority
+                sizes="(max-width: 620px) min(100vw, 20rem), (max-width: 900px) 46vw, 23vw"
+              />
+            </div>
+
+            <h1 className={styles["hero__tagline"]} id="home-title">
+              {taglineWords.map((word, index) => (
+                <span className={styles["hero__word"]} key={`${word}-${index}`}>
+                  <span data-hero-word>{word}</span>
+                </span>
+              ))}
+            </h1>
+          </div>
+        </div>
+
+        <div className={styles["hero__feature"]}>
+          <div className={styles["hero__feature-frame"]}>
+            <div className={styles["hero__feature-media"]} data-hero-media>
+              <LarahImage
+                src={content.heroImage.src}
+                alt={content.heroImage.alt}
+                blurDataURL={content.heroImage.blurDataURL}
+                fill
+                loading="eager"
+                priority
+                sizes="(max-width: 900px) 92vw, 41vw"
+              />
+            </div>
+            <span className={styles["hero__brandmark"]} aria-hidden="true">
+              <span data-hero-meta>{content.heroBrandmark}</span>
+            </span>
+          </div>
+
+          {/* The reveal drives the wrapper, not the button: `.button` carries a
+              CSS opacity transition, and a `from()` tween reads its end value
+              from the computed style — mid-transition that reads back as 0 and
+              the link never fades in. */}
+          <span className={styles["hero__cta"]} data-hero-meta>
+            <Button
+              href={content.heroCtaHref}
+              size="medium"
+              variant="secondary"
+              withIcon
+            >
+              {content.heroCtaLabel}
+            </Button>
+          </span>
+        </div>
       </section>
 
       <section className={styles["manifesto"]} data-manifesto>
@@ -231,9 +266,15 @@ export function HomeExperience({
         data-stack-section
         aria-label={content.selectedWorkEyebrow}
       >
-        <div className={styles["stack__header"]}>
-          <p className={styles["eyebrow"]}>{content.selectedWorkEyebrow}</p>
+        <div className={styles["discover"]}>
+          <h2 className={styles["discover__title"]}>
+            {projectCount} {projectCount === 1 ? "Project" : "Projects"}
+            <br />
+            Discover more
+          </h2>
+          <span className={styles["section-marker"]} aria-hidden="true" />
         </div>
+
         <WorkMasonryGrid
           className={styles["stack__grid"]}
           items={projects}

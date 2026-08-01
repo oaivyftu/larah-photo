@@ -1,116 +1,48 @@
 @use "@/styles/mixins" as *;
 
+/* Figma (669px form column): 24px between the field block, the message area
+   and the submit row; 40px between field rows; 20px between paired fields. */
 .inquiry-form {
   display: grid;
   width: 100%;
-  gap: clamp(3rem, 5vw, 5.8rem);
+  gap: var(--space-lg);
+}
+
+.inquiry-form__fields {
+  display: grid;
+  gap: var(--space-2xl);
 }
 
 .inquiry-form__row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(1.6rem, 2vw, 2.25rem);
+  gap: 1.25rem;
 }
 
-.inquiry-form__field {
-  position: relative;
-  display: grid;
-  gap: var(--space-xs);
-  min-width: 0;
-}
-
-.inquiry-form__required {
-  color: var(--color-accent);
-}
-
-.inquiry-form__label {
+.inquiry-form__actions {
   display: flex;
-  min-height: 1.0625rem;
+  flex-wrap: wrap;
+  gap: var(--space-md) var(--space-lg);
   align-items: center;
-  font-size: clamp(1rem, 1.22vw, 1.35rem);
-  font-weight: 500;
-  letter-spacing: 0;
-  line-height: 1.2;
-  text-transform: uppercase;
 }
 
-.inquiry-form__input,
-.inquiry-form__select,
-.inquiry-form__textarea {
-  width: 100%;
-  border: 0;
-  border-bottom: 1px solid var(--color-muted);
-  border-radius: 0;
-  background: transparent;
-  color: var(--color-ink);
-  font: inherit;
-  outline: none;
-}
-
-.inquiry-form__input,
-.inquiry-form__select {
-  min-height: 2.1rem;
-}
-
-.inquiry-form__input::placeholder {
-  color: var(--color-muted);
-  opacity: 1;
-}
-
-.inquiry-form__input:focus,
-.inquiry-form__select:focus,
-.inquiry-form__textarea:focus {
-  border-bottom-color: var(--color-ink);
-}
-
-.inquiry-form__select {
-  appearance: none;
-  cursor: pointer;
-  padding-right: 1.25rem;
-}
-
-.inquiry-form__select-icon {
-  position: absolute;
-  right: 0;
-  top: 2.55rem;
-  width: 0.5rem;
-  height: 0.5rem;
-  pointer-events: none;
-}
-
-.inquiry-form__textarea {
-  min-height: clamp(8.5rem, 13vw, 14rem);
-  resize: vertical;
-}
-
-.inquiry-form__field--message {
-  gap: var(--space-xs);
-}
-
-.inquiry-form__error {
-  color: var(--color-ink);
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  line-height: 1.25;
-}
-
-.inquiry-form__message {
-  min-height: 1rem;
-  margin-top: -2.1rem;
-  max-width: 31rem;
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  line-height: 1.35;
-}
-
+/* The design labels this button in sentence case rather than the design
+   system's default caps. */
 .inquiry-form__submit {
-  align-self: start;
-  justify-self: start;
-  margin-top: -3.6rem;
+  text-transform: none;
 }
 
 .inquiry-form__submit:disabled {
   cursor: wait;
+}
+
+/* Stays mounted (and never `display: none`) so the live region is already in
+   the accessibility tree when the submit result lands in it. */
+.inquiry-form__message {
+  max-width: 31rem;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 .inquiry-form__honeypot {
@@ -122,34 +54,17 @@
 }
 
 @include media-max("tablet-sm") {
-  .inquiry-form {
-    gap: var(--space-2xl);
+  .inquiry-form__fields {
+    gap: var(--space-xl);
   }
 
   .inquiry-form__row {
     grid-template-columns: 1fr;
-    gap: var(--space-2xl);
-  }
-
-  .inquiry-form__textarea {
-    min-height: 8.5rem;
-  }
-
-  .inquiry-form__message,
-  .inquiry-form__submit {
-    margin-top: 0;
+    gap: var(--space-xl);
   }
 }
 
 @include media-max("phone-sm") {
-  .inquiry-form {
-    gap: 2rem;
-  }
-
-  .inquiry-form__label {
-    font-size: var(--font-size-sm);
-  }
-
   .inquiry-form__submit {
     width: 100%;
     min-height: 2.85rem;

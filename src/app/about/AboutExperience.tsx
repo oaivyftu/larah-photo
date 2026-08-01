@@ -4,6 +4,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
+import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
 import type { AboutPageContent } from "@/types/site";
 import styles from "./about.module.scss";
 
@@ -30,7 +31,7 @@ export function AboutExperience({ content }: AboutExperienceProps) {
           ease: "power4.out",
         })
         .from(
-          "[data-about-copy] p, [data-about-media]",
+          "[data-about-copy] p, [data-about-media-visual]",
           {
             y: 34,
             opacity: 0,
@@ -41,7 +42,7 @@ export function AboutExperience({ content }: AboutExperienceProps) {
           "-=0.42",
         )
         .from(
-          "[data-about-logo]",
+          "[data-about-logo-motion]",
           {
             x: -34,
             opacity: 0,
@@ -49,7 +50,10 @@ export function AboutExperience({ content }: AboutExperienceProps) {
             ease: "power3.out",
           },
           "-=0.48",
-        );
+        )
+        .set("[data-about-media-visual], [data-about-logo-motion]", {
+          clearProps: "transform,opacity",
+        });
 
       const playIntro = () => intro.play(0);
 
@@ -71,26 +75,35 @@ export function AboutExperience({ content }: AboutExperienceProps) {
     <div className={styles["about"]} ref={rootRef}>
       <section className={styles["about__intro"]} aria-labelledby="about-title">
         <div className={styles["about__copy"]} data-about-copy>
-          <h1 className={styles["about__title"]} data-page-heading id="about-title">
-            {content.titleWords.map((word, index) => (
-              <span key={`${word}-${index}`}>{word}</span>
-            ))}
-          </h1>
+          <PageHeading
+            className={styles["about__title"]}
+            id="about-title"
+            words={content.titleWords}
+          />
           {content.story.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
         </div>
 
         <figure className={styles["about__media"]} data-about-media>
-          <LarahImage
-            src={content.portraitOne.src}
-            alt={content.portraitOne.alt}
-            blurDataURL={content.portraitOne.blurDataURL}
-            fill
-            priority
-            sizes="(max-width: 900px) calc(100vw - 48px), 42vw"
-          />
-          <figcaption data-about-logo>LARAH</figcaption>
+          <div
+            className={styles["about__media-visual"]}
+            data-about-media-visual
+          >
+            <LarahImage
+              preload
+              src={content.portraitOne.src}
+              alt={content.portraitOne.alt}
+              placeholder="blur"
+              blurDataURL={content.portraitOne.blurDataURL}
+              width={content.portraitOne.width}
+              height={content.portraitOne.height}
+              sizes="(max-width: 900px) calc(100vw - 48px), 42vw"
+            />
+          </div>
+          <figcaption data-about-logo>
+            <span data-about-logo-motion>LARAH</span>
+          </figcaption>
         </figure>
       </section>
     </div>

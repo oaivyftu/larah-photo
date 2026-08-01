@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
 import { WorkFilters } from "@/components/work/WorkFilters/WorkFilters";
 import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
 import type { Project } from "@/types/project";
@@ -81,11 +82,7 @@ export function WorkGalleryClient({
   return (
     <section className={styles["work-page"]} ref={rootRef} aria-labelledby="work-title">
       <div className={styles["work-page__hero"]}>
-        <h1 className={styles["work-page__title"]} data-page-heading id="work-title">
-          {content.titleWords.map((word, index) => (
-            <span key={`${word}-${index}`}>{word}</span>
-          ))}
-        </h1>
+        <PageHeading id="work-title" words={content.titleWords} />
       </div>
 
       <div className={styles["work-page__toolbar"]} data-work-filter>

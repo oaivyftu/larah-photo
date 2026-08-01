@@ -110,8 +110,11 @@
   transition: opacity 220ms ease;
 }
 
+// Every card is exactly one column wide. Mixed widths are what leave holes
+// mid-grid, so the album packs uniformly and only frays at the bottom edge.
 .work-detail__grid {
-  --detail-gap: clamp(0.75rem, 1.4vw, 1.5rem);
+  --detail-columns: 4;
+  --detail-gap: clamp(0.35rem, 0.9vw, 0.9rem);
 
   position: relative;
   width: 100%;
@@ -119,7 +122,10 @@
 
 .work-detail__sizer,
 .work-detail__item {
-  width: calc((100% - (var(--detail-gap) * 2)) / 3);
+  width: calc(
+    (100% - (var(--detail-gap) * (var(--detail-columns) - 1))) /
+      var(--detail-columns)
+  );
 }
 
 .work-detail__sizer,
@@ -133,12 +139,6 @@
 
 .work-detail__item {
   padding-bottom: var(--detail-gap);
-}
-
-.work-detail__item--wide {
-  width: calc(
-    (((100% - (var(--detail-gap) * 2)) / 3) * 2) + var(--detail-gap)
-  );
 }
 
 .work-detail__image-button {
@@ -189,14 +189,16 @@
   }
 }
 
-@include media-max("tablet-lg") {
-  .work-detail__sizer,
-  .work-detail__item {
-    width: calc((100% - var(--detail-gap)) / 2);
+@include media-max(1023px) {
+  .work-detail__grid {
+    --detail-columns: 3;
   }
+}
 
-  .work-detail__item--wide {
-    width: 100%;
+// Phones keep the staggered grid rather than stacking — the cards just shrink.
+@include media-max(767px) {
+  .work-detail__grid {
+    --detail-columns: 2;
   }
 }
 
@@ -221,14 +223,6 @@
 
   .work-detail__meta {
     grid-column: auto;
-  }
-}
-
-@include media-max("phone-lg") {
-  .work-detail__sizer,
-  .work-detail__item,
-  .work-detail__item--wide {
-    width: 100%;
   }
 }
 

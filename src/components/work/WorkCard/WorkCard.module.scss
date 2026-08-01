@@ -81,8 +81,14 @@
   line-height: 1;
 }
 
-@include media-max("phone-lg") {
+// Two columns on phones leaves each card ~160px wide, so the caption scales
+// down with it instead of wrapping the title over four lines.
+@include media-max(767px) {
   .work-card--work .work-card__title {
-    font-size: 1.2rem;
+    font-size: 0.95rem;
+  }
+
+  .work-card--work .work-card__meta {
+    font-size: 0.75rem;
   }
 }

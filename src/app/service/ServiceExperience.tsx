@@ -4,6 +4,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/Button/Button";
+import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import type { ServicePackage } from "@/types/service";
 import type { ServicePageContent } from "@/types/site";
@@ -63,11 +64,7 @@ export function ServiceExperience({ content, services }: ServiceExperienceProps)
   return (
     <div className={styles["service"]} ref={rootRef}>
       <section className={styles["service__header"]} aria-labelledby="service-title">
-        <h1 className={styles["service__title"]} data-page-heading id="service-title">
-          {content.titleWords.map((word, index) => (
-            <span key={`${word}-${index}`}>{word}</span>
-          ))}
-        </h1>
+        <PageHeading id="service-title" words={content.titleWords} />
       </section>
 
       <section className={styles["service__list"]} aria-label="Photography services">

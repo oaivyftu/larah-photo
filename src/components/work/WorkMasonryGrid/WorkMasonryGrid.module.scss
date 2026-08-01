@@ -35,6 +35,11 @@
   pointer-events: none;
 }
 
+// The fourth placeholder column only exists for the four-column work index.
+.work-layout--homepage .work-layout__skeleton-column:nth-child(4) {
+  display: none;
+}
+
 .work-layout__skeleton--visible {
   visibility: visible;
   opacity: 1;
@@ -183,10 +188,24 @@
   width: 100%;
 }
 
+// The work index mirrors the album grid: every card is exactly one column wide,
+// so the masonry packs without holes and only frays along the bottom edge.
 .work-layout--work {
-  --work-columns: 9;
-  --work-gap-x: clamp(0.8rem, 1.35vw, 1.6rem);
-  --work-gap-y: clamp(2.5rem, 4.7vw, 5.25rem);
+  --work-columns: 4;
+  --work-gap-x: clamp(0.35rem, 0.9vw, 0.9rem);
+  --work-gap-y: clamp(2rem, 3.4vw, 3.75rem);
+}
+
+.work-layout--work .work-layout__item {
+  width: calc(
+    (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+      var(--work-columns)
+  );
+}
+
+.work-layout--work .work-layout__skeleton {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--work-gap-x);
 }
 
 @include reduced-motion {
@@ -239,13 +258,24 @@
   }
 }
 
-@include media-max("tablet-lg") {
+@include media-max(1023px) {
   .work-layout--work {
-    --work-columns: 2;
+    --work-columns: 3;
   }
 
-  .work-layout--work .work-layout__item {
-    width: calc((100% - var(--work-gap-x)) / 2);
+  .work-layout--work .work-layout__skeleton {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .work-layout--work .work-layout__skeleton-column:nth-child(4) {
+    display: none;
+  }
+}
+
+// Phones keep the staggered grid rather than stacking — the cards just shrink.
+@include media-max(767px) {
+  .work-layout--work {
+    --work-columns: 2;
   }
 
   .work-layout--work .work-layout__skeleton {
@@ -258,21 +288,19 @@
 }
 
 @include media-max(720px) {
-  .work-layout {
+  .work-layout--homepage {
     --work-columns: 1;
   }
 
-  .work-layout__item,
-  .work-layout--homepage .work-layout__item,
-  .work-layout--work .work-layout__item {
+  .work-layout--homepage .work-layout__item {
     width: 100%;
   }
 
-  .work-layout .work-layout__skeleton {
+  .work-layout--homepage .work-layout__skeleton {
     grid-template-columns: 1fr;
   }
 
-  .work-layout .work-layout__skeleton-column:nth-child(2) {
+  .work-layout--homepage .work-layout__skeleton-column:nth-child(2) {
     display: none;
   }
 }

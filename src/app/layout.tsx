@@ -1,21 +1,29 @@
 import type { Metadata } from "next";
-import { config } from "@fortawesome/fontawesome-svg-core";
-import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.scss";
 import { Montserrat } from 'next/font/google'
 import { PageTransition } from "@/components/layout/PageTransition/PageTransition";
 import { GlassPointer } from "@/components/ui/GlassPointer/GlassPointer";
+import { isIndexable, siteUrl } from "@/constants/seo";
 
-config.autoAddCss = false;
-
+// Exposed as a CSS variable so `--font-sans` can point at the hashed family
+// `next/font` generates — naming "Montserrat" directly resolves to nothing.
 const montserrat = Montserrat({
-  subsets: ['latin']
+  subsets: ['latin'],
+  variable: '--font-montserrat',
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
   title: "Larah Photo",
   description: "Photography portfolio website.",
+  robots: isIndexable
+    ? undefined
+    : {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: { index: false, follow: false, noimageindex: true },
+      },
 };
 
 export default function RootLayout({
@@ -28,7 +36,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={montserrat.className}
+      className={montserrat.variable}
       data-scroll-behavior="smooth"
     >
       <body>
