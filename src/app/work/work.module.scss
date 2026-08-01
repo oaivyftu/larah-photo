@@ -18,10 +18,21 @@
 }
 
 .work-page__toolbar {
+  /* The grid's first card overlaps this row's last pixel, clipping the filter
+     buttons' 24px target. The z-index has to sit here rather than on the
+     filters: the intro leaves an inline transform on this element, and that
+     stacking context would cap anything set inside it. */
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: flex-end;
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: clamp(-3.2rem, -2.7vw, -2.1rem) auto clamp(1.55rem, 2.1vw, 2.2rem);
+}
+
+/* Announces the result count after a filter change. */
+.work-page__announcer {
+  @include visually-hidden;
 }
 
 .work-page__grid {

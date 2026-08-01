@@ -16,6 +16,13 @@
   flex: 0 0 auto;
 }
 
+/* The brand is the first stop after the skip link and had no ring of its own,
+   falling back to the UA default over a white header. */
+.site-header__brand:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 0.35rem;
+}
+
 .site-header__logo {
   width: 100%;
   height: 100%;

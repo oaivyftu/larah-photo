@@ -14,6 +14,9 @@ export function MainNav({ activeHref, items }: MainNavProps) {
         {items.map((item) => (
           <li className={styles["main-nav__item"]} key={item.href}>
             <Link
+              // The active state was carried by weight and an underline alone,
+              // which no assistive tech can read.
+              aria-current={item.href === activeHref ? "page" : undefined}
               className={[
                 styles["main-nav__link"],
                 item.href === activeHref ? styles["main-nav__link--active"] : "",

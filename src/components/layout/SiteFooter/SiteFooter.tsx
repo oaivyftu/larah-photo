@@ -22,10 +22,13 @@ export function SiteFooter({ settings }: SiteFooterProps) {
             {settings.phone}
           </a>
         </address>
-        <address className={styles["site-footer__contact"]}>
+        {/* Not an <address>: that element is for contact details, and a
+            service area is neither a way to reach anyone nor part of the
+            contact block above. */}
+        <div className={styles["site-footer__contact"]}>
           <span className={styles["site-footer__label"]}>Location</span>
           <span>{settings.location}</span>
-        </address>
+        </div>
       </div>
       <div className={styles["site-footer__bar"]}>
         <span>Larah Photo©2026</span>

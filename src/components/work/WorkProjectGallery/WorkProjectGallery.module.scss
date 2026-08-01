@@ -32,6 +32,12 @@
   min-height: 100%;
 }
 
+/* The panel takes focus programmatically when the lightbox opens so the dialog
+   announces itself; a ring around the whole surface would just read as noise. */
+.work-project-gallery__panel:focus {
+  outline: none;
+}
+
 .work-project-gallery__header {
   display: grid;
   grid-template-columns: minmax(25rem, 1.25fr) minmax(25rem, 0.9fr) auto;
@@ -472,6 +478,28 @@
 .work-project-gallery__float-button:focus-visible {
   outline: 1px solid rgba(255, 255, 255, 0.92);
   outline-offset: 2px;
+}
+
+/* Windows High Contrast drops background-color and box-shadow, and the glass
+   controls are drawn entirely from those — leaving unmarked hit areas floating
+   over the image. Real borders put the edges back. */
+@media (forced-colors: active) {
+  .work-project-gallery__float-container,
+  .work-project-gallery__float-close,
+  .work-project-gallery__float-button {
+    border: 1px solid ButtonBorder;
+    background: ButtonFace;
+  }
+
+  .work-project-gallery__float-close-icon,
+  .work-project-gallery__float-arrow-icon {
+    stroke: ButtonText;
+  }
+
+  .work-project-gallery__float-close:focus-visible,
+  .work-project-gallery__float-button:focus-visible {
+    outline: 2px solid Highlight;
+  }
 }
 
 @keyframes float-thumb-in {

@@ -4,7 +4,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
-  align-items: baseline;
+  /* Was `baseline`: a 24px-tall button aligned on its text baseline overflows
+     the flex line, so the row's box ended a pixel above the buttons and the
+     masonry grid below claimed that pixel. Centring makes the row exactly as
+     tall as its tallest item. */
+  align-items: center;
   justify-content: flex-end;
   font-size: clamp(0.62rem, 0.54vw, 0.72rem);
   line-height: 1;
@@ -18,25 +22,47 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
-  align-items: baseline;
+  align-items: center;
 }
 
 .work-filters__separator {
-  color: var(--color-muted);
+  color: var(--color-muted-text);
   user-select: none;
 }
 
 .work-filters__button {
+  position: relative;
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  justify-content: center;
   border: 0;
   background: transparent;
   color: var(--color-ink);
   cursor: pointer;
   font-size: inherit;
   line-height: inherit;
-  padding: 0.15rem 0.05rem;
+  /* Height is real box height, not an overlay: the masonry grid below is a
+     later sibling and paints over anything this row spills into, so an
+     overlay would hand back most of the target (WCAG 2.5.8). The parent
+     aligns on baseline, so the padding does not move the text. */
+  padding: 0.3rem 0.05rem;
   transition:
     color 160ms ease,
     opacity 160ms ease;
+}
+
+/* "All" is only ~15px wide. Widening sideways is safe — the only neighbours
+   are the non-interactive `/` separators, with gaps to spare. */
+.work-filters__button::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100%;
+  min-width: 24px;
+  content: "";
+  transform: translateX(-50%);
 }
 
 .work-filters__button:focus-visible {

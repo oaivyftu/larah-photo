@@ -29,7 +29,7 @@
 }
 
 .input__required {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .input__value {
@@ -59,12 +59,12 @@
 /* Resting state: the value slot reads as placeholder copy until it holds
    something. Covers `select` and `date`, which have no `::placeholder`. */
 .input:not([data-filled]) .input__field {
-  color: var(--color-muted);
+  color: var(--color-muted-text);
   font-weight: 500;
 }
 
 .input__field::placeholder {
-  color: var(--color-muted);
+  color: var(--color-muted-text);
   font-weight: 500;
   opacity: 1;
 }
@@ -90,7 +90,7 @@
 
 .input__error {
   min-height: 0.9375rem;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-size: var(--font-size-xs);
   font-weight: 400;
   letter-spacing: 0;
@@ -106,11 +106,20 @@
 }
 
 .input[data-invalid] .input__field {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .input__control:focus-within {
   border-bottom-color: var(--color-ink);
+}
+
+/* The field suppresses its own outline, leaving a 1px border colour change as
+   the only focus signal — too weak to find, and invisible to anyone who cannot
+   tell #8e8e93 from #111. The ring is drawn on the wrapper so it frames the
+   label and field together rather than the bare input box. */
+.input__control:has(.input__field:focus-visible) {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 0.35rem;
 }
 
 @include media-max("phone-sm") {

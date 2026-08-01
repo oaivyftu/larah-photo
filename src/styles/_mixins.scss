@@ -42,3 +42,18 @@
     @content;
   }
 }
+
+// Removed from the visual layout but kept in the accessibility tree — for
+// screen-reader-only labels and live regions. `display: none` would drop the
+// node entirely and silence any live region inside it.
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
