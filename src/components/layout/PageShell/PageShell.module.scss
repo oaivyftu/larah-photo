@@ -2,6 +2,8 @@
   min-height: 100svh;
   color: var(--color-ink);
   background: var(--color-paper);
+  display: flex;
+  flex-direction: column;
 }
 
 .page-shell__main {
@@ -18,4 +20,8 @@
 .page-shell__main--service,
 .page-shell__main--contact {
   display: block;
+}
+
+.page-shell__main--contact {
+  flex-grow: 1;
 }

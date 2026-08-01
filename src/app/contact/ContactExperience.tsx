@@ -3,23 +3,36 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { InquiryForm } from "@/components/contact/InquiryForm/InquiryForm";
 import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
-import type { ContactPageContent } from "@/types/site";
+import type { ContactPageContent, SiteSettings } from "@/types/site";
 import styles from "./contact.module.scss";
 
 gsap.registerPlugin(useGSAP);
 
 type ContactExperienceProps = {
+  contactDetails: Pick<SiteSettings, "email" | "instagramUrl" | "phone">;
   content: ContactPageContent;
-  sessionTypes: string[];
 };
 
+function getInstagramLabel(instagramUrl: string) {
+  try {
+    const [username] = new URL(instagramUrl).pathname
+      .split("/")
+      .filter(Boolean);
+
+    return username ? `@${username}` : "Instagram";
+  } catch {
+    return "Instagram";
+  }
+}
+
 export function ContactExperience({
+  contactDetails,
   content,
-  sessionTypes,
 }: ContactExperienceProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const instagramLabel = getInstagramLabel(contactDetails.instagramUrl);
+  const phoneHref = contactDetails.phone.replace(/[^\d+]/g, "");
 
   useGSAP(
     () => {
@@ -35,7 +48,7 @@ export function ContactExperience({
           ease: "power4.out",
         })
         .from(
-          "[data-contact-statement], [data-contact-form]",
+          "[data-contact-direct]",
           {
             y: 34,
             opacity: 0,
@@ -67,13 +80,46 @@ export function ContactExperience({
       <section className={styles["contact__layout"]} aria-labelledby="contact-title">
         <div className={styles["contact__copy"]}>
           <PageHeading id="contact-title" words={content.titleWords} />
-          <p className={styles["contact__statement"]} data-contact-statement>
-            {content.formCopy}
-          </p>
         </div>
-        <div className={styles["contact__form"]} data-contact-form id="book">
-          <InquiryForm sessionTypes={sessionTypes} />
-        </div>
+        <section
+          className={styles["contact__direct"]}
+          data-contact-direct
+          aria-label="Direct contact"
+        >
+          <address className={styles["contact__details"]}>
+            <div className={styles["contact__detail"]}>
+              <span className={styles["contact__detail-label"]}>Email</span>
+              <a
+                className={styles["contact__detail-value"]}
+                href={`mailto:${contactDetails.email}`}
+              >
+                {contactDetails.email}
+              </a>
+            </div>
+            <div className={styles["contact__detail"]}>
+              <span className={styles["contact__detail-label"]}>Phone</span>
+              <a
+                className={styles["contact__detail-value"]}
+                href={`tel:${phoneHref}`}
+              >
+                {contactDetails.phone}
+              </a>
+            </div>
+            <div className={styles["contact__detail"]}>
+              <span className={styles["contact__detail-label"]}>
+                Instagram
+              </span>
+              <a
+                className={styles["contact__detail-value"]}
+                href={contactDetails.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {instagramLabel}
+              </a>
+            </div>
+          </address>
+        </section>
       </section>
     </div>
   );
