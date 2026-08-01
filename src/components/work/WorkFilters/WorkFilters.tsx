@@ -16,7 +16,9 @@ export function WorkFilters({
   onFilterChange,
 }: WorkFiltersProps) {
   return (
-    <div className={styles["work-filters"]} aria-label="Work filters">
+    // `aria-label` on a plain <div> is dropped: a generic role takes no
+    // accessible name. `group` gives it one to hang off.
+    <div aria-label="Work filters" className={styles["work-filters"]} role="group">
       <span className={styles["work-filters__label"]}>Filters:</span>
       <div className={styles["work-filters__list"]}>
         {filters.map((filter, index) => {

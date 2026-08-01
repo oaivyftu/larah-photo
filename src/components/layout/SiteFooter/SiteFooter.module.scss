@@ -68,6 +68,17 @@
   display: inline-flex;
   min-height: 24px;
   align-items: center;
+  /* `a { text-decoration: none }` is set globally, which left "INSTAGRAM" and
+     "WORK" looking identical to the plain "Larah Photo©2026" beside them —
+     nothing but position marked them as links (WCAG 1.4.1). */
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.site-footer__bar a:focus-visible,
+.site-footer__contact a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 0.25rem;
 }
 
 .site-footer__back-to-top {

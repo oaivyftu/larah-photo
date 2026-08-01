@@ -672,6 +672,11 @@ export function WorkProjectGalleryClient({
   ]);
 
   return (
+    // Click-outside-to-dismiss and the pointer handlers that wake the controls
+    // are mouse affordances layered on top of keyboard paths that already
+    // exist (Escape closes, arrows page, the panel traps Tab) — there is no
+    // keyboard-only user stranded here for the rule to protect.
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <section
       aria-labelledby={`work-gallery-title-${project.slug}`}
       className={`${styles["work-project-gallery"]} ${
@@ -680,7 +685,18 @@ export function WorkProjectGalleryClient({
           : styles["work-project-gallery--page"]
       }`}
       onKeyDown={revealControls}
-      onClick={isModal ? handleClose : undefined}
+      // Only a press that both starts and ends on the backdrop dismisses, so
+      // the panel no longer needs a `stopPropagation` click handler of its own
+      // — one that existed solely to cancel this one.
+      onClick={
+        isModal
+          ? (event) => {
+              if (event.target === event.currentTarget) {
+                handleClose();
+              }
+            }
+          : undefined
+      }
       onPointerDown={revealControls}
     >
       <div
@@ -689,7 +705,6 @@ export function WorkProjectGalleryClient({
         }
         aria-modal={isModal ? true : undefined}
         className={styles["work-project-gallery__panel"]}
-        onClick={isModal ? (event) => event.stopPropagation() : undefined}
         ref={panelRef}
         role={isModal ? "dialog" : undefined}
         tabIndex={isModal ? -1 : undefined}
@@ -701,9 +716,17 @@ export function WorkProjectGalleryClient({
           {project.title} gallery
         </h2>
 
+        {/* Click-to-close and the pointer handlers driving the custom cursor
+            label are mouse-only decoration; Escape is the keyboard path. */}
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
         <div
           aria-label={`${project.title} image gallery`}
+          // Flickity puts `tabindex="0"` on this element, so it takes focus —
+          // but as a generic <div> it carried no role and its `aria-label` was
+          // ignored, landing the user on an unnamed stop.
+          aria-roledescription="carousel"
           className={styles["work-project-gallery__carousel"]}
+          role="region"
           onClick={handleCarouselClick}
           onDragStart={(event) => event.preventDefault()}
           onPointerEnter={(event) => {

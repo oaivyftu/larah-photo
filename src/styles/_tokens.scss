@@ -6,6 +6,11 @@
   --color-ink-soft: #1f1f1f;
   --color-muted: #8e8e93;
   --color-accent: #ff383c;
+  /* Text-safe siblings of the two colours above. The originals clear the 3:1
+     required of borders and other non-text UI, but land at 3.26 and 3.57 on
+     paper — under the 4.5:1 body text needs. Same hue, scaled toward black. */
+  --color-muted-text: #76767a;
+  --color-accent-text: #df3134;
   --color-line: #111111;
   --color-line-soft: #d8d8d8;
   --color-divider: #505050;

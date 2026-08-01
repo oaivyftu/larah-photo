@@ -31,13 +31,27 @@
   transform: translateY(0);
 }
 
+/* The skip link's only backdrop is its background colour, which forced-colours
+   modes discard — without a border it would read as text over the page. */
+@media (forced-colors: active) {
+  .page-shell__skip {
+    border: 1px solid ButtonBorder;
+  }
+
+  .page-shell__skip:focus {
+    outline: 2px solid Highlight;
+  }
+}
+
 .page-shell__main {
   min-height: 55vh;
   overflow: clip;
 }
 
-/* The main region only takes focus programmatically, so its ring would read as
-   a stray outline on an entire page section. */
+/* These only take focus programmatically — as the skip-link, route-announcer
+   and "back to top" targets — so a ring around a whole page section would read
+   as a stray outline. */
+.page-shell:focus,
 .page-shell__main:focus {
   outline: none;
 }

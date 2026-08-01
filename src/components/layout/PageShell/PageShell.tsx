@@ -21,7 +21,15 @@ export async function PageShell({ children, variant }: PageShellProps) {
   const settings = await getSiteSettings();
 
   return (
-    <div className={styles["page-shell"]} data-page-shell id="top">
+    // `tabIndex={-1}`: the footer's "back to top" link targets this element,
+    // and without it the browser scrolls but leaves focus stranded at the
+    // bottom of the page.
+    <div
+      className={styles["page-shell"]}
+      data-page-shell
+      id="top"
+      tabIndex={-1}
+    >
       <a className={styles["page-shell__skip"]} href="#main-content">
         Skip to content
       </a>

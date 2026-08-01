@@ -27,6 +27,7 @@ export function WorkGalleryClient({
 }: WorkGalleryClientProps) {
   const rootRef = useRef<HTMLElement>(null);
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
+  const [filterAnnouncement, setFilterAnnouncement] = useState("");
   const filters = useMemo(() => {
     const categories = Array.from(new Set(projects.map((project) => project.category)));
 
@@ -38,6 +39,24 @@ export function WorkGalleryClient({
       })),
     ];
   }, [projects]);
+
+  // Filtering rearranges the grid silently — Isotope just hides cards, so a
+  // screen reader user gets no confirmation that anything happened, nor how
+  // much is left. Announced on the interaction rather than from an effect, so
+  // the initial render stays quiet.
+  function handleFilterChange(filter: string) {
+    setActiveFilter(filter);
+
+    const matches =
+      filter === ALL_FILTER
+        ? projects
+        : projects.filter((project) => project.category === filter);
+    const label = filters.find((entry) => entry.value === filter)?.label ?? filter;
+
+    setFilterAnnouncement(
+      `${label}: ${matches.length} ${matches.length === 1 ? "project" : "projects"}`,
+    );
+  }
 
   useGSAP(
     () => {
@@ -92,9 +111,18 @@ export function WorkGalleryClient({
         <WorkFilters
           activeFilter={activeFilter}
           filters={filters}
-          onFilterChange={setActiveFilter}
+          onFilterChange={handleFilterChange}
         />
       </div>
+
+      <p
+        aria-atomic="true"
+        aria-live="polite"
+        className={styles["work-page__announcer"]}
+        role="status"
+      >
+        {filterAnnouncement}
+      </p>
 
       <WorkMasonryGrid
         activeFilter={activeFilter}

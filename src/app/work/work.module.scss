@@ -30,6 +30,11 @@
   margin: clamp(-3.2rem, -2.7vw, -2.1rem) auto clamp(1.55rem, 2.1vw, 2.2rem);
 }
 
+/* Announces the result count after a filter change. */
+.work-page__announcer {
+  @include visually-hidden;
+}
+
 .work-page__grid {
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;

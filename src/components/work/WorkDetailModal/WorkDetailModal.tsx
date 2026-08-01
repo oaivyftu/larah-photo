@@ -154,6 +154,11 @@ export function WorkDetailModal({
     // so that the close button — which is `position: fixed` and therefore
     // cannot be nested in the sheet without inheriting its slide animation —
     // still counts as part of the dialog.
+    //
+    // The rule reads `dialog` as non-interactive, but the handlers below are
+    // exactly what a dialog owes its keyboard users: Escape to dismiss and a
+    // Tab trap. Removing them is what would break accessibility.
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       aria-labelledby={titleId}
       // The lightbox stacks its own `aria-modal` dialog on top. Two nested
