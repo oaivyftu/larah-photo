@@ -224,37 +224,27 @@
   }
 }
 
+// Below the collage breakpoint the homepage adopts the work index layout: the
+// column spans are dropped so every card is exactly one column wide. The
+// `--homepage .work-layout__item` selector outranks the single-class span
+// widths, so no span override list is needed.
 @include media-max(1180px) {
   .work-layout--homepage {
-    --work-columns: 2;
+    --work-columns: 3;
+    --work-gap-x: clamp(0.35rem, 0.9vw, 0.9rem);
+    --work-gap-y: clamp(2rem, 3.4vw, 3.75rem);
   }
 
-  .work-layout--homepage .work-layout__item--span-1,
-  .work-layout--homepage .work-layout__item--span-2,
-  .work-layout--homepage .work-layout__item--span-3,
-  .work-layout--homepage .work-layout__item--span-4,
-  .work-layout--homepage .work-layout__item--span-5,
-  .work-layout--homepage .work-layout__item--span-6 {
-    width: calc((100% - var(--work-gap-x)) / 2);
-  }
-
-  .work-layout--homepage .work-layout__item--span-7,
-  .work-layout--homepage .work-layout__item--span-8,
-  .work-layout--homepage .work-layout__item--span-9,
-  .work-layout--homepage .work-layout__item--span-10,
-  .work-layout--homepage .work-layout__item--span-11,
-  .work-layout--homepage .work-layout__item--span-12,
-  .work-layout--homepage .work-layout__item--span-full {
-    width: 100%;
+  .work-layout--homepage .work-layout__item {
+    width: calc(
+      (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+        var(--work-columns)
+    );
   }
 
   .work-layout--homepage .work-layout__skeleton {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .work-layout--homepage
-    .work-layout__skeleton-column:nth-child(3) {
-    display: none;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--work-gap-x);
   }
 }
 
@@ -274,33 +264,18 @@
 
 // Phones keep the staggered grid rather than stacking — the cards just shrink.
 @include media-max(767px) {
-  .work-layout--work {
+  .work-layout--work,
+  .work-layout--homepage {
     --work-columns: 2;
   }
 
-  .work-layout--work .work-layout__skeleton {
+  .work-layout--work .work-layout__skeleton,
+  .work-layout--homepage .work-layout__skeleton {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .work-layout--work .work-layout__skeleton-column:nth-child(3) {
-    display: none;
-  }
-}
-
-@include media-max(720px) {
-  .work-layout--homepage {
-    --work-columns: 1;
-  }
-
-  .work-layout--homepage .work-layout__item {
-    width: 100%;
-  }
-
-  .work-layout--homepage .work-layout__skeleton {
-    grid-template-columns: 1fr;
-  }
-
-  .work-layout--homepage .work-layout__skeleton-column:nth-child(2) {
+  .work-layout--work .work-layout__skeleton-column:nth-child(3),
+  .work-layout--homepage .work-layout__skeleton-column:nth-child(3) {
     display: none;
   }
 }

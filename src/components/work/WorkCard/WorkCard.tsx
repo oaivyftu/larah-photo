@@ -36,7 +36,7 @@ export function WorkCard({
           height={project.height}
           sizes={
             variant === "homepage"
-              ? "(max-width: 720px) calc(100vw - 48px), (max-width: 1100px) 45vw, 42vw"
+              ? "(max-width: 767px) 47vw, (max-width: 1180px) 31vw, 42vw"
               : "(max-width: 767px) 47vw, (max-width: 1023px) 31vw, 23vw"
           }
         />
