@@ -44,7 +44,6 @@ type SanityHomePage = {
   heroTagline?: string;
   heroPortraitImage?: SanityImageValue;
   heroImage?: SanityImageValue;
-  heroBrandmark?: string;
   heroCtaLabel?: string;
   heroCtaHref?: string;
   manifestoWords?: string[];
@@ -263,7 +262,6 @@ export async function getHomePage(): Promise<HomePageContent> {
       "homePage.heroPortraitImage",
     ),
     heroImage: resolveSanityImage(page.heroImage, "homePage.heroImage"),
-    heroBrandmark: requireString(page.heroBrandmark, "homePage.heroBrandmark"),
     heroCtaLabel: requireString(page.heroCtaLabel, "homePage.heroCtaLabel"),
     heroCtaHref: requireString(page.heroCtaHref, "homePage.heroCtaHref"),
     manifestoWords: [

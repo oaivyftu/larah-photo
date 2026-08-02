@@ -37,7 +37,6 @@ export const homePageQuery = `*[_type == "homePage"][0]{
   heroTagline,
   heroPortraitImage{${imageFields}},
   heroImage{${imageFields}},
-  heroBrandmark,
   heroCtaLabel,
   heroCtaHref,
   manifestoWords,
