@@ -61,7 +61,7 @@
 }
 
 /* `difference` against the paper prints near-black, and inverts wherever the
-   type crosses a photograph — the same trick the design uses on the brandmark. */
+   type crosses a photograph. */
 .hero__tagline {
   min-width: 0;
   color: var(--color-paper-warm);
@@ -98,36 +98,14 @@
   justify-self: end;
 }
 
-/* Wraps the media alone, so the brandmark's percentage offsets resolve against
-   the photo rather than the photo plus the link beneath it. */
+/* Wraps the media alone, keeping the photo its own positioning context
+   separate from the link beneath it. */
 .hero__feature-frame {
   position: relative;
 }
 
 .hero__feature-media {
   aspect-ratio: 3 / 2;
-}
-
-.hero__brandmark {
-  position: absolute;
-  top: 41.62%;
-  left: 0.76%;
-  color: var(--color-paper-warm);
-  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 0.95;
-  text-align: center;
-  text-transform: uppercase;
-  white-space: nowrap;
-  mix-blend-mode: difference;
-  /* GSAP owns `transform` on the inner span (and clears `translate` when it
-     does), so the centring lives one level up where nothing overwrites it. */
-  transform: translateX(-50%);
-}
-
-.hero__brandmark span {
-  display: inline-block;
 }
 
 .hero__cta {
@@ -350,14 +328,6 @@
 
   .hero__feature {
     width: 100%;
-  }
-
-  /* Once the photo runs the full width there is no paper left of it for the
-     brandmark to hang over, so it tucks inside the frame instead. */
-  .hero__brandmark {
-    left: var(--space-md);
-    text-align: left;
-    transform: none;
   }
 
   .stack {
