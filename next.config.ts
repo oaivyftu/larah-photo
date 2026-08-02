@@ -23,6 +23,14 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/avif", "image/webp"],
+    // Photographs are replaced by re-uploading in Sanity, which mints a new
+    // asset URL, so an optimised variant is never stale. The default 4h TTL
+    // just makes the optimiser redo work it already did.
+    minimumCacheTTL: 31_536_000,
+    // Allowlist, not a preference: an unlisted `quality` is rejected, which
+    // stops the optimiser being driven through arbitrary variants. No caller
+    // overrides `quality`, so the single default is all that is reachable.
+    qualities: [75],
     remotePatterns: [
       {
         protocol: "https",
