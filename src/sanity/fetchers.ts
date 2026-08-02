@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { normalizeWorkCategory } from "@/utils/formatWorkCategory";
 import type { NavigationItem } from "@/types/navigation";
 import type { Project, ProjectImage, WorkPlacement } from "@/types/project";
@@ -6,6 +7,7 @@ import type {
   AboutPageContent,
   ContactPageContent,
   HomePageContent,
+  PostalAddress,
   ServicePageContent,
   SiteSettings,
   WorkPageContent,
@@ -17,6 +19,8 @@ import {
   aboutPageQuery,
   contactPageQuery,
   homePageQuery,
+  projectBySlugQuery,
+  projectSlugsQuery,
   projectsQuery,
   servicePageQuery,
   servicesQuery,
@@ -30,6 +34,8 @@ type SanitySiteSettings = {
   email?: string;
   phone?: string;
   location?: string;
+  priceCurrency?: string;
+  postalAddress?: PostalAddress;
   footerStatement?: string;
   navigationItems?: NavigationItem[];
 };
@@ -94,7 +100,39 @@ type SanityProject = {
   images?: SanityImageValue[];
 };
 
-async function fetchSanity<T>(query: string, label: string): Promise<T> {
+/** Shared by the fetchers and the `/api/revalidate` webhook that busts them. */
+export const SANITY_CACHE_TAG = "sanity";
+
+/** Upper bound on how stale a page can be if the webhook never fires. */
+const SANITY_REVALIDATE_SECONDS = 3600;
+
+/**
+ * Memoised for the lifetime of a single render pass. Without it every route
+ * pays for `getSiteSettings` twice — once in `PageShell`, once in the page —
+ * and the home page runs `projectsQuery` twice over. `cache` compares
+ * arguments with `Object.is`, so the params travel as a JSON string: a fresh
+ * object literal per call would never hit.
+ */
+const fetchSanityCached = cache(
+  async (query: string, paramsJson: string): Promise<unknown> =>
+    sanityClient.fetch(query, JSON.parse(paramsJson), {
+      // Without a cache directive Next treats the request as `no-store`, which
+      // makes every route dynamic and re-queries Sanity on each crawl. These
+      // pages change a few times a month, so they are prerendered and
+      // refreshed hourly instead.
+      //
+      // One coarse tag rather than per-document ones: the site is small enough
+      // that busting it wholesale is cheaper than tracking which page embeds
+      // which document, and `siteSettings` alone appears on all of them.
+      next: { revalidate: SANITY_REVALIDATE_SECONDS, tags: [SANITY_CACHE_TAG] },
+    }),
+);
+
+async function fetchSanity<T>(
+  query: string,
+  label: string,
+  params: Record<string, unknown> = {},
+): Promise<T> {
   if (!isSanityConfigured) {
     throw new Error(
       `Sanity is required to load ${label}. Configure NEXT_PUBLIC_SANITY_PROJECT_ID and NEXT_PUBLIC_SANITY_DATASET.`,
@@ -102,7 +140,7 @@ async function fetchSanity<T>(query: string, label: string): Promise<T> {
   }
 
   try {
-    return await sanityClient.fetch<T>(query);
+    return (await fetchSanityCached(query, JSON.stringify(params))) as T;
   } catch (error) {
     throw new Error(`Unable to load ${label} from Sanity.`, { cause: error });
   }
@@ -179,6 +217,12 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     email: requireString(settings.email, "siteSettings.email"),
     phone: requireString(settings.phone, "siteSettings.phone"),
     location: requireString(settings.location, "siteSettings.location"),
+    // Not `requireString`: the field is new, so existing documents have no
+    // value and a hard failure would take the whole site down until an editor
+    // opened the Studio. The studio is in Ontario, so CAD is the safe read of
+    // the bare "$" the price UI renders.
+    priceCurrency: settings.priceCurrency?.trim() || "CAD",
+    postalAddress: settings.postalAddress,
     footerStatement: requireString(
       settings.footerStatement,
       "siteSettings.footerStatement",
@@ -356,7 +400,36 @@ export async function getWorkProjects(): Promise<Project[]> {
     "work projects",
   );
 
-  return projects.map(mapSanityProject);
+  return projects.map((project, index) =>
+    mapSanityProject(project, `workProject[${index}]`),
+  );
+}
+
+/**
+ * Returns `null` for an unknown slug so callers can decide: the page renders
+ * `notFound()`, while `generateMetadata` needs to return early without
+ * throwing.
+ */
+export async function getWorkProjectBySlug(
+  slug: string,
+): Promise<Project | null> {
+  const project = await fetchSanity<SanityProject | null>(
+    projectBySlugQuery,
+    `the "${slug}" work project`,
+    { slug },
+  );
+
+  return project ? mapSanityProject(project, `workProject("${slug}")`) : null;
+}
+
+/** Slugs alone, for `generateStaticParams` and the sitemap. */
+export async function getWorkProjectSlugs(): Promise<string[]> {
+  const slugs = await fetchSanity<(string | null)[]>(
+    projectSlugsQuery,
+    "work project slugs",
+  );
+
+  return slugs.filter((slug): slug is string => Boolean(slug?.trim()));
 }
 
 export async function getFeaturedWorkProjects(): Promise<Project[]> {
@@ -391,8 +464,12 @@ function parseSpan(value: string | undefined): WorkPlacement["homepageSpan"] {
     : undefined;
 }
 
-function mapSanityProject(project: SanityProject, index: number): Project {
-  const fieldPrefix = `workProject[${index}]`;
+/** `fieldPrefix` only shapes validation error messages, so single-document
+ *  callers can name the document instead of faking a list position. */
+function mapSanityProject(
+  project: SanityProject,
+  fieldPrefix: string,
+): Project {
   const slug = requireString(getSlug(project.slug), `${fieldPrefix}.slug`);
   const cardImage = resolveSanityImage(
     project.cardImage,

@@ -1,6 +1,8 @@
 import { SiteFooter } from "@/components/layout/SiteFooter/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader/SiteHeader";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getSiteSettings } from "@/sanity/fetchers";
+import { buildBusinessSchema } from "@/utils/structuredData";
 import styles from "./PageShell.module.scss";
 
 type PageShellProps = {
@@ -30,6 +32,10 @@ export async function PageShell({ children, variant }: PageShellProps) {
       id="top"
       tabIndex={-1}
     >
+      {/* Every route renders through this shell, so the studio's identity is
+          declared once here and referenced by `@id` from the page-specific
+          graphs rather than repeated in each of them. */}
+      <JsonLd data={buildBusinessSchema(settings)} />
       <a className={styles["page-shell__skip"]} href="#main-content">
         Skip to content
       </a>

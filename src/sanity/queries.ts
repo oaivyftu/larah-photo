@@ -18,6 +18,14 @@ export const siteSettingsQuery = `*[_type == "siteSettings"][0]{
   email,
   phone,
   location,
+  priceCurrency,
+  postalAddress{
+    streetAddress,
+    locality,
+    region,
+    postalCode,
+    country
+  },
   footerStatement,
   navigationItems[]{
     label,
@@ -69,7 +77,7 @@ export const servicesQuery = `*[_type == "servicePackage"] | order(index asc, ti
   ctaHref
 }`;
 
-export const projectsQuery = `*[_type == "workProject"] | order(featuredOrder asc, title asc){
+const projectFields = `
   _id,
   slug,
   title,
@@ -86,4 +94,16 @@ export const projectsQuery = `*[_type == "workProject"] | order(featuredOrder as
   images[]{
     ${imageFields}
   }
-}`;
+`;
+
+export const projectsQuery = `*[_type == "workProject"] | order(featuredOrder asc, title asc){${projectFields}}`;
+
+/**
+ * `/work/[slug]` renders one project, so it fetches one project — pulling the
+ * whole gallery down to `.find()` in memory made every detail page pay for
+ * every other project's image metadata.
+ */
+export const projectBySlugQuery = `*[_type == "workProject" && slug.current == $slug][0]{${projectFields}}`;
+
+/** Slugs only — all `generateStaticParams` and the sitemap actually need. */
+export const projectSlugsQuery = `*[_type == "workProject" && defined(slug.current)].slug.current`;
