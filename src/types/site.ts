@@ -15,7 +15,6 @@ export type HomePageContent = {
   heroTagline: string;
   heroPortraitImage: ProjectImage;
   heroImage: ProjectImage;
-  heroBrandmark: string;
   heroCtaLabel: string;
   heroCtaHref: string;
   manifestoWords: [string, string, string];

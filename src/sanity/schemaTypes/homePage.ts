@@ -17,14 +17,6 @@ export const homePage = defineType({
     imageField("heroPortraitImage", "Hero portrait image (3:4)"),
     imageField("heroImage", "Hero feature image (3:2)"),
     defineField({
-      name: "heroBrandmark",
-      title: "Hero brandmark",
-      description:
-        "Word laid across the left edge of the hero feature image. Rendered uppercase.",
-      type: "string",
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
       name: "heroCtaLabel",
       title: "Hero link label",
       type: "string",
