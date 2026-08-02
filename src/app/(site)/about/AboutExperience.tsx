@@ -47,17 +47,7 @@ export function AboutExperience({ content }: AboutExperienceProps) {
             },
             "-=0.42",
           )
-          .from(
-            "[data-about-logo-motion]",
-            {
-              x: -34,
-              opacity: 0,
-              duration: 0.66,
-              ease: "power3.out",
-            },
-            "-=0.48",
-          )
-          .set("[data-about-media-visual], [data-about-logo-motion]", {
+          .set("[data-about-media-visual]", {
             clearProps: "transform,opacity",
           });
 
@@ -104,9 +94,6 @@ export function AboutExperience({ content }: AboutExperienceProps) {
               sizes="(max-width: 900px) calc(100vw - 48px), 42vw"
             />
           </div>
-          <figcaption data-about-logo>
-            <span data-about-logo-motion>LARAH</span>
-          </figcaption>
         </figure>
       </section>
     </div>

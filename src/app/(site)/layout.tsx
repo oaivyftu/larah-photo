@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+// Root layout for the public site only. `/studio` has its own root layout so
+// that the reset below — which styles bare `html`, `body`, `*`, `a`, `svg` —
+// never reaches Sanity Studio, whose own theme leaves those selectors alone.
 import "./globals.scss";
 import { Montserrat } from 'next/font/google'
 import { PageTransition } from "@/components/layout/PageTransition/PageTransition";

@@ -213,9 +213,6 @@ export function HomeExperience({
                 sizes="(max-width: 900px) 92vw, 41vw"
               />
             </div>
-            <span className={styles["hero__brandmark"]} aria-hidden="true">
-              <span data-hero-meta>{content.heroBrandmark}</span>
-            </span>
           </div>
 
           {/* The reveal drives the wrapper, not the button: `.button` carries a
