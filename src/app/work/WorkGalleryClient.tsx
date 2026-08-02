@@ -105,14 +105,14 @@ export function WorkGalleryClient({
     <section className={styles["work-page"]} ref={rootRef} aria-labelledby="work-title">
       <div className={styles["work-page__hero"]}>
         <PageHeading id="work-title" words={content.titleWords} />
-      </div>
 
-      <div className={styles["work-page__toolbar"]} data-work-filter>
-        <WorkFilters
-          activeFilter={activeFilter}
-          filters={filters}
-          onFilterChange={handleFilterChange}
-        />
+        <div className={styles["work-page__toolbar"]} data-work-filter>
+          <WorkFilters
+            activeFilter={activeFilter}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+          />
+        </div>
       </div>
 
       <p
