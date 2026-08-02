@@ -22,23 +22,27 @@ export function SiteHeader({
 }: SiteHeaderProps) {
   return (
     <header className={styles["site-header"]}>
-      {hideBrand ? (
-        <span
-          className={`${styles["site-header__brand"]} ${styles["site-header__brand--hidden"]}`}
-          aria-hidden="true"
+      {/* Always the real link, even where the home hero makes it redundant:
+          the stylesheet decides at which widths it shows, and `visibility`
+          keeps a hidden brand out of the tab order and the a11y tree. */}
+      <Link
+        className={[
+          styles["site-header__brand"],
+          hideBrand ? styles["site-header__brand--hidden"] : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        href="/"
+      >
+        <Image
+          className={styles["site-header__logo"]}
+          src="/logos/logo-larah.svg"
+          alt={siteName}
+          width={96}
+          height={32}
+          loading="eager"
         />
-      ) : (
-        <Link className={styles["site-header__brand"]} href="/">
-          <Image
-            className={styles["site-header__logo"]}
-            src="/logos/logo-larah.svg"
-            alt={siteName}
-            width={96}
-            height={32}
-            loading="eager"
-          />
-        </Link>
-      )}
+      </Link>
       <MainNav activeHref={activeHref} items={navigationItems} />
       <Button
         className={styles["site-header__cta"]}

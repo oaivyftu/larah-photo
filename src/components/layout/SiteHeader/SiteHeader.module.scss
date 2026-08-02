@@ -29,6 +29,10 @@
   object-fit: contain;
 }
 
+/* The home hero carries the full-size logo mark, so the header holds its own
+   back there — but only while the header sits in its wide layout. Once it
+   stacks, the hero mark has scrolled out of the header's row and the brand is
+   needed as the anchor it is on every other route. */
 .site-header__brand--hidden {
   visibility: hidden;
 }
@@ -51,6 +55,10 @@
     padding: 1rem var(--page-gutter);
   }
 
+  .site-header__brand--hidden {
+    visibility: visible;
+  }
+
   .site-header__cta {
     padding: 0.5rem 0.625rem;
     font-size: var(--font-size-xs);
@@ -66,9 +74,5 @@
   .site-header__brand {
     width: 4.75rem;
     height: 1.6rem;
-  }
-
-  .site-header__brand--hidden {
-    display: none;
   }
 }
