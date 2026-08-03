@@ -35,6 +35,30 @@ const FOCUSABLE_SELECTOR = [
   "textarea:not([disabled])",
   '[tabindex]:not([tabindex="-1"])',
 ].join(",");
+// How many slides either side of the current one get a real <img>.
+//
+// Withholding it in React is the only lever available. Flickity's own
+// `lazyLoad` option cannot help: it merely assigns `src` to images deliberately
+// rendered without one, and `next/image` always emits a real src/srcset. Nor
+// does the browser's native lazy loading, because fade mode stacks every cell
+// at the same coordinates — all of them read as on-screen, so opening the
+// lightbox used to fetch the whole album at once.
+const PRELOAD_RADIUS = 1;
+
+function collectWindowIndexes(center: number, total: number) {
+  const indexes = new Set<number>();
+
+  if (total <= 0) {
+    return indexes;
+  }
+
+  for (let offset = -PRELOAD_RADIUS; offset <= PRELOAD_RADIUS; offset += 1) {
+    // `wrapAround` means the window wraps too.
+    indexes.add((((center + offset) % total) + total) % total);
+  }
+
+  return indexes;
+}
 
 type WorkProjectGalleryClientProps = {
   images: ProjectImage[];
@@ -47,11 +71,13 @@ type WorkProjectGalleryClientProps = {
 const GallerySlide = memo(function GallerySlide({
   image,
   index,
+  shouldLoad,
   slideId,
   total,
 }: {
   image: ProjectImage;
   index: number;
+  shouldLoad: boolean;
   slideId: string;
   total: number;
 }) {
@@ -65,20 +91,36 @@ const GallerySlide = memo(function GallerySlide({
       }`}
       id={slideId}
     >
-      <LarahImage
-        alt={image.alt}
-        blurDataURL={image.blurDataURL}
-        className={styles["work-project-gallery__image"]}
-        draggable={false}
-        height={image.height}
-        sizes="(max-width: 760px) 86vw, 74vw"
-        src={image.src}
-        width={image.width}
-        style={{
-          objectFit: "contain",
-          objectPosition: "center",
-        }}
-      />
+      {shouldLoad ? (
+        <LarahImage
+          alt={image.alt}
+          blurDataURL={image.blurDataURL}
+          className={styles["work-project-gallery__image"]}
+          draggable={false}
+          height={image.height}
+          sizes="(max-width: 760px) 86vw, 74vw"
+          src={image.src}
+          width={image.width}
+          style={{
+            objectFit: "contain",
+            objectPosition: "center",
+          }}
+        />
+      ) : (
+        // The window is over the <img>, not the cell: Flickity keeps every slide
+        // mounted so `selectedIndex`, `wrapAround` and the fade interpolation all
+        // stay correct. The LQIP is a data URI, so this fills the same box for
+        // free. The figure's own `aria-label` already names the slide.
+        <div
+          aria-hidden="true"
+          className={styles["work-project-gallery__image-placeholder"]}
+          style={
+            image.blurDataURL
+              ? { backgroundImage: `url(${image.blurDataURL})` }
+              : undefined
+          }
+        />
+      )}
     </figure>
   );
 });
@@ -272,7 +314,14 @@ export function WorkProjectGalleryClient({
   const controlsHoveredRef = useRef(false);
   const canAutoHideControlsRef = useRef(false);
   const lastPointerPositionRef = useRef<{ x: number; y: number } | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  // Seeded with `initialIndex`, not 0: Flickity only reports the real index once
+  // its dynamic import resolves, and until then this drives which slide gets an
+  // <img> — starting at 0 would fetch the wrong photo and leave the one the user
+  // actually clicked waiting on the bundle.
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [loadedIndexes, setLoadedIndexes] = useState(() =>
+    collectWindowIndexes(initialIndex, images.length),
+  );
   const [areControlsVisible, setAreControlsVisible] = useState(true);
   const {
     hidePointerLabel: hideCloseHint,
@@ -450,6 +499,26 @@ export function WorkProjectGalleryClient({
     };
   }, [isModal, revealControls]);
 
+  // Driven from Flickity's own `change` event rather than an effect watching
+  // `currentIndex`, so the window moves in the same tick as the slide.
+  const selectIndex = useCallback(
+    (index: number) => {
+      setCurrentIndex(index);
+      // The set only ever grows: once a photo has been fetched, dropping it out
+      // of the window would just make paging back re-decode it for nothing.
+      setLoadedIndexes((previous) => {
+        const next = new Set(previous);
+
+        for (const windowIndex of collectWindowIndexes(index, images.length)) {
+          next.add(windowIndex);
+        }
+
+        return next.size === previous.size ? previous : next;
+      });
+    },
+    [images.length],
+  );
+
   const slideIds = useMemo(
     () =>
       images.map(
@@ -491,16 +560,15 @@ export function WorkProjectGalleryClient({
         prevNextButtons: false,
         setGallerySize: false,
         freeScroll: true,
-        lazyLoad: true,
         wrapAround: true,
         fade: true,
       } satisfies Flickity.Options & { fade: boolean };
 
       instance = new FlickityConstructor(carousel, flickityOptions);
       flickityRef.current = instance;
-      handleChange = (index) => setCurrentIndex(index);
+      handleChange = (index) => selectIndex(index);
       instance.on("change", handleChange);
-      setCurrentIndex(instance.selectedIndex);
+      selectIndex(instance.selectedIndex);
 
       if (cancelled) {
         instance.off("change", handleChange);
@@ -525,7 +593,7 @@ export function WorkProjectGalleryClient({
 
       flickityRef.current = null;
     };
-  }, [images, initialIndex]);
+  }, [images, initialIndex, selectIndex]);
 
   // Focus containment lives in its own effect: the effect below re-runs
   // whenever `onClose` is re-created by the parent, which would otherwise yank
@@ -759,6 +827,7 @@ export function WorkProjectGalleryClient({
               image={image}
               index={index}
               key={slideIds[index]}
+              shouldLoad={loadedIndexes.has(index)}
               slideId={slideIds[index]}
               total={images.length}
             />
