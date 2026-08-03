@@ -199,6 +199,17 @@
   object-fit: contain;
 }
 
+/* Stands in for a slide whose photo has not been fetched yet. `contain` mirrors
+   the `object-fit` above so the blur occupies the exact footprint the photo
+   will, and swapping one for the other shifts nothing. */
+.work-project-gallery__image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
 .work-project-gallery__sr-only {
   position: absolute;
   width: 1px;
