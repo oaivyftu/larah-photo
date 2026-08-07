@@ -9,21 +9,8 @@ import type { Metadata } from "next";
  */
 export const isIndexable = process.env.NEXT_PUBLIC_SITE_INDEXABLE === "true";
 
-/**
- * Vercel injects the project's production domain into every build, preview
- * ones included, but without a protocol. Falling back to it means a deploy
- * that forgot `NEXT_PUBLIC_SITE_URL` still publishes real URLs instead of
- * localhost ones — and previews canonicalise to production, which is what a
- * crawler should be told anyway.
- */
-const vercelProductionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : undefined;
-
 const configuredSiteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  vercelProductionUrl ??
-  "http://localhost:3000";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 /**
  * Every canonical, OG URL, sitemap entry and JSON-LD `@id` is built from this
