@@ -20,7 +20,7 @@
     minmax(15rem, 1.2fr)
     minmax(16rem, 0.9fr)
     minmax(18rem, 0.8fr);
-  gap: clamp(2rem, 5vw, 6rem);
+  gap: clamp(2rem, 4vw, 4rem) clamp(2rem, 5vw, 6rem);
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
   padding: clamp(4rem, 8vw, 8.5rem) 0 clamp(3rem, 6vw, 6rem);
@@ -32,9 +32,19 @@
   align-content: start;
 }
 
+// Its own row across the full header width: "All work" keeps the left edge,
+// the share control keeps the right one.
+.work-detail__actions {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem clamp(1.25rem, 2.5vw, 2rem);
+}
+
 .work-detail__back {
   width: fit-content;
-  margin-bottom: clamp(2rem, 4vw, 4rem);
 }
 
 .work-detail__back::before {
@@ -207,10 +217,6 @@
     grid-template-columns: 1fr;
     gap: 2rem;
     padding: 3.5rem 0 3rem;
-  }
-
-  .work-detail__back {
-    margin-bottom: 2.5rem;
   }
 
   .work-detail__title {
