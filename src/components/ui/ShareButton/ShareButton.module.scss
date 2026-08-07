@@ -1,0 +1,58 @@
+@use "@/styles/mixins" as *;
+
+.share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  // Sized for the longest label so confirming the copy cannot resize the pill
+  // or shove the controls beside it.
+  min-width: 11rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--color-line-soft);
+  border-radius: 2rem;
+  color: var(--color-ink);
+  background: transparent;
+  font-size: var(--font-size-2xs);
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color 200ms ease,
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+
+.share-button:hover {
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+  background: var(--color-ink);
+}
+
+.share-button:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 0.25rem;
+}
+
+.share-button[data-status="copied"] {
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+  background: var(--color-ink);
+}
+
+.share-button[data-status="failed"] {
+  border-color: var(--color-accent-text);
+  color: var(--color-accent-text);
+  background: transparent;
+}
+
+.share-button__status {
+  @include visually-hidden;
+}
+
+@include reduced-motion {
+  .share-button {
+    transition: none;
+  }
+}

@@ -33,6 +33,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  // The title truncates to fit, so without a gap it would run right up to the
+  // share control and read as one word.
+  gap: clamp(1rem, 3vw, 2rem);
   min-height: 4.5rem;
   padding: 0 var(--page-gutter);
   border-bottom: 1px solid var(--color-line-soft);
@@ -59,6 +62,14 @@
 .work-modal__identity span {
   color: var(--color-muted-text);
   font-weight: 600;
+}
+
+.work-modal__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: clamp(0.75rem, 1.6vw, 1.5rem);
+  padding: 0.6rem 0;
 }
 
 .work-modal__hint {

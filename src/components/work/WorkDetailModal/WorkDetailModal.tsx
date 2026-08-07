@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
+import { ShareButton } from "@/components/ui/ShareButton/ShareButton";
 import type { Project } from "@/types/project";
 import { formatWorkCategory } from "@/utils/formatWorkCategory";
 import styles from "./WorkDetailModal.module.scss";
@@ -181,9 +182,18 @@ export function WorkDetailModal({
               <span aria-hidden="true">/</span>
               <span>{formatWorkCategory(project.category)}</span>
             </div>
-            <span className={styles["work-modal__hint"]}>
-              Project preview
-            </span>
+            <div className={styles["work-modal__actions"]}>
+              <span className={styles["work-modal__hint"]}>
+                Project preview
+              </span>
+              {/* The modal is an intercepted route: the address bar already
+                  reads /work/<slug>, so this shares the same permalink the
+                  standalone page would. */}
+              <ShareButton
+                path={`/work/${project.slug}`}
+                title={project.title}
+              />
+            </div>
           </header>
           {children}
         </div>
