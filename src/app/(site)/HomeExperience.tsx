@@ -91,6 +91,118 @@ export function HomeExperience({
 
       });
 
+      // Below 901px the manifesto can't keep the desktop staging: pinning fights
+      // the mobile URL bar (every toolbar resize re-measures the pin) and under
+      // 620px the section stacks taller than the viewport, so there is nothing
+      // left to hold still. The drift survives — it just scrubs against the
+      // section's own pass through the viewport instead of a pinned scroll.
+      const manifestoDrift = ({
+        wordShift,
+        wordScales,
+        imageShift,
+        imageRotate,
+      }: {
+        wordShift: number;
+        wordScales: [number, number, number];
+        imageShift: number;
+        imageRotate: number;
+      }) => {
+        const manifesto =
+          rootRef.current?.querySelector<HTMLElement>("[data-manifesto]");
+
+        if (!manifesto) {
+          return;
+        }
+
+        gsap
+          .timeline({
+            defaults: { ease: "power3.out" },
+            scrollTrigger: {
+              trigger: manifesto,
+              start: "top 82%",
+              once: true,
+            },
+          })
+          .from("[data-manifesto-word]", {
+            yPercent: 45,
+            opacity: 0,
+            duration: 0.85,
+            stagger: 0.09,
+          })
+          .from(
+            "[data-manifesto-image]",
+            { opacity: 0, scale: 1.08, duration: 1, stagger: 0.14 },
+            0.1,
+          );
+
+        gsap
+          .timeline({
+            defaults: { ease: "none" },
+            scrollTrigger: {
+              trigger: manifesto,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 0.8,
+            },
+          })
+          .fromTo(
+            "[data-manifesto-word='light']",
+            { xPercent: wordShift },
+            { xPercent: -wordShift, scale: wordScales[0] },
+            0,
+          )
+          .fromTo(
+            "[data-manifesto-word='memory']",
+            { xPercent: -wordShift },
+            { xPercent: wordShift, scale: wordScales[1] },
+            0,
+          )
+          .fromTo(
+            "[data-manifesto-word='motion']",
+            { xPercent: wordShift * 0.6 },
+            { xPercent: wordShift * -0.6, scale: wordScales[2] },
+            0,
+          )
+          // The photos start at rest and diverge, the way they do on desktop.
+          // A symmetric drift would overlap them on phones, where the stacked
+          // layout leaves the two frames only a hair apart.
+          .to(
+            "[data-manifesto-image='one']",
+            { yPercent: -imageShift, rotate: -imageRotate },
+            0,
+          )
+          .to(
+            "[data-manifesto-image='two']",
+            { yPercent: imageShift * 1.1, rotate: imageRotate * 0.9 },
+            0,
+          );
+      };
+
+      mm.add(
+        "(min-width: 621px) and (max-width: 900px) and (prefers-reduced-motion: no-preference)",
+        () => {
+          // Tablets still get the desktop composition — centred words over
+          // absolutely placed photos — so only the pin is missing here.
+          manifestoDrift({
+            wordShift: 9,
+            wordScales: [1.08, 0.93, 1.04],
+            imageShift: 12,
+            imageRotate: 5,
+          });
+        },
+      );
+
+      mm.add("(max-width: 620px) and (prefers-reduced-motion: no-preference)", () => {
+        // Phones stack the words and photos into flow, so the same amplitudes
+        // would read as a layout glitch rather than motion. Half measures.
+        manifestoDrift({
+          wordShift: 4,
+          wordScales: [1.04, 0.97, 1.02],
+          imageShift: 6,
+          imageRotate: 3,
+        });
+      });
+
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         const root = rootRef.current;
         const servicesSection = root?.querySelector<HTMLElement>("[data-services]");
