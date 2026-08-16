@@ -14,6 +14,10 @@ import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
 import type { HomePageContent } from "@/types/site";
 import styles from "./home.module.scss";
+import {
+  BREAKPOINT_PHONE_LG,
+  BREAKPOINT_TABLET_LG
+} from "@/constants/breakpoints";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -179,7 +183,7 @@ export function HomeExperience({
       };
 
       mm.add(
-        "(min-width: 621px) and (max-width: 900px) and (prefers-reduced-motion: no-preference)",
+        `(min-width: ${BREAKPOINT_PHONE_LG + 1}px) and (max-width: ${BREAKPOINT_TABLET_LG}px) and (prefers-reduced-motion: no-preference)`,
         () => {
           // Tablets still get the desktop composition — centred words over
           // absolutely placed photos — so only the pin is missing here.
@@ -192,16 +196,19 @@ export function HomeExperience({
         },
       );
 
-      mm.add("(max-width: 620px) and (prefers-reduced-motion: no-preference)", () => {
-        // Phones stack the words and photos into flow, so the same amplitudes
-        // would read as a layout glitch rather than motion. Half measures.
-        manifestoDrift({
-          wordShift: 4,
-          wordScales: [1.04, 0.97, 1.02],
-          imageShift: 6,
-          imageRotate: 3,
-        });
-      });
+      mm.add(
+        `(max-width: ${BREAKPOINT_PHONE_LG}px) and (prefers-reduced-motion: no-preference)`,
+        () => {
+          // Phones stack the words and photos into flow, so the same amplitudes
+          // would read as a layout glitch rather than motion. Half measures.
+          manifestoDrift({
+            wordShift: 4,
+            wordScales: [1.04, 0.97, 1.02],
+            imageShift: 6,
+            imageRotate: 3,
+          });
+        },
+      );
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         const root = rootRef.current;
