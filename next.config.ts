@@ -22,7 +22,21 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    formats: ["image/avif", "image/webp"],
+    // AVIF encoding is the most expensive part of the optimiser and roughly
+    // doubles cache writes for marginal savings over WebP on photographs —
+    // dropped after the free-tier Image Optimization quota was exceeded.
+    formats: ["image/webp"],
+    // Trimmed from Next's 8-value default to the breakpoints this app's
+    // `sizes` props actually land on, merging pairs close enough (~10% or
+    // less apart) to be visually indistinguishable. 3840 is kept: the
+    // lightbox (`WorkProjectGalleryClient`) renders up to 74vw, which on a
+    // 2560px 2x-DPR display needs ~3788px — cutting this mark would upscale
+    // the app's largest, closest-viewed images.
+    deviceSizes: [640, 828, 1080, 1200, 1920, 3840],
+    // Only consumer is the 70px lightbox filmstrip thumbnail (a fixed px
+    // `sizes`, not vw, so it draws from this array rather than deviceSizes).
+    // 64/96 bracket 70px at 1x, 128 covers ~2x DPR.
+    imageSizes: [64, 96, 128],
     // Photographs are replaced by re-uploading in Sanity, which mints a new
     // asset URL, so an optimised variant is never stale. The default 4h TTL
     // just makes the optimiser redo work it already did.

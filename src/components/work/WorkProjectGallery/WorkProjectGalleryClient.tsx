@@ -226,10 +226,10 @@ function GalleryFloatNav({
                 alt=""
                 className={styles["work-project-gallery__float-thumb-image"]}
                 draggable={false}
-                fill
+                height={50}
                 key={currentIndex}
-                sizes="70px"
                 src={currentImage.src}
+                width={50}
               />
             ) : null}
           </span>
