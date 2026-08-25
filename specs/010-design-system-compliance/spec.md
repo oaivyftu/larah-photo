@@ -91,9 +91,11 @@ A few values — the breakpoint scale in particular — have to be readable both
 
 ### Measurable Outcomes
 
-- **SC-001**: Zero component stylesheets restate a colour value literally; every colour resolves through the design system.
-- **SC-002**: Zero component stylesheets restate a type size literally; every type size resolves through the design system.
-- **SC-003**: Zero viewport-width rules are written out at the point of use.
+- **SC-001**: No colour value appears literally in more than one place. Every colour used by two or more rules resolves through the design system, and any literal that remains is provably used once.
+- **SC-002**: No type size appears literally in more than one place, under the same rule as SC-001.
+- **SC-003**: No spacing value appears literally in more than one place, under the same rule as SC-001.
+- **SC-003a**: Every remaining single-use literal carries a comment saying why it is not a token, so the next reader can tell a deliberate exception from an oversight.
+- **SC-003b**: Zero viewport-width rules are written out at the point of use.
 - **SC-004**: Every pattern identified as appearing in two or more places has exactly one definition afterwards, and the number of places restating it locally is zero.
 - **SC-005**: Changing any single design-system value updates every screen that uses it, verified on at least one colour and one type size.
 - **SC-006**: A contributor can determine whether a given UI element already exists by checking one location, without searching feature folders.
@@ -102,7 +104,21 @@ A few values — the breakpoint scale in particular — have to be readable both
 
 ## Assumptions
 
-- The measured starting point, taken on 2026-08-25: 8 literal colour values across 2 component stylesheets (7 of them in the project-gallery lightbox, which carries an entire private dark palette), and 9 literal type sizes across 4 component stylesheets. Of those 9, five exactly match a size the design system already defines and are straightforward substitutions; four (0.6875rem, 0.72rem twice, 0.95rem) have no equivalent and require either a new definition or a deliberate decision to round to the nearest existing one.
+- **Corrected baseline, re-measured 2026-08-25.** An earlier count in this spec's first draft said 8 colours and 9 type sizes. That count was taken with a search that only matched literal numbers, and it missed every fluid `clamp()` value and every `rgba()`. The real starting point, across 24 component stylesheets totalling ~4,400 lines, is:
+
+  | Category  | Bypasses the design system | Uses it |
+  | --------- | -------------------------- | ------- |
+  | Colour    | 58 (8 hex, 50 rgba)        | —       |
+  | Type size | 47 (38 fluid, 9 fixed)     | 22      |
+  | Spacing   | 133                        | 17      |
+
+  The design system is therefore the minority convention today, not the norm with a few exceptions. This changes the feature's shape: see the next assumption.
+
+- Because most declarations bypass the token layer, "zero literals anywhere" is not the target. Two thirds of the type sizes are fluid `clamp()` ramps that the current fixed-step scale cannot express, and minting one token per unique ramp would turn the design system into a lookup table rather than a set of decisions. The target is instead the constitution's own two-or-more rule: **anything used twice or more becomes a token; a genuinely single-use value may stay local if it says why.** Measured duplicates that this makes mandatory: 10 distinct colour values used 28 times between them, and 5 distinct fluid type ramps used 12 times between them.
+
+- Of the 9 fixed type sizes, five exactly match a size the design system already defines and are straightforward substitutions. Four (0.6875rem, 0.72rem twice, 0.95rem) have no equivalent and need either a new definition or a deliberate decision to round to the nearest existing one.
+
+- The project-gallery lightbox carries a coherent warm-dark sub-palette of its own (7 values) for a dark surface, on a site whose tokens describe a light one. It is already partially compliant — it uses `--color-paper-warm` for one element — which suggests the sub-palette wants naming, not deleting.
 - No viewport-width rule is currently written out at the point of use — every one already goes through the shared helpers. FR-005 and SC-003 therefore protect an already-clean state rather than describing a repair.
 - Two stylesheets contain an identical operating-system accessibility query (`forced-colors`). This is not a breakpoint, so it is not a viewport-width violation, but it does appear twice and therefore falls under the two-or-more rule.
 - Known repeated patterns at the time of writing: an animation-library registration step repeated in four page-level components, and a page-ready animation helper called from those same four. Both are candidates for consolidation; the audit in this feature may surface others.
