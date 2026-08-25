@@ -492,7 +492,7 @@
 /* Windows High Contrast drops background-color and box-shadow, and the glass
    controls are drawn entirely from those — leaving unmarked hit areas floating
    over the image. Real borders put the edges back. */
-@media (forced-colors: active) {
+@include forced-colors {
   .work-project-gallery__float-container,
   .work-project-gallery__float-close,
   .work-project-gallery__float-button {

@@ -1,9 +1,7 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { playOnPageReady } from "@/utils/playOnPageReady";
+import { useMemo, useState } from "react";
+import { usePageIntro } from "@/utils/usePageIntro";
 import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
 import { WorkFilters } from "@/components/work/WorkFilters/WorkFilters";
 import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
@@ -11,8 +9,6 @@ import type { Project } from "@/types/project";
 import type { WorkPageContent } from "@/types/site";
 import { formatWorkCategory } from "@/utils/formatWorkCategory";
 import styles from "./work.module.scss";
-
-gsap.registerPlugin(useGSAP);
 
 const ALL_FILTER = "all";
 
@@ -25,7 +21,6 @@ export function WorkGalleryClient({
   content,
   projects,
 }: WorkGalleryClientProps) {
-  const rootRef = useRef<HTMLElement>(null);
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
   const [filterAnnouncement, setFilterAnnouncement] = useState("");
   const filters = useMemo(() => {
@@ -61,48 +56,28 @@ export function WorkGalleryClient({
     );
   }
 
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-
-      // Under `reduce` the timeline is never built, so nothing is parked at
-      // `opacity: 0` and the page renders at its natural state right away.
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const intro = gsap.timeline({ paused: true });
-
-        intro
-          .from("[data-page-heading] > span", {
-            yPercent: 115,
-            opacity: 0,
-            rotate: 2,
-            duration: 0.82,
-            stagger: 0.07,
-            ease: "power4.out",
-          })
-          .from(
-            "[data-work-filter], [data-work-card]",
-            {
-              y: 28,
-              opacity: 0,
-              duration: 0.72,
-              stagger: 0.035,
-              ease: "power3.out",
-            },
-            "-=0.38",
-          );
-
-        const stopWaitingForPage = playOnPageReady(() => intro.play(0));
-
-        return () => {
-          stopWaitingForPage();
-          intro.kill();
-        };
-      });
-
-      return () => mm.revert();
-    },
-    { scope: rootRef },
-  );
+  const rootRef = usePageIntro<HTMLElement>((intro) => {
+    intro
+      .from("[data-page-heading] > span", {
+        yPercent: 115,
+        opacity: 0,
+        rotate: 2,
+        duration: 0.82,
+        stagger: 0.07,
+        ease: "power4.out",
+      })
+      .from(
+        "[data-work-filter], [data-work-card]",
+        {
+          y: 28,
+          opacity: 0,
+          duration: 0.72,
+          stagger: 0.035,
+          ease: "power3.out",
+        },
+        "-=0.38",
+      );
+  });
 
   return (
     <section

@@ -43,6 +43,16 @@
   }
 }
 
+// Windows High Contrast and similar OS-level colour overrides. Not a
+// breakpoint — it responds to an accessibility setting, not a viewport —
+// so it is not subject to the width rule, but it appears in more than one
+// stylesheet and so belongs here like any other repeated block.
+@mixin forced-colors {
+  @media (forced-colors: active) {
+    @content;
+  }
+}
+
 // Removed from the visual layout but kept in the accessibility tree — for
 // screen-reader-only labels and live regions. `display: none` would drop the
 // node entirely and silence any live region inside it.

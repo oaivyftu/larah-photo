@@ -1,14 +1,9 @@
 "use client";
 
-import { useRef } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { playOnPageReady } from "@/utils/playOnPageReady";
+import { usePageIntro } from "@/utils/usePageIntro";
 import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
 import type { ContactPageContent, SiteSettings } from "@/types/site";
 import styles from "./contact.module.scss";
-
-gsap.registerPlugin(useGSAP);
 
 type ContactExperienceProps = {
   contactDetails: Pick<SiteSettings, "email" | "instagramUrl" | "phone">;
@@ -31,52 +26,31 @@ export function ContactExperience({
   contactDetails,
   content,
 }: ContactExperienceProps) {
-  const rootRef = useRef<HTMLDivElement>(null);
   const instagramLabel = getInstagramLabel(contactDetails.instagramUrl);
   const phoneHref = contactDetails.phone.replace(/[^\d+]/g, "");
 
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-
-      // Under `reduce` the timeline is never built, so nothing is parked at
-      // `opacity: 0` and the page renders at its natural state right away.
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const intro = gsap.timeline({ paused: true });
-
-        intro
-          .from("[data-page-heading] > span", {
-            yPercent: 115,
-            opacity: 0,
-            rotate: 2,
-            duration: 0.82,
-            stagger: 0.07,
-            ease: "power4.out",
-          })
-          .from(
-            "[data-contact-direct]",
-            {
-              y: 34,
-              opacity: 0,
-              duration: 0.78,
-              stagger: 0.1,
-              ease: "power3.out",
-            },
-            "-=0.42",
-          );
-
-        const stopWaitingForPage = playOnPageReady(() => intro.play(0));
-
-        return () => {
-          stopWaitingForPage();
-          intro.kill();
-        };
-      });
-
-      return () => mm.revert();
-    },
-    { scope: rootRef },
-  );
+  const rootRef = usePageIntro<HTMLDivElement>((intro) => {
+    intro
+      .from("[data-page-heading] > span", {
+        yPercent: 115,
+        opacity: 0,
+        rotate: 2,
+        duration: 0.82,
+        stagger: 0.07,
+        ease: "power4.out",
+      })
+      .from(
+        "[data-contact-direct]",
+        {
+          y: 34,
+          opacity: 0,
+          duration: 0.78,
+          stagger: 0.1,
+          ease: "power3.out",
+        },
+        "-=0.42",
+      );
+  });
 
   return (
     <div className={styles["contact"]} ref={rootRef}>

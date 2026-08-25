@@ -66,7 +66,7 @@ These are the 125 values used exactly once, listed in `baseline-audit.txt` (c). 
 
 ### Mixins and verification
 
-- [ ] T008 Add a `forced-colors` mixin to `src/styles/_mixins.scss`, beside `hover-fine`/`touch`/`reduced-motion`, wrapping `@media (forced-colors: active)`
+- [x] T008 Add a `forced-colors` mixin to `src/styles/_mixins.scss`, beside `hover-fine`/`touch`/`reduced-motion`, wrapping `@media (forced-colors: active)`
 - [x] T009 Verify the token layer still compiles and nothing rendered changed yet: `npm run build` succeeds and no `*.module.scss` consumer has been edited. Adding unused custom properties must be a no-op
 
 **Checkpoint**: all 156 new tokens exist across both tiers and are named for what they serve. Nothing consumes them yet.
@@ -107,14 +107,14 @@ Substitution runs **file by file**, not category by category. Under a zero-liter
 
 **Depends on**: Phase 2 (T008 for the mixin). Independent of US1 — different files, different failure mode.
 
-- [ ] T021 [US2] Create `src/components/ui/usePageIntro/usePageIntro.ts`: a client hook owning the module-scope `gsap.registerPlugin(useGSAP)` call and the `playOnPageReady` pairing, returning the root ref the four page components attach. Registration happens once at this module's scope (research.md §6, data-model.md)
-- [ ] T022 [US2] Adopt the hook in `src/app/(site)/about/AboutExperience.tsx`, removing its local `gsap.registerPlugin(useGSAP)` line and direct `playOnPageReady` import
-- [ ] T023 [US2] Adopt the hook in `src/app/(site)/contact/ContactExperience.tsx`, same removals
-- [ ] T024 [US2] Adopt the hook in `src/app/(site)/service/ServiceExperience.tsx`, same removals
-- [ ] T025 [US2] Adopt the hook in `src/app/(site)/work/WorkGalleryClient.tsx`, same removals
-- [ ] T026 [P] [US2] Replace the hand-written `@media (forced-colors: active)` in `src/components/layout/PageShell/PageShell.module.scss` with the T008 mixin
-- [ ] T027 [P] [US2] Replace the hand-written `@media (forced-colors: active)` in `src/components/work/WorkProjectGallery/WorkProjectGallery.module.scss` with the T008 mixin
-- [ ] T028 [US2] Validate quickstart Scenario 5: `registerPlugin(useGSAP)` appears exactly once in `src/`, and the page-entry animation on all four routes still plays as before
+- [x] T021 [US2] Create `src/utils/usePageIntro.ts` — **not** `src/components/ui/`, as this task first said: `src/components/ui/` is the design system's component half (Button, Icon, PageHeading …) and a hook is not a component. It sits beside `playOnPageReady.ts`, the helper it wraps. a client hook owning the module-scope `gsap.registerPlugin(useGSAP)` call and the `playOnPageReady` pairing, returning the root ref the four page components attach. Registration happens once at this module's scope (research.md §6, data-model.md)
+- [x] T022 [US2] Adopt the hook in `src/app/(site)/about/AboutExperience.tsx`, removing its local `gsap.registerPlugin(useGSAP)` line and direct `playOnPageReady` import
+- [x] T023 [US2] Adopt the hook in `src/app/(site)/contact/ContactExperience.tsx`, same removals
+- [x] T024 [US2] Adopt the hook in `src/app/(site)/service/ServiceExperience.tsx`, same removals
+- [x] T025 [US2] Adopt the hook in `src/app/(site)/work/WorkGalleryClient.tsx`, same removals
+- [x] T026 [P] [US2] Replace the hand-written `@media (forced-colors: active)` in `src/components/layout/PageShell/PageShell.module.scss` with the T008 mixin
+- [x] T027 [P] [US2] Replace the hand-written `@media (forced-colors: active)` in `src/components/work/WorkProjectGallery/WorkProjectGallery.module.scss` with the T008 mixin
+- [x] T028 [US2] Validate quickstart Scenario 5: `registerPlugin(useGSAP)` appears exactly once in `src/`, and the page-entry animation on all four routes still plays as before
 
 **Checkpoint**: US1 + US2 together remove both kinds of duplication — values and behaviour.
 
