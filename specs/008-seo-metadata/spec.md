@@ -37,7 +37,7 @@ A search engine renders enhanced ("rich") results for the studio's business iden
 
 **Acceptance Scenarios**:
 
-1. **Given** any public page loads, **When** its structured data is read, **Then** it includes the studio's business identity and a breadcrumb trail matching that page's position in the site.
+1. **Given** any public page loads, **When** its structured data is read, **Then** it includes the studio's business identity; and for pages below the site root (work listing, project detail, services, contact), a breadcrumb trail matching that page's position in the site.
 2. **Given** the work listing page loads, **When** its structured data is read, **Then** it describes the collection of work projects; given a project detail page loads, **Then** its structured data describes that specific project.
 3. **Given** the services page loads, **When** its structured data is read, **Then** it describes the list of service packages, priced in the site's configured currency.
 4. **Given** a visitor requests the web app manifest, **When** it is read, **Then** it declares the site's name, description, start URL, display mode, background/theme colors, and icon set.
@@ -48,7 +48,7 @@ A search engine renders enhanced ("rich") results for the studio's business iden
 
 - What happens when the site is not yet ready for public launch? Crawling MUST be fully disallowed for every route, regardless of any other robots rule.
 - What happens when a page has no dedicated preview image available (e.g. no projects exist yet)? The page MUST still produce valid metadata using the site-wide fallback image rather than omitting the image entirely or erroring.
-- What happens for the intercepted project-preview overlay versus the standalone project page, both reachable at the same URL? Both MUST resolve to the same canonical URL for that project, so search engines and shared links never see it as duplicate content.
+- What happens for the intercepted project-preview overlay versus the standalone project page, both reachable at the same URL? The overlay is a client-side-navigation presentation only — a crawler, a shared link, or a refresh always renders the standalone page. So exactly one canonical URL and one set of structured data exist per project, and duplicate content cannot arise.
 - What happens if the site is marked ready for indexing but the public site URL is still misconfigured (e.g. pointing at a local address)? The system MUST fail loudly (e.g. at build/startup) rather than publish incorrect canonical/OG URLs to the public.
 
 ## Requirements *(mandatory)*
@@ -59,11 +59,12 @@ A search engine renders enhanced ("rich") results for the studio's business iden
 - **FR-002**: Every public page MUST expose a distinct page title, meta description, canonical URL, and Open Graph/social preview metadata derived from that page's own content.
 - **FR-003**: System MUST generate robots rules that fully disallow crawling when the site is not marked ready for indexing, and that otherwise allow crawling of public pages while disallowing the CMS Studio route and internal API routes, referencing the sitemap.
 - **FR-004**: System MUST generate a web app manifest declaring the site's name, short name, description, start URL, display mode, background color, theme color, and an icon set including a maskable icon.
-- **FR-005**: Every public page MUST embed structured data describing the studio's business identity and a breadcrumb trail reflecting that page's position in the site hierarchy.
-- **FR-006**: The work listing page MUST embed structured data describing the collection of work projects; each project detail page (standalone or overlay) MUST embed structured data describing that specific project.
+- **FR-005**: Every public page MUST embed structured data describing the studio's business identity, emitted once from the shared page shell so no individual page can omit it.
+- **FR-005a**: Pages that sit below the site root MUST additionally embed a breadcrumb trail reflecting their position in the hierarchy. This currently applies to the work listing, project detail, services, and contact pages. The home page carries a site-level descriptor instead of a breadcrumb (it *is* the root, so a trail would have a single entry). The about page currently embeds neither a breadcrumb nor a site-level descriptor — only its own page-type descriptor and the shell's business identity.
+- **FR-006**: The work listing page MUST embed structured data describing the collection of work projects; each project detail page MUST embed structured data describing that specific project. The in-app overlay does not emit its own structured data and does not need to: interception occurs only on client-side navigation, so any crawler, shared link, or page refresh receives the standalone project page and its structured data instead.
 - **FR-007**: The services page MUST embed structured data describing the list of service packages, including pricing in the site's configured currency.
 - **FR-008**: The about and contact pages MUST embed structured data describing their respective content.
-- **FR-009**: A project's detail page and its in-app overlay counterpart MUST share the same canonical URL for that project.
+- **FR-009**: A project's URL MUST resolve to exactly one canonical URL, so search engines and shared links never see duplicate content. The in-app overlay does not declare its own canonical URL; because interception applies only to client-side navigation, every crawler or direct request to a project URL renders the standalone page and reads that page's canonical.
 - **FR-010**: When a page has no page-specific preview image, metadata generation MUST fall back to a site-wide default image rather than omitting the image or failing.
 - **FR-011**: If indexing is enabled while the configured public site URL is invalid (e.g. a local address), the system MUST fail at build/startup rather than publish incorrect canonical and social URLs.
 
@@ -90,3 +91,4 @@ A search engine renders enhanced ("rich") results for the studio's business iden
 - This specification documents the site's current, already-implemented SEO and metadata behavior as a baseline, rather than proposing new functionality.
 - Site indexability is controlled by a single site-wide setting that defaults to "not indexable," requiring an explicit, deliberate opt-in before launch.
 - "Public pages" refers to the home, work listing, project detail, about, service, and contact pages; the CMS Studio and internal API routes are explicitly excluded from indexing and structured data.
+- The about page's lack of a breadcrumb (FR-005a) is recorded here as observed current behaviour, not as a deliberate design choice — it sits one level below the root exactly like the contact page, which does emit one. This is a likely oversight in the implementation rather than in this specification; closing it is a code change, tracked separately from this documentation baseline.

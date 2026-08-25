@@ -15,17 +15,39 @@ npm test
 
 **Expected**: Vitest reports both a unit test (e.g. a `src/utils/*` formatter) and a mock test (e.g. `src/sanity/fetchers.ts` with the client mocked) passing, with zero real network calls made. Exit code 0.
 
-## Scenario 2 — Pre-commit blocks a lint/format/type/test failure
+## Scenario 2 — Pre-commit blocks a lint/type/test failure
 
 ```bash
 # Introduce one failure at a time and confirm each is caught:
-echo "const x=1" >> src/utils/formatWorkCategory.ts   # lint/format violation
 git add -A && git commit -m "test: trigger pre-commit"
 ```
 
-**Expected**: Commit is blocked; hook output names the failing step (ESLint or Prettier). Revert the change, repeat by introducing a type error (assign a `string` to a `number`-typed variable) → blocked by `typecheck`. Repeat by breaking an existing test's expectation → blocked by `test`.
+**Expected**, one at a time:
+
+- A lint violation ESLint cannot auto-fix → blocked, hook output names the ESLint step.
+- A type error (assign a `string` to a `number`-typed variable) → blocked by `typecheck`.
+- A broken expectation in an existing test → blocked by `test`.
 
 **Then**: revert all injected failures, commit again → commit succeeds.
+
+## Scenario 2a — Formatting is corrected, not blocked (FR-003a)
+
+```bash
+printf 'const   x =    1\n' >> src/utils/formatWorkCategory.ts   # badly formatted, still valid
+git add -A && git commit -m "test: formatting is auto-applied"
+git show --stat HEAD && git diff HEAD -- src/utils/formatWorkCategory.ts
+```
+
+**Expected**: the commit **succeeds** (formatting never blocks), and the committed content is Prettier-formatted — `git diff HEAD` is empty, confirming lint-staged re-staged what Prettier rewrote rather than leaving the fix unstaged.
+
+## Scenario 2b — Type-check is independent of build state (research.md §8)
+
+```bash
+rm -rf .next
+npm run typecheck   # tsc --noEmit -p tsconfig.typecheck.json
+```
+
+**Expected**: exit 0 with no `.next/types/validator.ts` TS2307 errors, whether `.next/` is absent, fresh, or stale. Running it against the base config (`npx tsc --noEmit`) on a stale `.next/` is what fails — that contrast is the point of the separate config.
 
 ## Scenario 3 — Pre-push blocks a build failure that passes pre-commit
 

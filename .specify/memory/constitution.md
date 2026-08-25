@@ -1,5 +1,27 @@
 <!--
-Sync Impact Report
+Sync Impact Report (2.1.1)
+- Version change: 2.1.0 → 2.1.1 (PATCH: factual correction to Principle V's
+  list of critical flows; no principle added, removed, or redefined)
+- Modified principles:
+  - V. Critical User Flows Require Test Coverage: removed "contact/inquiry form
+    submission" from the list of critical flows. It was never a live flow —
+    `InquiryForm` is imported but not rendered in
+    `src/app/(site)/contact/ContactExperience.tsx`, and the `/api/contact`
+    endpoint it posts to does not exist. Naming a non-existent flow as
+    test-critical made the principle unsatisfiable and contradicted
+    `specs/005-contact-page/spec.md`, which correctly scopes the form out. The
+    principle now names the two flows that do exist and states the condition
+    under which the form re-enters scope.
+- Modified sections:
+  - Development Workflow → Types gate: was `tsc --noEmit`, which **fails on this
+    repo** whenever `.next/` is stale, because the base `tsconfig.json`
+    includes `.next/types/**/*.ts`. The constitution was mandating a gate that
+    could not pass for reasons unrelated to the code under review. Now points at
+    `tsconfig.typecheck.json` (added 2026-08-24, verified passing on a clean
+    tree and still catching injected type errors).
+- Added/removed sections: none
+
+Prior report (2.1.0)
 - Version change: 2.0.0 → 2.1.0 (MINOR: Principle V and Development Workflow
   materially expanded; no principle removed or redefined)
 - Modified principles:
@@ -82,13 +104,19 @@ shared constants once; this principle prevents the drift from creeping back in.
 
 ### V. Critical User Flows Require Test Coverage
 
-Before a critical flow (contact/inquiry form submission, work gallery
-navigation, Sanity content error handling) ships or is materially changed, it
-MUST have automated coverage. **Vitest is the selected framework** — unit tests
-for isolated logic, and mock tests for code depending on the Sanity client,
-with that dependency replaced at the module boundary rather than over the
-network. Playwright/E2E is deliberately excluded from the commit and push gates
-and stays a manual command.
+Before a critical flow ships or is materially changed, it MUST have automated
+coverage. The critical flows that exist today are **work gallery navigation**
+and **Sanity content error handling**. (Inquiry-form submission is deliberately
+not on this list: `InquiryForm` exists in the codebase but is not rendered on
+the contact page and posts to an `/api/contact` route that does not exist — see
+`specs/005-contact-page/spec.md` Assumptions. It becomes a critical flow, and
+falls under this principle, the moment it is actually wired up.)
+
+**Vitest is the selected framework** — unit tests for isolated logic, and mock
+tests for code depending on the Sanity client, with that dependency replaced at
+the module boundary rather than over the network. Playwright/E2E is
+deliberately excluded from the commit and push gates and stays a manual
+command.
 
 **Interim clause (delete once the suite lands)**: the Vitest suite is specified
 in `specs/009-testing-quality-gates/` but is not implemented yet — there is no
@@ -130,8 +158,14 @@ before merge:
 - **Lint**: `npm run lint` passes with no errors. This is what gives Principle
   II its force — the jsx-a11y rules only protect the project if the lint run is
   actually required, so a change is not mergeable on a red lint run.
-- **Types**: `tsc --noEmit` reports no errors. TypeScript strict mode stays on
-  (see Technology Constraints).
+- **Types**: `tsc --noEmit -p tsconfig.typecheck.json` reports no errors.
+  TypeScript strict mode stays on (see Technology Constraints). Use that config,
+  not the base `tsconfig.json`: the base includes `.next/types/**/*.ts` so that
+  the editor and `next build` get generated route type-safety, which means a
+  stale `.next/` makes a plain `tsc --noEmit` fail on build output rather than
+  on your code. `tsconfig.typecheck.json` excludes `.next`, so the gate depends
+  only on the source (rationale in `specs/009-testing-quality-gates/research.md`
+  §8).
 - **Build**: `npm run build` completes. A change that type-checks but breaks the
   production build MUST NOT reach a shared branch.
 - **Tests**: `npm test` passes, once the suite exists; until then the interim
@@ -164,4 +198,4 @@ Versioning policy:
 - MINOR: New principle/section added or materially expanded guidance.
 - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 2.1.0 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-24
+**Version**: 2.1.1 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-24

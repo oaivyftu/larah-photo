@@ -4,8 +4,6 @@
 
 **Input**: Feature specification from `/specs/009-testing-quality-gates/spec.md`
 
-**Note**: This template is filled in by the `/speckit-plan` command; its definition describes the execution workflow.
-
 ## Summary
 
 Add an automated Vitest-based unit/mock test suite (covering pure utilities, Client Components, and CMS-dependent code with the Sanity client mocked), then wire Husky + lint-staged Git hooks so `git commit` blocks on lint/format/type-check/test failures and `git push` additionally blocks on a failed production build. Playwright/E2E testing is deliberately kept out of both hooks and left as a manual/CI-only command, per research.md §4.
@@ -26,7 +24,7 @@ Add an automated Vitest-based unit/mock test suite (covering pure utilities, Cli
 
 **Performance Goals**: Pre-commit hook should complete in the time it takes to lint/type-check/test the project locally (no numeric SLA specified by the spec); pre-push adds one `next build` on top. No goal is set for `test:e2e`, which is explicitly out of hook scope.
 
-**Constraints**: Async Server Component pages (every `src/app/(site)/**/page.tsx`) are not unit-testable with Vitest (research.md §2) — out of scope for this feature's unit/mock coverage, left to manual/future-E2E coverage. No new runtime (non-dev) dependency introduced, per constitution Technology Constraints.
+**Constraints**: Async Server Component pages (every `src/app/(site)/**/page.tsx`) are not unit-testable with Vitest (research.md §2) — out of scope for this feature's unit/mock coverage, left to manual/future-E2E coverage. No new runtime (non-dev) dependency introduced, per constitution Technology Constraints. Type-checking runs against `tsconfig.typecheck.json`, not the base `tsconfig.json`, because the base config includes `.next/types/**/*.ts` and a stale `.next/` makes `tsc` fail on generated build output rather than on source (research.md §8 — verified failing before this feature was started). Formatting corrects rather than blocks (research.md §9, spec FR-003a).
 
 **Scale/Scope**: Test-infrastructure + 2 Git hooks; initial test coverage seeded on a representative slice (one utility, one Client Component, one fetcher) rather than exhaustive coverage of every existing component — full backfill is a separate, larger effort tracked via `/speckit-tasks`.
 
@@ -67,8 +65,8 @@ specs/009-testing-quality-gates/
 
 ```text
 .husky/
-├── pre-commit            # lint-staged → tsc --noEmit → vitest run
-└── pre-push               # same as pre-commit, plus `next build`
+├── pre-commit            # lint-staged → typecheck → vitest run
+└── pre-push              # same as pre-commit, plus `next build`
 
 src/
 ├── **/*.test.ts           # unit tests, colocated next to the module under test
@@ -80,8 +78,9 @@ src/
 
 vitest.config.mts          # Vitest + @vitejs/plugin-react + vite-tsconfig-paths, jsdom env
 vitest.setup.ts            # Testing Library jest-dom matchers, global test setup
+tsconfig.typecheck.json    # extends tsconfig.json, drops/excludes .next (research.md §8) — ALREADY ADDED
 .prettierrc                # Prettier config (new)
-package.json                # + test/typecheck/format scripts, lint-staged config, "prepare": "husky"
+package.json               # + test/typecheck/format scripts, lint-staged config, "prepare": "husky"
 ```
 
 **Structure Decision**: Single Next.js project (no frontend/backend split — Option 1 from the template, adapted). Tests are colocated with the code they cover (`*.test.ts(x)` next to the source file) rather than a separate top-level `tests/` tree, matching the Next.js Vitest guide's convention and keeping mock setup close to what it mocks. Git hook scripts live in the standard Husky `.husky/` directory at the repo root.
