@@ -4,7 +4,7 @@
 .page-heading {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.28em;
+  gap: var(--page-heading-gap);
   align-items: baseline;
   color: var(--color-ink);
   font-family: var(--font-sans);
@@ -18,7 +18,7 @@
 .page-heading > span {
   display: inline-block;
   overflow: hidden;
-  padding-bottom: 0.08em;
+  padding-bottom: var(--page-heading-underline-gap);
 }
 
 .page-heading > span:last-child {

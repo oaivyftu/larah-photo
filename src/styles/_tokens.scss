@@ -173,4 +173,156 @@
   --space-3xl: 4rem;
   --space-4xl: 5.5rem;
   --space-section: clamp(4.5rem, 7.8vw, 7rem);
+
+  /* Spacing — scale tier, additions.
+     Steps the original ladder did not have. Named for the relationship they
+     space rather than for their size, because they do not sit at clean
+     interpolations of the 2xs..4xl ladder and a step name would imply an
+     evenness that is not there. That unevenness is itself recorded as a
+     consolidation candidate (research.md §3). */
+  --space-pair-gap: 0.35rem;
+  --space-control-pad-sm: 0.55rem;
+  --space-control-gap: 0.6rem;
+  --space-control-pad: 0.625rem;
+  --space-label-gap: 0.8rem;
+  --space-block-gap: 1.25rem;
+  --space-row-gap: 1.4rem;
+  --space-section-narrow: 3rem;
+  --space-section-narrow-lg: 3.5rem;
+  --space-fluid-header: clamp(1.5rem, 3vw, 3rem);
+
+  /* Spacing — semantic tier.
+     One element each. See contracts/token-naming.md for why these are not
+     forced onto the scale above. */
+
+  /* About */
+  --about-intro-gap: clamp(4rem, 9.2vw, 13rem);
+  --about-intro-pad-top: clamp(6rem, 9vw, 10.3rem);
+  --about-intro-pad-bottom: clamp(7rem, 10vw, 11rem);
+  --about-intro-pad-top-tablet: clamp(3.5rem, 10vw, 5rem);
+  --about-intro-pad-bottom-tablet: clamp(4.5rem, 12vw, 7rem);
+  --about-copy-gap: clamp(1.9rem, 2.4vw, 2.7rem);
+  --about-title-gap: clamp(1.5rem, 2vw, 2.2rem);
+  --about-media-offset: clamp(0.5rem, 0.8vw, 1rem);
+
+  /* Contact */
+  --contact-layout-gap: clamp(2.5rem, 17.43vw, 15.6875rem);
+  --contact-layout-pad-y: clamp(1rem, 1.67vw, 1.5rem);
+  --contact-layout-pad-top-narrow: clamp(2rem, 6vw, 3rem);
+  --contact-layout-pad-bottom-narrow: clamp(3rem, 8vw, 4rem);
+  /* Within a thousandth of --contact-layout-pad-y and not the same decision:
+     one is the column's padding, this is the gap between detail rows. */
+  --contact-detail-gap: clamp(1rem, 1.6vw, 1.5rem);
+
+  /* Home */
+  --home-hero-pad-bottom: clamp(2.5rem, 5.56vw, 5rem);
+  --home-hero-pad-bottom-tablet: clamp(2.5rem, 6vw, 4rem);
+  --home-hero-gap-tablet: clamp(2rem, 5vw, 3rem);
+  --home-hero-intro-gap: clamp(1.5rem, 4.1vw, 3.6875rem);
+  --home-hero-word-gap: 0.25em;
+  --home-section-header-pad: clamp(3.5rem, 6.94vw, 6.25rem);
+  --home-manifesto-gap: clamp(0.15rem, 1vw, 0.8rem);
+  --home-stack-pad-bottom: clamp(2rem, 5vw, 4rem);
+  --home-stack-footer-offset: clamp(0.5rem, 2vw, 1.5rem);
+  --home-stack-footer-pad: clamp(1rem, 2vw, 1.75rem);
+  --home-services-pad: clamp(3rem, 5.55vw, 5rem);
+  --home-services-column-gap: clamp(2.5rem, 13.89vw, 12.5rem);
+  --home-services-column-gap-tablet: clamp(2rem, 6vw, 4rem);
+  --home-services-row-gap: clamp(2.5rem, 4vw, 3.5rem);
+  --home-services-header-pad-phone: 2.4rem;
+  --home-stack-pad-bottom-tablet: clamp(4rem, 9vw, 7rem);
+  --home-manifesto-pad-y: 4.5rem;
+
+  /* Service */
+  --service-header-pad-top: clamp(2rem, 4.03vw, 3.625rem);
+  --service-header-pad-bottom: clamp(1.5rem, 2.22vw, 2rem);
+  --service-list-gap: clamp(4.8rem, 6vw, 7rem);
+  --service-list-pad-bottom: clamp(7rem, 9.5vw, 11rem);
+  --service-list-pad-bottom-tablet: 5rem;
+  --service-row-stack-gap: clamp(2.4rem, 5vw, 6rem);
+  --service-summary-gap: clamp(1.2rem, 1.7vw, 2rem);
+  --service-detail-list-gap: 0.58rem;
+  --service-detail-label-offset: 1.1rem;
+
+  /* Work index */
+  --work-hero-pad-top: clamp(1rem, 1.94vw, 1.75rem);
+  --work-hero-pad-bottom: clamp(1.55rem, 2.1vw, 2.2rem);
+  --work-grid-pad-bottom: clamp(4rem, 8vw, 7rem);
+  --work-toolbar-offset-tablet: clamp(1.7rem, 2.5vw, 2.4rem);
+  --work-grid-gap-x: clamp(0.35rem, 0.9vw, 0.9rem);
+  --work-grid-gap-y: clamp(2rem, 3.4vw, 3.75rem);
+  --work-grid-gap-x-narrow: 1.25rem;
+  --work-grid-gap-y-narrow: 5rem;
+  --work-skeleton-gap: clamp(1rem, 2vw, 2rem);
+
+  /* Site chrome */
+  --footer-inner-gap: clamp(2rem, 8vw, 10rem);
+  --footer-inner-pad-y: clamp(2.8rem, 5.1vw, 5.75rem);
+  --footer-bar-pad-top: 1.35rem;
+  --footer-bar-pad-bottom: 1.45rem;
+  --footer-bar-gap-phone: 0.9rem;
+  --nav-list-gap: clamp(1.5rem, 8.33vw, 7.5rem);
+  --nav-link-pad: 0.375rem;
+  --nav-link-pad-phone: 0.72rem;
+  --page-heading-gap: 0.28em;
+  --page-heading-underline-gap: 0.08em;
+  --input-label-gap: 0.125rem;
+  --glass-pointer-pad-x: 15px;
+
+  /* Work detail */
+  --work-detail-header-pad: clamp(3rem, 6vw, 6rem);
+  --work-detail-header-pad-top: clamp(4rem, 8vw, 8.5rem);
+  --work-detail-header-gap-y: clamp(2rem, 4vw, 4rem);
+  --work-detail-header-gap-x: clamp(2rem, 5vw, 6rem);
+  --work-detail-actions-gap: clamp(1.25rem, 2.5vw, 2rem);
+  --work-detail-gallery-pad-top: clamp(1.25rem, 2vw, 2rem);
+  --work-detail-gallery-pad-bottom: clamp(5rem, 10vw, 10rem);
+  /* Holds the same value as --work-grid-gap-x by coincidence, not by
+     decision: that one is the masonry gutter, this is the gap inside a meta
+     pair. Two tokens so that tuning one does not silently move the other. */
+  --work-detail-meta-gap: clamp(0.35rem, 0.9vw, 0.9rem);
+
+  /* Work modal */
+  --work-modal-pad-top: clamp(0.9rem, 2vw, 1.8rem);
+  --work-modal-bar-gap: clamp(1rem, 3vw, 2rem);
+  --work-modal-identity-gap: 0.7rem;
+  --work-modal-actions-gap: clamp(0.75rem, 1.6vw, 1.5rem);
+
+  /* Work filters */
+  --work-filters-gap: 0.45rem;
+  --work-filters-button-pad-y: 0.3rem;
+  --work-filters-button-pad-x: 0.05rem;
+
+  /* Project gallery */
+  --gallery-section-gap: clamp(2rem, 4vw, 5rem);
+  --gallery-panel-pad-y: clamp(1.5rem, 3vw, 3.75rem);
+  --gallery-header-pad-top: clamp(1.75rem, 3vw, 3rem);
+  --gallery-header-pad-bottom: clamp(2rem, 3vw, 3.5rem);
+  --gallery-slide-gap: clamp(1.5rem, 2vw, 2rem);
+  --gallery-slide-pad-tablet: 3px;
+  --gallery-title-block-gap-tablet: 0.85rem;
+  --gallery-panel-radius-value: 2.5rem;
+  --gallery-float-title-offset: 0.15rem;
+
+  /* The floating gallery control, at its two sizes. These drive the
+     component's local custom properties rather than replacing them: the
+     locals exist so the sizes can be swapped once at the breakpoint instead
+     of at every rule that reads them. A local that references a token is not
+     a private token -- a local holding a raw value is. */
+  --gallery-float-height: 70px;
+  --gallery-float-height-tablet: 56px;
+  --gallery-float-inner: 50px;
+  --gallery-float-inner-tablet: 40px;
+  --gallery-float-icon: 24px;
+  --gallery-float-icon-tablet: 20px;
+  --gallery-float-radius: 8px;
+  --gallery-float-radius-tablet: 6px;
+  --gallery-float-pad: 10px;
+  --gallery-float-pad-tablet: 8px;
+  /* Same 8px as the container padding above, and not the same decision:
+     the nav's own gap tightens from 5px to 4px at this breakpoint while the
+     action row's opens from 5px to 8px. Two tokens so they can diverge. */
+  --gallery-float-actions-gap-tablet: 8px;
+  --gallery-float-nav-gap: 5px;
+  --gallery-float-nav-gap-tablet: 4px;
 }

@@ -15,13 +15,13 @@
 /* Figma: the title sits 58px under the header with 32px of air before the first
    service row — the same rhythm the work page's hero already uses. */
 .service__header {
-  padding: clamp(2rem, 4.03vw, 3.625rem) 0 clamp(1.5rem, 2.22vw, 2rem);
+  padding: var(--service-header-pad-top) 0 var(--service-header-pad-bottom);
 }
 
 .service__list {
   display: grid;
-  gap: clamp(4.8rem, 6vw, 7rem);
-  padding-bottom: clamp(7rem, 9.5vw, 11rem);
+  gap: var(--service-list-gap);
+  padding-bottom: var(--service-list-pad-bottom);
 }
 
 /* The four intrinsic minimums plus three gaps need ~1230px of viewport, so the
@@ -34,7 +34,7 @@
       0,
       0.78fr
     );
-  gap: clamp(2.4rem, 5vw, 6rem);
+  gap: var(--service-row-stack-gap);
   align-items: start;
 }
 
@@ -49,7 +49,7 @@
   display: grid;
   min-height: clamp(17rem, 20vw, 24rem);
   align-content: start;
-  gap: clamp(1.2rem, 1.7vw, 2rem);
+  gap: var(--service-summary-gap);
 }
 
 .service-row__summary h2 {
@@ -91,18 +91,18 @@
 
 .service-row__details {
   display: grid;
-  gap: 2rem;
+  gap: var(--space-xl);
 }
 
 .service-row__details ul {
   display: grid;
-  gap: 0.58rem;
+  gap: var(--service-detail-list-gap);
   list-style: none;
 }
 
 .service-row__details span {
   display: block;
-  margin-bottom: 1.1rem;
+  margin-bottom: var(--service-detail-label-offset);
   font-size: var(--service-detail-label-size);
   font-weight: 700;
   letter-spacing: 0;
@@ -119,7 +119,10 @@
 
 @include media-max("desktop") {
   .service-row {
-    grid-template-columns: 4.5rem minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-columns: var(--home-manifesto-pad-y) minmax(0, 1fr) minmax(
+        0,
+        1.1fr
+      );
   }
 
   .service-row__details {
@@ -130,17 +133,17 @@
 
 @include media-max("tablet") {
   .service__header {
-    padding: 2rem 0 1.5rem;
+    padding: var(--space-xl) 0 var(--space-lg);
   }
 
   .service__list {
-    gap: 4rem;
-    padding-bottom: 5rem;
+    gap: var(--space-3xl);
+    padding-bottom: var(--service-list-pad-bottom-tablet);
   }
 
   .service-row {
     grid-template-columns: 1fr;
-    gap: 1.4rem;
+    gap: var(--space-row-gap);
   }
 
   .service-row__summary,

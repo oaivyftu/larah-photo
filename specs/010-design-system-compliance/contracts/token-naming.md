@@ -76,8 +76,11 @@ Viewport widths MUST go through `media-min`/`media-max`, which accept a key from
 1. Every colour, type size and spacing literal in `src/**/*.module.scss` that does not resolve through `var(--…)`.
 2. Which of those appear **two or more** times — already drifting, so fix first.
 3. Which appear once — not drifting yet, and equally not owned by the design system.
+4. **Component-local custom properties holding a raw value** — private tokens, reported as kind `local-token`. A local that _references_ a token is fine and is the intended pattern where a value must change at a breakpoint; a local that _holds_ a literal is the thing Principle VII forbids.
 
 **Exit semantics**: non-zero when category 2 or category 3 is non-empty. Both are the same hard rule (spec SC-001–SC-003); the split orders the work, it does not grade it. There is no category of permitted local literal, and no comment that excuses one.
+
+**A declaration is judged value by value.** `padding: 1rem 0` contributes `1rem`, and `padding: 0 var(--page-gutter) clamp(4rem, 9vw, 7rem)` contributes the `clamp()`. Skipping a declaration because it already contains a `var()` means the more compliant a stylesheet becomes, the less of it is inspected.
 
 **Spacing is keyed per value, not per declaration.** `padding: 1rem 0` contributes `1rem`, not the string `"1rem 0"`. The first version of this script keyed on the whole declaration, so `1rem` and `1rem 0` read as unrelated and a `clamp()` inside a shorthand never matched the same `clamp()` standing alone — hiding seven genuinely repeated values from the check meant to find them (research.md §3).
 

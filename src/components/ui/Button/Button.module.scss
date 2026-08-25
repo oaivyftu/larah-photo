@@ -52,8 +52,8 @@
 
 /* Sizes — primary */
 .button--primary.button--small {
-  gap: 0.25rem;
-  padding: 0.5rem 0.75rem;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-sm);
   font-size: var(--font-size-fluid-base);
   line-height: 1.25;
 }
@@ -63,8 +63,8 @@
 }
 
 .button--primary.button--medium {
-  gap: 0.5rem;
-  padding: 0.625rem 0.75rem;
+  gap: var(--space-xs);
+  padding: var(--space-control-pad) var(--space-sm);
   font-size: var(--font-size-fluid-md);
   line-height: 1.2;
 }
@@ -74,8 +74,8 @@
 }
 
 .button--primary.button--large {
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
   font-size: var(--font-size-control-lg);
   line-height: 1.2;
 }
@@ -86,7 +86,7 @@
 
 /* Sizes — secondary */
 .button--secondary.button--small {
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   font-size: var(--font-size-fluid-base);
   line-height: 1.25;
 }
@@ -96,7 +96,7 @@
 }
 
 .button--secondary.button--medium {
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   font-size: var(--font-size-fluid-md);
   font-weight: 600;
   line-height: 1.4;
@@ -107,7 +107,7 @@
 }
 
 .button--secondary.button--large {
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   font-size: var(--font-size-control-lg);
   line-height: 1.4;
 }

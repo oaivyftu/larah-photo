@@ -75,6 +75,14 @@ The tables above list the repeated values only, because those are the ones that 
 
 This does not change what this feature does — FR-010 is about not making a decision here, and the tokens stay separate. It does change the follow-up: merging the rim pair is **provably** a zero-change edit, verifiable by resolving the tokens in the built CSS and diffing the declarations. That method is what verified the colour substitution itself (1609 declarations, identical), and it is a stronger check than visual comparison. T034 should use it.
 
+**Three bugs in the audit, all found by using it (2026-08-25)**. Each hid work from the check written to find it, and each was found only because the strict rule forced every value to be accounted for — a threshold rule would have left all three in place:
+
+1. **Spacing keyed on the whole declaration.** `1rem` and `1rem 0` read as unrelated, and a `clamp()` inside a shorthand never matched the same `clamp()` standing alone. Hid 7 repeated values.
+2. **Any declaration containing a `var(--…)` was skipped outright for spacing and type size.** So `padding: 0 var(--page-gutter) clamp(4rem, 9vw, 7rem)` — two thirds compliant — reported nothing at all. Hid 6 literals, in exactly the declarations a partial cleanup leaves behind.
+3. **Every `--` declaration was skipped.** A component-local custom property holding a raw value is a _private token_, the anti-pattern Principle VII exists to replace, and the check could not see one. Hid 16, including the whole `--float-nav-*` set.
+
+The fixes are in `scripts/audit-design-system.mjs`; category (d) in the report is new. Bug 2 is the instructive one: the more compliant a stylesheet became, the less of it the audit inspected.
+
 **A measurement correction (2026-08-25)**: the spacing figures moved from 15 repeated values to 22. The audit originally keyed spacing on the whole declaration, so `1rem` and `1rem 0` counted as two unrelated things and a `clamp()` inside a shorthand never matched the same `clamp()` standing alone. It now splits shorthands into their individual values. The seven values this uncovered were repeated all along and invisible to the check meant to catch them — which is the strongest evidence in this document that use-count thresholds are fragile in a way that a zero-literals rule is not.
 
 ## 4. Naming fluid tokens

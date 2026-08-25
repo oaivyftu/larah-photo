@@ -72,15 +72,43 @@ grep -rn "thing-you-need" src/ # then the whole tree
 | `_breakpoints.scss` | the breakpoint scale and the `$breakpoints` map |
 | `_mixins.scss`      | shared style mixins, including media queries    |
 
+**The rule is zero literals.** No colour, type size or spacing value may be
+written out in a `*.module.scss` — not once, not with a comment explaining it.
+Run `npm run audit:design-system` to check; it must exit 0. Feature 010 brought
+the tree to that state, so anything the audit reports is new drift.
+
+The design system has **two naming tiers**, both in `src/styles/`:
+
+| Tier     | For                             | Named                              | Example                 |
+| -------- | ------------------------------- | ---------------------------------- | ----------------------- |
+| Scale    | values that genuinely recur     | by step                            | `--space-lg`            |
+| Semantic | values belonging to one element | `--<surface>-<element>-<property>` | `--about-intro-pad-top` |
+
+Pick a tier by asking whether a second call site would want that value _for the
+same reason_. If yes, scale. If sharing the number would be coincidence,
+semantic — two tokens holding the same value is correct when they encode two
+decisions, so tuning one does not silently move the other.
+
+Never name a token after its own value. `--space-fluid-37` passes the audit and
+defeats the point of it.
+
 In any `*.module.scss`:
 
 - Use the tokens: `var(--color-…)`, `var(--font-size-…)`, `var(--space-…)`,
-  plus the `--line-height-*`, `--page-*`, `--container-*`, `--header-*`,
-  `--frame-*` and `--divider-*` families. A raw hex or a bare
-  `font-size: 14px` is a violation.
+  plus the `--overlay-*`, `--surface-dark*`, `--on-surface-dark-*`,
+  `--font-size-fluid-*`, `--space-fluid-*`, `--line-height-*`, `--page-*`,
+  `--container-*`, `--header-*`, `--frame-*` and `--divider-*` families, and
+  the per-surface semantic tokens. A raw hex or a bare `font-size: 14px` is a
+  violation.
+- A component-local `--custom-property` holding a raw value is a **private
+  token** and is also a violation. Where a value must change at a breakpoint,
+  keep the local but point it at a token:
+  `--float-nav-height: var(--gallery-float-height);`.
 - Use the mixins from `_mixins.scss` rather than writing queries by hand:
   `media-max($breakpoint-tablet)` / `media-min(…)` for widths, and
   `hover-fine`, `touch`, `reduced-motion`, `visually-hidden` for the rest.
+  Reach for `visually-hidden` before writing a screen-reader-only block by
+  hand — the project already grew one byte-identical copy of it.
   An inline `@media (max-width: 767px)` is a violation.
 - No token for the value you need? Add it to `src/styles/` first, then
   reference it. Do not inline it "just this once".

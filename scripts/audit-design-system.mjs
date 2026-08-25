@@ -11,6 +11,10 @@
 // The report still separates them, because they are not equally urgent:
 //   (b) a literal used 2+ times -- already drifting; fix first.
 //   (c) a literal used once     -- not yet drifting, but equally not owned.
+//   (d) a component-local custom property holding a raw value -- a private
+//       token, the anti-pattern Principle VII exists to replace. The first
+//       version of this script skipped every `--` declaration outright and
+//       so could not see these at all.
 //   (a) totals, for context.
 //
 // Exits non-zero when (b) or (c) is non-empty.
@@ -39,6 +43,10 @@ const KEYWORDS = new Set([
   "auto",
   "0",
 ]);
+
+// A raw length, or a clamp() of them. Decides whether a component-local
+// custom property is holding a design decision that belongs in src/styles/.
+const RAW_VALUE = /^(-?[\d.]+(px|rem|em|vw|vh|%)|clamp\([^)]*\))$/;
 
 const found = new Map();
 
@@ -95,22 +103,32 @@ for (const file of FILES) {
     // to prevent. Only src/styles/ defines tokens, and this scan never looks
     // there. So these are audited like any other declaration.
     const isLocalToken = prop.startsWith("--");
+    if (isLocalToken && RAW_VALUE.test(value)) {
+      record("local-token", prop + ": " + value, file, bufferStart);
+    }
 
     for (const match of value.match(COLOUR) ?? []) {
       record("colour", match, file, bufferStart);
     }
 
-    // A value mixing a token with a literal still hides the literal, so the
-    // colour scan above runs regardless. But the declaration as a whole is
-    // already partly compliant -- do not also judge it on size or spacing.
-    if (value.includes("var(--") || isLocalToken) return;
+    if (isLocalToken) return;
 
-    if (prop === "font-size" && !KEYWORDS.has(value)) {
+    // A shorthand that mixes a token with a literal is the easiest place for
+    // a literal to hide: `padding: 0 var(--page-gutter) clamp(4rem, 9vw, 7rem)`
+    // is two thirds compliant and wholly uncaught if the declaration is
+    // skipped for containing a var(). Judge each value on its own instead.
+    if (
+      prop === "font-size" &&
+      !KEYWORDS.has(value) &&
+      !value.includes("var(--")
+    ) {
       record("type-size", value, file, bufferStart);
     }
     if (SPACING_PROPS.test(prop)) {
       for (const part of splitValues(value)) {
-        if (!KEYWORDS.has(part)) record("spacing", part, file, bufferStart);
+        if (!KEYWORDS.has(part) && !part.includes("var(--")) {
+          record("spacing", part, file, bufferStart);
+        }
       }
     }
   };
@@ -164,7 +182,7 @@ const lone = entries.filter((e) => e.uses.length === 1);
 
 const short = (f) => f.replace(/^src\//, "").replace(/\.module\.scss$/, "");
 const byKind = (list, kind) => list.filter((e) => e.kind === kind);
-const KINDS = ["colour", "type-size", "spacing"];
+const KINDS = ["colour", "type-size", "spacing", "local-token"];
 const rule = (n) => "-".repeat(n);
 
 const out = [];
@@ -173,6 +191,8 @@ out.push(rule(72));
 out.push("Scanned " + FILES.length + " component stylesheets.");
 out.push("Every value below must resolve through src/styles/. Use count sets");
 out.push("the order to fix them in, not whether they must be fixed.");
+out.push("A local-token entry is a component-local custom property holding a");
+out.push("raw value: a private token, the anti-pattern Principle VII names.");
 out.push("");
 
 out.push("(b) USED 2+ TIMES -- already drifting; fix first");

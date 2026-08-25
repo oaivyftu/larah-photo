@@ -8,20 +8,20 @@
 .about__intro {
   display: grid;
   grid-template-columns: minmax(22rem, 0.86fr) minmax(26rem, 0.9fr);
-  gap: clamp(4rem, 9.2vw, 13rem);
+  gap: var(--about-intro-gap);
   align-items: start;
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
-  padding: clamp(6rem, 9vw, 10.3rem) 0 clamp(7rem, 10vw, 11rem);
+  padding: var(--about-intro-pad-top) 0 var(--about-intro-pad-bottom);
 }
 
 .about__copy {
   display: grid;
-  gap: clamp(1.9rem, 2.4vw, 2.7rem);
+  gap: var(--about-copy-gap);
 }
 
 .about__title {
-  margin-bottom: clamp(1.5rem, 2vw, 2.2rem);
+  margin-bottom: var(--about-title-gap);
 }
 
 .about__copy p {
@@ -36,7 +36,7 @@
   position: relative;
   width: 100%;
   height: auto;
-  margin-top: clamp(0.5rem, 0.8vw, 1rem);
+  margin-top: var(--about-media-offset);
 }
 
 .about__media-visual {
@@ -69,8 +69,9 @@
 @include media-max("tablet-lg") {
   .about__intro {
     grid-template-columns: 1fr;
-    gap: 3rem;
-    padding: clamp(3.5rem, 10vw, 5rem) 0 clamp(4.5rem, 12vw, 7rem);
+    gap: var(--space-section-narrow);
+    padding: var(--about-intro-pad-top-tablet) 0
+      var(--about-intro-pad-bottom-tablet);
   }
 
   .about__media {
@@ -84,7 +85,7 @@
 
 @include media-max("phone") {
   .about__intro {
-    padding-top: 3rem;
+    padding-top: var(--space-section-narrow);
   }
 
   .about__copy p {

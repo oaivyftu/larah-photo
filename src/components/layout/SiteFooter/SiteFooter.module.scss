@@ -9,9 +9,9 @@
 .site-footer__inner {
   display: grid;
   grid-template-columns: minmax(20rem, 1.1fr) repeat(2, minmax(12rem, 0.55fr));
-  gap: clamp(2rem, 8vw, 10rem);
+  gap: var(--footer-inner-gap);
   border-bottom: var(--divider-hairline) solid var(--color-divider);
-  padding: clamp(2.8rem, 5.1vw, 5.75rem) var(--page-gutter);
+  padding: var(--footer-inner-pad-y) var(--page-gutter);
 }
 
 .site-footer__statement {
@@ -26,7 +26,7 @@
 .site-footer__contact {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   align-items: flex-start;
   font-style: normal;
   font-size: var(--footer-contact-size);
@@ -47,7 +47,8 @@
   grid-template-columns: 1.5fr repeat(3, 0.55fr) 1fr;
   gap: var(--space-xl);
   align-items: center;
-  padding: 1.35rem var(--page-gutter) 1.45rem;
+  padding: var(--footer-bar-pad-top) var(--page-gutter)
+    var(--footer-bar-pad-bottom);
   font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0;
@@ -110,9 +111,9 @@
 
 @include media-max("phone") {
   .site-footer__inner {
-    gap: 2rem;
-    padding-top: 3.5rem;
-    padding-bottom: 3.5rem;
+    gap: var(--space-xl);
+    padding-top: var(--space-section-narrow-lg);
+    padding-bottom: var(--space-section-narrow-lg);
   }
 
   .site-footer__statement {
@@ -120,7 +121,7 @@
   }
 
   .site-footer__bar {
-    gap: 0.9rem;
+    gap: var(--footer-bar-gap-phone);
     line-height: 1.2;
   }
 }

@@ -61,11 +61,11 @@
 }
 
 .work-card--work .work-card__link {
-  gap: 0.35rem;
+  gap: var(--space-pair-gap);
 }
 
 .work-card--work .work-card__media {
-  margin-bottom: 0.35rem;
+  margin-bottom: var(--space-pair-gap);
 }
 
 .work-card--work .work-card__title {

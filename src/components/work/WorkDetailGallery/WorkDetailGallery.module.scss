@@ -11,7 +11,7 @@
 }
 
 .work-detail--modal .work-detail__header {
-  padding-top: clamp(3rem, 6vw, 6rem);
+  padding-top: var(--work-detail-header-pad);
 }
 
 .work-detail__header {
@@ -20,10 +20,10 @@
     minmax(15rem, 1.2fr)
     minmax(16rem, 0.9fr)
     minmax(18rem, 0.8fr);
-  gap: clamp(2rem, 4vw, 4rem) clamp(2rem, 5vw, 6rem);
+  gap: var(--work-detail-header-gap-y) var(--work-detail-header-gap-x);
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
-  padding: clamp(4rem, 8vw, 8.5rem) 0 clamp(3rem, 6vw, 6rem);
+  padding: var(--work-detail-header-pad-top) 0 var(--work-detail-header-pad);
   border-bottom: 1px solid var(--color-line-soft);
 }
 
@@ -40,7 +40,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem clamp(1.25rem, 2.5vw, 2rem);
+  gap: var(--space-md) var(--work-detail-actions-gap);
 }
 
 .work-detail__back {
@@ -48,12 +48,12 @@
 }
 
 .work-detail__back::before {
-  margin-right: 0.55rem;
+  margin-right: var(--space-control-pad-sm);
   content: "←";
 }
 
 .work-detail__eyebrow {
-  margin-bottom: 0.8rem;
+  margin-bottom: var(--space-label-gap);
   color: var(--color-muted-text);
   font-size: var(--font-size-xs);
   font-weight: 600;
@@ -81,14 +81,14 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-self: end;
-  gap: 1.5rem 2rem;
+  gap: var(--space-lg) var(--space-xl);
   margin: 0;
 }
 
 .work-detail__meta div {
   display: grid;
-  gap: 0.35rem;
-  padding-top: 0.8rem;
+  gap: var(--space-pair-gap);
+  padding-top: var(--space-label-gap);
   border-top: 1px solid var(--color-line-soft);
 }
 
@@ -111,7 +111,8 @@
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   min-height: 40vh;
   margin: 0 auto;
-  padding: clamp(1.25rem, 2vw, 2rem) 0 clamp(5rem, 10vw, 10rem);
+  padding: var(--work-detail-gallery-pad-top) 0
+    var(--work-detail-gallery-pad-bottom);
   opacity: 0;
 }
 
@@ -124,7 +125,7 @@
 // mid-grid, so the album packs uniformly and only frays at the bottom edge.
 .work-detail__grid {
   --detail-columns: 4;
-  --detail-gap: clamp(0.35rem, 0.9vw, 0.9rem);
+  --detail-gap: var(--work-detail-meta-gap);
 
   position: relative;
   width: 100%;
@@ -215,8 +216,8 @@
 @include media-max(680px) {
   .work-detail__header {
     grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 3.5rem 0 3rem;
+    gap: var(--space-xl);
+    padding: var(--space-section-narrow-lg) 0 var(--space-section-narrow);
   }
 
   .work-detail__title {

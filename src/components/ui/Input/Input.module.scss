@@ -18,7 +18,7 @@
 
 .input__label {
   display: flex;
-  gap: 0.125rem;
+  gap: var(--input-label-gap);
   align-items: flex-start;
   color: var(--color-ink);
   font-size: var(--font-size-sm);

@@ -10,7 +10,7 @@
   justify-content: center;
   min-width: 60px;
   height: 34px;
-  padding: 0 15px;
+  padding: 0 var(--glass-pointer-pad-x);
   overflow: hidden;
   border-radius: 5px;
   background: var(--overlay-glass-fill);

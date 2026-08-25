@@ -1,0 +1,25 @@
+DESIGN SYSTEM AUDIT
+------------------------------------------------------------------------
+Scanned 24 component stylesheets.
+Every value below must resolve through src/styles/. Use count sets
+the order to fix them in, not whether they must be fixed.
+A local-token entry is a component-local custom property holding a
+raw value: a private token, the anti-pattern Principle VII names.
+
+(b) USED 2+ TIMES -- already drifting; fix first
+------------------------------------------------------------------------
+  none
+
+(c) USED ONCE -- not drifting yet, and equally not owned
+------------------------------------------------------------------------
+  none
+
+(a) TOTALS
+------------------------------------------------------------------------
+  colour      0 distinct values to tokenise ( 0 repeated across   0 uses,   0 used once)
+  type-size   0 distinct values to tokenise ( 0 repeated across   0 uses,   0 used once)
+  spacing     0 distinct values to tokenise ( 0 repeated across   0 uses,   0 used once)
+  local-token  0 distinct values to tokenise ( 0 repeated across   0 uses,   0 used once)
+
+------------------------------------------------------------------------
+PASS

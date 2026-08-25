@@ -4,7 +4,7 @@
   position: fixed;
   inset: 0;
   z-index: 1200;
-  padding-top: clamp(0.9rem, 2vw, 1.8rem);
+  padding-top: var(--work-modal-pad-top);
   overflow: hidden;
   background: var(--overlay-modal-backdrop);
   animation: modal-backdrop-in 420ms ease both;
@@ -35,8 +35,8 @@
   justify-content: space-between;
   // The title truncates to fit, so without a gap it would run right up to the
   // share control and read as one word.
-  gap: clamp(1rem, 3vw, 2rem);
-  min-height: 4.5rem;
+  gap: var(--work-modal-bar-gap);
+  min-height: var(--home-manifesto-pad-y);
   padding: 0 var(--page-gutter);
   border-bottom: 1px solid var(--color-line-soft);
   background: color-mix(in srgb, var(--color-paper) 92%, transparent);
@@ -46,7 +46,7 @@
 .work-modal__identity {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: var(--work-modal-identity-gap);
   min-width: 0;
   font-size: var(--font-size-xs);
   line-height: 1;
@@ -68,8 +68,8 @@
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: clamp(0.75rem, 1.6vw, 1.5rem);
-  padding: 0.6rem 0;
+  gap: var(--work-modal-actions-gap);
+  padding: var(--space-control-gap) 0;
 }
 
 .work-modal__hint {
@@ -105,7 +105,7 @@
 
 .work-modal__close span,
 .work-modal__close span::after {
-  width: 1.35rem;
+  width: var(--footer-bar-pad-top);
   height: 1px;
   background: currentColor;
 }
@@ -159,7 +159,7 @@
 
 @include media-max(680px) {
   .work-modal {
-    padding-top: 0.5rem;
+    padding-top: var(--space-xs);
   }
 
   .work-modal__document {

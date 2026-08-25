@@ -7,7 +7,7 @@
   // Sized for the longest label so confirming the copy cannot resize the pill
   // or shove the controls beside it.
   min-width: 11rem;
-  padding: 0.55rem 1rem;
+  padding: var(--space-control-pad-sm) var(--space-md);
   border: 1px solid var(--color-line-soft);
   border-radius: 2rem;
   color: var(--color-ink);

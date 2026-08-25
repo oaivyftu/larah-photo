@@ -2,8 +2,8 @@
 
 .work-layout {
   --work-columns: 12;
-  --work-gap-x: 1.25rem;
-  --work-gap-y: 5rem;
+  --work-gap-x: var(--work-grid-gap-x-narrow);
+  --work-gap-y: var(--work-grid-gap-y-narrow);
   position: relative;
   width: 100%;
 }
@@ -56,7 +56,7 @@
 .work-layout__skeleton-column {
   display: grid;
   align-content: start;
-  gap: clamp(1rem, 2vw, 2rem);
+  gap: var(--work-skeleton-gap);
 }
 
 .work-layout__skeleton-block {
@@ -225,8 +225,8 @@
 // so the masonry packs without holes and only frays along the bottom edge.
 .work-layout--work {
   --work-columns: 4;
-  --work-gap-x: clamp(0.35rem, 0.9vw, 0.9rem);
-  --work-gap-y: clamp(2rem, 3.4vw, 3.75rem);
+  --work-gap-x: var(--work-grid-gap-x);
+  --work-gap-y: var(--work-grid-gap-y);
 }
 
 .work-layout--work .work-layout__item {
@@ -264,8 +264,8 @@
 @include media-max(1180px) {
   .work-layout--homepage {
     --work-columns: 3;
-    --work-gap-x: clamp(0.35rem, 0.9vw, 0.9rem);
-    --work-gap-y: clamp(2rem, 3.4vw, 3.75rem);
+    --work-gap-x: var(--work-grid-gap-x);
+    --work-gap-y: var(--work-grid-gap-y);
   }
 
   .work-layout--homepage .work-layout__item {

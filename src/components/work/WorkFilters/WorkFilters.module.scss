@@ -3,7 +3,7 @@
 .work-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: var(--work-filters-gap);
   /* Was `baseline`: a 24px-tall button aligned on its text baseline overflows
      the flex line, so the row's box ended a pixel above the buttons and the
      masonry grid below claimed that pixel. Centring makes the row exactly as
@@ -21,7 +21,7 @@
 .work-filters__list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: var(--work-filters-gap);
   align-items: center;
 }
 
@@ -46,7 +46,7 @@
      later sibling and paints over anything this row spills into, so an
      overlay would hand back most of the target (WCAG 2.5.8). The parent
      aligns on baseline, so the padding does not move the text. */
-  padding: 0.3rem 0.05rem;
+  padding: var(--work-filters-button-pad-y) var(--work-filters-button-pad-x);
   transition:
     color 160ms ease,
     opacity 160ms ease;
