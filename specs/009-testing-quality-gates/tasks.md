@@ -82,13 +82,13 @@ Single Next.js project. Tests are **colocated** next to the module under test (`
 
 **Depends on**: US1 (the hook's `test` step needs tests to run).
 
-- [ ] T018 [US2] Resolve the open decision recorded in `contracts/npm-scripts.md` ("do warnings block?"): choose either plain `eslint` or `--max-warnings=0` for the hook path, and record the choice plus its reason as a comment in `.husky/pre-commit`. If `--max-warnings=0` is chosen, first remove the dead `InquiryForm` import in `src/app/(site)/contact/ContactExperience.tsx` — otherwise the repo's one existing warning blocks every commit from day one
-- [ ] T019 [US2] Add the `lint-staged` key to `package.json` per data-model.md: `"*.{ts,tsx,js,jsx}": "eslint --fix"` and `"*.{ts,tsx,js,jsx,scss,json,md}": "prettier --write"`. lint-staged re-stages what it rewrites, which is what makes formatting a correction rather than a gate (FR-003a, research.md §9)
-- [ ] T020 [US2] Add `"prepare": "husky"` to `package.json` scripts and run `npx husky init` to create the `.husky/` directory, so hooks install automatically on `npm install` with no manual step (FR-006)
-- [ ] T021 [US2] Write `.husky/pre-commit` running three separately-invoked, individually-labelled steps in order: `npx lint-staged` → `npm run typecheck` → `npm test`. Each step must echo its own name before running so a failure identifies itself (FR-005/SC-004). It MUST NOT invoke `next build` or any E2E command (FR-007), and MUST NOT run `prettier --check` (FR-003a)
-- [ ] T022 [US2] Validate quickstart.md Scenario 2 — one failure at a time (an ESLint error that `--fix` cannot repair; a type error; a broken expectation in `src/utils/formatWorkCategory.test.ts`), confirming each blocks the commit and names its step. Revert each and confirm a clean commit succeeds
-- [ ] T023 [US2] Validate quickstart.md Scenario 2a — append badly-formatted-but-valid code to `src/utils/formatWorkCategory.ts`, commit, and confirm the commit **succeeds** and `git diff HEAD` is empty, proving Prettier's rewrite was re-staged into the commit rather than left behind (FR-003a, SC-001)
-- [ ] T024 [US2] Validate quickstart.md Scenario 4 — from a fresh clone, `npm install` then `git commit --allow-empty` fires the hook with no separate `husky install` step (FR-006, SC-003)
+- [x] T018 [US2] Resolve the open decision recorded in `contracts/npm-scripts.md` ("do warnings block?"): choose either plain `eslint` or `--max-warnings=0` for the hook path, and record the choice plus its reason as a comment in `.husky/pre-commit`. If `--max-warnings=0` is chosen, first remove the dead `InquiryForm` import in `src/app/(site)/contact/ContactExperience.tsx` — otherwise the repo's one existing warning blocks every commit from day one
+- [x] T019 [US2] Add the `lint-staged` key to `package.json` per data-model.md: `"*.{ts,tsx,js,jsx}": "eslint --fix"` and `"*.{ts,tsx,js,jsx,scss,json,md}": "prettier --write"`. lint-staged re-stages what it rewrites, which is what makes formatting a correction rather than a gate (FR-003a, research.md §9)
+- [x] T020 [US2] Add `"prepare": "husky"` to `package.json` scripts and run `npx husky init` to create the `.husky/` directory, so hooks install automatically on `npm install` with no manual step (FR-006)
+- [x] T021 [US2] Write `.husky/pre-commit` running three separately-invoked, individually-labelled steps in order: `npx lint-staged` → `npm run typecheck` → `npm test`. Each step must echo its own name before running so a failure identifies itself (FR-005/SC-004). It MUST NOT invoke `next build` or any E2E command (FR-007), and MUST NOT run `prettier --check` (FR-003a)
+- [x] T022 [US2] Validate quickstart.md Scenario 2 — one failure at a time (an ESLint error that `--fix` cannot repair; a type error; a broken expectation in `src/utils/formatWorkCategory.test.ts`), confirming each blocks the commit and names its step. Revert each and confirm a clean commit succeeds
+- [x] T023 [US2] Validate quickstart.md Scenario 2a — append badly-formatted-but-valid code to `src/utils/formatWorkCategory.ts`, commit, and confirm the commit **succeeds** and `git diff HEAD` is empty, proving Prettier's rewrite was re-staged into the commit rather than left behind (FR-003a, SC-001)
+- [x] T024 [US2] Validate quickstart.md Scenario 4 — from a fresh clone, `npm install` then `git commit --allow-empty` fires the hook with no separate `husky install` step (FR-006, SC-003)
 
 **Checkpoint**: Commits are gated. US1 + US2 together are a shippable increment.
 
@@ -102,9 +102,9 @@ Single Next.js project. Tests are **colocated** next to the module under test (`
 
 **Depends on**: US2 (pre-push reuses the same check set).
 
-- [ ] T025 [US3] Write `.husky/pre-push` running the full pre-commit check set plus a final `npm run build` step, each separately invoked and labelled. Per the spec's Edge Cases, pre-push is **not** a lighter version of pre-commit — it runs everything, then builds. It MUST NOT invoke any E2E command (FR-007)
-- [ ] T026 [US3] Validate quickstart.md Scenario 3 — introduce a change that lints, type-checks and tests clean but fails `next build`, attempt a push, and confirm the push is blocked with the build step distinguishable from lint/type/test failures (FR-004, SC-002)
-- [ ] T027 [US3] Validate quickstart.md Scenario 2b — run `rm -rf .next && npm run typecheck` and confirm exit 0 with no `.next/types/validator.ts` TS2307 errors, proving the type-check result is independent of build state whether `.next/` is absent, fresh, or stale (research.md §8)
+- [x] T025 [US3] Write `.husky/pre-push` running the full pre-commit check set plus a final `npm run build` step, each separately invoked and labelled. Per the spec's Edge Cases, pre-push is **not** a lighter version of pre-commit — it runs everything, then builds. It MUST NOT invoke any E2E command (FR-007)
+- [x] T026 [US3] Validate quickstart.md Scenario 3 — introduce a change that lints, type-checks and tests clean but fails `next build`, attempt a push, and confirm the push is blocked with the build step distinguishable from lint/type/test failures (FR-004, SC-002)
+- [x] T027 [US3] Validate quickstart.md Scenario 2b — run `rm -rf .next && npm run typecheck` and confirm exit 0 with no `.next/types/validator.ts` TS2307 errors, proving the type-check result is independent of build state whether `.next/` is absent, fresh, or stale (research.md §8)
 
 **Checkpoint**: All three user stories functional.
 
@@ -112,10 +112,10 @@ Single Next.js project. Tests are **colocated** next to the module under test (`
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T028 [P] Validate quickstart.md Scenario 5: `grep -r "playwright" .husky/` returns no matches, confirming E2E stays outside both hooks (FR-007, research.md §4)
-- [ ] T029 [P] Document the new commands (`npm test`, `npm run typecheck`, `npm run format`) and the two hooks in `README.md`, including how to bypass with `--no-verify` and when that is legitimate (spec Edge Cases)
-- [ ] T030 Run every quickstart.md scenario end-to-end on a scratch branch in one pass, confirming no scenario regressed while a later one was being built
-- [ ] T031 Amend `.specify/memory/constitution.md` to **2.1.1 (PATCH)** now that the suite exists: delete Principle V's interim clause (the manual-test-plan fallback and its "not implemented yet" note), and change the Development Workflow "Tests" bullet plus the "Until the Git hooks are implemented..." paragraph to reference `.husky/pre-commit` and `.husky/pre-push` by name. Update the Sync Impact Report and the `**Last Amended**` date. This is the follow-up already tracked in `plan.md` Constitution Check and `research.md` §1 — do NOT skip it
+- [x] T028 [P] Validate quickstart.md Scenario 5: `grep -r "playwright" .husky/` returns no matches, confirming E2E stays outside both hooks (FR-007, research.md §4)
+- [x] T029 [P] Document the new commands (`npm test`, `npm run typecheck`, `npm run format`) and the two hooks in `README.md`, including how to bypass with `--no-verify` and when that is legitimate (spec Edge Cases)
+- [x] T030 Run every quickstart.md scenario end-to-end on a scratch branch in one pass, confirming no scenario regressed while a later one was being built
+- [x] T031 Amend `.specify/memory/constitution.md` to **2.1.1 (PATCH)** now that the suite exists: delete Principle V's interim clause (the manual-test-plan fallback and its "not implemented yet" note), and change the Development Workflow "Tests" bullet plus the "Until the Git hooks are implemented..." paragraph to reference `.husky/pre-commit` and `.husky/pre-push` by name. Update the Sync Impact Report and the `**Last Amended**` date. This is the follow-up already tracked in `plan.md` Constitution Check and `research.md` §1 — do NOT skip it
 
 ---
 

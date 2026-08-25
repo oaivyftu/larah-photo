@@ -73,10 +73,13 @@ git commit --allow-empty -m "test: hooks fire without manual husky install"
 ## Scenario 5 — Playwright is not part of either hook
 
 ```bash
-grep -r "playwright" .husky/ 2>/dev/null
+# Comments are stripped first: both hooks *mention* Playwright to explain why
+# it is excluded, and that explanation is evidence of compliance, not a breach.
+# What matters is that no line either hook executes invokes a browser suite.
+grep -rhv '^\s*#' .husky/pre-commit .husky/pre-push | grep -i "playwright\|e2e\|cypress"
 ```
 
-**Expected**: No matches. `test:e2e` (or equivalent) exists as a standalone `package.json` script but is not referenced by `.husky/pre-commit` or `.husky/pre-push` — confirms FR-007 / research.md §4.
+**Expected**: No matches. No E2E command is executed by either hook — confirms FR-007 / research.md §4. Note that no `test:e2e` script exists in `package.json` yet either: Playwright has not been adopted, only reserved as the future home for async-Server-Component coverage (research.md §2). Add the script alongside Playwright itself, not before.
 
 ## Reference
 

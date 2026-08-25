@@ -1,5 +1,28 @@
 <!--
-Sync Impact Report (2.1.1)
+Sync Impact Report (2.1.2)
+- Version change: 2.1.1 → 2.1.2 (PATCH: retires a clause that had served its
+  purpose and replaces a "nothing enforces this" note with what now does; no
+  principle added, removed, or redefined)
+- Modified principles:
+  - V. Critical User Flows Require Test Coverage: interim clause deleted.
+    Feature 009 shipped 2026-08-24 — Vitest, 31 tests, and both Git hooks are
+    in the tree — so the manual-test-plan fallback described a state that no
+    longer exists. Replaced with which of the two named flows are actually
+    covered, and the honest gap: the gallery pages are async Server Components
+    and stay uncovered end-to-end.
+- Modified sections:
+  - Development Workflow: the paragraph stating that the gates are run by the
+    author because "nothing enforces them automatically" is replaced by what
+    `.husky/pre-commit` and `.husky/pre-push` run, the formatting-corrects-not-
+    blocks rule, and the `--no-verify` caveat.
+- Added/removed sections: none
+- Note: the v2.1.1 report below says `InquiryForm` "is imported but not
+  rendered". As of 2026-08-24 it is no longer imported either — the dead import
+  was removed when the lint gate adopted `--max-warnings=0`. The component file
+  still exists and is still rendered nowhere, so the principle's reasoning is
+  unchanged.
+
+Prior report (2.1.1)
 - Version change: 2.1.0 → 2.1.1 (PATCH: factual correction to Principle V's
   list of critical flows; no principle added, removed, or redefined)
 - Modified principles:
@@ -118,17 +141,18 @@ the module boundary rather than over the network. Playwright/E2E is
 deliberately excluded from the commit and push gates and stays a manual
 command.
 
-**Interim clause (delete once the suite lands)**: the Vitest suite is specified
-in `specs/009-testing-quality-gates/` but is not implemented yet — there is no
-`.husky/`, no Vitest dependency, and no test file in `src/`. Until `npm test`
-exists and passes, PRs touching a critical flow MUST carry a manual test plan
-in the PR description. No CI enforces this; it is a reviewer check, and the
-reviewer is expected to block the PR when it is missing.
+Of the two flows named above, Sanity content error handling has direct coverage
+(`src/sanity/fetchers.test.ts` asserts that missing, blank, and unfetchable
+content raises rather than degrading into a placeholder). Work gallery
+navigation is covered only at the component level
+(`WorkFilters.test.tsx`); the gallery pages themselves are async Server
+Components, which Vitest cannot render, so that flow's end-to-end path remains
+uncovered until an E2E tool is adopted.
 
-**Rationale**: The project has no regression safety net today. Naming the
-framework closes the open-ended "some framework, someday" wording this
-principle carried through v2.0.0, without pretending coverage exists before it
-does.
+**Rationale**: The project ran with no regression safety net at all until
+2026-08-24. Coverage is now enforced mechanically at commit and push time
+rather than by reviewer diligence, which is why the manual-test-plan fallback
+this principle carried through v2.1.1 is gone.
 
 ### VI. Stay Current With This Next.js Version
 
@@ -168,12 +192,22 @@ before merge:
   §8).
 - **Build**: `npm run build` completes. A change that type-checks but breaks the
   production build MUST NOT reach a shared branch.
-- **Tests**: `npm test` passes, once the suite exists; until then the interim
-  clause in Principle V applies.
+- **Tests**: `npm test` passes.
 
-Until the Git hooks specified in `specs/009-testing-quality-gates/` are
-implemented, these gates are run by the author and confirmed by the reviewer —
-nothing enforces them automatically.
+These gates are enforced automatically. `.husky/pre-commit` runs lint-staged
+(ESLint `--fix` and Prettier `--write` over staged files), then the type-check,
+then the tests. `.husky/pre-push` re-runs lint, type-check and tests across the
+whole project and adds `npm run build`. Both install with `npm install`;
+neither needs a setup step.
+
+Formatting is corrected into the commit rather than blocking it, so no commit
+fails over layout and none enters history unformatted. Lint warnings do block:
+the hooks run ESLint with `--max-warnings=0`.
+
+`--no-verify` bypasses both hooks and stays available for a gate failing for
+reasons unrelated to the change at hand. It is not a route for landing a red
+build on a shared branch. No CI re-runs these checks, so a bypass is final —
+nothing downstream catches what it skipped.
 
 Two kinds of change carry an extra burden, and the rationale belongs in the PR
 description, not only in a code comment:
@@ -198,4 +232,4 @@ Versioning policy:
 - MINOR: New principle/section added or materially expanded guidance.
 - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 2.1.1 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-24
+**Version**: 2.1.2 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-24
