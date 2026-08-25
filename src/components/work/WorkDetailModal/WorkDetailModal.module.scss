@@ -6,7 +6,7 @@
   z-index: 1200;
   padding-top: clamp(0.9rem, 2vw, 1.8rem);
   overflow: hidden;
-  background: rgb(18 18 18 / 68%);
+  background: var(--overlay-modal-backdrop);
   animation: modal-backdrop-in 420ms ease both;
   overscroll-behavior: contain;
 }
@@ -22,7 +22,7 @@
   overflow-y: auto;
   border-radius: 0.9rem 0.9rem 0 0;
   background: var(--color-paper);
-  box-shadow: 0 -1.2rem 4rem rgb(0 0 0 / 18%);
+  box-shadow: 0 -1.2rem 4rem var(--overlay-modal-document);
   overscroll-behavior: contain;
 }
 
@@ -94,7 +94,7 @@
   border-radius: 0.65rem;
   color: var(--color-paper);
   background: var(--color-ink);
-  box-shadow: 0 0.8rem 2.5rem rgb(0 0 0 / 22%);
+  box-shadow: 0 0.8rem 2.5rem var(--overlay-modal-close);
   cursor: pointer;
   transition:
     color 220ms ease,
@@ -191,13 +191,13 @@
 
 @keyframes modal-backdrop-in {
   from {
-    background: rgb(18 18 18 / 0%);
+    background: var(--overlay-modal-backdrop-clear);
   }
 }
 
 @keyframes modal-backdrop-out {
   to {
-    background: rgb(18 18 18 / 0%);
+    background: var(--overlay-modal-backdrop-clear);
   }
 }
 

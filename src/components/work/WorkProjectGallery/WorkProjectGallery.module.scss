@@ -45,7 +45,7 @@
   gap: clamp(2rem, 4vw, 5rem);
   min-height: clamp(10.5rem, 18vh, 12rem);
   padding: clamp(1.75rem, 3vw, 3rem) clamp(2rem, 3vw, 3.5rem);
-  background: #170707;
+  background: var(--surface-dark);
 }
 
 .work-project-gallery__title-block {
@@ -67,7 +67,7 @@
 
 .work-project-gallery__description {
   max-width: 42rem;
-  color: #eadede;
+  color: var(--on-surface-dark-body);
   font-size: clamp(0.9rem, 1.05vw, 1.15rem);
   font-weight: 400;
   line-height: 1.35;
@@ -86,7 +86,7 @@
 }
 
 .work-project-gallery__detail dt {
-  color: #8f7e7e;
+  color: var(--on-surface-dark-muted);
   font-size: clamp(0.7rem, 0.78vw, 0.85rem);
   font-weight: 400;
   line-height: 1.1;
@@ -94,7 +94,7 @@
 
 .work-project-gallery__detail dd {
   margin: 0;
-  color: #f3e8e8;
+  color: var(--on-surface-dark-strong);
   font-size: clamp(0.78rem, 0.86vw, 0.95rem);
   font-weight: 650;
   line-height: 1.25;
@@ -106,7 +106,7 @@
   aspect-ratio: 1;
   padding: 0;
   border: 0;
-  color: #241010;
+  color: var(--surface-dark-raised);
   background: var(--color-paper-warm);
   border-radius: 0.5rem;
   cursor: pointer;
@@ -136,7 +136,7 @@
 }
 
 .work-project-gallery__close:hover {
-  background: #fff0ee;
+  background: var(--surface-dark-close-hover);
   transform: scale(1.04);
 }
 
@@ -243,7 +243,7 @@
   max-width: calc(100% - 2rem);
   height: var(--float-nav-height);
   margin: 0 auto;
-  color: #fff;
+  color: var(--on-surface-dark);
   opacity: 0;
   pointer-events: none;
   transform: translate3d(0, 12px, 0);
@@ -265,16 +265,16 @@
   position: relative;
   overflow: hidden;
   border: 0;
-  background: rgba(12, 12, 12, 0.3);
+  background: var(--overlay-glass-fill);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-    inset 1.8px 3px 0 -2px rgba(255, 255, 255, 0.34),
-    inset -2px -2px 0 -2px rgba(255, 255, 255, 0.3),
-    inset -3px -8px 1px -6px rgba(255, 255, 255, 0.22),
-    inset 0 3px 4px -2px rgba(0, 0, 0, 0.08),
-    inset -0.3px -1px 4px rgba(0, 0, 0, 0.05),
-    0 1px 5px rgba(0, 0, 0, 0.04),
-    0 6px 12px rgba(0, 0, 0, 0.12);
+    inset 0 0 0 1px var(--overlay-glass-rim),
+    inset 1.8px 3px 0 -2px var(--overlay-glass-bevel),
+    inset -2px -2px 0 -2px var(--overlay-glass-bevel-under),
+    inset -3px -8px 1px -6px var(--overlay-glass-glow),
+    inset 0 3px 4px -2px var(--overlay-glass-inner-top),
+    inset -0.3px -1px 4px var(--overlay-glass-under),
+    0 1px 5px var(--overlay-glass-cast-near),
+    0 6px 12px var(--overlay-glass-cast-far);
   backdrop-filter: blur(6px) saturate(180%);
   -webkit-backdrop-filter: blur(6px) saturate(180%);
 }
@@ -288,9 +288,9 @@
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.11),
-    rgba(255, 255, 255, 0.04) 32%,
-    rgba(0, 0, 0, 0.02)
+    var(--overlay-glass-tint-top),
+    var(--overlay-glass-rim) 32%,
+    var(--overlay-glass-tint-foot)
   );
 }
 
@@ -381,14 +381,14 @@
   width: var(--float-nav-inner);
   height: var(--float-nav-inner);
   overflow: hidden;
-  background: rgba(12, 12, 12, 0.22);
+  background: var(--overlay-glass-fill-thumb);
   border-radius: 50%;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-    inset 2px 1px 0 -1px rgba(255, 255, 255, 0.34),
-    inset -1.5px -1px 0 -1px rgba(255, 255, 255, 0.3),
-    inset -2px -6px 1px -5px rgba(255, 255, 255, 0.22),
-    0 3px 6px rgba(0, 0, 0, 0.03);
+    inset 0 0 0 1px var(--overlay-glass-rim),
+    inset 2px 1px 0 -1px var(--overlay-glass-bevel),
+    inset -1.5px -1px 0 -1px var(--overlay-glass-bevel-under),
+    inset -2px -6px 1px -5px var(--overlay-glass-glow),
+    0 3px 6px var(--overlay-glass-drop);
 }
 
 .work-project-gallery__float-thumb-image {
@@ -409,7 +409,7 @@
 .work-project-gallery__float-sub-label {
   max-width: 14rem;
   overflow: hidden;
-  color: rgba(255, 255, 255, 0.62);
+  color: var(--overlay-glass-label);
   font-size: 0.6875rem;
   font-weight: 400;
   line-height: 1.15;
@@ -444,14 +444,14 @@
   place-items: center;
   border: 0;
   color: inherit;
-  background: rgba(12, 12, 12, 0.17);
+  background: var(--overlay-glass-fill-button);
   border-radius: 999px;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-    inset 2px 1px 0 -1px rgba(255, 255, 255, 0.34),
-    inset -1.5px -1px 0 -1px rgba(255, 255, 255, 0.3),
-    inset -2px -6px 1px -5px rgba(255, 255, 255, 0.22),
-    0 3px 6px rgba(0, 0, 0, 0.03);
+    inset 0 0 0 1px var(--overlay-glass-rim),
+    inset 2px 1px 0 -1px var(--overlay-glass-bevel),
+    inset -1.5px -1px 0 -1px var(--overlay-glass-bevel-under),
+    inset -2px -6px 1px -5px var(--overlay-glass-glow),
+    0 3px 6px var(--overlay-glass-drop);
   cursor: pointer;
   transition:
     color 180ms ease,
@@ -488,12 +488,12 @@
 
 .work-project-gallery__float-close:hover,
 .work-project-gallery__float-button:hover {
-  background-color: rgba(255, 255, 255, 0.14);
+  background-color: var(--overlay-glass-hover);
 }
 
 .work-project-gallery__float-close:focus-visible,
 .work-project-gallery__float-button:focus-visible {
-  outline: 1px solid rgba(255, 255, 255, 0.92);
+  outline: 1px solid var(--overlay-glass-focus-ring);
   outline-offset: 2px;
 }
 

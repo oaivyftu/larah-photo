@@ -16,6 +16,67 @@
   --color-divider: #505050;
   --divider-hairline: 0.5px;
 
+  /* Overlays — translucent veils over photography and glass surfaces.
+     Named for the layer of light each models, not for its alpha: the number
+     is tuning, the role is the decision (contracts/token-naming.md).
+
+     Four surfaces share one glass recipe — rim, bevel, glow, shade — at two
+     tunings. The `-soft` variants are the cursor label's; they are within a
+     few thousandths of the standard ones and are deliberately NOT merged,
+     because merging changes what renders (spec FR-010). Which pairs are
+     candidates for a later, deliberate consolidation is recorded in
+     specs/010-design-system-compliance/research.md section 3. */
+  --overlay-glass-fill: rgba(12, 12, 12, 0.3);
+  --overlay-glass-fill-thumb: rgba(12, 12, 12, 0.22);
+  --overlay-glass-fill-button: rgba(12, 12, 12, 0.17);
+
+  /* Also the mid stop of the tint gradient — one value, one token, so a
+     change to the rim moves the tint with it. */
+  --overlay-glass-rim: rgba(255, 255, 255, 0.04);
+  --overlay-glass-rim-soft: rgba(255, 255, 255, 0.0375);
+  --overlay-glass-bevel: rgba(255, 255, 255, 0.34);
+  --overlay-glass-bevel-soft: rgba(255, 255, 255, 0.3375);
+  --overlay-glass-bevel-under: rgba(255, 255, 255, 0.3);
+  --overlay-glass-glow: rgba(255, 255, 255, 0.22);
+  --overlay-glass-glow-soft: rgba(255, 255, 255, 0.225);
+  --overlay-glass-shine-top: rgba(255, 255, 255, 0.36);
+  --overlay-glass-shine-edge: rgba(255, 255, 255, 0.18);
+  --overlay-glass-tint-top: rgba(255, 255, 255, 0.11);
+  --overlay-glass-tint-foot: rgba(0, 0, 0, 0.02);
+  --overlay-glass-hover: rgba(255, 255, 255, 0.14);
+  --overlay-glass-label: rgba(255, 255, 255, 0.62);
+  --overlay-glass-focus-ring: rgba(255, 255, 255, 0.92);
+
+  --overlay-glass-drop: rgba(0, 0, 0, 0.03);
+  --overlay-glass-hair: rgba(0, 0, 0, 0.038);
+  --overlay-glass-cast-near: rgba(0, 0, 0, 0.04);
+  --overlay-glass-cast-far: rgba(0, 0, 0, 0.12);
+  --overlay-glass-blur-soft: rgba(0, 0, 0, 0.045);
+  --overlay-glass-under: rgba(0, 0, 0, 0.05);
+  --overlay-glass-edge-soft: rgba(0, 0, 0, 0.075);
+  --overlay-glass-inner-top: rgba(0, 0, 0, 0.08);
+
+  --overlay-modal-backdrop: rgb(18 18 18 / 68%);
+  /* The same backdrop at zero alpha: the from/to stop of the modal's fade.
+     Written as a transparent black rather than `transparent` so the
+     interpolation stays in the same colour space as the opaque end. */
+  --overlay-modal-backdrop-clear: rgb(18 18 18 / 0%);
+  --overlay-modal-document: rgb(0 0 0 / 18%);
+  --overlay-modal-close: rgb(0 0 0 / 22%);
+
+  /* Dark surface — project lightbox.
+     A warm-dark sub-palette for viewing photographs, on a site whose other
+     tokens describe a light surface. Six of these seven are used exactly
+     once; they are named as one coherent set because that is what they are,
+     not because any use count made them mandatory (research.md section 5). */
+  --surface-dark: #170707;
+  --surface-dark-raised: #241010;
+  --surface-dark-close-hover: #fff0ee;
+  --on-surface-dark: #fff;
+  --on-surface-dark-strong: #f3e8e8;
+  --on-surface-dark-body: #eadede;
+  --on-surface-dark-muted: #8f7e7e;
+
   /* Typography */
   --font-sans: var(--font-montserrat), Arial, Helvetica, sans-serif;
   --font-serif: Georgia, "Times New Roman", serif;

@@ -71,6 +71,10 @@ Note the near-collision: `clamp(1.25rem, …)` and `clamp(1.15rem, …)` share a
 
 The tables above list the repeated values only, because those are the ones that demonstrate drift. The single-use values are equally mandatory and are enumerated in `baseline-audit.txt` section (c) rather than duplicated here.
 
+**The near-misses are smaller than they look (measured 2026-08-25, after substitution)**: the CSS minifier quantises alpha to 8 bits, so several of the pairs this feature carefully kept apart are already identical in shipped output. `--overlay-glass-rim` (`0.04`) and `--overlay-glass-rim-soft` (`0.0375`) both minify to `#ffffff0a` — the same colour, byte for byte, in every build this site has ever shipped. The bevel pair (`0.34`/`0.3375`) and the glow pair (`0.22`/`0.225`) differ by exactly one 8-bit step.
+
+This does not change what this feature does — FR-010 is about not making a decision here, and the tokens stay separate. It does change the follow-up: merging the rim pair is **provably** a zero-change edit, verifiable by resolving the tokens in the built CSS and diffing the declarations. That method is what verified the colour substitution itself (1609 declarations, identical), and it is a stronger check than visual comparison. T034 should use it.
+
 **A measurement correction (2026-08-25)**: the spacing figures moved from 15 repeated values to 22. The audit originally keyed spacing on the whole declaration, so `1rem` and `1rem 0` counted as two unrelated things and a `clamp()` inside a shorthand never matched the same `clamp()` standing alone. It now splits shorthands into their individual values. The seven values this uncovered were repeated all along and invisible to the check meant to catch them — which is the strongest evidence in this document that use-count thresholds are fragile in a way that a zero-literals rule is not.
 
 ## 4. Naming fluid tokens
