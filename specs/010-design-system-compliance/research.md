@@ -45,13 +45,13 @@
 
 An earlier draft of this section said 10 values across 28 uses; that list was truncated. These are overlays — scrims and veils over photography — which is why they are alpha values rather than named hues. The `0.02`–`0.075` cluster and the `0.22`–`0.34` cluster are close enough that some variation is probably accidental, but **collapsing them would change rendering**, so each becomes its own token and consolidation is a separate, deliberate decision later.
 
-**Spacing** — 12 distinct values used 33 times. Several already have an exact token and are pure substitutions (`0.5rem` → `--space-xs`, `0.25rem` → `--space-2xs`, `1rem` → `--space-md`, `2rem` → `--space-xl`, `4rem` → `--space-3xl`). The rest have no equivalent: `1.25rem` (×5, sits between `--space-md` and `--space-lg`), `0.35rem`, `0.45rem`, `3rem`, and one `5px` — the only px value in the set, which is worth a second look at substitution time.
+**Spacing** — 15 distinct values used 53 times. (An earlier hand count said 12 across 33; it used a narrower property list and missed multi-line declarations. The audit script's count supersedes it.) Several already have an exact token and are pure substitutions (`0.5rem` → `--space-xs`, `0.25rem` → `--space-2xs`, `1rem` → `--space-md`, `2rem` → `--space-xl`, `4rem` → `--space-3xl`). The rest have no equivalent: `1.25rem` (×5, sits between `--space-md` and `--space-lg`), `0.35rem`, `0.45rem`, `3rem`, and one `5px` — the only px value in the set, which is worth a second look at substitution time.
 
 **Type size** — 5 distinct ramps used 12 times: `clamp(1rem, 1.39vw, 1.25rem)` ×3 and `clamp(0.875rem, 1.11vw, 1rem)` ×3 (both shared between `home` and `Button`), `clamp(1.25rem, 1.67vw, 1.5rem)` ×2 (`home`), `clamp(1.15rem, 1.67vw, 1.5rem)` ×2 (`Button`), `clamp(0.8125rem, 0.97vw, 0.875rem)` ×2 (`home`).
 
 Note the near-collision: `clamp(1.25rem, …)` and `clamp(1.15rem, …)` share an identical upper bound and vw slope, differing only in floor — and they live in different files, so neither author saw the other. Both are kept as separate tokens for the same no-visual-change reason.
 
-**Total mandatory work**: 31 distinct values across 81 uses, plus one repeated media query and one repeated animation setup.
+**Total mandatory work**: 36 distinct values across 105 uses, plus one repeated media query and one repeated animation setup. On top of that the audit finds 134 single-use literals with no explanatory comment, which must each gain a comment or a token (spec SC-003a).
 
 ## 4. Naming fluid tokens
 

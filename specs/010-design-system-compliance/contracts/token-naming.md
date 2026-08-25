@@ -47,13 +47,15 @@ Viewport widths MUST go through `media-min`/`media-max`, which accept a key from
 
 ## The compliance check
 
-A script, runnable on demand and by a task in this feature, reports:
+`npm run audit:design-system` (`scripts/audit-design-system.mjs`) reports:
 
 1. Every colour, type size and spacing literal in `src/**/*.module.scss` that does not resolve through `var(--…)`.
 2. Which of those appear **two or more** times — the set that must become tokens.
 3. Which appear once **without** an explanatory comment — the set that must either become tokens or gain one.
 
 **Exit semantics**: non-zero when category 2 is non-empty, or when category 3 is non-empty. Category 2 is the hard rule; category 3 is the documentation rule.
+
+**Written in Node, not shell.** The project already requires Node, so this adds no dependency, and the script has to do two things shell handles badly: join multi-line declarations before parsing (every `linear-gradient` and multi-shadow `box-shadow` in this codebase spans several lines, and a line-by-line scan silently misses the continuation lines where most raw `rgba()` values actually live), and read the line above a declaration to decide whether a single-use literal is explained.
 
 It is deliberately **not** wired into the Git hooks. The same reasoning as feature 009 §4 applies: this is a periodic audit over the whole tree, not a per-commit gate, and the drift it finds is not introduced by every commit.
 

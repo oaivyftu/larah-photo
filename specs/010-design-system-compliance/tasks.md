@@ -28,9 +28,9 @@ Every token introduced MUST hold a value **byte-identical** to the literal it re
 
 **Purpose**: Be able to measure drift before changing anything, so "we fixed it" is provable rather than asserted.
 
-- [ ] T001 Write `scripts/audit-design-system.sh`: scan `src/**/*.module.scss` and report (a) every colour, type-size and spacing literal not resolving through `var(--…)`, (b) which of those appear 2+ times, (c) which appear once with no explanatory comment on or above the line. Exit non-zero when (b) or (c) is non-empty, per contracts/token-naming.md
-- [ ] T002 Add `"audit:design-system": "bash scripts/audit-design-system.sh"` to `package.json` scripts. Do **not** wire it into `.husky/pre-commit` or `.husky/pre-push` — it is a periodic tree-wide audit, not a per-commit gate (contracts/token-naming.md)
-- [ ] T003 Run the audit and save its output to `specs/010-design-system-compliance/baseline-audit.txt`. Confirm it reproduces the counts in research.md §3 (14 colour values / 36 uses, 12 spacing / 33, 5 type ramps / 12). If it disagrees, the script is wrong — fix T001 before continuing, because every later task is measured against this
+- [x] T001 Write `scripts/audit-design-system.sh`: scan `src/**/*.module.scss` and report (a) every colour, type-size and spacing literal not resolving through `var(--…)`, (b) which of those appear 2+ times, (c) which appear once with no explanatory comment on or above the line. Exit non-zero when (b) or (c) is non-empty, per contracts/token-naming.md
+- [x] T002 Add `"audit:design-system": "bash scripts/audit-design-system.sh"` to `package.json` scripts. Do **not** wire it into `.husky/pre-commit` or `.husky/pre-push` — it is a periodic tree-wide audit, not a per-commit gate (contracts/token-naming.md)
+- [x] T003 Run the audit and save its output to `specs/010-design-system-compliance/baseline-audit.txt`. Confirm it reproduces the counts in research.md §3 (14 colour values / 36 uses, 12 spacing / 33, 5 type ramps / 12). If it disagrees, the script is wrong — fix T001 before continuing, because every later task is measured against this
 
 **Checkpoint**: drift is measurable and the baseline is recorded.
 
