@@ -1,33 +1,31 @@
 <!--
 Sync Impact Report
-- Version change: 1.1.0 → 2.0.0 (MAJOR: principle set redefined and reordered)
-- Modified/renamed principles:
-  - II. Sanity as Content Source of Truth → I. Sanity Is the Sole Source of Content
-    (expanded: silent fallback/placeholder rendering now explicitly forbidden)
-  - I. Next.js Version Awareness (NON-NEGOTIABLE) → VI. Stay Current With This
-    Next.js Version (renumbered, wording tightened)
-  - V. Critical User Flows Require Test Coverage (Aspirational) → V. Critical
-    User Flows Require Test Coverage (aspirational) (renumbered only, intent
-    unchanged)
-  - III. Figma-Driven Visual Fidelity → folded into IV. Design Fidelity Through
-    Shared Tokens (scope narrowed to shared-constants enforcement; general
-    Figma-matching guidance removed as a standalone principle)
-- Added principles:
-  - II. Accessibility Is Non-Negotiable (new, non-negotiable)
-  - III. Performance and Image Delivery Are Deliberately Budgeted (new)
-- Removed principles:
-  - IV. Simplicity & Minimal Abstraction (core principle removed; the
-    no-new-`any`/justify-new-dependencies portion is retained under Technology
-    Constraints, but the general "prefer direct implementation" guidance is no
-    longer a constitutional principle)
-  - VI. Small, Reviewed Changes (removed entirely; not carried forward)
-- Added sections: none (Technology Constraints and Development Workflow retained
-  under equivalent names, content replaced per user input)
-- Removed sections: none
+- Version change: 2.0.0 → 2.1.0 (MINOR: Principle V and Development Workflow
+  materially expanded; no principle removed or redefined)
+- Modified principles:
+  - V. Critical User Flows Require Test Coverage (aspirational) → V. Critical
+    User Flows Require Test Coverage. Vitest is now named as the selected
+    framework (decision recorded in `specs/009-testing-quality-gates/`
+    research.md §1 and plan.md). The principle is no longer open-ended: the
+    manual-test-plan fallback is now explicitly time-boxed to the window before
+    the suite lands, and the enforcement mechanism is stated (reviewer check on
+    the PR description — no CI enforces it today).
+- Added principles: none
+- Removed principles: none
+- Modified sections:
+  - Development Workflow: replaced the single-sentence stub left behind when
+    "Small, Reviewed Changes" was dropped in v2.0.0. Now states the gates that
+    actually apply to every change (lint, type-check, production build), the
+    rationale requirements carried over from Principles III and IV, and the
+    review expectation. Previously nothing in this constitution required lint
+    to pass, even though Principle II depends entirely on it.
+- Added/removed sections: none
 - Deferred TODOs:
-  - Principle V remains explicitly aspirational: no test framework is selected
-    yet. Adopting one requires a follow-up amendment (version bump) naming the
-    framework and retiring the manual-test-plan fallback.
+  - Feature 009 is planned but not implemented: no `.husky/`, no Vitest, no
+    test files in `src/` as of this amendment. Until the suite exists, the
+    interim clause in Principle V governs. Once 009 ships, amend again (PATCH)
+    to delete the interim clause and point the workflow gates at the hook
+    scripts by name.
   - RATIFICATION_DATE carried forward unchanged from v1.1.0 (2026-08-17); no
     earlier historical ratification date is on record.
 -->
@@ -82,18 +80,27 @@ reference these shared values.
 **Rationale**: Breakpoints were already extracted from inline values into
 shared constants once; this principle prevents the drift from creeping back in.
 
-### V. Critical User Flows Require Test Coverage (aspirational)
+### V. Critical User Flows Require Test Coverage
 
-No test framework is wired up yet, but going forward, before a critical flow
-(contact/inquiry form submission, work gallery navigation, Sanity content error
-handling) ships or is materially changed, it MUST have automated coverage using
-a framework selected and documented via a constitution amendment. Until a
-framework is adopted, PRs touching these flows MUST include a manual test plan
-in the PR description as an interim substitute.
+Before a critical flow (contact/inquiry form submission, work gallery
+navigation, Sanity content error handling) ships or is materially changed, it
+MUST have automated coverage. **Vitest is the selected framework** — unit tests
+for isolated logic, and mock tests for code depending on the Sanity client,
+with that dependency replaced at the module boundary rather than over the
+network. Playwright/E2E is deliberately excluded from the commit and push gates
+and stays a manual command.
 
-**Rationale**: The project has no regression safety net today; this principle
-is deliberately aspirational and should be revisited (version-bumped) once a
-framework lands.
+**Interim clause (delete once the suite lands)**: the Vitest suite is specified
+in `specs/009-testing-quality-gates/` but is not implemented yet — there is no
+`.husky/`, no Vitest dependency, and no test file in `src/`. Until `npm test`
+exists and passes, PRs touching a critical flow MUST carry a manual test plan
+in the PR description. No CI enforces this; it is a reviewer check, and the
+reviewer is expected to block the PR when it is missing.
+
+**Rationale**: The project has no regression safety net today. Naming the
+framework closes the open-ended "some framework, someday" wording this
+principle carried through v2.0.0, without pretending coverage exists before it
+does.
 
 ### VI. Stay Current With This Next.js Version
 
@@ -117,9 +124,30 @@ strict mode MUST remain enabled; no new `any` without justification.
 
 ## Development Workflow
 
-Changes to `next.config.ts` image config
-and to shared design-token constants require explicit rationale in the PR (see
-Principles III and IV).
+Work reaches `main` through pull requests. Every change MUST clear these gates
+before merge:
+
+- **Lint**: `npm run lint` passes with no errors. This is what gives Principle
+  II its force — the jsx-a11y rules only protect the project if the lint run is
+  actually required, so a change is not mergeable on a red lint run.
+- **Types**: `tsc --noEmit` reports no errors. TypeScript strict mode stays on
+  (see Technology Constraints).
+- **Build**: `npm run build` completes. A change that type-checks but breaks the
+  production build MUST NOT reach a shared branch.
+- **Tests**: `npm test` passes, once the suite exists; until then the interim
+  clause in Principle V applies.
+
+Until the Git hooks specified in `specs/009-testing-quality-gates/` are
+implemented, these gates are run by the author and confirmed by the reviewer —
+nothing enforces them automatically.
+
+Two kinds of change carry an extra burden, and the rationale belongs in the PR
+description, not only in a code comment:
+
+- Changes to the `images` block in `next.config.ts` MUST state the tradeoff
+  made — cost, quality, or layout (Principle III).
+- Changes to shared design-token constants (`src/constants`) MUST state what
+  design source the new value comes from (Principle IV).
 
 ## Governance
 
@@ -136,4 +164,4 @@ Versioning policy:
 - MINOR: New principle/section added or materially expanded guidance.
 - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 2.0.0 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-17
+**Version**: 2.1.0 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-24
