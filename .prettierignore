@@ -1,0 +1,16 @@
+# Build output and dependencies
+node_modules/
+.next/
+out/
+build/
+coverage/
+
+# Lockfiles are generated — reformatting them creates noise and merge conflicts
+package-lock.json
+
+# Git worktrees, each with its own node_modules and sources — same reason
+# eslint.config.mjs and tsconfig.typecheck.json ignore this directory.
+.claude/
+
+# Local Sanity dataset snapshots
+.sanity-backups/

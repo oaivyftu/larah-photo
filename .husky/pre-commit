@@ -1,0 +1,25 @@
+# Each step runs as its own labelled invocation so a failure names itself
+# rather than hiding inside one opaque chain (spec FR-005 / SC-004).
+#
+# Warnings are treated as failures (`--max-warnings=0`, set in the lint-staged
+# config in package.json). This repo had exactly one warning — a dead import —
+# and it was removed rather than tolerated: a gate that permits warnings
+# accumulates them until nobody reads the output.
+#
+# Formatting is absent from the failure list on purpose. lint-staged runs
+# `prettier --write` and re-stages what it rewrote, so badly formatted code is
+# corrected into the commit instead of bouncing back at the developer
+# (spec FR-003a, research.md §9).
+#
+# No `next build` here — that belongs to pre-push. No E2E either (FR-007).
+
+echo "▶ lint-staged  (ESLint --fix + Prettier --write, staged files only)"
+npx lint-staged || { echo "✖ pre-commit failed at: lint-staged"; exit 1; }
+
+echo "▶ typecheck    (tsc --noEmit, whole project)"
+npm run typecheck || { echo "✖ pre-commit failed at: typecheck"; exit 1; }
+
+echo "▶ test         (vitest run, whole project)"
+npm test || { echo "✖ pre-commit failed at: test"; exit 1; }
+
+echo "✔ pre-commit passed"

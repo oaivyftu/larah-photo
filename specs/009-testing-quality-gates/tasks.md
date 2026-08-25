@@ -1,5 +1,4 @@
 ---
-
 description: "Task list for Testing & Git Quality Gates"
 ---
 
@@ -9,7 +8,7 @@ description: "Task list for Testing & Git Quality Gates"
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/npm-scripts.md, quickstart.md
 
-**Tests**: This feature *is* the test infrastructure, so test files are first-class deliverables (US1), not optional add-ons. There is no "write a failing test first" TDD layer on top of them — the suite itself is the product.
+**Tests**: This feature _is_ the test infrastructure, so test files are first-class deliverables (US1), not optional add-ons. There is no "write a failing test first" TDD layer on top of them — the suite itself is the product.
 
 **Organization**: Tasks are grouped by user story so each can be implemented and validated independently.
 
@@ -29,10 +28,10 @@ Single Next.js project. Tests are **colocated** next to the module under test (`
 
 **Purpose**: Install the dev-only dependency set. No runtime dependency is added (constitution Technology Constraints).
 
-- [ ] T001 Install Vitest runner dependencies as devDependencies in `package.json`: `vitest`, `@vitejs/plugin-react`, `vite-tsconfig-paths`, `jsdom`, `@testing-library/react`, `@testing-library/dom`, `@testing-library/jest-dom` (run `npm install -D`; commits `package.json` + `package-lock.json`)
-- [ ] T002 [P] Install formatting dependencies as devDependencies in `package.json`: `prettier`, `eslint-config-prettier`
-- [ ] T003 [P] Install Git-hook dependencies as devDependencies in `package.json`: `husky`, `lint-staged`
-- [ ] T004 Verify `tsconfig.typecheck.json` at repo root still gates correctly: `npx tsc --noEmit -p tsconfig.typecheck.json` exits 0 on a clean tree, and exits non-zero when a deliberate type error is injected into `src/utils/formatWorkCategory.ts` (revert after). File already exists — this task confirms it, does not create it (research.md §8)
+- [x] T001 Install Vitest runner dependencies as devDependencies in `package.json`: `vitest`, `@vitejs/plugin-react`, `vite-tsconfig-paths`, `jsdom`, `@testing-library/react`, `@testing-library/dom`, `@testing-library/jest-dom` (run `npm install -D`; commits `package.json` + `package-lock.json`)
+- [x] T002 [P] Install formatting dependencies as devDependencies in `package.json`: `prettier`, `eslint-config-prettier`
+- [x] T003 [P] Install Git-hook dependencies as devDependencies in `package.json`: `husky`, `lint-staged`
+- [x] T004 Verify `tsconfig.typecheck.json` at repo root still gates correctly: `npx tsc --noEmit -p tsconfig.typecheck.json` exits 0 on a clean tree, and exits non-zero when a deliberate type error is injected into `src/utils/formatWorkCategory.ts` (revert after). File already exists — this task confirms it, does not create it (research.md §8)
 
 **Checkpoint**: All tooling installed; nothing wired up yet.
 
@@ -44,13 +43,13 @@ Single Next.js project. Tests are **colocated** next to the module under test (`
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete — US1 cannot run a test without a Vitest config, and US2/US3 hooks invoke scripts defined here.
 
-- [ ] T005 Create `vitest.config.mts` at repo root: `@vitejs/plugin-react` + `vite-tsconfig-paths` plugins, `test.environment: "jsdom"`, `test.setupFiles: ["./vitest.setup.ts"]`, and `test.globals: true`. Follow `node_modules/next/dist/docs/01-app/02-guides/testing/vitest.md` for this pinned Next.js version rather than memorized config (constitution Principle VI)
-- [ ] T006 Create `vitest.setup.ts` at repo root importing `@testing-library/jest-dom/vitest` so DOM matchers are available in every test file
-- [ ] T007 [P] Create `.prettierrc` at repo root matching the existing code style observed across `src/` — double quotes, semicolons, trailing commas (research.md §7)
-- [ ] T008 [P] Create `.prettierignore` at repo root excluding `.next/`, `node_modules/`, `package-lock.json`, `.claude/`, and `public/` build artifacts
-- [ ] T009 Append `eslint-config-prettier` as the last entry in the `defineConfig([...])` array in `eslint.config.mjs`, so it disables ESLint formatting rules that conflict with Prettier. It MUST come after `nextVitals`/`nextTs`/the jsx-a11y rules block, and MUST NOT disable any jsx-a11y rule (constitution Principle II)
-- [ ] T010 Add scripts to `package.json` exactly per `contracts/npm-scripts.md`: `"test": "vitest run"`, `"test:watch": "vitest"`, `"typecheck": "tsc --noEmit -p tsconfig.typecheck.json"`, `"format": "prettier --write ."`, `"format:check": "prettier --check ."`. Leave the existing `"lint": "eslint"` unchanged
-- [ ] T011 Verify the runner boots: `npm test` exits 0 (Vitest reporting "no tests found" is an acceptable pass at this checkpoint), and `npm run typecheck` exits 0
+- [x] T005 Create `vitest.config.mts` at repo root: `@vitejs/plugin-react` + `vite-tsconfig-paths` plugins, `test.environment: "jsdom"`, `test.setupFiles: ["./vitest.setup.ts"]`, and `test.globals: true`. Follow `node_modules/next/dist/docs/01-app/02-guides/testing/vitest.md` for this pinned Next.js version rather than memorized config (constitution Principle VI)
+- [x] T006 Create `vitest.setup.ts` at repo root importing `@testing-library/jest-dom/vitest` so DOM matchers are available in every test file
+- [x] T007 [P] Create `.prettierrc` at repo root matching the existing code style observed across `src/` — double quotes, semicolons, trailing commas (research.md §7)
+- [x] T008 [P] Create `.prettierignore` at repo root excluding `.next/`, `node_modules/`, `package-lock.json`, `.claude/`, and `public/` build artifacts
+- [x] T009 Append `eslint-config-prettier` as the last entry in the `defineConfig([...])` array in `eslint.config.mjs`, so it disables ESLint formatting rules that conflict with Prettier. It MUST come after `nextVitals`/`nextTs`/the jsx-a11y rules block, and MUST NOT disable any jsx-a11y rule (constitution Principle II)
+- [x] T010 Add scripts to `package.json` exactly per `contracts/npm-scripts.md`: `"test": "vitest run"`, `"test:watch": "vitest"`, `"typecheck": "tsc --noEmit -p tsconfig.typecheck.json"`, `"format": "prettier --write ."`, `"format:check": "prettier --check ."`. Leave the existing `"lint": "eslint"` unchanged
+- [x] T011 Verify the runner boots: `npm test` exits 0 (Vitest reporting "no tests found" is an acceptable pass at this checkpoint), and `npm run typecheck` exits 0
 
 **Checkpoint**: Runner and formatter work standalone. User stories can now begin.
 
@@ -64,12 +63,12 @@ Single Next.js project. Tests are **colocated** next to the module under test (`
 
 **Scope note**: A representative slice, not exhaustive backfill (plan.md Scale/Scope). Async Server Components (`src/app/(site)/**/page.tsx`) are deliberately excluded — Vitest cannot test them (research.md §2).
 
-- [ ] T012 [P] [US1] Write unit tests in `src/utils/formatWorkCategory.test.ts` covering both exports: `normalizeWorkCategory` (trims, lowercases, collapses whitespace to hyphens) and `formatWorkCategory` (title-cases each hyphen-separated word). Include multi-word and already-hyphenated inputs
-- [ ] T013 [P] [US1] Write unit tests in `src/utils/structuredData.test.ts` for at least two pure builders (e.g. `buildBreadcrumbSchema`, `buildProjectSchema`) asserting the emitted JSON-LD graph shape and that `businessId`/`websiteId` are referenced correctly. No mocking needed — these are pure functions over passed-in data
-- [ ] T014 [US1] Write a component test in `src/components/work/WorkFilters/WorkFilters.test.tsx` using `@testing-library/react`: render with a `filters` array, assert each filter label appears, assert the `activeFilter` one is marked active, and assert `onFilterChange` fires with the right value on click. Also assert the accessible group name is present (guards the a11y fix documented in the component's own comment)
-- [ ] T015 [US1] Write mock tests in `src/sanity/fetchers.test.ts`: `vi.mock("@/sanity/client")` to stub `sanityClient.fetch`, then cover (a) a success path — e.g. `getWorkProjectSlugs()` returns mapped slugs from fixture data; (b) the validation failure path — a fetcher throws `Sanity field "..." is required.` when a required field is missing (`requireString`/`requireValue` behavior, `src/sanity/fetchers.ts:153`); (c) the wrapper failure path — a rejected client call surfaces as `Unable to load ... from Sanity.` (`src/sanity/fetchers.ts:144`). This directly exercises constitution Principle I (errors surface, no silent fallback)
-- [ ] T016 [US1] Assert no real network happens: in `src/sanity/fetchers.test.ts`, confirm the mocked `sanityClient.fetch` is the only call path (e.g. `expect(fetchSpy).toHaveBeenCalledTimes(n)`) and that `globalThis.fetch` is never invoked during the run — satisfies FR-002 and data-model.md's Mock Test validation rule
-- [ ] T017 [US1] Run quickstart.md Scenario 1: `npm test` passes with both categories present, exit code 0
+- [x] T012 [P] [US1] Write unit tests in `src/utils/formatWorkCategory.test.ts` covering both exports: `normalizeWorkCategory` (trims, lowercases, collapses whitespace to hyphens) and `formatWorkCategory` (title-cases each hyphen-separated word). Include multi-word and already-hyphenated inputs
+- [x] T013 [P] [US1] Write unit tests in `src/utils/structuredData.test.ts` for at least two pure builders (e.g. `buildBreadcrumbSchema`, `buildProjectSchema`) asserting the emitted JSON-LD graph shape and that `businessId`/`websiteId` are referenced correctly. No mocking needed — these are pure functions over passed-in data
+- [x] T014 [US1] Write a component test in `src/components/work/WorkFilters/WorkFilters.test.tsx` using `@testing-library/react`: render with a `filters` array, assert each filter label appears, assert the `activeFilter` one is marked active, and assert `onFilterChange` fires with the right value on click. Also assert the accessible group name is present (guards the a11y fix documented in the component's own comment)
+- [x] T015 [US1] Write mock tests in `src/sanity/fetchers.test.ts`: `vi.mock("@/sanity/client")` to stub `sanityClient.fetch`, then cover (a) a success path — e.g. `getWorkProjectSlugs()` returns mapped slugs from fixture data; (b) the validation failure path — a fetcher throws `Sanity field "..." is required.` when a required field is missing (`requireString`/`requireValue` behavior, `src/sanity/fetchers.ts:153`); (c) the wrapper failure path — a rejected client call surfaces as `Unable to load ... from Sanity.` (`src/sanity/fetchers.ts:144`). This directly exercises constitution Principle I (errors surface, no silent fallback)
+- [x] T016 [US1] Assert no real network happens: in `src/sanity/fetchers.test.ts`, confirm the mocked `sanityClient.fetch` is the only call path (e.g. `expect(fetchSpy).toHaveBeenCalledTimes(n)`) and that `globalThis.fetch` is never invoked during the run — satisfies FR-002 and data-model.md's Mock Test validation rule
+- [x] T017 [US1] Run quickstart.md Scenario 1: `npm test` passes with both categories present, exit code 0
 
 **Checkpoint**: US1 is independently deliverable — the project has a working test suite even if no hook is ever wired up.
 

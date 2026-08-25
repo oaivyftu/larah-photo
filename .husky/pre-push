@@ -1,0 +1,25 @@
+# The full pre-commit check set, plus a production build.
+#
+# Deliberately not a lighter version of pre-commit (spec Edge Cases): the same
+# lint/type/test steps run again, because what was committed one file at a time
+# still has to hold together as a whole before it leaves the machine.
+#
+# lint runs unscoped here — there are no "staged files" during a push, so the
+# whole project is linted rather than a diff.
+#
+# Still no E2E (FR-007, research.md §4): Playwright needs a booted app, and a
+# broken build already fails this hook without starting a browser.
+
+echo "▶ lint         (eslint, whole project, warnings fail)"
+npx eslint --max-warnings=0 || { echo "✖ pre-push failed at: lint"; exit 1; }
+
+echo "▶ typecheck    (tsc --noEmit, whole project)"
+npm run typecheck || { echo "✖ pre-push failed at: typecheck"; exit 1; }
+
+echo "▶ test         (vitest run, whole project)"
+npm test || { echo "✖ pre-push failed at: test"; exit 1; }
+
+echo "▶ build        (next build, production)"
+npm run build || { echo "✖ pre-push failed at: build"; exit 1; }
+
+echo "✔ pre-push passed"

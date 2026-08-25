@@ -4,7 +4,6 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { playOnPageReady } from "@/utils/playOnPageReady";
-import { InquiryForm } from "@/components/contact/InquiryForm/InquiryForm";
 import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
 import type { ContactPageContent, SiteSettings } from "@/types/site";
 import styles from "./contact.module.scss";
@@ -45,26 +44,26 @@ export function ContactExperience({
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         const intro = gsap.timeline({ paused: true });
 
-      intro
-        .from("[data-page-heading] > span", {
-          yPercent: 115,
-          opacity: 0,
-          rotate: 2,
-          duration: 0.82,
-          stagger: 0.07,
-          ease: "power4.out",
-        })
-        .from(
-          "[data-contact-direct]",
-          {
-            y: 34,
+        intro
+          .from("[data-page-heading] > span", {
+            yPercent: 115,
             opacity: 0,
-            duration: 0.78,
-            stagger: 0.1,
-            ease: "power3.out",
-          },
-          "-=0.42",
-        );
+            rotate: 2,
+            duration: 0.82,
+            stagger: 0.07,
+            ease: "power4.out",
+          })
+          .from(
+            "[data-contact-direct]",
+            {
+              y: 34,
+              opacity: 0,
+              duration: 0.78,
+              stagger: 0.1,
+              ease: "power3.out",
+            },
+            "-=0.42",
+          );
 
         const stopWaitingForPage = playOnPageReady(() => intro.play(0));
 
@@ -81,7 +80,10 @@ export function ContactExperience({
 
   return (
     <div className={styles["contact"]} ref={rootRef}>
-      <section className={styles["contact__layout"]} aria-labelledby="contact-title">
+      <section
+        className={styles["contact__layout"]}
+        aria-labelledby="contact-title"
+      >
         <div className={styles["contact__copy"]}>
           <PageHeading id="contact-title" words={content.titleWords} />
         </div>
@@ -110,9 +112,7 @@ export function ContactExperience({
               </a>
             </div>
             <div className={styles["contact__detail"]}>
-              <span className={styles["contact__detail-label"]}>
-                Instagram
-              </span>
+              <span className={styles["contact__detail-label"]}>Instagram</span>
               <a
                 className={styles["contact__detail-value"]}
                 href={contactDetails.instagramUrl}
