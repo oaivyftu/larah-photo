@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "audit:design-system": "node scripts/audit-design-system.mjs"
+    "audit:design-system": "node scripts/audit-design-system.mjs",
+    "audit:css-diff": "node scripts/compare-built-css.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

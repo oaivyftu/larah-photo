@@ -66,7 +66,17 @@ Then compare before and after by eye on the affected routes — `/`, `/about`, `
 
 **Expected**: no visible difference anywhere. Every substitution was value-for-value identical by construction (contracts/token-naming.md), so any difference you can see is a typo to hunt down, not a design change to accept.
 
-**Why by eye**: this project has no visual-regression tooling, and adding it is a larger decision than this feature should make alone — the same reasoning that kept Playwright out of the Git hooks in feature 009 §4. Recorded as a follow-up.
+**And mechanically**, which is stronger than eyes and repeatable:
+
+```bash
+npm run audit:css-diff
+```
+
+**Expected**: `RENDERED CSS IDENTICAL`. It builds the working tree, builds HEAD, resolves every custom property on both sides, and compares all ~1600 declarations. A screenshot shows one viewport of one route; this shows everything the browser receives. It is what verified each of this feature's four substitution passes.
+
+Still worth a human look at the routes above, for the things CSS equality cannot speak to — the GSAP page-entry timing in particular, which no check here covers.
+
+**Why not full visual-regression tooling**: adding Playwright screenshots is a larger decision than this feature should make alone — the same reasoning that kept it out of the Git hooks in feature 009 §4. Recorded as a follow-up.
 
 ## Reference
 

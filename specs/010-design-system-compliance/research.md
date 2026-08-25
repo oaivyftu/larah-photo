@@ -85,6 +85,20 @@ The fixes are in `scripts/audit-design-system.mjs`; category (d) in the report i
 
 **A measurement correction (2026-08-25)**: the spacing figures moved from 15 repeated values to 22. The audit originally keyed spacing on the whole declaration, so `1rem` and `1rem 0` counted as two unrelated things and a `clamp()` inside a shorthand never matched the same `clamp()` standing alone. It now splits shorthands into their individual values. The seven values this uncovered were repeated all along and invisible to the check meant to catch them — which is the strongest evidence in this document that use-count thresholds are fragile in a way that a zero-literals rule is not.
 
+## 3a. Deferred consolidation (the follow-up this work earns)
+
+Every near-duplicate below was kept separate because FR-010 forbids changing what renders. That was the right call while the values were scattered; now that they are all named in one file, someone can decide about them on purpose. `npm run audit:css-diff` makes each decision checkable rather than arguable — it reports whether a proposed merge changes a single rendered declaration.
+
+| Candidate                                                                | Why it is a candidate                                 | Verdict available now                                                                                 |
+| ------------------------------------------------------------------------ | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `--overlay-glass-rim` / `--overlay-glass-rim-soft`                       | `0.04` vs `0.0375`                                    | **Provably free.** Both minify to `#ffffff0a`; they have been the same colour in every shipped build. |
+| `--overlay-glass-bevel` / `-soft`                                        | `0.34` vs `0.3375`                                    | Differ by one 8-bit alpha step. Sub-perceptual, not identical.                                        |
+| `--overlay-glass-glow` / `-soft`                                         | `0.22` vs `0.225`                                     | Same.                                                                                                 |
+| `--font-size-fluid-lg` / `--font-size-control-lg`                        | Same ceiling and slope, floors `1.25rem` vs `1.15rem` | Real below ~900px. A merge is a design decision, not a cleanup.                                       |
+| `--space-control-pad-sm` / `--space-control-gap` / `--space-control-pad` | `0.55` / `0.6` / `0.625rem`                           | Three values inside 0.075rem, across unrelated controls. Almost certainly accidental.                 |
+| `--work-grid-gap-x` / `--work-detail-meta-gap`                           | Identical values, different reasons                   | Deliberately two tokens. Merge only if the reasons turn out to be one.                                |
+| `--gallery-float-pad-tablet` / `--gallery-float-actions-gap-tablet`      | Both `8px`                                            | Same: two decisions that currently agree.                                                             |
+
 ## 4. Naming fluid tokens
 
 **Decision**: introduce a parallel fluid scale in `_tokens.scss` — `--font-size-fluid-*` and, where duplicates warrant, `--space-fluid-*` — sitting alongside the fixed scale rather than replacing it. Overlay colours get a `--overlay-*` family named by surface and weight (e.g. `--overlay-light-weak`), not by their numeric alpha, so the name survives a future tuning of the value.

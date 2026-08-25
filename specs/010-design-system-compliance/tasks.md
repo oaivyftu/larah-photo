@@ -138,10 +138,10 @@ Substitution runs **file by file**, not category by category. Under a zero-liter
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T032 Run every quickstart.md scenario end to end in one pass on a scratch branch, confirming no earlier scenario regressed while a later one was built
+- [x] T032 Run every quickstart.md scenario end to end in one pass on a scratch branch, confirming no earlier scenario regressed while a later one was built
 - [x] T033 [P] Update `AGENTS.md` §3 with the two naming tiers and when to use each, the new scale families (`--font-size-fluid-*`, `--space-fluid-*`, `--overlay-*`, `--surface-dark*`), the semantic-tier convention (`--<surface>-<element>-<property>`), the `forced-colors` mixin, and the `npm run audit:design-system` command. State the rule plainly — no literal values in a `*.module.scss`, none — so the next agent session inherits it rather than reinventing a threshold
-- [ ] T034 [P] Record the deferred consolidation candidates in `specs/010-design-system-compliance/research.md` §3 as a follow-up: the `0.02`–`0.075` alpha cluster, the two near-identical `clamp()` ramps, and every near-collision T007d surfaced between semantic-tier blocks. All were deliberately kept separate because merging them changes rendering. With the whole set finally visible in one file, someone should decide on purpose later — that review is the point of doing this work, not an afterthought to it
-- [ ] T035 Consider whether the audit script should become a Git hook step or a CI check now that the tree is clean. Feature 009 §4's reasoning says no for a per-commit gate; the calculation changes if CI ever lands. Record the decision either way — do not leave it implicit
+- [x] T034 [P] Record the deferred consolidation candidates in `specs/010-design-system-compliance/research.md` §3 as a follow-up: the `0.02`–`0.075` alpha cluster, the two near-identical `clamp()` ramps, and every near-collision T007d surfaced between semantic-tier blocks. All were deliberately kept separate because merging them changes rendering. With the whole set finally visible in one file, someone should decide on purpose later — that review is the point of doing this work, not an afterthought to it
+- [x] T035 **Decided: pre-push, not pre-commit.** The audit was kept out of the hooks when written because it failed on every run — as a gate that is noise a developer learns to skip. It passes now, which is what turns it into a gate. Tree-wide, so pre-push rather than pre-commit (which is scoped to staged files), and 0.05s beside a `next build`. Reasoning recorded in `.husky/pre-push` itself
 
 ---
 
