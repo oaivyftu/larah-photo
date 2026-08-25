@@ -10,7 +10,7 @@
      tall as its tallest item. */
   align-items: center;
   justify-content: flex-end;
-  font-size: clamp(0.62rem, 0.54vw, 0.72rem);
+  font-size: var(--work-filters-size);
   line-height: 1;
 }
 
@@ -87,6 +87,6 @@
 @include media-max("tablet-lg") {
   .work-filters {
     justify-content: flex-start;
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
   }
 }

@@ -64,7 +64,7 @@
 .work-detail__title {
   max-width: 12ch;
   font-family: var(--font-serif);
-  font-size: clamp(2.7rem, 5.6vw, 6.3rem);
+  font-size: var(--work-detail-title-size);
   font-weight: 400;
   letter-spacing: -0.045em;
   line-height: 0.92;
@@ -73,7 +73,7 @@
 .work-detail__description {
   align-self: end;
   max-width: 38rem;
-  font-size: clamp(1rem, 1.25vw, 1.3rem);
+  font-size: var(--work-detail-copy-size);
   line-height: 1.55;
 }
 
@@ -220,7 +220,7 @@
   }
 
   .work-detail__title {
-    font-size: clamp(2.8rem, 15vw, 4.8rem);
+    font-size: var(--work-detail-title-size-phone);
   }
 
   .work-detail__description {

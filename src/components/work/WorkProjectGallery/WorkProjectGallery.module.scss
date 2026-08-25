@@ -55,7 +55,7 @@
 }
 
 .work-project-gallery__title {
-  font-size: clamp(1.55rem, 2.05vw, 2.25rem);
+  font-size: var(--gallery-title-size);
   font-weight: 400;
   line-height: 1.05;
 }
@@ -68,7 +68,7 @@
 .work-project-gallery__description {
   max-width: 42rem;
   color: var(--on-surface-dark-body);
-  font-size: clamp(0.9rem, 1.05vw, 1.15rem);
+  font-size: var(--gallery-copy-size);
   font-weight: 400;
   line-height: 1.35;
 }
@@ -87,7 +87,7 @@
 
 .work-project-gallery__detail dt {
   color: var(--on-surface-dark-muted);
-  font-size: clamp(0.7rem, 0.78vw, 0.85rem);
+  font-size: var(--gallery-detail-label-size);
   font-weight: 400;
   line-height: 1.1;
 }
@@ -95,7 +95,7 @@
 .work-project-gallery__detail dd {
   margin: 0;
   color: var(--on-surface-dark-strong);
-  font-size: clamp(0.78rem, 0.86vw, 0.95rem);
+  font-size: var(--gallery-detail-value-size);
   font-weight: 650;
   line-height: 1.25;
 }
@@ -330,7 +330,7 @@
   grid-template-columns: 0fr;
   margin-right: 0;
   opacity: 0;
-  font-size: 0.72rem;
+  font-size: var(--font-size-glass-label);
   font-weight: 650;
   letter-spacing: 0.09em;
   line-height: 1;
@@ -410,7 +410,7 @@
   max-width: 14rem;
   overflow: hidden;
   color: var(--overlay-glass-label);
-  font-size: 0.6875rem;
+  font-size: var(--gallery-float-sub-size);
   font-weight: 400;
   line-height: 1.15;
   text-overflow: ellipsis;
@@ -419,7 +419,7 @@
 
 .work-project-gallery__float-title {
   margin-top: 0.15rem;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
@@ -605,11 +605,11 @@
 
   .work-project-gallery__float-sub-label {
     max-width: 9rem;
-    font-size: 0.625rem;
+    font-size: var(--font-size-2xs);
   }
 
   .work-project-gallery__float-title {
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
   }
 
   .work-project-gallery__float-actions {

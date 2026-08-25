@@ -8,7 +8,7 @@
   align-items: baseline;
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: clamp(1.5rem, 2.22vw, 2rem);
+  font-size: var(--page-heading-size);
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1.22;

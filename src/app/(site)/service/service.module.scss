@@ -39,7 +39,7 @@
 }
 
 .service-row__index {
-  font-size: clamp(2.3rem, 3.15vw, 4rem);
+  font-size: var(--service-index-size);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1;
@@ -54,7 +54,7 @@
 
 .service-row__summary h2 {
   max-width: 18rem;
-  font-size: clamp(2.15rem, 3.1vw, 4.1rem);
+  font-size: var(--service-row-title-size);
   font-weight: 400;
   letter-spacing: 0;
   line-height: 0.96;
@@ -62,7 +62,7 @@
 
 .service-row__summary p,
 .service-row__details li {
-  font-size: clamp(1rem, 1.22vw, 1.28rem);
+  font-size: var(--service-row-copy-size);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1.2;
@@ -103,7 +103,7 @@
 .service-row__details span {
   display: block;
   margin-bottom: 1.1rem;
-  font-size: clamp(0.82rem, 0.95vw, 0.96rem);
+  font-size: var(--service-detail-label-size);
   font-weight: 700;
   letter-spacing: 0;
   line-height: 1;
@@ -111,7 +111,7 @@
 
 .service-row__details strong {
   display: block;
-  font-size: clamp(2.2rem, 2.95vw, 3.4rem);
+  font-size: var(--service-detail-figure-size);
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1;

@@ -26,7 +26,7 @@
 
 .about__copy p {
   max-width: 51rem;
-  font-size: clamp(1.45rem, 1.78vw, 2rem);
+  font-size: var(--about-copy-size);
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1.16;
@@ -54,7 +54,7 @@
   left: -10.5%;
   z-index: 1;
   color: var(--color-paper-warm);
-  font-size: clamp(1.75rem, 2.78vw, 2.5rem);
+  font-size: var(--about-caption-size);
   font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 0.95;
@@ -88,6 +88,6 @@
   }
 
   .about__copy p {
-    font-size: clamp(1.1rem, 5.6vw, 1.45rem);
+    font-size: var(--about-copy-size-phone);
   }
 }

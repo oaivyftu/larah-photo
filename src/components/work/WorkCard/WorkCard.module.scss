@@ -69,14 +69,14 @@
 }
 
 .work-card--work .work-card__title {
-  font-size: clamp(1.2rem, 1.25vw, 1.5rem);
+  font-size: var(--work-card-title-size);
   font-weight: 700;
   line-height: 1;
 }
 
 .work-card--work .work-card__meta {
   font-family: var(--font-sans);
-  font-size: clamp(0.86rem, 0.84vw, 1rem);
+  font-size: var(--work-card-meta-size);
   font-weight: 700;
   line-height: 1;
 }
@@ -85,10 +85,10 @@
 // down with it instead of wrapping the title over four lines.
 @include media-max(767px) {
   .work-card--work .work-card__title {
-    font-size: 0.95rem;
+    font-size: var(--work-card-title-size-phone);
   }
 
   .work-card--work .work-card__meta {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
   }
 }
