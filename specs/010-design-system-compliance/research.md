@@ -24,7 +24,7 @@
 
 ## 3. The measured duplicates (the mandatory work)
 
-**Colour** — 10 distinct values used 28 times:
+**Colour** — 14 distinct values used 36 times, concentrated almost entirely in two stylesheets (`GlassPointer`, `WorkProjectGallery`) plus one in `WorkDetailModal`:
 
 | Value                       | Uses | Reading                          |
 | --------------------------- | ---- | -------------------------------- |
@@ -33,17 +33,25 @@
 | `rgba(255, 255, 255, 0.34)` | 3    | light scrim, slightly stronger   |
 | `rgba(255, 255, 255, 0.22)` | 3    | light scrim, weaker              |
 | `rgba(0, 0, 0, 0.03)`       | 3    | faintest dark veil on light      |
+| `#fff`                      | 3    | plain white text on dark         |
 | `rgba(255, 255, 255, 0.11)` | 2    | light veil                       |
 | `rgba(12, 12, 12, 0.3)`     | 2    | dark scrim (near-ink, not black) |
 | `rgba(0, 0, 0, 0.075)`      | 2    | dark veil                        |
 | `rgba(0, 0, 0, 0.05)`       | 2    | dark veil                        |
 | `rgba(0, 0, 0, 0.04)`       | 2    | dark veil                        |
+| `rgba(0, 0, 0, 0.038)`      | 2    | dark veil                        |
+| `rgba(0, 0, 0, 0.02)`       | 2    | dark veil                        |
+| `rgb(18 18 18 / 0%)`        | 2    | transparent stop in a gradient   |
 
-These are overlays — scrims and veils over photography — which is why they are alpha values rather than named hues. The 0.22/0.30/0.34 cluster and the 0.03/0.04/0.05/0.075 cluster are close enough that some are probably accidental variation, but **collapsing them would change rendering**, so each becomes its own token and any consolidation is a separate, deliberate decision later.
+An earlier draft of this section said 10 values across 28 uses; that list was truncated. These are overlays — scrims and veils over photography — which is why they are alpha values rather than named hues. The `0.02`–`0.075` cluster and the `0.22`–`0.34` cluster are close enough that some variation is probably accidental, but **collapsing them would change rendering**, so each becomes its own token and consolidation is a separate, deliberate decision later.
 
-**Type size** — 5 distinct ramps used 12 times: `clamp(1rem, 1.39vw, 1.25rem)` ×3, `clamp(0.875rem, 1.11vw, 1rem)` ×3, `clamp(1.25rem, 1.67vw, 1.5rem)` ×2, `clamp(1.15rem, 1.67vw, 1.5rem)` ×2, `clamp(0.8125rem, 0.97vw, 0.875rem)` ×2.
+**Spacing** — 12 distinct values used 33 times. Several already have an exact token and are pure substitutions (`0.5rem` → `--space-xs`, `0.25rem` → `--space-2xs`, `1rem` → `--space-md`, `2rem` → `--space-xl`, `4rem` → `--space-3xl`). The rest have no equivalent: `1.25rem` (×5, sits between `--space-md` and `--space-lg`), `0.35rem`, `0.45rem`, `3rem`, and one `5px` — the only px value in the set, which is worth a second look at substitution time.
 
-Note the near-collision: `clamp(1.25rem, …)` and `clamp(1.15rem, …)` share an identical upper bound and vw slope, differing only in floor. Both are kept as separate tokens for the same no-visual-change reason.
+**Type size** — 5 distinct ramps used 12 times: `clamp(1rem, 1.39vw, 1.25rem)` ×3 and `clamp(0.875rem, 1.11vw, 1rem)` ×3 (both shared between `home` and `Button`), `clamp(1.25rem, 1.67vw, 1.5rem)` ×2 (`home`), `clamp(1.15rem, 1.67vw, 1.5rem)` ×2 (`Button`), `clamp(0.8125rem, 0.97vw, 0.875rem)` ×2 (`home`).
+
+Note the near-collision: `clamp(1.25rem, …)` and `clamp(1.15rem, …)` share an identical upper bound and vw slope, differing only in floor — and they live in different files, so neither author saw the other. Both are kept as separate tokens for the same no-visual-change reason.
+
+**Total mandatory work**: 31 distinct values across 81 uses, plus one repeated media query and one repeated animation setup.
 
 ## 4. Naming fluid tokens
 
