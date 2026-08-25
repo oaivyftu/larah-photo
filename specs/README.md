@@ -40,18 +40,23 @@ rather than back-filling a plan for the shipped baseline.
 
 ## Forward-looking specs (009+) — full artifact set
 
-`009-testing-quality-gates` is the first feature specified _before_ being built,
-so it carries the full set: `spec.md`, `plan.md`, `research.md`, `data-model.md`,
-`quickstart.md`, `contracts/`. Nothing in it is implemented yet — there is no
-`.husky/`, no Vitest dependency, and no test file in `src/`.
+These are specified _before_ being built, so they carry the full artifact set:
+`spec.md`, `plan.md`, `research.md`, `data-model.md`, `quickstart.md`,
+`contracts/`, `tasks.md`.
 
-**Current gap**: `009` has no `tasks.md` — `/speckit-tasks` has not been run, so
-`/speckit-implement` has nothing to execute yet.
+- **`009-testing-quality-gates`** — shipped 2026-08-24. Vitest suite (31 tests),
+  Prettier, and Husky pre-commit/pre-push hooks are all in the tree; all 31
+  tasks are checked off.
+- **`010-design-system-compliance`** — specified 2026-08-25, not yet planned.
+  Makes the codebase comply with constitution Principle VII: every colour and
+  type size resolves through `src/styles/`, anything needed twice or more lives
+  once in `src/components/ui/`, and the TypeScript breakpoint mirror cannot
+  drift from the stylesheet silently. Next step: `/speckit-plan`.
 
 ## Targeting a feature
 
 `.specify/feature.json` holds the active feature directory and currently points
-at `009-testing-quality-gates`. To run a Spec Kit command against a different
+at `010-design-system-compliance`. To run a Spec Kit command against a different
 one without editing that file, set the override read by
 `.specify/scripts/bash/common.sh`:
 

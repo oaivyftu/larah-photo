@@ -20,17 +20,18 @@ this first_.
 Every area of this app has a spec in `specs/`. Find the one covering what you
 are about to change and read it:
 
-| Area                            | Spec                                 |
-| ------------------------------- | ------------------------------------ |
-| Home page                       | `specs/001-home-page/`               |
-| Work gallery / project detail   | `specs/002-work-gallery/`            |
-| About page                      | `specs/003-about-page/`              |
-| Services page                   | `specs/004-services-page/`           |
-| Contact page                    | `specs/005-contact-page/`            |
-| Header, footer, nav, page shell | `specs/006-site-navigation-shell/`   |
-| Sanity Studio / content sync    | `specs/007-cms-studio-content-sync/` |
-| SEO, metadata, structured data  | `specs/008-seo-metadata/`            |
-| Tests and Git hooks             | `specs/009-testing-quality-gates/`   |
+| Area                             | Spec                                  |
+| -------------------------------- | ------------------------------------- |
+| Home page                        | `specs/001-home-page/`                |
+| Work gallery / project detail    | `specs/002-work-gallery/`             |
+| About page                       | `specs/003-about-page/`               |
+| Services page                    | `specs/004-services-page/`            |
+| Contact page                     | `specs/005-contact-page/`             |
+| Header, footer, nav, page shell  | `specs/006-site-navigation-shell/`    |
+| Sanity Studio / content sync     | `specs/007-cms-studio-content-sync/`  |
+| SEO, metadata, structured data   | `specs/008-seo-metadata/`             |
+| Tests and Git hooks              | `specs/009-testing-quality-gates/`    |
+| Design system, shared components | `specs/010-design-system-compliance/` |
 
 `specs/001`–`008` are **retrospective**: they describe what already shipped.
 They have no `plan.md` or `tasks.md` and should not get one — see
