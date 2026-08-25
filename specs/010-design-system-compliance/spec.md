@@ -59,8 +59,8 @@ A few values — the breakpoint scale in particular — have to be readable both
 
 ### Edge Cases
 
-- What about a value used exactly once, that no other screen shares? It still comes from the design system if a suitable token exists; a genuinely one-off value may stay local, but must be commented with why it is not a token.
-- What about styles that respond to an operating-system accessibility setting rather than to viewport width? These are not breakpoints and are not subject to the breakpoint rule, but if the same query is written in two or more places it falls under the two-or-more rule like anything else.
+- What about a value used exactly once, that no other screen shares? It makes no difference. A value used once is still a design decision; the design system is where decisions are recorded, and a use count of one only means it has not drifted **yet**. Colour, type size and spacing are treated alike here.
+- What about styles that respond to an operating-system accessibility setting rather than to viewport width? These are not breakpoints and are not subject to the breakpoint rule, but if the same query is written in two or more places it falls under FR-006, which governs repeated blocks and behaviour and does still use a two-or-more threshold. Values do not — see FR-001.
 - What about shared primitives that nothing currently renders? They stay. A design system is allowed to hold components ahead of their first consumer (constitution Principle VII).
 - What if consolidating a repeated pattern would change how a screen looks or behaves? Then it is not a like-for-like consolidation. Visual and behavioural output must be unchanged; anything that would alter output is out of scope for this feature.
 
@@ -68,8 +68,8 @@ A few values — the breakpoint scale in particular — have to be readable both
 
 ### Functional Requirements
 
-- **FR-001**: Every colour used in a component stylesheet MUST reference a design-system colour definition rather than restating the value literally.
-- **FR-002**: Every type size used in a component stylesheet MUST reference a design-system type-size definition.
+- **FR-001**: Every colour, type size and spacing value used in a component stylesheet MUST reference a design-system definition rather than restating the value literally. This holds regardless of how many places use it: a value used exactly once is still a design decision, and a stylesheet is not where design decisions are recorded.
+- **FR-002**: Where the design system cannot express a value with a shared, reusable name, it MUST still own the value — under a name describing the element or surface the value serves. Being hard to name generically is not grounds for leaving a value at the point of use.
 - **FR-003**: Where a component needs a value the design system does not define, the value MUST be added to the design system and then referenced. Inlining it at the point of use is not an acceptable outcome.
 - **FR-004**: Where a needed value differs only marginally from an existing design-system value, the existing value MUST be used instead of introducing a near-duplicate, unless the difference is deliberate and documented.
 - **FR-005**: Every viewport-width rule MUST be expressed through the design system's shared width helpers rather than written out at the point of use.
@@ -91,10 +91,10 @@ A few values — the breakpoint scale in particular — have to be readable both
 
 ### Measurable Outcomes
 
-- **SC-001**: No colour value appears literally in more than one place. Every colour used by two or more rules resolves through the design system, and any literal that remains is provably used once.
-- **SC-002**: No type size appears literally in more than one place, under the same rule as SC-001.
-- **SC-003**: No spacing value appears literally in more than one place, under the same rule as SC-001.
-- **SC-003a**: Every remaining single-use literal carries a comment saying why it is not a token, so the next reader can tell a deliberate exception from an oversight.
+- **SC-001**: No colour value appears literally in a component stylesheet. Every colour resolves through the design system, whether one rule uses it or twenty.
+- **SC-002**: No type size appears literally in a component stylesheet, under the same rule as SC-001.
+- **SC-003**: No spacing value appears literally in a component stylesheet, under the same rule as SC-001.
+- **SC-003a**: Every design-system value is named for what it serves, never for the number it holds. A name that restates its own value is a violation of this criterion even though the value is technically tokenised.
 - **SC-003b**: Zero viewport-width rules are written out at the point of use.
 - **SC-004**: Every pattern identified as appearing in two or more places has exactly one definition afterwards, and the number of places restating it locally is zero.
 - **SC-005**: Changing any single design-system value updates every screen that uses it, verified on at least one colour and one type size.
@@ -114,13 +114,29 @@ A few values — the breakpoint scale in particular — have to be readable both
 
   The design system is therefore the minority convention today, not the norm with a few exceptions. This changes the feature's shape: see the next assumption.
 
-- Because most declarations bypass the token layer, "zero literals anywhere" is not the target. Two thirds of the type sizes are fluid `clamp()` ramps that the current fixed-step scale cannot express, and minting one token per unique ramp would turn the design system into a lookup table rather than a set of decisions. The target is instead the constitution's own two-or-more rule: **anything used twice or more becomes a token; a genuinely single-use value may stay local if it says why.** Measured duplicates that this makes mandatory: 10 distinct colour values used 28 times between them, and 5 distinct fluid type ramps used 12 times between them.
+  These are counts of **declarations that bypass the token layer**. The next assumption counts **distinct values**, which is the smaller number, since one value can be restated many times. Both are needed: the first says how much of the tree is touched, the second says how many tokens result.
 
-- Of the 9 fixed type sizes, five exactly match a size the design system already defines and are straightforward substitutions. Four (0.6875rem, 0.72rem twice, 0.95rem) have no equivalent and need either a new definition or a deliberate decision to round to the nearest existing one.
+- **The target is zero literals, in all three categories (decided 2026-08-25).** An earlier draft of this spec set the bar at the constitution's two-or-more rule, then at zero for colour only. Both were rejected in favour of the constitution's plain reading: a raw hex or a bare `font-size` is a violation, not a shortcut. A use count of one does not mean a value is not a design decision — it means the decision has not been copied anywhere **yet**, which is the moment before drift, not an exemption from it. The measured scope this creates, from `baseline-audit.txt`:
 
-- The project-gallery lightbox carries a coherent warm-dark sub-palette of its own (7 values) for a dark surface, on a site whose tokens describe a light one. It is already partially compliant — it uses `--color-paper-warm` for one element — which suggests the sub-palette wants naming, not deleting.
-- No viewport-width rule is currently written out at the point of use — every one already goes through the shared helpers. FR-005 and SC-003 therefore protect an already-clean state rather than describing a repair.
-- Two stylesheets contain an identical operating-system accessibility query (`forced-colors`). This is not a breakpoint, so it is not a viewport-width violation, but it does appear twice and therefore falls under the two-or-more rule.
+  | Category  | Distinct values to tokenise | Repeated | Used once |
+  | --------- | --------------------------- | -------- | --------- |
+  | Colour    | 36                          | 14       | 22        |
+  | Type size | 37                          | 7        | 30        |
+  | Spacing   | 95                          | 22       | 73        |
+
+  Of those 168, twelve already have an exact token and are pure substitutions. The remaining 156 are new definitions, and 84 of them are fluid `clamp()` ramps used exactly once.
+
+- **The 84 one-off ramps force a naming decision, not a naming problem.** Three rules would otherwise collide: every value is tokenised, every token holds a byte-identical value (FR-010, no visible change), and no token is named for the number it holds (SC-003a). Eighty-four near-identical ramps cannot all be `--space-fluid-lg`, they cannot be merged without changing rendering, and naming them `--space-fluid-37` would satisfy the letter of the first rule while defeating the third. The resolution is that the design system gains a **second naming tier**: alongside the reusable scale, values are named for the element or surface they serve (`--about-intro-pad-y`, `--service-hero-size`). Two ramps that differ only slightly then carry different names honestly, because they genuinely serve different things. See research.md §2 and contracts/token-naming.md.
+
+- Strictness is **not** licence to collapse near-misses. `rgba(255, 255, 255, 0.0375)` and `rgba(255, 255, 255, 0.04)` each get their own token, because FR-010 forbids a visible change. The result will contain near-identical entries; merging them is a separate, deliberate decision taken later with the whole set in view (research.md §3).
+
+- **This scope is larger than the two-or-more rule would have produced** — roughly 168 values rather than 58 — and the difference is concentrated in single-use fluid ramps. That trade was made knowingly: it is the only version of the rule that is mechanically checkable without a judgement call at every call site, and a rule with no judgement calls is one that survives contact with the next contributor.
+
+- Of the fixed type sizes, four exactly match a size the design system already defines and are straightforward substitutions. The three with no equivalent (`0.6875rem`, `0.72rem`, `0.95rem`) get new definitions. Rounding them onto the nearest existing step was considered and is forbidden: it changes rendering, which FR-010 does not allow.
+
+- The project-gallery lightbox carries a coherent warm-dark sub-palette of its own (7 values) for a dark surface, on a site whose tokens describe a light one. It is already partially compliant — it uses `--color-paper-warm` for one element. Six of the seven are used once; under the strict rule they are tokenised like everything else, and as one named set rather than seven unrelated entries.
+- No viewport-width rule is currently written out at the point of use — every one already goes through the shared helpers. FR-005 and SC-003b therefore protect an already-clean state rather than describing a repair.
+- Two stylesheets contain an identical operating-system accessibility query (`forced-colors`). This is not a breakpoint, so it is not a viewport-width violation, but it is a repeated pattern and so falls under FR-006, which still uses a two-or-more threshold. The zero-literals rule governs **values**; FR-006 governs repeated markup, blocks and behaviour, where a single occurrence genuinely is not yet a shared thing.
 - Known repeated patterns at the time of writing: an animation-library registration step repeated in four page-level components, and a page-ready animation helper called from those same four. Both are candidates for consolidation; the audit in this feature may surface others.
 - The shared component library keeps its current name and location. Renaming it was considered and deliberately rejected — it would rewrite imports across sixteen files for no functional gain (constitution v2.2.0 Sync Impact Report).
 - Because this feature changes no visible output, its safety net is the existing test suite plus direct visual comparison. Screens whose behaviour is not unit-testable are verified by rendering them before and after.

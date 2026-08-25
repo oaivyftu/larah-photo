@@ -29,7 +29,7 @@ No runtime domain data. The "entities" are the design-system artifacts this feat
 - **Where**: `src/styles/_tokens.scss`, in a `/* Dark surface — project lightbox */` block.
 - **Shape**: `--surface-dark: #170707;`, `--on-surface-dark-muted: #8f7e7e;`
 - **Scope**: names the project-gallery lightbox's warm-dark palette. Consumed only by that surface today; available to any future dark surface.
-- **Note**: six of the seven are single-use and technically exempt under the two-or-more rule, but they form one coherent set and are named as a set (research.md §5).
+- **Note**: six of the seven are single-use. An earlier two-or-more rule would have exempted them; the zero-literals rule does not, and they are named as one coherent set regardless (research.md §5).
 
 ## Accessibility mixin (extended)
 
@@ -50,7 +50,10 @@ No runtime domain data. The "entities" are the design-system artifacts this feat
 - **Mirror**: `src/constants/breakpoints.ts`, currently mirroring 2 of the 10 breakpoints.
 - **Rule**: the mirror names what it mirrors in a comment, and a test asserts each mirrored constant equals its SCSS counterpart. Partial mirroring is fine — only the values that are mirrored are checked.
 
-## Local literal (the permitted exception)
+## Semantic token (replaces the "local literal" exception)
 
-- **Definition**: a value used exactly once, left in the stylesheet that uses it.
-- **Rule**: permitted, but MUST carry a comment saying why it is not a token, so a later reader can distinguish a deliberate exception from drift (spec SC-003a).
+- **Definition**: a design-system value named for the single element or surface it serves — `--about-intro-pad-y`, `--lightbox-caption-size` — rather than for a step on a shared scale.
+- **Lives in**: `src/styles/`, like every other token. It is _not_ a component-local custom property; those remain the private-token anti-pattern Principle VII forbids.
+- **Why it exists**: earlier drafts of this feature permitted a single-use value to stay inline behind an explanatory comment. That exception is gone (spec SC-001–SC-003). The semantic tier is what replaces it — the value still gets a home and a name, the home is just the design system rather than the stylesheet.
+- **Rule**: named for what it serves, never for what it holds (spec SC-003a). `--service-hero-size`, not `--font-size-fluid-31`.
+- **Promotion**: if a second call site later wants the same value for the same reason, it graduates to the scale tier and both sites reference the new name. That is a normal edit, not a violation.

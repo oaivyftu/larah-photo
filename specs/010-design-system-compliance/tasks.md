@@ -22,15 +22,19 @@ description: "Task list for Design System Compliance"
 
 Every token introduced MUST hold a value **byte-identical** to the literal it replaces (contracts/token-naming.md). Do not round near-identical alphas together, do not collapse `clamp()` ramps that share two of three arguments, do not normalise onto the nearest existing step. A visible difference after this work means a typo, not a decision.
 
+**Zero literals, all three categories.** Every colour, type size and spacing value becomes a token regardless of how many places use it (spec SC-001–SC-003): 36 colours, 37 type sizes, 95 spacing values — 168 in all, 12 of which already have a token. There is no comment that excuses a literal and no use-count threshold. Note this is _not_ permission to merge near-misses: `0.0375` and `0.04` are still two tokens.
+
+**Which tier a token goes in** (contracts/token-naming.md): scale tier for values that genuinely recur (`--space-fluid-lg`), semantic tier named for the element served for values that belong to one place (`--about-intro-pad-y`). 84 of the new tokens are one-off fluid ramps and take semantic names. Numbering a token after its own value — `--space-fluid-37` — is a violation of SC-003a even though the literal is technically gone.
+
 ---
 
 ## Phase 1: Setup (Measurement First)
 
 **Purpose**: Be able to measure drift before changing anything, so "we fixed it" is provable rather than asserted.
 
-- [x] T001 Write `scripts/audit-design-system.sh`: scan `src/**/*.module.scss` and report (a) every colour, type-size and spacing literal not resolving through `var(--…)`, (b) which of those appear 2+ times, (c) which appear once with no explanatory comment on or above the line. Exit non-zero when (b) or (c) is non-empty, per contracts/token-naming.md
-- [x] T002 Add `"audit:design-system": "bash scripts/audit-design-system.sh"` to `package.json` scripts. Do **not** wire it into `.husky/pre-commit` or `.husky/pre-push` — it is a periodic tree-wide audit, not a per-commit gate (contracts/token-naming.md)
-- [x] T003 Run the audit and save its output to `specs/010-design-system-compliance/baseline-audit.txt`. Confirm it reproduces the counts in research.md §3 (14 colour values / 36 uses, 12 spacing / 33, 5 type ramps / 12). If it disagrees, the script is wrong — fix T001 before continuing, because every later task is measured against this
+- [x] T001 Write `scripts/audit-design-system.mjs`: scan `src/**/*.module.scss` and report (a) every colour, type-size and spacing literal not resolving through `var(--…)`, (b) which of those appear 2+ times, (c) which appear once. Exit non-zero when (b) or (c) is non-empty, per contracts/token-naming.md. Key spacing on individual values, not whole declarations — `padding: 1rem 0` contributes `1rem`, or repeated values hide inside shorthands
+- [x] T002 Add `"audit:design-system": "node scripts/audit-design-system.mjs"` to `package.json` scripts. Do **not** wire it into `.husky/pre-commit` or `.husky/pre-push` — it is a periodic tree-wide audit, not a per-commit gate (contracts/token-naming.md)
+- [x] T003 Run the audit and save its output to `specs/010-design-system-compliance/baseline-audit.txt`. Confirm it reproduces the counts in research.md §3. Recorded baseline: colour 36 distinct values (14 repeated across 36 uses, 22 used once), type-size 37 (7 across 16, 30 once), spacing 95 (22 across 87, 73 once) — 168 in all. If the script disagrees, the script is wrong — fix T001 before continuing, because every later task is measured against this
 
 **Checkpoint**: drift is measurable and the baseline is recorded.
 
@@ -42,36 +46,54 @@ Every token introduced MUST hold a value **byte-identical** to the literal it re
 
 **⚠️ CRITICAL**: No substitution task may begin until this phase is complete.
 
-- [ ] T004 [P] Add a `/* Typography — fluid */` block to `src/styles/_tokens.scss` with the 5 ramps from research.md §3, named `--font-size-fluid-*` by relative size. Copy each `clamp()` argument list exactly; `clamp(1.25rem, 1.67vw, 1.5rem)` and `clamp(1.15rem, 1.67vw, 1.5rem)` are two separate tokens despite sharing an upper bound and slope
-- [ ] T005 [P] Add an `/* Overlays */` block to `src/styles/_tokens.scss` with the 14 values from research.md §3, named `--overlay-<light|dark>-<weight>` by surface and intent, never by alpha. `rgb(18 18 18 / 0%)` is a gradient's transparent stop, not a veil — name it for that role
+Work from `baseline-audit.txt`: section (b) is the scale tier, section (c) is mostly the semantic tier. Do the scale tier first — a value that turns out to recur must not be given a semantic name.
+
+### Scale tier
+
+- [ ] T004 [P] Add a `/* Typography — fluid */` block to `src/styles/_tokens.scss` for the repeated fluid ramps in research.md §3, named `--font-size-fluid-*` by relative size. Copy each `clamp()` argument list exactly; `clamp(1.25rem, 1.67vw, 1.5rem)` and `clamp(1.15rem, 1.67vw, 1.5rem)` are two separate tokens despite sharing an upper bound and slope
+- [ ] T005 [P] Add an `/* Overlays */` block to `src/styles/_tokens.scss` covering **every** translucent colour in the tree: the 14 repeated values plus the 16 used once, in `GlassPointer` (6), `WorkDetailModal` (3) and `WorkProjectGallery` (7) — 30 in all, listed in `baseline-audit.txt` (b) and (c). Name each `--overlay-<light|dark>-<weight>` by surface and intent, never by alpha. `rgb(18 18 18 / 0%)` is a gradient's transparent stop, not a veil — name it for that role. Several single-use values sit a hair from a repeated one (`0.0375`/`0.04`, `0.3375`/`0.3`, `0.225`/`0.22`); each keeps its own token and its own name, and the pairing is recorded for T034
 - [ ] T006 [P] Add a `/* Dark surface — project lightbox */` block to `src/styles/_tokens.scss` for the 7 warm-dark values in `WorkProjectGallery.module.scss`, as `--surface-dark*` and `--on-surface-dark-*` (research.md §5, data-model.md)
-- [ ] T007 [P] Add spacing tokens to `src/styles/_tokens.scss` for the duplicate values that have no existing equivalent: `1.25rem` (×5), `0.35rem`, `0.45rem`, `3rem`, and the lone `5px`. The other duplicates map onto existing tokens and need nothing new. Investigate the `5px` while here — it is the only px value in the set and may be a mistake worth flagging rather than enshrining
+- [ ] T007 [P] Add scale-tier spacing tokens to `src/styles/_tokens.scss` for the 22 repeated values in `baseline-audit.txt` (b). Eight map onto existing tokens and need nothing new (`0.5rem`→`--space-xs`, `0.25rem`→`--space-2xs`, `1rem`→`--space-md`, `1.5rem`→`--space-lg`, `2rem`→`--space-xl`, `4rem`→`--space-3xl` among them); the rest are new, including `1.25rem` (×6), `0.35rem` (×5), `0.45rem`, `3rem`, `0.6rem`, `0.8rem`. Investigate the px values (`3px`, `4px`, `5px`, `8px`, `-1px`) while here — they are the only px in the set and may be mistakes worth flagging rather than enshrining
+
+### Semantic tier
+
+These are the 125 values used exactly once, listed in `baseline-audit.txt` (c). Name each for the element or surface it serves, never for the number it holds (contracts/token-naming.md). Grouped by owning surface so each task is one coherent naming decision rather than a list of numbers.
+
+- [ ] T007a [P] Name the single-use type sizes and spacing for the four content pages in `src/styles/_tokens.scss`: `home` (28 values), `service` (18), `about` (12), `contact` (6). These are section rhythms and heading ramps — `--home-hero-size`, `--about-intro-pad-y` — and they are the largest group by count
+- [ ] T007b [P] Name the single-use type sizes and spacing owned by the work surfaces: `WorkProjectGallery` (51 values, the heaviest file in the feature), `WorkDetailGallery` (18), `WorkDetailModal` (10), `WorkCard` (5), `WorkFilters` (5), `WorkMasonryGrid` (1)
+- [ ] T007c [P] Name the remainder, owned by shared chrome and primitives: `GlassPointer` (19), `Button` (8), `SiteFooter` (8), `SiteHeader` (6), `MainNav` (4), `PageHeading` (3), `not-found` (3), `ShareButton` (2), `Input` (1), and the `work` route shell (8)
+- [ ] T007d Review the three semantic blocks together before any of them is consumed. Values named independently in T007a–T007c will have collided — two surfaces naming the same rhythm differently, or one ramp appearing in two blocks. Anything genuinely shared moves to the scale tier now; near-identical-but-distinct values stay separate and get recorded for T034. This is the task that stops the semantic tier becoming the lookup table research.md §2 warned about
+
+### Mixins and verification
+
 - [ ] T008 Add a `forced-colors` mixin to `src/styles/_mixins.scss`, beside `hover-fine`/`touch`/`reduced-motion`, wrapping `@media (forced-colors: active)`
 - [ ] T009 Verify the token layer still compiles and nothing rendered changed yet: `npm run build` succeeds and no `*.module.scss` consumer has been edited. Adding unused custom properties must be a no-op
 
-**Checkpoint**: every token the feature needs exists and is named. Nothing consumes them yet.
+**Checkpoint**: all 156 new tokens exist across both tiers and are named for what they serve. Nothing consumes them yet.
 
 ---
 
 ## Phase 3: User Story 1 - A designer changes a value once and the site follows (Priority: P1) 🎯 MVP
 
-**Goal**: No colour, type size, or spacing value is stated literally in more than one place.
+**Goal**: No colour, type size or spacing value is stated literally in any component stylesheet.
 
-**Independent Test**: Change one token, rebuild, confirm every place that used that value changed together. The audit reports zero duplicate literals.
+**Independent Test**: Change one token, rebuild, confirm every place that used that value changed together. `npm run audit:design-system` exits 0 with both (b) and (c) empty.
 
 **Depends on**: Phase 2.
 
-- [ ] T010 [US1] Replace duplicate colour literals in `src/components/ui/GlassPointer/GlassPointer.module.scss` with the `--overlay-*` tokens from T005. This file and T011's carry almost all of them
-- [ ] T011 [US1] Replace duplicate colour literals in `src/components/work/WorkProjectGallery/WorkProjectGallery.module.scss` with `--overlay-*` tokens (T005), and its 7 warm-dark values with `--surface-dark*` / `--on-surface-dark-*` (T006). Largest single file in the feature
-- [ ] T012 [P] [US1] Replace the repeated `rgb(18 18 18 / 0%)` gradient stop in `src/components/work/WorkDetailModal/WorkDetailModal.module.scss` with its T005 token
-- [ ] T013 [P] [US1] Replace the duplicate fluid type ramps in `src/app/(site)/home.module.scss` with `--font-size-fluid-*` tokens (T004)
-- [ ] T014 [P] [US1] Replace the duplicate fluid type ramps in `src/components/ui/Button/Button.module.scss` with `--font-size-fluid-*` tokens (T004)
-- [ ] T015 [US1] Replace the 5 fixed type sizes that exactly match an existing token (`0.625rem`, `0.75rem` ×2, `0.875rem`, `1rem`) across `WorkCard.module.scss`, `WorkFilters.module.scss` and `WorkProjectGallery.module.scss` with `var(--font-size-*)`
-- [ ] T016 [US1] Decide and apply the 4 fixed type sizes with no equivalent — `0.6875rem`, `0.72rem` ×2, `0.95rem` in `GlassPointer.module.scss` and `WorkProjectGallery.module.scss`. Either mint a token or, if a value is single-use, leave it with a comment saying why (spec SC-003a). Do **not** round onto the nearest existing step — that changes rendering
-- [ ] T017 [US1] Replace the 12 duplicate spacing values across their call sites: the ones with exact existing tokens (`0.5rem`→`--space-xs`, `0.25rem`→`--space-2xs`, `1rem`→`--space-md`, `2rem`→`--space-xl`, `4rem`→`--space-3xl`) and the ones minted in T007
-- [ ] T018 [US1] Run `npm run audit:design-system` and confirm category (b) — literals appearing 2+ times — is empty. Diff against `baseline-audit.txt` from T003 to show exactly what closed
-- [ ] T019 [US1] Add explanatory comments to every remaining single-use literal the audit reports in category (c), or promote it to a token if it turns out to encode a real decision. The audit must exit 0 afterwards
-- [ ] T020 [US1] Verify nothing moved: `npm run build`, then compare `/`, `/about`, `/service`, `/work` and a project detail page with the lightbox open at ~375px, ~820px and ~1440px against the pre-change rendering (quickstart Scenario 6)
+Substitution runs **file by file**, not category by category. Under a zero-literals rule every literal in a file is going, so splitting the file across a colour pass and a spacing pass just means editing it twice and reviewing it twice. Counts below are total literals per file from `baseline-audit.txt`; run the audit after each task and watch that file's entries disappear.
+
+- [ ] T010 [US1] `src/components/work/WorkProjectGallery/WorkProjectGallery.module.scss` — 51 values, the heaviest file in the feature and the only one carrying its own sub-palette. Colours to `--overlay-*` (T005) and `--surface-dark*` / `--on-surface-dark-*` (T006); type sizes and spacing to their T004/T007 scale tokens where the value recurs, otherwise the T007b semantic names. Do this one first and alone — it is where a mistake is most likely and hardest to spot
+- [ ] T011 [US1] `src/app/(site)/home.module.scss` — 28 values, almost all one-off section rhythms and heading ramps taking T007a semantic names. The two repeated ramps it shares with `Button` go to `--font-size-fluid-*` (T004); do not give them a home-specific name
+- [ ] T012 [P] [US1] `src/components/ui/GlassPointer/GlassPointer.module.scss` — 19 values, mostly translucent. Every colour to `--overlay-*` (T005), including the 6 used once; `0.72rem` and `0.6875rem` per T004/T007c
+- [ ] T013 [P] [US1] `src/components/work/WorkDetailGallery/WorkDetailGallery.module.scss` — 18 values, and `src/app/(site)/service/service.module.scss` — 18 values
+- [ ] T014 [P] [US1] `src/app/(site)/about/about.module.scss` — 12 values, and `src/components/work/WorkDetailModal/WorkDetailModal.module.scss` — 10 values, whose 4 colours all go to T005 tokens
+- [ ] T015 [P] [US1] `src/components/ui/Button/Button.module.scss` (8), `src/app/(site)/work/work.module.scss` (8), `src/components/layout/SiteFooter/SiteFooter.module.scss` (8). Button's ramps are shared with `home` — scale tier, not semantic
+- [ ] T016 [P] [US1] `src/components/layout/SiteHeader/SiteHeader.module.scss` (6), `src/app/(site)/contact/contact.module.scss` (6), `src/components/work/WorkCard/WorkCard.module.scss` (5), `src/components/work/WorkFilters/WorkFilters.module.scss` (5)
+- [ ] T017 [P] [US1] The tail: `MainNav` (4), `not-found` (3), `PageHeading` (3), `ShareButton` (2), `Input` (1), `WorkMasonryGrid` (1). Small but not optional — one literal left behind fails the audit exactly as loudly as fifty
+- [ ] T018 [US1] Run `npm run audit:design-system` and confirm **both** (b) and (c) report `none`. Diff against `baseline-audit.txt` from T003 to show exactly what closed. There is no partial pass here: a literal still listed is unfinished work, never something to annotate
+- [ ] T019 [US1] Audit the token names, which the script cannot check: no token is named after its own value (spec SC-003a). `grep -nE '\-\-[a-z-]*[0-9]{2,}' src/styles/_tokens.scss` catches the obvious `--space-fluid-37` shape; the rest is reading. A value-named token means the literal moved rather than became a decision
+- [ ] T020 [US1] Verify nothing moved: `npm run build`, then compare `/`, `/about`, `/service`, `/work` and a project detail page with the lightbox open at ~375px, ~820px and ~1440px against the pre-change rendering (quickstart Scenario 6). With 168 substitutions this is the task most likely to find a typo — budget real time for it
 
 **Checkpoint**: US1 is independently shippable — the design system actually governs, even if US2/US3 never land.
 
@@ -117,8 +139,8 @@ Every token introduced MUST hold a value **byte-identical** to the literal it re
 ## Phase 6: Polish & Cross-Cutting Concerns
 
 - [ ] T032 Run every quickstart.md scenario end to end in one pass on a scratch branch, confirming no earlier scenario regressed while a later one was built
-- [ ] T033 [P] Update `AGENTS.md` §3 with the new token families (`--font-size-fluid-*`, `--space-fluid-*`, `--overlay-*`, `--surface-dark*`), the `forced-colors` mixin, and the `npm run audit:design-system` command, so the next agent session inherits the vocabulary rather than reinventing it
-- [ ] T034 [P] Record the deferred consolidation candidates in `specs/010-design-system-compliance/research.md` §3 as a follow-up: the `0.02`–`0.075` alpha cluster and the two near-identical `clamp()` ramps were deliberately kept separate here because merging them changes rendering. Someone should decide on purpose later
+- [ ] T033 [P] Update `AGENTS.md` §3 with the two naming tiers and when to use each, the new scale families (`--font-size-fluid-*`, `--space-fluid-*`, `--overlay-*`, `--surface-dark*`), the semantic-tier convention (`--<surface>-<element>-<property>`), the `forced-colors` mixin, and the `npm run audit:design-system` command. State the rule plainly — no literal values in a `*.module.scss`, none — so the next agent session inherits it rather than reinventing a threshold
+- [ ] T034 [P] Record the deferred consolidation candidates in `specs/010-design-system-compliance/research.md` §3 as a follow-up: the `0.02`–`0.075` alpha cluster, the two near-identical `clamp()` ramps, and every near-collision T007d surfaced between semantic-tier blocks. All were deliberately kept separate because merging them changes rendering. With the whole set finally visible in one file, someone should decide on purpose later — that review is the point of doing this work, not an afterthought to it
 - [ ] T035 Consider whether the audit script should become a Git hook step or a CI check now that the tree is clean. Feature 009 §4's reasoning says no for a per-commit gate; the calculation changes if CI ever lands. Record the decision either way — do not leave it implicit
 
 ---
@@ -128,7 +150,7 @@ Every token introduced MUST hold a value **byte-identical** to the literal it re
 ### Phase Dependencies
 
 - **Setup (Phase 1)**: no dependencies — start immediately
-- **Foundational (Phase 2)**: depends on Phase 1 (the baseline tells you which tokens to mint) — BLOCKS US1 and US2
+- **Foundational (Phase 2)**: depends on Phase 1 (the baseline tells you which tokens to mint) — BLOCKS US1 and US2. This is now the largest phase in the feature: 156 tokens across two tiers
 - **US1 (Phase 3)**: depends on Phase 2
 - **US2 (Phase 4)**: depends on Phase 2 (T008 only); otherwise independent of US1
 - **US3 (Phase 5)**: independent of everything — can start any time
@@ -138,14 +160,14 @@ Unlike feature 009, these stories are **largely parallel**. US3 shares no file w
 
 ### Within Each User Story
 
-- US1: T010/T011 first (they hold most of the drift), then the [P] group T012–T014, then T015–T017, then verification T018–T020
+- US1: T010 alone first (51 of the 168 values), then T011, then the [P] group T012–T017 which touch unrelated files, then verification T018–T020
 - US2: T021 → T022–T025 (each a different file, but all depend on the hook existing) → T026/T027 → T028
 - US3: T029 → T030 → T031
 
 ### Parallel Opportunities
 
-- T004–T007 all add separate blocks to `_tokens.scss`. Marked [P] as independent decisions, but they touch one file — apply them in sequence to avoid conflicts
-- T012, T013, T014 — three different stylesheets, genuinely parallel
+- T004–T007c all add separate blocks to `_tokens.scss`. Marked [P] as independent decisions, but they touch one file — apply them in sequence to avoid conflicts. T007d is the reconciliation pass and must come after all of them
+- T012–T017 — every file distinct, genuinely parallel once T010/T011 land
 - T026 and T027 — different stylesheets (subject to the T011 ordering note)
 - T033 and T034 — different files
 - All of US3 runs alongside US1/US2
@@ -186,6 +208,8 @@ Task: "Replace fluid type ramps in Button.module.scss"
 ## Notes
 
 - Byte-identical substitution is the whole safety argument. If a task tempts you to improve a value, that is a different change — record it in research.md §3 and move on
+- Zero literals and byte-identical substitution pull in opposite directions and both win: every value becomes a token, and no two values become the same token. Expect a token file with visible near-duplicates at the end of this feature — that is the intended state, not an oversight (research.md §2)
+- The risk this feature runs is not leftover literals, which the audit catches. It is 156 tokens named badly, which nothing catches. T007d and T019 are the only defence; do not skim them
 - `GlassPointer.module.scss` and `WorkProjectGallery.module.scss` hold almost all the colour drift; T010 and T011 are the two heaviest tasks here
 - The audit script is the feature's own measuring instrument. If T003 shows it disagreeing with research.md §3, trust neither until you know which is wrong
 - Commit after each task or logical group; stop at any checkpoint to validate a story independently

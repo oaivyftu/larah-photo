@@ -10,19 +10,35 @@
 
 ## 2. What "compliant" should mean here
 
-**Decision**: enforce the constitution's own two-or-more rule rather than a blanket zero-literals target.
+**Decision (2026-08-25, superseding two earlier drafts)**: zero literals, in all three categories. Every colour, type size and spacing value in a component stylesheet resolves through `src/styles/`, whatever its use count.
 
-- A value used in **two or more** places MUST become a token. It has proven it is a shared decision.
-- A value used **once** MAY stay local, but MUST carry a comment saying why it is not a token.
+This section previously said the opposite twice — first that the constitution's two-or-more rule was the target, then that colour alone should be strict. Both are recorded below under Alternatives, because the reasoning that rejected them is the reasoning that has to hold the new rule up.
 
-**Rationale**: minting one token per unique `clamp()` ramp would produce ~40 single-use tokens. That is a lookup table, not a design system — it moves the literals without making any of them a decision, and it makes the token file harder to read than the stylesheets it serves. The two-or-more rule is already what Principle VII says, it is mechanically checkable, and it targets exactly the values that can drift apart.
+**Why the two-or-more rule was not enough**: it treats a use count of one as evidence that a value is not a shared decision. It is not. It is evidence that the value has not been copied **yet** — the state immediately before drift, not an exemption from it. The baseline shows what that looks like in practice: `rgba(255, 255, 255, 0.0375)` sitting beside a repeated `0.04`, `0.3375` beside a repeated `0.3`, `0.225` beside a repeated `0.22`. Each of those is a single use, so each would have been exempt; each is also unmistakably the same decision, made twice, slightly differently, by authors who never saw one another's work. A rule that exempts them preserves exactly the condition this feature exists to remove.
+
+**Why the count is not the objection it appears to be**: 168 distinct values, of which 12 already have tokens, leaves 156 new definitions. That is a large token file but a normal-sized design system, and it is bounded — this is a complete inventory of the tree, not a rate. The genuine difficulty is not the number but the naming, addressed next.
+
+**The naming tier (the decision that makes the strict rule workable)**: 84 of the 156 are fluid `clamp()` ramps used exactly once. Three rules collide over them:
+
+1. Every value is tokenised (this section).
+2. Every token holds a byte-identical value — no rounding, no merging (spec FR-010, §3 below).
+3. No token is named for the number it holds (contracts/token-naming.md).
+
+Eighty-four near-identical ramps cannot all be `--space-fluid-lg`; rule 2 forbids merging them; and `--space-fluid-37` satisfies rule 1 while gutting rule 3. So the design system gains a **second naming tier**:
+
+- **Scale tier** — reusable steps with generic names, the existing `--space-*`, `--font-size-*`, and the new `--space-fluid-*`, `--font-size-fluid-*`, `--overlay-*` families. Used where a value genuinely recurs.
+- **Semantic tier** — values named for the element or surface they serve: `--about-intro-pad-y`, `--service-hero-size`, `--lightbox-caption-size`. Used where a value belongs to one place.
+
+Two ramps that differ by 0.1rem then carry different names honestly, because they serve different things — which is what they were doing all along, undocumented. The semantic tier lives in `src/styles/` like everything else, so this is not a licence to reintroduce component-local custom properties: those remain the private-token anti-pattern Principle VII forbids.
 
 **Alternatives considered**:
 
-- **Zero literals anywhere**: rejected per above. It also collides with FR-010 (no visual change), since collapsing distinct fluid ramps onto shared tokens would alter rendered sizes at intermediate viewports.
+- **The constitution's two-or-more rule, all categories** (this section's first draft): rejected 2026-08-25 per the second paragraph above. It was chosen originally to avoid ~40 single-use tokens, on the reasoning that they would make a lookup table rather than a design system. The semantic naming tier answers that objection directly — a token named for what it serves is a decision no matter how many places use it.
+- **Strict for colour only** (this section's second draft): rejected 2026-08-25. It was a real improvement on the first, and its arguments — palette-sized token count, visible drift among the single uses, colour being the category with a wholesale change ahead of it — all held. What it could not answer was why the same arguments do not apply to a section's vertical rhythm or a heading's ramp. They do; the numbers are just bigger.
 - **Convert fluid ramps to fixed steps**: rejected outright — it changes what every screen renders between breakpoints, which FR-010 forbids.
+- **Merge near-identical values while tokenising**: rejected, same reason. Recorded in §3 as a deliberate follow-up instead.
 
-## 3. The measured duplicates (the mandatory work)
+## 3. The measured values (the mandatory work)
 
 **Colour** — 14 distinct values used 36 times, concentrated almost entirely in two stylesheets (`GlassPointer`, `WorkProjectGallery`) plus one in `WorkDetailModal`:
 
@@ -51,7 +67,11 @@ An earlier draft of this section said 10 values across 28 uses; that list was tr
 
 Note the near-collision: `clamp(1.25rem, …)` and `clamp(1.15rem, …)` share an identical upper bound and vw slope, differing only in floor — and they live in different files, so neither author saw the other. Both are kept as separate tokens for the same no-visual-change reason.
 
-**Total mandatory work**: 36 distinct values across 105 uses, plus one repeated media query and one repeated animation setup. On top of that the audit finds 134 single-use literals with no explanatory comment, which must each gain a comment or a token (spec SC-003a).
+**Total mandatory work**: 168 distinct values — colour 36, type size 37, spacing 95 — of which 43 are repeated across 139 uses and 125 are used exactly once. Twelve already have an exact token and are pure substitution; 156 are new definitions, 84 of them one-off fluid ramps that take semantic-tier names (§2). On top of the values: one repeated media query and one repeated animation setup.
+
+The tables above list the repeated values only, because those are the ones that demonstrate drift. The single-use values are equally mandatory and are enumerated in `baseline-audit.txt` section (c) rather than duplicated here.
+
+**A measurement correction (2026-08-25)**: the spacing figures moved from 15 repeated values to 22. The audit originally keyed spacing on the whole declaration, so `1rem` and `1rem 0` counted as two unrelated things and a `clamp()` inside a shorthand never matched the same `clamp()` standing alone. It now splits shorthands into their individual values. The seven values this uncovered were repeated all along and invisible to the check meant to catch them — which is the strongest evidence in this document that use-count thresholds are fragile in a way that a zero-literals rule is not.
 
 ## 4. Naming fluid tokens
 
@@ -70,7 +90,7 @@ Note the near-collision: `clamp(1.25rem, …)` and `clamp(1.15rem, …)` share a
 
 **Decision**: name them as a scoped dark surface family in `_tokens.scss` (`--surface-dark-*`, `--on-surface-dark-*`) rather than leaving them inline or forcing them into the light palette's names.
 
-**Rationale**: this is a real design decision — a dark viewing surface for photographs — not an accident. A design system that cannot express it is incomplete. Six of the seven are single-use and so are technically exempt under §2, but they form one coherent set, and naming a set is worth more than exempting each member of it individually.
+**Rationale**: this is a real design decision — a dark viewing surface for photographs — not an accident. A design system that cannot express it is incomplete. Six of the seven are single-use, which §2's original two-or-more rule would have exempted. That is a good illustration of why the threshold was dropped: they form one coherent, deliberate set, and no use count would ever have revealed that.
 
 ## 6. Consolidating the repeated behaviour
 
@@ -91,7 +111,7 @@ Note the near-collision: `clamp(1.25rem, …)` and `clamp(1.15rem, …)` share a
 
 **Decision**: add a `forced-colors` mixin alongside the existing accessibility mixins and use it in both places.
 
-**Note**: this is not a breakpoint violation — `forced-colors` is an OS accessibility setting, not a viewport width — so FR-005 does not cover it. It qualifies purely under the two-or-more rule, and it fills an obvious gap in a mixin family that already exists.
+**Note**: this is not a breakpoint violation — `forced-colors` is an OS accessibility setting, not a viewport width — so FR-005 does not cover it. It qualifies under FR-006, which governs repeated blocks rather than values and so keeps its two-or-more threshold, and it fills an obvious gap in a mixin family that already exists.
 
 ## 8. Detecting mirror drift (FR-009, SC-008)
 

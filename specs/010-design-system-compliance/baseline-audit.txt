@@ -1,8 +1,10 @@
 DESIGN SYSTEM AUDIT
 ------------------------------------------------------------------------
 Scanned 24 component stylesheets.
+Every value below must resolve through src/styles/. Use count sets
+the order to fix them in, not whether they must be fixed.
 
-(b) USED 2+ TIMES -- must become a token
+(b) USED 2+ TIMES -- already drifting; fix first
 ------------------------------------------------------------------------
 
   colour: 14 values, 36 uses
@@ -30,24 +32,31 @@ Scanned 24 component stylesheets.
     0.72rem                                x2  [components/ui/GlassPointer/GlassPointer, components/work/WorkProjectGallery/WorkProjectGallery]
     0.75rem                                x2  [components/work/WorkCard/WorkCard, components/work/WorkFilters/WorkFilters]
 
-  spacing: 15 values, 53 uses
-    1rem                                   x7  [app/(site)/home, app/(site)/work/work, components/layout/SiteHeader/SiteHeader, components/work/WorkProjectGallery/WorkProjectGallery]
-    0.5rem                                 x7  [app/(site)/home, app/not-found, components/layout/SiteFooter/SiteFooter, components/ui/Button/Button, components/work/WorkDetailModal/WorkDetailModal]
-    1.25rem                                x5  [app/(site)/home, components/work/WorkProjectGallery/WorkProjectGallery]
+  spacing: 22 values, 87 uses
+    1rem                                   x12  [app/(site)/home, app/(site)/work/work, components/layout/SiteHeader/SiteHeader, components/ui/Button/Button, components/ui/ShareButton/ShareButton, components/work/WorkDetailGallery/WorkDetailGallery, components/work/WorkProjectGallery/WorkProjectGallery]
+    0.5rem                                 x9  [app/(site)/home, app/not-found, components/layout/SiteFooter/SiteFooter, components/layout/SiteHeader/SiteHeader, components/ui/Button/Button, components/work/WorkDetailModal/WorkDetailModal]
+    1.25rem                                x6  [app/(site)/home, components/work/WorkProjectGallery/WorkProjectGallery]
+    1.5rem                                 x6  [app/(site)/home, app/(site)/service/service, app/not-found, components/work/WorkDetailGallery/WorkDetailGallery, components/work/WorkProjectGallery/WorkProjectGallery]
+    2rem                                   x5  [app/(site)/service/service, components/layout/SiteFooter/SiteFooter, components/work/WorkDetailGallery/WorkDetailGallery]
+    0.75rem                                x5  [app/not-found, components/layout/SiteHeader/SiteHeader, components/ui/Button/Button]
+    0.35rem                                x5  [components/navigation/MainNav/MainNav, components/work/WorkCard/WorkCard, components/work/WorkDetailGallery/WorkDetailGallery, components/work/WorkProjectGallery/WorkProjectGallery]
+    3rem                                   x4  [app/(site)/about/about, app/(site)/home, components/work/WorkDetailGallery/WorkDetailGallery]
     4rem                                   x4  [app/(site)/home, app/(site)/service/service, app/(site)/work/work]
     0.25rem                                x4  [components/ui/Button/Button]
-    0.35rem                                x4  [components/work/WorkCard/WorkCard, components/work/WorkDetailGallery/WorkDetailGallery, components/work/WorkProjectGallery/WorkProjectGallery]
-    3rem                                   x3  [app/(site)/about/about, app/(site)/home]
-    1.5rem                                 x3  [app/(site)/home, app/not-found, components/work/WorkProjectGallery/WorkProjectGallery]
-    2rem                                   x3  [app/(site)/service/service, components/layout/SiteFooter/SiteFooter, components/work/WorkDetailGallery/WorkDetailGallery]
+    0.6rem                                 x3  [app/(site)/work/work, components/work/WorkDetailModal/WorkDetailModal, components/work/WorkProjectGallery/WorkProjectGallery]
+    3.5rem                                 x3  [components/layout/SiteFooter/SiteFooter, components/work/WorkDetailGallery/WorkDetailGallery]
     0.8rem                                 x3  [components/layout/SiteHeader/SiteHeader, components/work/WorkDetailGallery/WorkDetailGallery]
-    0.75rem                                x2  [app/not-found, components/layout/SiteHeader/SiteHeader]
-    3.5rem                                 x2  [components/layout/SiteFooter/SiteFooter]
+    1.4rem                                 x2  [app/(site)/service/service, components/work/WorkProjectGallery/WorkProjectGallery]
+    clamp(1.5rem, 3vw, 3rem)               x2  [app/(site)/work/work, components/layout/SiteHeader/SiteHeader]
+    0.625rem                               x2  [components/layout/SiteHeader/SiteHeader, components/ui/Button/Button]
+    0.55rem                                x2  [components/ui/ShareButton/ShareButton, components/work/WorkDetailGallery/WorkDetailGallery]
+    clamp(3rem, 6vw, 6rem)                 x2  [components/work/WorkDetailGallery/WorkDetailGallery]
     0.45rem                                x2  [components/work/WorkFilters/WorkFilters]
+    clamp(2rem, 4vw, 5rem)                 x2  [components/work/WorkProjectGallery/WorkProjectGallery]
     5px                                    x2  [components/work/WorkProjectGallery/WorkProjectGallery]
     8px                                    x2  [components/work/WorkProjectGallery/WorkProjectGallery]
 
-(c) USED ONCE, NO EXPLANATION -- must gain a comment or a token
+(c) USED ONCE -- not drifting yet, and equally not owned
 ------------------------------------------------------------------------
 
   colour: 22
@@ -74,7 +83,7 @@ Scanned 24 component stylesheets.
     rgba(255, 255, 255, 0.14)              components/work/WorkProjectGallery/WorkProjectGallery:491
     rgba(255, 255, 255, 0.92)              components/work/WorkProjectGallery/WorkProjectGallery:496
 
-  type-size: 31
+  type-size: 30
     clamp(1.45rem, 1.78vw, 2rem)           app/(site)/about/about:29
     clamp(1.75rem, 2.78vw, 2.5rem)         app/(site)/about/about:57
     clamp(1.1rem, 5.6vw, 1.45rem)          app/(site)/about/about:91
@@ -97,7 +106,6 @@ Scanned 24 component stylesheets.
     clamp(1rem, 1.25vw, 1.3rem)            components/work/WorkDetailGallery/WorkDetailGallery:76
     clamp(2.8rem, 15vw, 4.8rem)            components/work/WorkDetailGallery/WorkDetailGallery:223
     clamp(0.62rem, 0.54vw, 0.72rem)        components/work/WorkFilters/WorkFilters:13
-    inherit                                components/work/WorkFilters/WorkFilters:43
     clamp(1.55rem, 2.05vw, 2.25rem)        components/work/WorkProjectGallery/WorkProjectGallery:58
     clamp(0.9rem, 1.05vw, 1.15rem)         components/work/WorkProjectGallery/WorkProjectGallery:71
     clamp(0.7rem, 0.78vw, 0.85rem)         components/work/WorkProjectGallery/WorkProjectGallery:90
@@ -107,94 +115,86 @@ Scanned 24 component stylesheets.
     0.625rem                               components/work/WorkProjectGallery/WorkProjectGallery:608
     0.875rem                               components/work/WorkProjectGallery/WorkProjectGallery:612
 
-  spacing: 81
+  spacing: 73
     clamp(4rem, 9.2vw, 13rem)              app/(site)/about/about:11
-    clamp(6rem, 9vw, 10.3rem) 0 clamp(7rem, 10vw, 11rem) app/(site)/about/about:15
+    clamp(6rem, 9vw, 10.3rem)              app/(site)/about/about:15
+    clamp(7rem, 10vw, 11rem)               app/(site)/about/about:15
     clamp(1.9rem, 2.4vw, 2.7rem)           app/(site)/about/about:20
     clamp(1.5rem, 2vw, 2.2rem)             app/(site)/about/about:24
     clamp(0.5rem, 0.8vw, 1rem)             app/(site)/about/about:39
-    clamp(3.5rem, 10vw, 5rem) 0 clamp(4.5rem, 12vw, 7rem) app/(site)/about/about:73
+    clamp(3.5rem, 10vw, 5rem)              app/(site)/about/about:73
+    clamp(4.5rem, 12vw, 7rem)              app/(site)/about/about:73
     clamp(2.5rem, 17.43vw, 15.6875rem)     app/(site)/contact/contact:16
-    clamp(1rem, 1.67vw, 1.5rem) 0          app/(site)/contact/contact:20
-    0 0 clamp(1rem, 1.6vw, 1.5rem)         app/(site)/contact/contact:53
-    clamp(2rem, 6vw, 3rem) 0 clamp(3rem, 8vw, 4rem) app/(site)/contact/contact:78
-    1.25rem 0 clamp(2.5rem, 5.56vw, 5rem)  app/(site)/home:23
+    clamp(1rem, 1.67vw, 1.5rem)            app/(site)/contact/contact:20
+    clamp(1rem, 1.6vw, 1.5rem)             app/(site)/contact/contact:53
+    clamp(2rem, 6vw, 3rem)                 app/(site)/contact/contact:78
+    clamp(3rem, 8vw, 4rem)                 app/(site)/contact/contact:78
+    clamp(2.5rem, 5.56vw, 5rem)            app/(site)/home:23
     clamp(1.5rem, 4.1vw, 3.6875rem)        app/(site)/home:30
     0.25em                                 app/(site)/home:86
-    clamp(3.5rem, 6.94vw, 6.25rem) 0       app/(site)/home:123
+    clamp(3.5rem, 6.94vw, 6.25rem)         app/(site)/home:123
     clamp(0.15rem, 1vw, 0.8rem)            app/(site)/home:167
-    0 0 clamp(2rem, 5vw, 4rem)             app/(site)/home:210
-    clamp(0.5rem, 2vw, 1.5rem) auto 0      app/(site)/home:224
+    clamp(2rem, 5vw, 4rem)                 app/(site)/home:210
+    clamp(0.5rem, 2vw, 1.5rem)             app/(site)/home:224
     clamp(1rem, 2vw, 1.75rem)              app/(site)/home:225
     clamp(2.5rem, 13.89vw, 12.5rem)        app/(site)/home:248
     clamp(2.5rem, 4vw, 3.5rem)             app/(site)/home:249
-    0 0 clamp(3rem, 5.55vw, 5rem)          app/(site)/home:251
+    clamp(3rem, 5.55vw, 5rem)              app/(site)/home:251
     clamp(2rem, 5vw, 3rem)                 app/(site)/home:314
     clamp(2.5rem, 6vw, 4rem)               app/(site)/home:315
     clamp(2rem, 6vw, 4rem)                 app/(site)/home:347
-    1rem 0                                 app/(site)/home:391
     2.4rem                                 app/(site)/home:409
     2.5rem                                 app/(site)/home:414
-    clamp(2rem, 4.03vw, 3.625rem) 0 clamp(1.5rem, 2.22vw, 2rem) app/(site)/service/service:18
+    clamp(2rem, 4.03vw, 3.625rem)          app/(site)/service/service:18
+    clamp(1.5rem, 2.22vw, 2rem)            app/(site)/service/service:18
     clamp(4.8rem, 6vw, 7rem)               app/(site)/service/service:23
     clamp(7rem, 9.5vw, 11rem)              app/(site)/service/service:24
     clamp(2.4rem, 5vw, 6rem)               app/(site)/service/service:37
     clamp(1.2rem, 1.7vw, 2rem)             app/(site)/service/service:52
     0.58rem                                app/(site)/service/service:99
     1.1rem                                 app/(site)/service/service:105
-    2rem 0 1.5rem                          app/(site)/service/service:133
     5rem                                   app/(site)/service/service:138
-    1.4rem                                 app/(site)/service/service:143
-    0.6rem clamp(1.5rem, 3vw, 3rem)        app/(site)/work/work:23
-    clamp(1rem, 1.94vw, 1.75rem) 0 clamp(1.55rem, 2.1vw, 2.2rem) app/(site)/work/work:26
+    clamp(1rem, 1.94vw, 1.75rem)           app/(site)/work/work:26
+    clamp(1.55rem, 2.1vw, 2.2rem)          app/(site)/work/work:26
     clamp(4rem, 8vw, 7rem)                 app/(site)/work/work:48
     clamp(1.7rem, 2.5vw, 2.4rem)           app/(site)/work/work:61
     clamp(2rem, 8vw, 10rem)                components/layout/SiteFooter/SiteFooter:12
     0.9rem                                 components/layout/SiteFooter/SiteFooter:123
-    clamp(1.5rem, 3vw, 3rem)               components/layout/SiteHeader/SiteHeader:8
-    0.5rem 0.625rem                        components/layout/SiteHeader/SiteHeader:63
     clamp(1.5rem, 8.33vw, 7.5rem)          components/navigation/MainNav/MainNav:11
     0.375rem                               components/navigation/MainNav/MainNav:23
-    0.72rem 0.35rem                        components/navigation/MainNav/MainNav:105
-    0.5rem 0.75rem                         components/ui/Button/Button:56
-    0.625rem 0.75rem                       components/ui/Button/Button:67
-    0.75rem 1rem                           components/ui/Button/Button:78
-    0 15px                                 components/ui/GlassPointer/GlassPointer:13
+    0.72rem                                components/navigation/MainNav/MainNav:105
+    15px                                   components/ui/GlassPointer/GlassPointer:13
     0.125rem                               components/ui/Input/Input:21
     0.28em                                 components/ui/PageHeading/PageHeading:7
     0.08em                                 components/ui/PageHeading/PageHeading:21
-    0.55rem 1rem                           components/ui/ShareButton/ShareButton:10
-    clamp(3rem, 6vw, 6rem)                 components/work/WorkDetailGallery/WorkDetailGallery:14
-    clamp(2rem, 4vw, 4rem) clamp(2rem, 5vw, 6rem) components/work/WorkDetailGallery/WorkDetailGallery:23
-    clamp(4rem, 8vw, 8.5rem) 0 clamp(3rem, 6vw, 6rem) components/work/WorkDetailGallery/WorkDetailGallery:26
-    1rem clamp(1.25rem, 2.5vw, 2rem)       components/work/WorkDetailGallery/WorkDetailGallery:43
-    0.55rem                                components/work/WorkDetailGallery/WorkDetailGallery:51
-    1.5rem 2rem                            components/work/WorkDetailGallery/WorkDetailGallery:84
-    clamp(1.25rem, 2vw, 2rem) 0 clamp(5rem, 10vw, 10rem) components/work/WorkDetailGallery/WorkDetailGallery:114
-    3.5rem 0 3rem                          components/work/WorkDetailGallery/WorkDetailGallery:219
+    clamp(2rem, 4vw, 4rem)                 components/work/WorkDetailGallery/WorkDetailGallery:23
+    clamp(2rem, 5vw, 6rem)                 components/work/WorkDetailGallery/WorkDetailGallery:23
+    clamp(4rem, 8vw, 8.5rem)               components/work/WorkDetailGallery/WorkDetailGallery:26
+    clamp(1.25rem, 2.5vw, 2rem)            components/work/WorkDetailGallery/WorkDetailGallery:43
+    clamp(1.25rem, 2vw, 2rem)              components/work/WorkDetailGallery/WorkDetailGallery:114
+    clamp(5rem, 10vw, 10rem)               components/work/WorkDetailGallery/WorkDetailGallery:114
     clamp(0.9rem, 2vw, 1.8rem)             components/work/WorkDetailModal/WorkDetailModal:7
+    clamp(1rem, 3vw, 2rem)                 components/work/WorkDetailModal/WorkDetailModal:38
     0.7rem                                 components/work/WorkDetailModal/WorkDetailModal:49
     clamp(0.75rem, 1.6vw, 1.5rem)          components/work/WorkDetailModal/WorkDetailModal:71
-    0.6rem 0                               components/work/WorkDetailModal/WorkDetailModal:72
+    0.3rem                                 components/work/WorkFilters/WorkFilters:49
+    0.05rem                                components/work/WorkFilters/WorkFilters:49
     clamp(1rem, 2vw, 2rem)                 components/work/WorkMasonryGrid/WorkMasonryGrid:59
-    clamp(2rem, 4vw, 5rem)                 components/work/WorkProjectGallery/WorkProjectGallery:45
-    clamp(1.75rem, 3vw, 3rem) clamp(2rem, 3vw, 3.5rem) components/work/WorkProjectGallery/WorkProjectGallery:47
-    1.4rem clamp(2rem, 4vw, 5rem)          components/work/WorkProjectGallery/WorkProjectGallery:79
-    0 clamp(1.5rem, 2vw, 2rem) 0 0         components/work/WorkProjectGallery/WorkProjectGallery:184
+    clamp(1.75rem, 3vw, 3rem)              components/work/WorkProjectGallery/WorkProjectGallery:47
+    clamp(2rem, 3vw, 3.5rem)               components/work/WorkProjectGallery/WorkProjectGallery:47
+    clamp(1.5rem, 2vw, 2rem)               components/work/WorkProjectGallery/WorkProjectGallery:184
     -1px                                   components/work/WorkProjectGallery/WorkProjectGallery:220
-    0.6rem                                 components/work/WorkProjectGallery/WorkProjectGallery:354
     10px                                   components/work/WorkProjectGallery/WorkProjectGallery:364
     0.15rem                                components/work/WorkProjectGallery/WorkProjectGallery:421
-    1.5rem 1rem                            components/work/WorkProjectGallery/WorkProjectGallery:562
     0.85rem                                components/work/WorkProjectGallery/WorkProjectGallery:568
-    0 3px                                  components/work/WorkProjectGallery/WorkProjectGallery:586
+    3px                                    components/work/WorkProjectGallery/WorkProjectGallery:586
     4px                                    components/work/WorkProjectGallery/WorkProjectGallery:596
 
 (a) TOTALS
 ------------------------------------------------------------------------
-  colour     14 duplicated values /  36 uses,  22 unexplained single,   0 explained single
-  type-size   7 duplicated values /  16 uses,  31 unexplained single,   0 explained single
-  spacing    15 duplicated values /  53 uses,  81 unexplained single,   2 explained single
+  colour     36 distinct values to tokenise (14 repeated across  36 uses,  22 used once)
+  type-size  37 distinct values to tokenise ( 7 repeated across  16 uses,  30 used once)
+  spacing    95 distinct values to tokenise (22 repeated across  87 uses,  73 used once)
 
 ------------------------------------------------------------------------
 FAIL -- see (b) and (c) above

@@ -26,13 +26,13 @@ npm run dev
 
 **Expected**: every element that previously carried that literal changes together. Revert afterwards. This is the concrete form of SC-005 — it is what "one place to change it" means.
 
-## Scenario 3 — Remaining literals are single-use and explained
+## Scenario 3 — No literal values remain in any component stylesheet
 
 ```bash
 npm run audit:design-system   # exact name per contracts/token-naming.md
 ```
 
-**Expected**: exits 0. Any literal it still reports is used exactly once and carries a comment saying why. A single-use literal with no comment fails the run.
+**Expected**: exits 0, with both (b) and (c) reporting `none`. No colour, type size or spacing literal is reported at any use count. Every value the audit previously listed now resolves through `src/styles/`, on either the scale tier or the semantic tier — a literal left inline behind a comment is a failure, not an exception.
 
 ## Scenario 4 — The breakpoint mirror cannot drift silently
 
