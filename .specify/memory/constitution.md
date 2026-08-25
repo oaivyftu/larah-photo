@@ -1,5 +1,25 @@
 <!--
-Sync Impact Report (2.1.2)
+Sync Impact Report (2.2.0)
+- Version change: 2.1.2 → 2.2.0 (MINOR: new principle added)
+- Added principles:
+  - VII. One Design System, One Place For Shared UI. Names `src/styles/` as the
+    token layer and `src/components/ui/` as the shared component library,
+    requires a duplication check before new UI is written, and sets the
+    promote-on-second-use rule. `src/components/ui/` was already serving this
+    role for 16 files but no rule said so, which is how a broken duplicate form
+    survived alongside the primitives it should have used.
+- Modified principles: none
+- Removed principles: none
+- Added/removed sections: none
+- Note: the folder keeps the name `ui/` rather than being renamed `common/`.
+  Renaming would touch 16 files' imports to no functional end; the constitution
+  fixes the meaning instead.
+- Relationship to Principle IV: IV governs shared values in `src/constants/`
+  that JavaScript and GSAP read; VII governs the stylesheet tokens and the
+  component library. Where a value lives in both (breakpoints), VII names the
+  stylesheet as the source and the TS file as a declared mirror.
+
+Prior report (2.1.2)
 - Version change: 2.1.1 → 2.1.2 (PATCH: retires a clause that had served its
   purpose and replaces a "nothing enforces this" note with what now does; no
   principle added, removed, or redefined)
@@ -166,6 +186,51 @@ heed deprecation notices.
 it to the constitution makes it binding across all Spec Kit-generated plans, not
 just ad hoc agent sessions.
 
+### VII. One Design System, One Place For Shared UI
+
+The project has a single design system with two layers, and both are
+authoritative:
+
+- **Token layer** — `src/styles/` (`_tokens.scss`, `_typography.scss`,
+  `_breakpoints.scss`, `_mixins.scss`) defines colour, font size, line height,
+  spacing, layout and breakpoints. Component styles MUST consume these via
+  `var(--token)` or the shared mixins. A raw hex, a bare `font-size: 14px`, or
+  an inline `@media (max-width: 767px)` in a `*.module.scss` is a violation,
+  not a shortcut. A value that has no token yet MUST be added to `src/styles/`
+  first and then referenced.
+- **Component layer** — `src/components/ui/` is the shared component library.
+  Despite the name it is the design system's component half, not a loose
+  grab-bag: `Button`, `Input`/`Select`/`Textarea`, `Icon`, `PageHeading`,
+  `GlassPointer`, `ShareButton` live there and every consumer imports them from
+  there. Feature folders (`work/`, `layout/`, `navigation/`, `media/`) compose
+  these primitives; they MUST NOT reimplement one locally.
+
+Before building any UI, contributors (including AI agents) MUST check whether
+`src/components/ui/` already provides it. When the same markup, style block, or
+behaviour is needed in **two or more** places, it MUST be promoted into
+`src/components/ui/` (or `src/styles/` if it is purely a value) and every call
+site MUST import the shared version. Copying a component into a second feature
+folder and editing it is forbidden.
+
+The library is allowed to hold primitives that currently have no consumer —
+that is what a design system is for. Unused does not mean dead.
+
+Where a value must exist in both CSS and JavaScript, `src/styles/` is the
+source of truth and the TypeScript copy in `src/constants/` is a declared
+mirror, not a second opinion — `src/constants/breakpoints.ts` mirrors
+`_breakpoints.scss` this way because SCSS variables cannot be imported into JS
+without extra build tooling. Mirrors MUST name what they mirror in a comment,
+and changing one side without the other is a defect. This is the same drift
+Principle IV guards against, seen from the styling side: Principle IV governs
+the TypeScript constants that motion code reads, this principle governs the
+stylesheet tokens they mirror.
+
+**Rationale**: The project already grew a broken duplicate
+(`contact/InquiryForm`, which imported a stylesheet that did not exist and was
+rendered nowhere) while the primitives it needed sat unused in
+`src/components/ui/`. Divergence starts as a second copy, not as a bad
+component.
+
 ## Technology Constraints
 
 Stack is fixed: Next.js App Router, React 19, TypeScript strict mode, Sanity
@@ -232,4 +297,4 @@ Versioning policy:
 - MINOR: New principle/section added or materially expanded guidance.
 - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 2.1.2 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-24
+**Version**: 2.2.0 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-25
