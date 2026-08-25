@@ -128,9 +128,9 @@ Substitution runs **file by file**, not category by category. Under a zero-liter
 
 **Depends on**: nothing in this feature. Could ship first if desired.
 
-- [ ] T029 [US3] Write `src/constants/breakpoints.test.ts`: read `src/styles/_breakpoints.scss` as text, match `$breakpoint-<name>: <n>px;`, and assert each exported constant in `breakpoints.ts` equals the SCSS value its name maps to. Check only what is mirrored — adding an unmirrored breakpoint to the SCSS must not fail (contracts/token-naming.md, research.md §8)
-- [ ] T030 [US3] Prove the test can fail: change `$breakpoint-phone-lg` in `src/styles/_breakpoints.scss` to a different value, confirm `npm test` fails and names the mismatch, then revert. A check that cannot fail is not a gate (quickstart Scenario 4)
-- [ ] T031 [US3] Update the comment at the top of `src/constants/breakpoints.ts` to say the mirror is now test-enforced, replacing "keep these two files in sync manually"
+- [x] T029 [US3] Write `src/constants/breakpoints.test.ts`: read `src/styles/_breakpoints.scss` as text, match `$breakpoint-<name>: <n>px;`, and assert each exported constant in `breakpoints.ts` equals the SCSS value its name maps to. Check only what is mirrored — adding an unmirrored breakpoint to the SCSS must not fail (contracts/token-naming.md, research.md §8)
+- [x] T030 [US3] Prove the test can fail: change `$breakpoint-phone-lg` in `src/styles/_breakpoints.scss` to a different value, confirm `npm test` fails and names the mismatch, then revert. A check that cannot fail is not a gate (quickstart Scenario 4)
+- [x] T031 [US3] Update the comment at the top of `src/constants/breakpoints.ts` to say the mirror is now test-enforced, replacing "keep these two files in sync manually"
 
 **Checkpoint**: all three stories complete.
 
