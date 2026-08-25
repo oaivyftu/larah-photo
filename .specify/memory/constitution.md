@@ -1,142 +1,139 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 → 1.1.0 (MINOR: new principle added)
-- Modified principles:
-  - V. Small, Reviewed Changes → VI. Small, Reviewed Changes (renumbered only,
-    text unchanged)
-- Added sections:
-  - Core Principles: V. Critical User Flows Require Test Coverage (Aspirational)
+- Version change: 1.1.0 → 2.0.0 (MAJOR: principle set redefined and reordered)
+- Modified/renamed principles:
+  - II. Sanity as Content Source of Truth → I. Sanity Is the Sole Source of Content
+    (expanded: silent fallback/placeholder rendering now explicitly forbidden)
+  - I. Next.js Version Awareness (NON-NEGOTIABLE) → VI. Stay Current With This
+    Next.js Version (renumbered, wording tightened)
+  - V. Critical User Flows Require Test Coverage (Aspirational) → V. Critical
+    User Flows Require Test Coverage (aspirational) (renumbered only, intent
+    unchanged)
+  - III. Figma-Driven Visual Fidelity → folded into IV. Design Fidelity Through
+    Shared Tokens (scope narrowed to shared-constants enforcement; general
+    Figma-matching guidance removed as a standalone principle)
+- Added principles:
+  - II. Accessibility Is Non-Negotiable (new, non-negotiable)
+  - III. Performance and Image Delivery Are Deliberately Budgeted (new)
+- Removed principles:
+  - IV. Simplicity & Minimal Abstraction (core principle removed; the
+    no-new-`any`/justify-new-dependencies portion is retained under Technology
+    Constraints, but the general "prefer direct implementation" guidance is no
+    longer a constitutional principle)
+  - VI. Small, Reviewed Changes (removed entirely; not carried forward)
+- Added sections: none (Technology Constraints and Development Workflow retained
+  under equivalent names, content replaced per user input)
 - Removed sections: none
-- Other edits:
-  - Development Workflow: cross-referenced Principle V's manual-test-plan
-    requirement for critical flows.
 - Deferred TODOs:
-  - Principle V is explicitly aspirational: no test framework is selected yet.
-    Adopting one requires a follow-up constitution amendment (version bump) to
-    name the framework and retire the manual-test-plan fallback.
-  - RATIFICATION_DATE carried forward from v1.0.0 (no prior historical date on
-    record); replace if the project has a true earlier ratification date.
+  - Principle V remains explicitly aspirational: no test framework is selected
+    yet. Adopting one requires a follow-up amendment (version bump) naming the
+    framework and retiring the manual-test-plan fallback.
+  - RATIFICATION_DATE carried forward unchanged from v1.1.0 (2026-08-17); no
+    earlier historical ratification date is on record.
 -->
 
 # Larah Photo Constitution
 
 ## Core Principles
 
-### I. Next.js Version Awareness (NON-NEGOTIABLE)
+### I. Sanity Is the Sole Source of Content
 
-This project runs a version of Next.js newer than what any model's training data
-reflects. Before writing or modifying framework-touching code (routing, data
-fetching, caching, config, middleware), consult `node_modules/next/dist/docs/`
-for the current API and heed any deprecation notices found there. Do not assume
-an API, convention, or file-structure rule from prior Next.js experience without
-verifying it against the installed version's docs first.
+Sanity CMS is the only source of page copy, images, navigation, site settings,
+services, and work projects. No production copy or imagery may be hardcoded in
+components. When required Sanity data is missing or a query fails, the app MUST
+surface a configuration/content error rather than silently rendering fallback or
+placeholder content.
 
-**Rationale**: `AGENTS.md` exists specifically to flag this risk. Silently
-applying stale Next.js conventions produces code that looks correct but breaks
-against this project's actual APIs.
+**Rationale**: Editors manage the entire site through Studio; silent fallbacks
+would hide real content errors from editors and let broken pages reach
+production.
 
-### II. Sanity as Content Source of Truth
+### II. Accessibility Is Non-Negotiable
 
-All page copy, imagery, and structured content (site settings, home page,
-work projects, service packages, about/contact copy) MUST come from Sanity, not
-hardcoded strings or fallback content baked into components. When required
-Sanity data is unavailable, the site MUST surface a configuration/content error
-rather than silently rendering placeholder text. Live Sanity copy is expected to
-diverge from design mockups (Figma) — that divergence is correct CMS behavior,
-not a bug to "fix" in code.
+The full jsx-a11y recommended rule set MUST stay enabled in ESLint, not just the
+subset eslint-config-next enables by default. New UI MUST NOT introduce a11y
+lint violations, and interactive elements MUST have correct semantics/labels/
+ARIA before merge.
 
-**Rationale**: Editors manage the site through Sanity Studio. Hardcoding content
-in code defeats the CMS and creates drift between what editors control and what
-actually renders.
+**Rationale**: This project already shipped and had to hand-fix unlabelled
+controls and misapplied ARIA; the stricter lint config exists specifically to
+catch this class of regression before it recurs.
 
-### III. Figma-Driven Visual Fidelity
+### III. Performance and Image Delivery Are Deliberately Budgeted
 
-Layout, spacing, breakpoints, and component structure MUST match the connected
-Figma design file. When comparing a rendered page against Figma, only styling
-and markup are in scope for changes — copy differences are expected (see
-Principle II) and MUST be resolved in Sanity Studio, not in component code.
+Next.js image optimization settings (formats, deviceSizes, imageSizes, quality
+allowlist, cache TTL) are tuned deliberately, not left at framework defaults.
+Any change to `next.config.ts` image config MUST document the tradeoff it makes
+(cost, quality, or layout justification), the same way existing settings are
+documented today. Arbitrary quality values or new breakpoints MUST NOT be
+introduced without updating the allowlist and stating why.
 
-**Rationale**: Design and content are governed by separate sources (Figma for
-visual structure, Sanity for words/images). Conflating them causes visual
-regressions when someone "corrects" text that was never wrong in code.
+**Rationale**: This project already hit and fixed an Image Optimization quota
+overage by trimming AVIF and breakpoints; undocumented changes risk regressing
+that.
 
-### IV. Simplicity & Minimal Abstraction
+### IV. Design Fidelity Through Shared Tokens
 
-Prefer the direct, readable implementation over a new abstraction, config layer,
-or generalized helper until at least two real call sites need it. Do not add
-error handling, feature flags, or backwards-compatibility shims for scenarios
-that cannot occur in this codebase. Refactors that reduce indirection (see the
-project's history of `simplify`/`refactor` commits) are preferred over ones that
-add it.
+Visual and motion values sourced from Figma (breakpoints, drift/animation
+thresholds, spacing) MUST live in shared constants (e.g. `src/constants`), not
+as magic numbers duplicated across components. GSAP-driven motion effects MUST
+reference these shared values.
 
-**Rationale**: This is a small, focused marketing/portfolio site, not a
-platform. Premature abstraction here has historically been reverted via
-follow-up simplification commits.
+**Rationale**: Breakpoints were already extracted from inline values into
+shared constants once; this principle prevents the drift from creeping back in.
 
-### V. Critical User Flows Require Test Coverage (Aspirational)
+### V. Critical User Flows Require Test Coverage (aspirational)
 
-No test framework is wired up in this repository today. Going forward, before a
-critical user flow — contact/inquiry form submission, work gallery navigation,
-Sanity content error handling — ships or is materially changed, it MUST have
-automated test coverage using a framework that is selected and documented via a
-constitution amendment. Until a framework is adopted, PRs touching these flows
-MUST include a manual test plan in the PR description as an interim substitute.
+No test framework is wired up yet, but going forward, before a critical flow
+(contact/inquiry form submission, work gallery navigation, Sanity content error
+handling) ships or is materially changed, it MUST have automated coverage using
+a framework selected and documented via a constitution amendment. Until a
+framework is adopted, PRs touching these flows MUST include a manual test plan
+in the PR description as an interim substitute.
 
-**Rationale**: The project has no regression safety net today. This principle
-is deliberately aspirational and MUST be revisited (version-bumped) once a test
+**Rationale**: The project has no regression safety net today; this principle
+is deliberately aspirational and should be revisited (version-bumped) once a
 framework lands.
 
-### VI. Small, Reviewed Changes
+### VI. Stay Current With This Next.js Version
 
-Changes land through pull requests reviewed and merged individually rather than
-batched into large, mixed-purpose commits. Each PR should be scoped to one
-concern (a feature, a fix, a refactor, or a style adjustment) so it can be
-reviewed and reverted independently.
+This project pins a Next.js version with breaking changes relative to common
+training-data knowledge (see `AGENTS.md`). Before using any Next.js API,
+contributors (including AI agents) MUST consult `node_modules/next/dist/docs/`
+for the relevant guide rather than relying on memorized conventions, and MUST
+heed deprecation notices.
 
-**Rationale**: The project's commit history is consistently structured this way
-(discrete `feat:`/`fix:`/`refactor:`/`perf:`/`style:` commits merged via
-individual PRs); this principle codifies the existing, working practice.
+**Rationale**: `AGENTS.md` already states this as a hard requirement; elevating
+it to the constitution makes it binding across all Spec Kit-generated plans, not
+just ad hoc agent sessions.
 
-## Technology Stack Constraints
+## Technology Constraints
 
-- Framework: Next.js (App Router) on the version pinned in `package.json` —
-  see Principle I before touching framework-level code.
-- Content: Sanity CMS via `next-sanity`; Studio is mounted at `/studio`.
-- Styling: Sass (SCSS) and `styled-components`; match existing per-component
-  conventions rather than introducing a third styling approach.
-- Motion: GSAP (`gsap`, `@gsap/react`) for animation and scroll-driven effects.
-- Language: TypeScript throughout; no new JavaScript files in `src/`.
-- Hosting: Vercel.
+Stack is fixed: Next.js App Router, React 19, TypeScript strict mode, Sanity
+(`next-sanity`), Sass + styled-components for styling, GSAP (+ `@gsap/react`)
+for animation, Flickity/Isotope for gallery/masonry behavior. New dependencies
+for problems already solved by this stack require justification. TypeScript
+strict mode MUST remain enabled; no new `any` without justification.
 
 ## Development Workflow
 
-- Run `npm run lint` before proposing a change is complete; fix or explicitly
-  justify any new lint findings.
-- There is no automated test suite in this repository today. Do not claim a
-  change is "tested" based on type-checking or linting alone — for UI/behavior
-  changes, verify manually (dev server + browser) per the project's standing
-  guidance to test the golden path and edge cases before reporting completion.
-  For the critical flows named in Principle V, include a manual test plan in
-  the PR description until an automated framework is adopted.
-- Environment variables required for local development are documented in
-  `.env.example` / `README.md` (Sanity project ID, dataset, API version); keep
-  that documentation in sync with any new required variable.
+Changes to `next.config.ts` image config
+and to shared design-token constants require explicit rationale in the PR (see
+Principles III and IV).
 
 ## Governance
 
-This constitution supersedes ad-hoc conventions when the two conflict. Amendments
-are made by editing `.specify/memory/constitution.md` directly (via
-`/speckit-constitution`), incrementing the version per semantic versioning:
+This constitution supersedes ad hoc conventions; where it conflicts with an
+existing pattern in the codebase, the pattern needs correction, not the
+constitution. Amendments require a documented rationale, a semver version
+bump, and updates to any dependent Spec Kit templates that reference changed
+principles. PRs and Spec Kit plans MUST verify compliance with these
+principles before completion.
 
-- MAJOR: backward-incompatible principle removal or redefinition.
-- MINOR: a new principle or materially expanded section is added.
-- PATCH: wording, clarification, or non-semantic fixes.
+Versioning policy:
 
-Every feature spec, plan, and task list produced by Spec Kit commands is
-expected to be consistent with these principles; a conflict should be resolved
-by amending this document (if the principle is wrong or outdated) or by
-adjusting the feature work (if the principle still holds). Complexity that
-violates Principle IV must be justified in the relevant plan's rationale, not
-silently introduced.
+- MAJOR: Backward incompatible governance/principle removals or redefinitions.
+- MINOR: New principle/section added or materially expanded guidance.
+- PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 1.1.0 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-17
+**Version**: 2.0.0 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-17
