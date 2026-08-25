@@ -14,7 +14,7 @@ own Assumptions section:
 
 These have `spec.md` + `checklists/` and **no `plan.md`, and no `tasks.md`.
 That is intentional, not an oversight — do not "fix" it by running
-`/speckit-plan` across them.** `/speckit-plan` produces an *implementation*
+`/speckit-plan` across them.** `/speckit-plan` produces an _implementation_
 plan whose purpose is to feed `/speckit-tasks` → `/speckit-implement`. Running
 that pipeline against code that already exists generates tasks to build things
 that are already running, and multiplies the number of artifacts that have to
@@ -35,12 +35,12 @@ Drift is real and has already been found: `008-seo-metadata` FR-005/FR-006/FR-00
 described breadcrumb and overlay structured-data behaviour the code never had,
 and were corrected on 2026-08-24 to match the implementation.
 
-If a retrospective feature ever gains genuinely *new* scope, plan that new work
+If a retrospective feature ever gains genuinely _new_ scope, plan that new work
 rather than back-filling a plan for the shipped baseline.
 
 ## Forward-looking specs (009+) — full artifact set
 
-`009-testing-quality-gates` is the first feature specified *before* being built,
+`009-testing-quality-gates` is the first feature specified _before_ being built,
 so it carries the full set: `spec.md`, `plan.md`, `research.md`, `data-model.md`,
 `quickstart.md`, `contracts/`. Nothing in it is implemented yet — there is no
 `.husky/`, no Vitest dependency, and no test file in `src/`.

@@ -15,7 +15,7 @@
 - Q: Should decorative/motion-driven content (duplicate manifesto text, service-card icons) and CMS image alt text get explicit, testable accessibility requirements in this spec, or should the spec rely on the constitution's blanket accessibility principle without page-specific requirements? → A: Add explicit requirements: decorative/duplicate content excluded from assistive tech, all CMS images require meaningful alt text
 - Q: Should this spec include an explicit, measurable performance success criterion for the hero's image loading, given the constitution's principle that image delivery is deliberately budgeted, or is performance out of scope for this documentation spec? → A: Add a success criterion tied to prioritized/eager loading of hero imagery, matching current implementation and the constitution's image-budget principle
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Arrive and read the hero (Priority: P1)
 
@@ -79,7 +79,7 @@ After the manifesto, a visitor reaches a summary of the photographer's body of w
 - What happens when a visitor scrolls the services section into view, then away, then back? The reveal animation MUST NOT replay once it has already played.
 - What happens when there are zero featured projects or zero configured service packages? Each section's heading/eyebrow MUST still render; this is a valid empty content state (an empty grid or empty card list), not treated as missing/invalid required content.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -106,7 +106,7 @@ After the manifesto, a visitor reaches a summary of the photographer's body of w
 - **Service Package**: A bookable offering with an identifying category, title, description, feature list, starting price, and booking destination, shown as a card in the services section.
 - **Site Settings**: Site-level identity (e.g., site name) used for the hero logo's accessible label.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

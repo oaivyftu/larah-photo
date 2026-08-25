@@ -18,7 +18,11 @@ export function WorkFilters({
   return (
     // `aria-label` on a plain <div> is dropped: a generic role takes no
     // accessible name. `group` gives it one to hang off.
-    <div aria-label="Work filters" className={styles["work-filters"]} role="group">
+    <div
+      aria-label="Work filters"
+      className={styles["work-filters"]}
+      role="group"
+    >
       <span className={styles["work-filters__label"]}>Filters:</span>
       <div className={styles["work-filters__list"]}>
         {filters.map((filter, index) => {
@@ -27,7 +31,10 @@ export function WorkFilters({
           return (
             <Fragment key={filter.value}>
               {index > 0 ? (
-                <span aria-hidden="true" className={styles["work-filters__separator"]}>
+                <span
+                  aria-hidden="true"
+                  className={styles["work-filters__separator"]}
+                >
                   /
                 </span>
               ) : null}

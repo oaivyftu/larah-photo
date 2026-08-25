@@ -14,7 +14,7 @@
 
 - Q: Should the services page spec include an explicit image-loading performance requirement, matching the same treatment given to the home page and work gallery? → A: Add a requirement that only the initially visible package images load immediately and the rest defer.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Review service packages and book (Priority: P1)
 
@@ -40,7 +40,7 @@ A visitor navigates to the services page to see what photography sessions are of
 - What happens when a service package doesn't specify a booking link? The system MUST fall back to the site's general contact destination.
 - What happens when required content (page title, or a package's title/image) is missing or invalid in the CMS? The page MUST surface an error rather than silently rendering blank space or placeholder content.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -58,7 +58,7 @@ A visitor navigates to the services page to see what photography sessions are of
 - **Service Page Content**: CMS-managed page-level copy for the services index (title words).
 - **Service Package**: A bookable photography session offering with a display index, title, description, feature list, starting price, an image (with alt text), and a booking link destination.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

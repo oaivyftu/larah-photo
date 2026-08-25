@@ -30,7 +30,10 @@
    width and the three-column fallback now starts where the minimums give out. */
 .service-row {
   display: grid;
-  grid-template-columns: 5.5rem minmax(0, 0.88fr) minmax(0, 1.2fr) minmax(0, 0.78fr);
+  grid-template-columns: 5.5rem minmax(0, 0.88fr) minmax(0, 1.2fr) minmax(
+      0,
+      0.78fr
+    );
   gap: clamp(2.4rem, 5vw, 6rem);
   align-items: start;
 }

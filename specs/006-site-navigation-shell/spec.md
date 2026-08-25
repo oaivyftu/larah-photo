@@ -8,7 +8,7 @@
 
 **Input**: User description: "Site navigation & shell — Document the existing site chrome: MainNav, SiteHeader, SiteFooter, PageShell, and PageTransition, including page-transition animations, driven by siteSettings."
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Move around the site via consistent chrome (Priority: P1)
 
@@ -67,7 +67,7 @@ A keyboard or screen-reader user can skip the header to reach the page's main co
 - What happens when required site settings (navigation items, Instagram URL, site name) are missing or invalid? The chrome MUST surface an error rather than silently rendering blank or broken navigation.
 - What happens when navigation items are configured with zero entries? This MUST be treated as invalid configuration, since primary navigation is required.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -88,7 +88,7 @@ A keyboard or screen-reader user can skip the header to reach the page's main co
 - **Site Settings**: Site-wide configuration driving the shell — site name, Instagram URL, business email/phone, location, footer statement, and the ordered list of primary navigation items (label + destination).
 - **Navigation Item**: A single primary navigation entry with a label and a destination path.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

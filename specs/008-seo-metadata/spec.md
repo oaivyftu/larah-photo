@@ -8,7 +8,7 @@
 
 **Input**: User description: "SEO & metadata — Document existing SEO surface: sitemap, robots.txt, web manifest, and per-page metadata and structured data."
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Be discoverable and correctly represented in search results (Priority: P1)
 
@@ -51,7 +51,7 @@ A search engine renders enhanced ("rich") results for the studio's business iden
 - What happens for the intercepted project-preview overlay versus the standalone project page, both reachable at the same URL? The overlay is a client-side-navigation presentation only — a crawler, a shared link, or a refresh always renders the standalone page. So exactly one canonical URL and one set of structured data exist per project, and duplicate content cannot arise.
 - What happens if the site is marked ready for indexing but the public site URL is still misconfigured (e.g. pointing at a local address)? The system MUST fail loudly (e.g. at build/startup) rather than publish incorrect canonical/OG URLs to the public.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -60,7 +60,7 @@ A search engine renders enhanced ("rich") results for the studio's business iden
 - **FR-003**: System MUST generate robots rules that fully disallow crawling when the site is not marked ready for indexing, and that otherwise allow crawling of public pages while disallowing the CMS Studio route and internal API routes, referencing the sitemap.
 - **FR-004**: System MUST generate a web app manifest declaring the site's name, short name, description, start URL, display mode, background color, theme color, and an icon set including a maskable icon.
 - **FR-005**: Every public page MUST embed structured data describing the studio's business identity, emitted once from the shared page shell so no individual page can omit it.
-- **FR-005a**: Pages that sit below the site root MUST additionally embed a breadcrumb trail reflecting their position in the hierarchy. This currently applies to the work listing, project detail, services, and contact pages. The home page carries a site-level descriptor instead of a breadcrumb (it *is* the root, so a trail would have a single entry). The about page currently embeds neither a breadcrumb nor a site-level descriptor — only its own page-type descriptor and the shell's business identity.
+- **FR-005a**: Pages that sit below the site root MUST additionally embed a breadcrumb trail reflecting their position in the hierarchy. This currently applies to the work listing, project detail, services, and contact pages. The home page carries a site-level descriptor instead of a breadcrumb (it _is_ the root, so a trail would have a single entry). The about page currently embeds neither a breadcrumb nor a site-level descriptor — only its own page-type descriptor and the shell's business identity.
 - **FR-006**: The work listing page MUST embed structured data describing the collection of work projects; each project detail page MUST embed structured data describing that specific project. The in-app overlay does not emit its own structured data and does not need to: interception occurs only on client-side navigation, so any crawler, shared link, or page refresh receives the standalone project page and its structured data instead.
 - **FR-007**: The services page MUST embed structured data describing the list of service packages, including pricing in the site's configured currency.
 - **FR-008**: The about and contact pages MUST embed structured data describing their respective content.
@@ -75,7 +75,7 @@ A search engine renders enhanced ("rich") results for the studio's business iden
 - **Structured Data Document**: A page-embedded description of an entity (business, breadcrumb, work collection, project, service list, about, contact) used by search engines for rich results.
 - **Site Indexability Setting**: A site-wide flag controlling whether the site is crawlable at all, independent of individual page rules.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

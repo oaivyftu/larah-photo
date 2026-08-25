@@ -109,76 +109,109 @@
 
 .work-layout__item--span-1 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 1)
+    (
+      (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+        var(--work-columns) * 1
+    )
   );
 }
 
 .work-layout__item--span-2 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 2) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 2
+      ) +
       (var(--work-gap-x) * 1)
   );
 }
 
 .work-layout__item--span-3 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 3) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 3
+      ) +
       (var(--work-gap-x) * 2)
   );
 }
 
 .work-layout__item--span-4 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 4) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 4
+      ) +
       (var(--work-gap-x) * 3)
   );
 }
 
 .work-layout__item--span-5 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 5) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 5
+      ) +
       (var(--work-gap-x) * 4)
   );
 }
 
 .work-layout__item--span-6 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 6) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 6
+      ) +
       (var(--work-gap-x) * 5)
   );
 }
 
 .work-layout__item--span-7 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 7) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 7
+      ) +
       (var(--work-gap-x) * 6)
   );
 }
 
 .work-layout__item--span-8 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 8) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 8
+      ) +
       (var(--work-gap-x) * 7)
   );
 }
 
 .work-layout__item--span-9 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 9) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 9
+      ) +
       (var(--work-gap-x) * 8)
   );
 }
 
 .work-layout__item--span-10 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 10) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 10
+      ) +
       (var(--work-gap-x) * 9)
   );
 }
 
 .work-layout__item--span-11 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 11) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 11
+      ) +
       (var(--work-gap-x) * 10)
   );
 }

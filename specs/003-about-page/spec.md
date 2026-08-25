@@ -8,7 +8,7 @@
 
 **Input**: User description: "About page — Document the existing about page: Sanity-driven bio/story content (AboutExperience) from the aboutPage schema."
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Read the photographer's story (Priority: P1)
 
@@ -32,7 +32,7 @@ A visitor navigates to the about page to learn who Larah Photo is, and sees a he
 - What happens when the about page's title, portrait, or story content is missing or invalid in the CMS? The page MUST surface an error rather than silently rendering blank space or placeholder content.
 - What happens when the story has zero configured paragraphs? This MUST be treated as missing required content, not a valid empty state.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -47,7 +47,7 @@ A visitor navigates to the about page to learn who Larah Photo is, and sees a he
 
 - **About Page Content**: The CMS-managed content for the page — title words, a portrait image (with alt text), and an ordered list of story paragraphs.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

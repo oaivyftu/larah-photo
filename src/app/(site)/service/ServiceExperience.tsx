@@ -18,7 +18,10 @@ type ServiceExperienceProps = {
   services: ServicePackage[];
 };
 
-export function ServiceExperience({ content, services }: ServiceExperienceProps) {
+export function ServiceExperience({
+  content,
+  services,
+}: ServiceExperienceProps) {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -66,14 +69,26 @@ export function ServiceExperience({ content, services }: ServiceExperienceProps)
 
   return (
     <div className={styles["service"]} ref={rootRef}>
-      <section className={styles["service__header"]} aria-labelledby="service-title">
+      <section
+        className={styles["service__header"]}
+        aria-labelledby="service-title"
+      >
         <PageHeading id="service-title" words={content.titleWords} />
       </section>
 
-      <section className={styles["service__list"]} aria-label="Photography services">
+      <section
+        className={styles["service__list"]}
+        aria-label="Photography services"
+      >
         {services.map((service) => (
-          <article className={styles["service-row"]} data-service-row key={service.id}>
-            <span className={styles["service-row__index"]}>{service.index}</span>
+          <article
+            className={styles["service-row"]}
+            data-service-row
+            key={service.id}
+          >
+            <span className={styles["service-row__index"]}>
+              {service.index}
+            </span>
 
             <div className={styles["service-row__summary"]}>
               <h2>{service.title}</h2>

@@ -14,7 +14,7 @@
 
 - Q: The webhook endpoint only validates the HMAC signature — it has no replay protection or rate limiting beyond that. Should the spec explicitly document this as a known limitation, or leave it unmentioned? → A: Document as a known limitation so a future reader doesn't mistake silence for a guarantee.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Edit site content through the Studio (Priority: P1)
 
@@ -56,7 +56,7 @@ After an editor publishes a change in the Studio, that change becomes visible on
 - What happens when a document is published as soon as it is created, before it's fully consistent across the CMS's storage? The invalidation MUST still result in the fresh version being served, not a partially-updated one.
 - **Known limitation**: The notification endpoint validates only the request's signature; it does not currently implement replay protection (rejecting a previously-seen valid request) or rate limiting. A validly-signed request can be resent without being detected as a duplicate.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -73,7 +73,7 @@ After an editor publishes a change in the Studio, that change becomes visible on
 - **Content Document**: Any CMS-managed record the public site depends on (site settings, page content documents, work projects, service packages), each with a content type used to route change notifications.
 - **Cache Invalidation Notification**: A signed request identifying which content type changed, used to trigger a targeted cache refresh.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

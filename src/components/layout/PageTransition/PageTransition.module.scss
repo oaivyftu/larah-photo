@@ -68,11 +68,13 @@
   animation: curtain-in 780ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.page-transition--covered .page-transition__accent, .page-transition--covering .page-transition__accent {
+.page-transition--covered .page-transition__accent,
+.page-transition--covering .page-transition__accent {
   animation: accent-sweep 780ms 90ms linear infinite backwards;
 }
 
-.page-transition--covered .page-transition__logo, .page-transition--covering .page-transition__logo {
+.page-transition--covered .page-transition__logo,
+.page-transition--covering .page-transition__logo {
   animation: logo-sweep-in 700ms 90ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -167,4 +169,3 @@
     transform: translateX(-34vw) skewX(6deg);
   }
 }
-

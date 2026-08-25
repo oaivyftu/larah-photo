@@ -48,7 +48,9 @@ function FieldShell({
       <label className={styles["input__control"]} htmlFor={id}>
         <span className={styles["input__label"]}>
           {label}
-          {required ? <span className={styles["input__required"]}>*</span> : null}
+          {required ? (
+            <span className={styles["input__required"]}>*</span>
+          ) : null}
         </span>
         {children}
       </label>
@@ -155,7 +157,11 @@ export function Select({
             </option>
           ))}
         </select>
-        <Icon className={styles["input__icon"]} decorative icon={icons.chevronDown} />
+        <Icon
+          className={styles["input__icon"]}
+          decorative
+          icon={icons.chevronDown}
+        />
       </span>
     </FieldShell>
   );

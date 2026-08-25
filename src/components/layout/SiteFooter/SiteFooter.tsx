@@ -16,7 +16,9 @@ export function SiteFooter({ settings }: SiteFooterProps) {
           {settings.footerStatement}
         </p>
         <address className={styles["site-footer__contact"]}>
-          <span className={styles["site-footer__label"]}>BUSINESS ENQUIRIES</span>
+          <span className={styles["site-footer__label"]}>
+            BUSINESS ENQUIRIES
+          </span>
           <a href={`mailto:${settings.email}`}>{settings.email}</a>
           <a href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`}>
             {settings.phone}
@@ -32,7 +34,11 @@ export function SiteFooter({ settings }: SiteFooterProps) {
       </div>
       <div className={styles["site-footer__bar"]}>
         <span>Larah Photo©2026</span>
-        <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
+        <a
+          href={settings.instagramUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           Instagram
         </a>
         <Link href="/work">Work</Link>

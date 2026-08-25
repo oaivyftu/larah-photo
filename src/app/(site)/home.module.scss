@@ -226,7 +226,6 @@
   border-top: 1px solid var(--home-line);
 }
 
-
 .services {
   overflow: hidden;
   border-top: var(--divider-hairline) solid var(--color-divider);
@@ -419,7 +418,6 @@
   .service-card {
     min-height: 0;
   }
-
 }
 
 @include reduced-motion {

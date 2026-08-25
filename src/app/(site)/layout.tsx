@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 // that the reset below — which styles bare `html`, `body`, `*`, `a`, `svg` —
 // never reaches Sanity Studio, whose own theme leaves those selectors alone.
 import "./globals.scss";
-import { Montserrat } from 'next/font/google'
+import { Montserrat } from "next/font/google";
 import { PageTransition } from "@/components/layout/PageTransition/PageTransition";
 import { GlassPointer } from "@/components/ui/GlassPointer/GlassPointer";
 import {
@@ -16,9 +16,9 @@ import {
 // Exposed as a CSS variable so `--font-sans` can point at the hashed family
 // `next/font` generates — naming "Montserrat" directly resolves to nothing.
 const montserrat = Montserrat({
-  subsets: ['latin'],
-  variable: '--font-montserrat',
-})
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

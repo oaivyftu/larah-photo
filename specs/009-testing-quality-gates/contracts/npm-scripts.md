@@ -4,16 +4,16 @@ This feature's "interface to other systems" is the set of npm scripts and Git ho
 
 ## npm scripts
 
-| Script | Command (indicative) | Exit 0 means | Used by |
-|---|---|---|---|
-| `test` | `vitest run` | All unit + mock tests passed | pre-commit, pre-push, manual |
-| `test:watch` | `vitest` | — (interactive, not used by hooks) | manual dev loop |
-| `typecheck` | `tsc --noEmit -p tsconfig.typecheck.json` | No TypeScript type errors project-wide | pre-commit, pre-push, manual |
-| `lint` | `eslint` (existing — unchanged, no path argument) | No lint **errors**; warnings do not fail the run | manual, CI-equivalent to lint-staged's scoped run |
-| `format` | `prettier --write .` | — | manual |
-| `format:check` | `prettier --check .` | All files match Prettier formatting | manual / future CI only — **not** used by either hook (see below) |
-| `test:e2e` | `playwright test` (if/when added) | All E2E scenarios passed | **manual only** — not wired into any Git hook (research.md §4) |
-| `prepare` | `husky` | Hooks installed into `.husky/` | automatically on `npm install` (FR-006) |
+| Script         | Command (indicative)                              | Exit 0 means                                     | Used by                                                           |
+| -------------- | ------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------- |
+| `test`         | `vitest run`                                      | All unit + mock tests passed                     | pre-commit, pre-push, manual                                      |
+| `test:watch`   | `vitest`                                          | — (interactive, not used by hooks)               | manual dev loop                                                   |
+| `typecheck`    | `tsc --noEmit -p tsconfig.typecheck.json`         | No TypeScript type errors project-wide           | pre-commit, pre-push, manual                                      |
+| `lint`         | `eslint` (existing — unchanged, no path argument) | No lint **errors**; warnings do not fail the run | manual, CI-equivalent to lint-staged's scoped run                 |
+| `format`       | `prettier --write .`                              | —                                                | manual                                                            |
+| `format:check` | `prettier --check .`                              | All files match Prettier formatting              | manual / future CI only — **not** used by either hook (see below) |
+| `test:e2e`     | `playwright test` (if/when added)                 | All E2E scenarios passed                         | **manual only** — not wired into any Git hook (research.md §4)    |
+| `prepare`      | `husky`                                           | Hooks installed into `.husky/`                   | automatically on `npm install` (FR-006)                           |
 
 ### Open decision: do warnings block?
 

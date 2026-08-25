@@ -8,7 +8,7 @@
 
 **Input**: User description: "Add automated testing and Git quality gates: unit tests and mock tests for the application, plus Husky + lint-staged Git hooks. Pre-commit hook runs ESLint, Prettier, TypeScript type-checking, unit tests, and mock tests. Pre-push hook additionally verifies the production build completes successfully. Investigate whether Playwright end-to-end tests should be included in these hooks or left to manual/CI-only runs, given their AI-token/CI cost versus value."
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Verify logic with an automated test suite (Priority: P1)
 
@@ -32,12 +32,12 @@ A developer runs `git commit`. Before the commit is created, their staged code i
 
 **Why this priority**: This is the first line of defense that keeps broken or inconsistent code out of history at all, but it depends on the test suite from User Story 1 already existing.
 
-**Independent Test**: Introduce a lint violation, a type error, or a failing test on a branch, attempt to commit, and confirm the commit is blocked with a message identifying which check failed; then fix it and confirm the commit succeeds. Separately, stage a badly-formatted but otherwise valid file, commit, and confirm the commit succeeds *and* the committed content is formatted.
+**Independent Test**: Introduce a lint violation, a type error, or a failing test on a branch, attempt to commit, and confirm the commit is blocked with a message identifying which check failed; then fix it and confirm the commit succeeds. Separately, stage a badly-formatted but otherwise valid file, commit, and confirm the commit succeeds _and_ the committed content is formatted.
 
 **Acceptance Scenarios**:
 
 1. **Given** a developer attempts to commit code with a linting violation, a type error, or a failing unit/mock test, **When** the commit is attempted, **Then** the commit is blocked and the developer sees which check failed.
-1a. **Given** a developer stages a file whose formatting does not match the project's style but which is otherwise valid, **When** the commit is attempted, **Then** the file is reformatted automatically, the reformatted content is what gets committed, and the commit is *not* blocked.
+   1a. **Given** a developer stages a file whose formatting does not match the project's style but which is otherwise valid, **When** the commit is attempted, **Then** the file is reformatted automatically, the reformatted content is what gets committed, and the commit is _not_ blocked.
 2. **Given** a developer attempts to commit code that passes every check, **When** the commit is attempted, **Then** the commit proceeds without unnecessary delay.
 3. **Given** a new contributor clones the repository and installs dependencies, **When** they later run `git commit`, **Then** the pre-commit checks run automatically, without any manual hook-installation step.
 
@@ -66,14 +66,14 @@ A developer runs `git push`, and in addition to the same checks as commit time, 
 - What happens when the pre-commit and pre-push checks overlap (lint/format/type/tests run at both stages)? Both stages MUST still run their full defined check set; pre-push is not a lighter version of pre-commit.
 - What happens with end-to-end (full browser) tests? They are explicitly NOT part of the automated pre-commit or pre-push gates in this feature; see Assumptions for the rationale and how they remain available.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
 - **FR-001**: Project MUST have an automated unit test suite covering isolated application logic (functions/utilities with no external dependencies).
 - **FR-002**: Project MUST have automated "mock" tests covering code that depends on external services (e.g. the CMS client, network requests, browser-only APIs), with those dependencies replaced by mocks so no real external call is made during the test run.
 - **FR-003**: A pre-commit Git hook MUST run automatically on every commit attempt and MUST block the commit if linting, type-checking, unit tests, or mock tests fail.
-- **FR-003a**: Formatting MUST be applied automatically to staged files during the pre-commit hook, and the reformatted result MUST be included in the commit being created. Formatting is a *correction* step, not a blocking gate: a developer MUST NOT have to fix formatting by hand and re-run the commit. Consequently no commit can enter history with unformatted content, which is the outcome a blocking format check would have aimed at.
+- **FR-003a**: Formatting MUST be applied automatically to staged files during the pre-commit hook, and the reformatted result MUST be included in the commit being created. Formatting is a _correction_ step, not a blocking gate: a developer MUST NOT have to fix formatting by hand and re-run the commit. Consequently no commit can enter history with unformatted content, which is the outcome a blocking format check would have aimed at.
 - **FR-004**: A pre-push Git hook MUST run automatically on every push attempt and MUST block the push if any pre-commit-level check fails, or if the production build fails to complete.
 - **FR-005**: Both hooks MUST report which specific check failed (lint, type-check, unit test, mock test, or build) so a developer can address it directly.
 - **FR-006**: Hooks MUST be installed automatically as part of the project's standard dependency-installation step, requiring no separate manual setup by a new contributor.
@@ -87,7 +87,7 @@ A developer runs `git push`, and in addition to the same checks as commit time, 
 - **Pre-commit Gate**: An automatic formatting step applied to staged files, followed by the set of checks (lint, type-check, unit tests, mock tests) that must pass before a commit is created.
 - **Pre-push Gate**: The pre-commit gate plus a production build verification, run before code leaves the developer's machine.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

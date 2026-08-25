@@ -16,7 +16,7 @@ import type { HomePageContent } from "@/types/site";
 import styles from "./home.module.scss";
 import {
   BREAKPOINT_PHONE_LG,
-  BREAKPOINT_TABLET_LG
+  BREAKPOINT_TABLET_LG,
 } from "@/constants/breakpoints";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -34,7 +34,7 @@ const serviceIcons: Record<string, typeof icons.portrait> = {
   "couple-session": icons.userGroup,
   "wedding-session": icons.ring,
   "family-session": icons.family,
-  "graduation-session": icons.graduation
+  "graduation-session": icons.graduation,
 };
 
 export function HomeExperience({
@@ -51,49 +51,67 @@ export function HomeExperience({
     () => {
       const mm = gsap.matchMedia();
 
-      mm.add("(min-width: 901px) and (prefers-reduced-motion: no-preference)", () => {
-        const heroTl = gsap.timeline({ defaults: { ease: "power4.out" } });
+      mm.add(
+        "(min-width: 901px) and (prefers-reduced-motion: no-preference)",
+        () => {
+          const heroTl = gsap.timeline({ defaults: { ease: "power4.out" } });
 
-        heroTl
-          .from("[data-hero-word]", {
-            yPercent: 120,
-            rotate: 4,
-            opacity: 0,
-            duration: 1.05,
-            stagger: 0.08,
-          })
-          .from(
-            "[data-hero-media]",
-            {
-              clipPath: "inset(44% 28% 44% 28%)",
-              scale: 0.96,
-              duration: 1.1,
-            },
-            0.12,
-          )
-          .from(
-            "[data-hero-meta]",
-            { y: 18, opacity: 0, duration: 0.65, stagger: 0.07 },
-            0.52,
-          );
+          heroTl
+            .from("[data-hero-word]", {
+              yPercent: 120,
+              rotate: 4,
+              opacity: 0,
+              duration: 1.05,
+              stagger: 0.08,
+            })
+            .from(
+              "[data-hero-media]",
+              {
+                clipPath: "inset(44% 28% 44% 28%)",
+                scale: 0.96,
+                duration: 1.1,
+              },
+              0.12,
+            )
+            .from(
+              "[data-hero-meta]",
+              { y: 18, opacity: 0, duration: 0.65, stagger: 0.07 },
+              0.52,
+            );
 
-        gsap
-          .timeline({
-            scrollTrigger: {
-              trigger: "[data-manifesto]",
-              start: "top top",
-              end: "+=160%",
-              pin: true,
-              scrub: 1,
-            },
-          })
-          .to("[data-manifesto-word='light']", { xPercent: -16, scale: 1.12 }, 0)
-          .to("[data-manifesto-word='memory']", { xPercent: 12, scale: 0.88 }, 0)
-          .to("[data-manifesto-word='motion']", { xPercent: -8, scale: 1.05 }, 0)
-          .to("[data-manifesto-image='one']", { yPercent: -16, rotate: -6 }, 0)
-          .to("[data-manifesto-image='two']", { yPercent: 18, rotate: 5 }, 0);
-
-      });
+          gsap
+            .timeline({
+              scrollTrigger: {
+                trigger: "[data-manifesto]",
+                start: "top top",
+                end: "+=160%",
+                pin: true,
+                scrub: 1,
+              },
+            })
+            .to(
+              "[data-manifesto-word='light']",
+              { xPercent: -16, scale: 1.12 },
+              0,
+            )
+            .to(
+              "[data-manifesto-word='memory']",
+              { xPercent: 12, scale: 0.88 },
+              0,
+            )
+            .to(
+              "[data-manifesto-word='motion']",
+              { xPercent: -8, scale: 1.05 },
+              0,
+            )
+            .to(
+              "[data-manifesto-image='one']",
+              { yPercent: -16, rotate: -6 },
+              0,
+            )
+            .to("[data-manifesto-image='two']", { yPercent: 18, rotate: 5 }, 0);
+        },
+      );
 
       // Below 901px the manifesto can't keep the desktop staging: pinning fights
       // the mobile URL bar (every toolbar resize re-measures the pin) and under
@@ -212,7 +230,8 @@ export function HomeExperience({
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         const root = rootRef.current;
-        const servicesSection = root?.querySelector<HTMLElement>("[data-services]");
+        const servicesSection =
+          root?.querySelector<HTMLElement>("[data-services]");
         const revealItems = gsap.utils.toArray<HTMLElement>(
           "[data-service-reveal]",
           root,
@@ -264,7 +283,9 @@ export function HomeExperience({
           });
         };
 
-        window.addEventListener("scroll", checkServiceReveal, { passive: true });
+        window.addEventListener("scroll", checkServiceReveal, {
+          passive: true,
+        });
         window.addEventListener("resize", checkServiceReveal);
         checkServiceReveal();
 
@@ -357,7 +378,10 @@ export function HomeExperience({
           <span data-manifesto-word="memory">{content.manifestoWords[1]}</span>
           <span data-manifesto-word="motion">{content.manifestoWords[2]}</span>
         </div>
-        <div className={styles["manifesto__image-one"]} data-manifesto-image="one">
+        <div
+          className={styles["manifesto__image-one"]}
+          data-manifesto-image="one"
+        >
           <LarahImage
             src={content.manifestoImageOne.src}
             alt={content.manifestoImageOne.alt}
@@ -366,7 +390,10 @@ export function HomeExperience({
             sizes="(max-width: 760px) 46vw, 24vw"
           />
         </div>
-        <div className={styles["manifesto__image-two"]} data-manifesto-image="two">
+        <div
+          className={styles["manifesto__image-two"]}
+          data-manifesto-image="two"
+        >
           <LarahImage
             src={content.manifestoImageTwo.src}
             alt={content.manifestoImageTwo.alt}
@@ -409,7 +436,11 @@ export function HomeExperience({
         </div>
       </section>
 
-      <section className={styles["services"]} data-services aria-labelledby="services-title">
+      <section
+        className={styles["services"]}
+        data-services
+        aria-labelledby="services-title"
+      >
         <div className={styles["services__header"]} data-service-reveal>
           <p className={styles["services__eyebrow"]} id="services-title">
             {content.servicesEyebrow}

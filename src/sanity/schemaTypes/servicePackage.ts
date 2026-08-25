@@ -14,7 +14,12 @@ export const servicePackage = defineType({
       type: "string",
       validation: (rule) => rule.required(),
     }),
-    defineField({ name: "description", title: "Description", type: "text", rows: 3 }),
+    defineField({
+      name: "description",
+      title: "Description",
+      type: "text",
+      rows: 3,
+    }),
     defineField({
       name: "features",
       title: "Features",

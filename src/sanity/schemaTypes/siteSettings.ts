@@ -61,8 +61,16 @@ export const siteSettings = defineType({
       fields: [
         defineField({ name: "streetAddress", title: "Street", type: "string" }),
         defineField({ name: "locality", title: "City", type: "string" }),
-        defineField({ name: "region", title: "State / region", type: "string" }),
-        defineField({ name: "postalCode", title: "Postal code", type: "string" }),
+        defineField({
+          name: "region",
+          title: "State / region",
+          type: "string",
+        }),
+        defineField({
+          name: "postalCode",
+          title: "Postal code",
+          type: "string",
+        }),
         defineField({
           name: "country",
           title: "Country code",

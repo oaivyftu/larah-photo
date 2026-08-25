@@ -14,7 +14,7 @@
 
 - Q: Should the work gallery spec include an explicit, measurable performance criterion for how card and gallery images load, given the constitution's principle that image delivery is deliberately budgeted? → A: Add a requirement/success criterion that initial visible cards load immediately and below-the-fold cards and full-size gallery images defer until needed, matching current lazy-loading behavior.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Browse the gallery and preview a project (Priority: P1)
 
@@ -73,7 +73,7 @@ While viewing a project's full gallery (either in the overlay or on its standalo
 - What happens when a category has exactly one matching project versus more than one? The filter announcement MUST use correct singular/plural wording in both cases.
 - What happens while the masonry layout is still calculating positions? The grid MUST show a placeholder rather than a visibly jumping or overlapping layout.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -97,7 +97,7 @@ While viewing a project's full gallery (either in the overlay or on its standalo
 - **Work Project**: A photography project with a title, unique slug, category, year, location, description, a card image, a set of gallery images (each with required alt text), and flags/ordering controlling whether and where it appears among featured projects on the home page.
 - **Work Page Content**: CMS-managed page-level copy for the work index (e.g. heading text).
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

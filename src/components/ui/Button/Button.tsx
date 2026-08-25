@@ -61,8 +61,10 @@ export function Button({
   );
 
   if (rest.href === undefined) {
-    const { type = "button", ...buttonProps } =
-      rest as Omit<ButtonElementProps, keyof SharedProps>;
+    const { type = "button", ...buttonProps } = rest as Omit<
+      ButtonElementProps,
+      keyof SharedProps
+    >;
 
     return (
       <button className={classNames} type={type} {...buttonProps}>

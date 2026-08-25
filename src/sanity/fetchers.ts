@@ -166,10 +166,7 @@ function requireString(value: string | null | undefined, field: string) {
   return resolved;
 }
 
-function requireStringArray(
-  value: string[] | null | undefined,
-  field: string,
-) {
+function requireStringArray(value: string[] | null | undefined, field: string) {
   const resolved = requireValue(value, field);
 
   if (!resolved.length || resolved.some((item) => !item.trim())) {
@@ -264,11 +261,7 @@ export async function getHomePage(): Promise<HomePageContent> {
     heroImage: resolveSanityImage(page.heroImage, "homePage.heroImage"),
     heroCtaLabel: requireString(page.heroCtaLabel, "homePage.heroCtaLabel"),
     heroCtaHref: requireString(page.heroCtaHref, "homePage.heroCtaHref"),
-    manifestoWords: [
-      manifestoWords[0],
-      manifestoWords[1],
-      manifestoWords[2],
-    ],
+    manifestoWords: [manifestoWords[0], manifestoWords[1], manifestoWords[2]],
     manifestoImageOne: resolveSanityImage(
       page.manifestoImageOne,
       "homePage.manifestoImageOne",
@@ -296,10 +289,7 @@ export async function getAboutPage(): Promise<AboutPageContent> {
 
   return {
     titleWords: requireStringArray(page.titleWords, "aboutPage.titleWords"),
-    portraitOne: resolveSanityImage(
-      page.portraitOne,
-      "aboutPage.portraitOne",
-    ),
+    portraitOne: resolveSanityImage(page.portraitOne, "aboutPage.portraitOne"),
     story: requireStringArray(page.story, "aboutPage.story"),
   };
 }
@@ -361,14 +351,8 @@ export async function getServices(): Promise<ServicePackage[]> {
 
     return {
       id,
-      index: requireString(
-        service.index,
-        `servicePackage[${index}].index`,
-      ),
-      title: requireString(
-        service.title,
-        `servicePackage[${index}].title`,
-      ),
+      index: requireString(service.index, `servicePackage[${index}].index`),
+      title: requireString(service.title, `servicePackage[${index}].title`),
       description: requireString(
         service.description,
         `servicePackage[${index}].description`,
@@ -377,10 +361,7 @@ export async function getServices(): Promise<ServicePackage[]> {
         service.features,
         `servicePackage[${index}].features`,
       ),
-      price: requireValue(
-        service.price,
-        `servicePackage[${index}].price`,
-      ),
+      price: requireValue(service.price, `servicePackage[${index}].price`),
       image: image.src,
       imageBlurDataURL: image.blurDataURL,
       imageAlt: image.alt,

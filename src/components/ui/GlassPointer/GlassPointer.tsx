@@ -58,10 +58,8 @@ export function GlassPointer() {
       const smoothing = 1 - Math.pow(1 - 0.14, elapsedFrames);
 
       previousTimeRef.current = time;
-      position.currentX +=
-        (position.targetX - position.currentX) * smoothing;
-      position.currentY +=
-        (position.targetY - position.currentY) * smoothing;
+      position.currentX += (position.targetX - position.currentX) * smoothing;
+      position.currentY += (position.targetY - position.currentY) * smoothing;
       paintPosition();
 
       const distance =
@@ -77,10 +75,7 @@ export function GlassPointer() {
     }
 
     function startAnimation() {
-      if (
-        !prefersReducedMotionRef.current &&
-        frameRef.current === null
-      ) {
+      if (!prefersReducedMotionRef.current && frameRef.current === null) {
         frameRef.current = window.requestAnimationFrame(animatePosition);
       }
     }
@@ -276,7 +271,12 @@ export function GlassPointer() {
             operator="in"
             result="caClipped"
           />
-          <feBlend in="disp1" in2="caClipped" mode="lighten" result="finalGlass" />
+          <feBlend
+            in="disp1"
+            in2="caClipped"
+            mode="lighten"
+            result="finalGlass"
+          />
         </filter>
       </svg>
     </>

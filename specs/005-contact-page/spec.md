@@ -8,7 +8,7 @@
 
 **Input**: User description: "Contact page — Document the existing contact page: content sourced from the contactPage schema and site settings, showing direct contact details (email, phone, Instagram)."
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Find a way to get in touch (Priority: P1)
 
@@ -34,7 +34,7 @@ A visitor navigates to the contact page to find a way to reach the photographer,
 - What happens when the configured Instagram URL doesn't include a parseable username? The link MUST still work and MUST fall back to a generic "Instagram" label rather than breaking or showing malformed text.
 - What happens when the page title, email, phone, or Instagram URL is missing or invalid in the CMS/site settings? The page MUST surface an error rather than silently rendering blank space or placeholder content.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -51,7 +51,7 @@ A visitor navigates to the contact page to find a way to reach the photographer,
 - **Contact Page Content**: CMS-managed page-level copy for the contact page (title words).
 - **Site Contact Settings**: Site-wide settings supplying the studio's email address, phone number, and Instagram URL.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

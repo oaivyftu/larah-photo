@@ -29,7 +29,9 @@ export function WorkGalleryClient({
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
   const [filterAnnouncement, setFilterAnnouncement] = useState("");
   const filters = useMemo(() => {
-    const categories = Array.from(new Set(projects.map((project) => project.category)));
+    const categories = Array.from(
+      new Set(projects.map((project) => project.category)),
+    );
 
     return [
       { label: "All", value: ALL_FILTER },
@@ -51,7 +53,8 @@ export function WorkGalleryClient({
       filter === ALL_FILTER
         ? projects
         : projects.filter((project) => project.category === filter);
-    const label = filters.find((entry) => entry.value === filter)?.label ?? filter;
+    const label =
+      filters.find((entry) => entry.value === filter)?.label ?? filter;
 
     setFilterAnnouncement(
       `${label}: ${matches.length} ${matches.length === 1 ? "project" : "projects"}`,
@@ -102,7 +105,11 @@ export function WorkGalleryClient({
   );
 
   return (
-    <section className={styles["work-page"]} ref={rootRef} aria-labelledby="work-title">
+    <section
+      className={styles["work-page"]}
+      ref={rootRef}
+      aria-labelledby="work-title"
+    >
       <div className={styles["work-page__hero"]}>
         <PageHeading id="work-title" words={content.titleWords} />
 

@@ -58,7 +58,8 @@ export function WorkMasonryGrid({
     const filter = activeFilterRef.current;
 
     return (
-      filter === ALL_FILTER || item.getAttribute("data-work-category") === filter
+      filter === ALL_FILTER ||
+      item.getAttribute("data-work-category") === filter
     );
   }, []);
 

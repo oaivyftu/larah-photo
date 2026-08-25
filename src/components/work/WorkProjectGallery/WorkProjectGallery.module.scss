@@ -110,7 +110,9 @@
   background: var(--color-paper-warm);
   border-radius: 0.5rem;
   cursor: pointer;
-  transition: background-color 180ms ease, transform 180ms ease;
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
 }
 
 .work-project-gallery__close span::before,
@@ -344,7 +346,8 @@
   white-space: nowrap;
 }
 
-.work-project-gallery__float-close:hover .work-project-gallery__float-close-label,
+.work-project-gallery__float-close:hover
+  .work-project-gallery__float-close-label,
 .work-project-gallery__float-close:focus-visible
   .work-project-gallery__float-close-label {
   grid-template-columns: 1fr;

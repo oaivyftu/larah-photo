@@ -31,10 +31,7 @@ type WorkDetailModalProps = {
   project: Project;
 };
 
-export function WorkDetailModal({
-  children,
-  project,
-}: WorkDetailModalProps) {
+export function WorkDetailModal({ children, project }: WorkDetailModalProps) {
   const router = useRouter();
   const titleId = useId();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -142,9 +139,7 @@ export function WorkDetailModal({
     }
   }
 
-  function handleBackdropPointerDown(
-    event: ReactPointerEvent<HTMLDivElement>,
-  ) {
+  function handleBackdropPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (event.target === event.currentTarget) {
       closeModal();
     }

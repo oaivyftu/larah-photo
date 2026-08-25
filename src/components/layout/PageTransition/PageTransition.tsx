@@ -29,7 +29,9 @@ export function PageTransition() {
   const pathname = usePathname();
   const router = useRouter();
   const isStudioRoute = pathname.startsWith("/studio");
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   // The first pass is the initial page load, not a navigation — moving focus or
   // announcing there would talk over the screen reader reading the new page.
   const hasNavigatedRef = useRef(false);
@@ -76,10 +78,7 @@ export function PageTransition() {
     function handlePopState() {
       const isGalleryContext = pathname === "/" || pathname === "/work";
 
-      if (
-        isGalleryContext &&
-        isWorkDetailPath(window.location.pathname)
-      ) {
+      if (isGalleryContext && isWorkDetailPath(window.location.pathname)) {
         document.documentElement.dataset.modalNavigation = "true";
       }
     }
@@ -91,7 +90,11 @@ export function PageTransition() {
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {
-      if (event.defaultPrevented || event.button !== 0 || isModifiedClick(event)) {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        isModifiedClick(event)
+      ) {
         return;
       }
 

@@ -67,9 +67,9 @@ export function InquiryForm({ sessionTypes }: InquiryFormProps) {
   } as const;
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
-    "idle",
-  );
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
   function updateValue(field: keyof FormValues, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
@@ -199,7 +199,9 @@ export function InquiryForm({ sessionTypes }: InquiryFormProps) {
             id={`${formId}-preferred-date`}
             label="Preferred date"
             name="preferredDate"
-            onChange={(event) => updateValue("preferredDate", event.target.value)}
+            onChange={(event) =>
+              updateValue("preferredDate", event.target.value)
+            }
             type="date"
             value={values.preferredDate}
           />
