@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-25
 
-**Status**: Draft
+**Status**: Implemented 2026-08-25 — all 39 tasks, all six quickstart scenarios. `npm run audit:design-system` passes and runs in pre-push.
 
 **Input**: User description: "Make the codebase actually comply with constitution Principle VII — src/styles/ as the token layer, src/components/ui/ as the shared component library. Replace values that bypass the token layer, promote anything repeated twice or more into the shared library, and keep the TypeScript breakpoint mirror in sync."
 
