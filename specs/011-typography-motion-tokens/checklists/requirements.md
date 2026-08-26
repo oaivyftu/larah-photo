@@ -54,3 +54,19 @@
   question — whether corner radius and stacking order join this round — has a
   reasonable default (the scope as stated) and is recorded in Assumptions as a
   named follow-up, so it does not block planning.
+- **Three decisions were settled before planning, all on measurement rather than
+  on principle**, and all three are recorded in Assumptions with the numbers
+  that decided them:
+  1. **Composite text styles are out.** They presuppose a small set of text
+     treatments; this codebase has 49 distinct combinations across 50 blocks,
+     with exactly one recurring, twice. FR-003a keeps the achievable half —
+     name the size and its leading as a visible pair — and the composite
+     version is recorded as what consolidation would unlock.
+  2. **Motion held in interaction code stays out**, including a page-heading
+     reveal stated byte-identically in four files. This is the boundary most
+     likely to be regretted, so it is written down in full rather than left to
+     absence, which is US3's own principle applied to this feature.
+  3. **No new stylesheet linter.** The off-the-shelf rule cannot express the
+     three checks that found real defects here, so adopting it would give one
+     rule two sources of truth. The existing check moved into pre-commit
+     instead, at no cost.
