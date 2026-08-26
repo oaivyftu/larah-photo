@@ -153,3 +153,301 @@ describe("no real network is reached", () => {
     expect(globalFetch).not.toHaveBeenCalled();
   });
 });
+
+// ---------------------------------------------------------------------------
+// The rest of Principle V's second critical flow: Sanity content error
+// handling. The guards above are proven on `getSiteSettings`; these prove the
+// same rule holds for every other read, because "the app raises rather than
+// rendering a placeholder" is only true if it is true everywhere. A single
+// fetcher that quietly returns a half-built object is the whole principle
+// gone.
+
+/** A Sanity image with everything `resolveSanityImage` requires. */
+const image = {
+  asset: {
+    url: "https://cdn.sanity.io/i/a.jpg",
+    metadata: { lqip: "data:x", dimensions: { width: 800, height: 600 } },
+  },
+  alt: "A photograph",
+};
+
+const serviceDoc = {
+  _id: "service-1",
+  index: "01",
+  title: "Wedding",
+  description: "A full day.",
+  features: ["Coverage", "Album"],
+  price: 2500,
+  image,
+  ctaHref: "/contact",
+};
+
+const projectDoc = {
+  _id: "project-1",
+  slug: "harbour-light",
+  title: "Harbour Light",
+  meta: "2026",
+  category: "wedding",
+  year: "2026",
+  location: "Ontario",
+  description: "A coastal wedding.",
+  // The card thumbnail is a separate field from the gallery images, and both
+  // go through resolveSanityImage.
+  cardImage: image,
+  images: [image],
+};
+
+describe.each([
+  ["getAboutPage", "the about page", "aboutPage"],
+  ["getWorkPage", "the work page", "workPage"],
+  ["getContactPage", "the contact page", "contactPage"],
+  ["getServicePage", "the service page", "servicePage"],
+  ["getHomePage", "the home page", "homePage"],
+] as const)("%s", (name, label, documentName) => {
+  it("raises when the document does not exist rather than rendering empty", async () => {
+    fetchMock.mockResolvedValue(null);
+    const fetchers = await loadFetchers();
+
+    await expect(fetchers[name]()).rejects.toThrow(
+      `Sanity document "${documentName}" is required.`,
+    );
+  });
+
+  it("names the read that failed when the transport breaks", async () => {
+    fetchMock.mockRejectedValue(new Error("ECONNRESET"));
+    const fetchers = await loadFetchers();
+
+    await expect(fetchers[name]()).rejects.toThrow(
+      `Unable to load ${label} from Sanity.`,
+    );
+  });
+
+  it("raises when titleWords is missing", async () => {
+    // Every one of these pages renders its title through PageHeading, which
+    // would otherwise render an empty <h1>.
+    fetchMock.mockResolvedValue({});
+    const fetchers = await loadFetchers();
+
+    await expect(fetchers[name]()).rejects.toThrow(/is required|must contain/);
+  });
+});
+
+describe("getAboutPage", () => {
+  it("returns the page when every field is present", async () => {
+    fetchMock.mockResolvedValue({
+      titleWords: ["About", "Larah"],
+      portraitOne: image,
+      story: ["A paragraph."],
+    });
+    const { getAboutPage } = await loadFetchers();
+
+    await expect(getAboutPage()).resolves.toMatchObject({
+      titleWords: ["About", "Larah"],
+      story: ["A paragraph."],
+      portraitOne: { src: image.asset.url, alt: "A photograph" },
+    });
+  });
+
+  it("raises when the portrait has no alt text", async () => {
+    fetchMock.mockResolvedValue({
+      titleWords: ["About"],
+      portraitOne: { asset: image.asset },
+      story: ["A paragraph."],
+    });
+    const { getAboutPage } = await loadFetchers();
+
+    await expect(getAboutPage()).rejects.toThrow(
+      'Sanity image "aboutPage.portraitOne" requires an asset, alt text, and dimensions.',
+    );
+  });
+
+  it("raises when the story is an array of blanks", async () => {
+    fetchMock.mockResolvedValue({
+      titleWords: ["About"],
+      portraitOne: image,
+      story: ["  ", ""],
+    });
+    const { getAboutPage } = await loadFetchers();
+
+    await expect(getAboutPage()).rejects.toThrow(
+      'Sanity field "aboutPage.story" must contain non-empty values.',
+    );
+  });
+});
+
+describe("getHomePage", () => {
+  const homeDoc = {
+    heroTagline: "Photographs that stay.",
+    heroPortraitImage: image,
+    heroImage: image,
+    heroCtaLabel: "See the work",
+    heroCtaHref: "/work",
+    manifestoWords: ["Light", "Time", "Place"],
+    manifestoImageOne: image,
+    manifestoImageTwo: image,
+    selectedWorkEyebrow: "Selected",
+    servicesEyebrow: "Services",
+  };
+
+  it("returns the page when every field is present", async () => {
+    fetchMock.mockResolvedValue(homeDoc);
+    const { getHomePage } = await loadFetchers();
+
+    await expect(getHomePage()).resolves.toMatchObject({
+      heroTagline: "Photographs that stay.",
+      manifestoWords: ["Light", "Time", "Place"],
+    });
+  });
+
+  it.each([
+    [2, ["Light", "Time"]],
+    [4, ["A", "B", "C", "D"]],
+  ])(
+    "raises on %i manifesto words, because the layout is built for three",
+    async (_count, manifestoWords) => {
+      fetchMock.mockResolvedValue({ ...homeDoc, manifestoWords });
+      const { getHomePage } = await loadFetchers();
+
+      await expect(getHomePage()).rejects.toThrow(
+        'Sanity field "homePage.manifestoWords" must contain exactly three items.',
+      );
+    },
+  );
+});
+
+describe("getServices", () => {
+  it("maps a complete service package", async () => {
+    fetchMock.mockResolvedValue([serviceDoc]);
+    const { getServices } = await loadFetchers();
+
+    await expect(getServices()).resolves.toEqual([
+      {
+        id: "service-1",
+        index: "01",
+        title: "Wedding",
+        description: "A full day.",
+        features: ["Coverage", "Album"],
+        price: 2500,
+        image: image.asset.url,
+        imageBlurDataURL: "data:x",
+        imageAlt: "A photograph",
+        ctaHref: "/contact",
+      },
+    ]);
+  });
+
+  it("prefers an explicit id over the document id", async () => {
+    fetchMock.mockResolvedValue([{ ...serviceDoc, id: "chosen" }]);
+    const { getServices } = await loadFetchers();
+
+    await expect(getServices()).resolves.toMatchObject([{ id: "chosen" }]);
+  });
+
+  it("returns an empty list when there are no packages", async () => {
+    // Not an error: a studio with no packages published yet is a valid state.
+    fetchMock.mockResolvedValue([]);
+    const { getServices } = await loadFetchers();
+
+    await expect(getServices()).resolves.toEqual([]);
+  });
+
+  it.each([
+    ["index", "servicePackage[0].index"],
+    ["title", "servicePackage[0].title"],
+    ["description", "servicePackage[0].description"],
+    ["ctaHref", "servicePackage[0].ctaHref"],
+  ])(
+    "names %s when it is missing, with its position",
+    async (field, expected) => {
+      fetchMock.mockResolvedValue([{ ...serviceDoc, [field]: undefined }]);
+      const { getServices } = await loadFetchers();
+
+      await expect(getServices()).rejects.toThrow(
+        `Sanity field "${expected}" is required.`,
+      );
+    },
+  );
+
+  it("points at the offending package when it is not the first", async () => {
+    fetchMock.mockResolvedValue([serviceDoc, { ...serviceDoc, title: "  " }]);
+    const { getServices } = await loadFetchers();
+
+    await expect(getServices()).rejects.toThrow(
+      'Sanity field "servicePackage[1].title" cannot be empty.',
+    );
+  });
+
+  it("allows a price of zero rather than reading it as absent", async () => {
+    // requireValue, not requireString: 0 is a real price for a free consult
+    // and must not trip the falsy check.
+    fetchMock.mockResolvedValue([{ ...serviceDoc, price: 0 }]);
+    const { getServices } = await loadFetchers();
+
+    await expect(getServices()).resolves.toMatchObject([{ price: 0 }]);
+  });
+});
+
+describe("getWorkProjects", () => {
+  it("maps a complete project", async () => {
+    fetchMock.mockResolvedValue([projectDoc]);
+    const { getWorkProjects } = await loadFetchers();
+
+    await expect(getWorkProjects()).resolves.toMatchObject([
+      { slug: "harbour-light", title: "Harbour Light", category: "wedding" },
+    ]);
+  });
+
+  it("returns an empty list when nothing is published", async () => {
+    fetchMock.mockResolvedValue([]);
+    const { getWorkProjects } = await loadFetchers();
+
+    await expect(getWorkProjects()).resolves.toEqual([]);
+  });
+
+  it("names the offending project by position", async () => {
+    fetchMock.mockResolvedValue([projectDoc, { ...projectDoc, title: null }]);
+    const { getWorkProjects } = await loadFetchers();
+
+    await expect(getWorkProjects()).rejects.toThrow(/workProject\[1\]/);
+  });
+});
+
+describe("getWorkProjectBySlug", () => {
+  it("maps the project when the slug resolves", async () => {
+    fetchMock.mockResolvedValue(projectDoc);
+    const { getWorkProjectBySlug } = await loadFetchers();
+
+    await expect(getWorkProjectBySlug("harbour-light")).resolves.toMatchObject({
+      slug: "harbour-light",
+    });
+  });
+
+  it("names the slug in the error when the read fails", async () => {
+    fetchMock.mockRejectedValue(new Error("ECONNRESET"));
+    const { getWorkProjectBySlug } = await loadFetchers();
+
+    await expect(getWorkProjectBySlug("harbour-light")).rejects.toThrow(
+      'Unable to load the "harbour-light" work project from Sanity.',
+    );
+  });
+
+  it("raises when the document resolves but is malformed", async () => {
+    // Distinct from an unknown slug, which returns null: this document exists
+    // and is broken, so it must not be reported as "not found".
+    fetchMock.mockResolvedValue({ ...projectDoc, title: null });
+    const { getWorkProjectBySlug } = await loadFetchers();
+
+    await expect(getWorkProjectBySlug("harbour-light")).rejects.toThrow(
+      /workProject\("harbour-light"\)/,
+    );
+  });
+});
+
+describe("getWorkProjectSlugs", () => {
+  it("returns an empty list rather than raising when there are none", async () => {
+    fetchMock.mockResolvedValue([]);
+    const { getWorkProjectSlugs } = await loadFetchers();
+
+    await expect(getWorkProjectSlugs()).resolves.toEqual([]);
+  });
+});

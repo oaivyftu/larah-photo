@@ -136,13 +136,30 @@ data is missing, the app raises an error — it never renders a placeholder. See
 ```bash
 npm run lint       # jsx-a11y included; warnings fail
 npm run typecheck  # uses tsconfig.typecheck.json, not the base config
-npm test           # Vitest unit + mock tests
+npm test           # Vitest unit + integration tests
 npm run build      # catches prerender-time breakage the others cannot see
 ```
 
-The Git hooks run these on commit and push, so a broken change cannot be
-committed by accident. Formatting is applied for you — never hand-fix layout.
+The Git hooks run these for you: lint, typecheck and the design-system audit on
+commit, all of those plus `npm test` and `npm run build` on push. So the tests
+are the one gate a commit does not wait for — run them yourself while you work,
+or the push is where you will find out. Formatting is applied for you — never
+hand-fix layout.
 
 New or changed behaviour in a critical flow (work gallery navigation, Sanity
-content error handling) needs a test. Async Server Components under
-`src/app/` cannot be unit-tested; that gap is known and documented.
+content error handling) needs a test. Both flows have integration coverage:
+`src/app/(site)/work/WorkGalleryClient.test.tsx` and the guard suites in
+`src/sanity/fetchers.test.ts`.
+
+**"Mock" is a technique, not a level.** Tests here are unit (one thing in
+isolation) or integration (several wired together, still in jsdom); mocking is
+what either of them does at a boundary it cannot use for real — the Sanity
+client, `navigator.clipboard`, Isotope. Browser-only behaviour (GSAP timelines,
+Flickity, the page-transition curtain) is not faked into a unit test, because a
+mocked timeline asserts nothing about whether the animation runs.
+
+**Async Server Components under `src/app/` are testable**, contrary to what this
+file said before. `render(<Page />)` does not work, but a Server Component is a
+function returning a promise of an element — call it, await it, and assert on
+the result. See `src/app/(site)/work/[slug]/page.test.tsx`, which covers the
+404 path, the content-error path and `generateMetadata`.

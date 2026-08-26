@@ -131,7 +131,7 @@ export function WorkMasonryGrid({
       {!isMasonryReady && (
         <div
           aria-hidden="true"
-          className={`${styles["work-layout__skeleton"]} styles["work-layout__skeleton--visible"]`}
+          className={`${styles["work-layout__skeleton"]} ${styles["work-layout__skeleton--visible"]}`}
         >
           {SKELETON_COLUMNS.map((column, columnIndex) => (
             <div
