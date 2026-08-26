@@ -52,12 +52,11 @@ These are specified _before_ being built, so they carry the full artifact set:
   `src/styles/`, the four-way copy of the page-entry animation is one hook, and
   the TypeScript breakpoint mirror is test-enforced. `npm run audit:design-system`
   passes and runs in pre-push.
-- **`011-typography-motion-tokens`** — specified 2026-08-25, not yet planned.
-  Extends 010's zero-literal rule to the categories its check never inspected:
-  line height, font weight, letter spacing, and motion (duration and easing).
-  188 literals across 59 distinct values. Also makes the check's coverage
-  explicit, since implicit coverage is why these four drifted. Next step:
-  `/speckit-plan`.
+- **`011-typography-motion-tokens`** — shipped 2026-08-25; all 31 tasks checked
+  off. Line height, font weight, letter spacing, duration and easing all
+  resolve through `src/styles/`. The audit now carries a written coverage
+  declaration, and a test holds it to what the script actually scans — implicit
+  coverage is why these five categories drifted in the first place.
 
 ## Targeting a feature
 

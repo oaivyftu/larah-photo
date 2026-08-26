@@ -97,10 +97,17 @@ In any `*.module.scss`:
 
 - Use the tokens: `var(--color-…)`, `var(--font-size-…)`, `var(--space-…)`,
   plus the `--overlay-*`, `--surface-dark*`, `--on-surface-dark-*`,
-  `--font-size-fluid-*`, `--space-fluid-*`, `--line-height-*`, `--page-*`,
-  `--container-*`, `--header-*`, `--frame-*` and `--divider-*` families, and
-  the per-surface semantic tokens. A raw hex or a bare `font-size: 14px` is a
-  violation.
+  `--font-size-fluid-*`, `--space-fluid-*`, `--line-height-*`, `--tracking-*`,
+  `--font-weight-*`, `--duration-*`, `--ease-*`, `--page-*`, `--container-*`,
+  `--header-*`, `--frame-*` and `--divider-*` families, and the per-surface
+  semantic tokens. A raw hex, a bare `font-size: 14px`, a bare
+  `line-height: 1.2` and a bare `220ms` are all violations.
+- **Pair a size with its leading.** Where an element defines both, the two
+  names differ only in the property — `--gallery-title-size` and
+  `--gallery-title-leading` — so a reader changing one sees the other. An
+  element reading a scale-tier leading such as `--line-height-control` does
+  **not** get a private alias; that would hide the fact it is sharing a
+  decision.
 - A component-local `--custom-property` holding a raw value is a **private
   token** and is also a violation. Where a value must change at a breakpoint,
   keep the local but point it at a token:

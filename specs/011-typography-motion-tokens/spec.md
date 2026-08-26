@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-25
 
-**Status**: Draft
+**Status**: Implemented 2026-08-25 — all 31 tasks, all six quickstart scenarios. All nine audit categories report zero.
 
 **Input**: User description: "Extend the design system's zero-literal rule from feature 010 to the four value categories it left out: line height, font weight, letter spacing, and motion (transition/animation duration and easing curve). The audit script must be extended to cover these categories so the rule is enforced by the existing pre-push gate rather than by good intentions."
 

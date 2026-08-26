@@ -27,7 +27,70 @@
 
 import { readFileSync, globSync } from "node:fs";
 
-const FILES = globSync("src/**/*.module.scss").sort();
+// What this check inspects, and what it deliberately does not.
+//
+// This exists because feature 010's coverage lived only inside its regexes.
+// Nothing stated it, so nothing could notice that four whole categories --
+// line height, font weight, letter spacing, motion -- sat outside the rule
+// while this script reported success for two months. A list of property
+// groups nobody wrote down is not a scope; it is an accident waiting to be
+// discovered by someone asking a question.
+//
+// src/styles/coverage.test.ts asserts that `inspects` matches the property
+// groups the code below actually scans, so the declaration cannot drift from
+// the implementation the way the implementation drifted from the rule.
+export const COVERAGE = {
+  inspects: [
+    "colour",
+    "type-size",
+    "line-height",
+    "font-weight",
+    "letter-spacing",
+    "spacing",
+    "duration",
+    "easing",
+    "local-token",
+  ],
+  excludes: [
+    {
+      group: "border-radius",
+      reason:
+        "A genuine token family in most design systems, deferred on scope rather than on principle. 13 literals across 9 distinct values. The obvious candidate for the next round.",
+    },
+    {
+      group: "z-index",
+      reason:
+        "Same: a real stacking system wants naming. 13 literals, 10 distinct. Deferred with border-radius.",
+    },
+    {
+      group: "width / height / min-* / max-*",
+      reason:
+        "Mostly layout arithmetic and one-off visual sizing rather than shared design decisions. 94 literals, 81 distinct -- a rule here would generate noise faster than value.",
+    },
+    {
+      group: "outline-offset",
+      reason:
+        "12 literals, 6 distinct, all focus-ring nudges tied to the shape they outline. Not a shared scale.",
+    },
+    {
+      group: "opacity",
+      reason:
+        "One-off visual states rather than a palette. 24 literals, 10 distinct.",
+    },
+    {
+      group: "motion held in interaction code",
+      reason:
+        "This script reads stylesheets only. src/**/*.tsx holds 39 more motion values across 5 files -- 14 durations, 13 staggers, 12 easing references -- including a page-heading reveal stated byte-identically in four files. That last one is shared-behaviour duplication rather than a token question, and it survived feature 010 for exactly the reason this declaration exists.",
+    },
+  ],
+};
+
+// The audit runs only when this file is the entry point. coverage.test.ts
+// imports COVERAGE from here, and an import must not scan the tree or call
+// process.exit.
+const IS_ENTRY_POINT = process.argv[1]?.endsWith("audit-design-system.mjs");
+
+const FILES = IS_ENTRY_POINT ? globSync("src/**/*.module.scss").sort() : [];
 
 const COLOUR = /#[0-9a-fA-F]{3,8}\b|\brgba?\([^)]*\)/g;
 const SPACING_PROPS =
@@ -210,7 +273,7 @@ const lone = entries.filter((e) => e.uses.length === 1);
 
 const short = (f) => f.replace(/^src\//, "").replace(/\.module\.scss$/, "");
 const byKind = (list, kind) => list.filter((e) => e.kind === kind);
-const KINDS = [
+export const KINDS = [
   "colour",
   "type-size",
   "line-height",
@@ -227,6 +290,12 @@ const out = [];
 out.push("DESIGN SYSTEM AUDIT");
 out.push(rule(72));
 out.push("Scanned " + FILES.length + " component stylesheets.");
+out.push("");
+out.push("Inspects: " + COVERAGE.inspects.join(", ") + ".");
+out.push("Does NOT inspect, on purpose:");
+for (const { group } of COVERAGE.excludes) out.push("  - " + group);
+out.push("Reasons are in COVERAGE at the top of this script. A passing run");
+out.push("claims nothing about the groups above.");
 out.push("Every value below must resolve through src/styles/. Use count sets");
 out.push("the order to fix them in, not whether they must be fixed.");
 out.push("A local-token entry is a component-local custom property holding a");
@@ -307,5 +376,7 @@ out.push("");
 out.push(rule(72));
 out.push(fail ? "FAIL -- see (b) and (c) above" : "PASS");
 
-console.log(out.join("\n"));
-process.exit(fail ? 1 : 0);
+if (IS_ENTRY_POINT) {
+  console.log(out.join("\n"));
+  process.exit(fail ? 1 : 0);
+}

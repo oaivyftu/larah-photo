@@ -140,3 +140,21 @@ The declaration is the actual deliverable of US3. A list of property groups insi
 
 - **A stylesheet linter** (`stylelint` with `declaration-strict-value`), which would report violations in the editor as they are typed. Rejected: it does not clear the constitution's bar for a new dependency, and more importantly the off-the-shelf rule cannot express the three checks that have actually found defects here — splitting a shorthand into its individual values, detecting a component-local variable holding a literal, and reading a declaration that mixes a token with a literal. Adopting it would give one rule two sources of truth, which is the failure this work exists to remove. The existing check moved into `pre-commit` instead, at no cost.
 - **Leaving coverage implicit and just adding the regexes.** Rejected: that is precisely what produced this feature.
+
+## 8. What implementing this changed about the plan
+
+Recorded because each was found by doing the work, not by planning it.
+
+**The measurement was short by two values, in the same way this feature's own subject drifted.** Phase 0 counted 21 durations. The extended audit found 23: `450ms` and `1ms`, both in longhand `transition-duration` / `animation-duration` declarations the counting script never read. The `1ms` is the reduced-motion kill switch, used three times, and is 1ms rather than 0s on purpose — a zero duration makes some browsers skip the `animationend` event that cleanup code listens for, so it is a real decision and is tokenised with that reason attached. A measurement that does not look at a property group cannot report it, which is the entire thesis of §1 arriving one level up.
+
+**The pairing rule was easier than expected.** Every one of the eleven one-off leadings sat on an element that already had a size token from feature 010, so `--x-size` / `--x-leading` fell out with no judgement calls. Thirty-seven further elements read a scale-tier leading and were correctly left without a private alias.
+
+**Verifying the motion pass found three defects in `compare-built-css.mjs`** — the tool feature 010 built and this feature relied on. It had never been exercised on `transition` or `animation`:
+
+1. `ease` was stripped only at the end of a value, so the minifier dropping a default timing function mid-shorthand read as a difference.
+2. The `animation` shorthand was split on every comma, which cuts `cubic-bezier(.7, 0, .2, 1)` into four pieces.
+3. The first fix sorted the whole shorthand — which would have made `700ms 90ms` and `90ms 700ms` compare equal, a false equality between a duration and a delay in the one tool whose job is to not have those.
+
+The shorthand now preserves the order of the two `<time>` values, which are positional, and sorts only the parts the spec says are order-free. A verification tool that reports success wrongly is worse than no tool, and this one nearly did.
+
+**Putting the audit in `pre-commit` has a cost nobody named.** A tree-wide check at commit time means a partially-migrated tree cannot be committed at all: the US1 typography commit was refused because US2's durations were still literals. It is the gate working correctly, and it also removes the ability to land a migration in reviewable pieces. Feature 010 kept the check out of the hooks for a related reason — a gate that always fails is noise — and this is its mirror image. Worth revisiting if a future migration is large enough that one commit is too big to review.

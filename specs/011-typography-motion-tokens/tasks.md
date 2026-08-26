@@ -108,9 +108,9 @@ Substitution runs **file by file**, not property by property — every literal i
 
 **Depends on**: T001 only. Could ship before US1 or US2.
 
-- [ ] T025 [US3] Add a coverage declaration to `scripts/audit-design-system.mjs`: an exported structure naming every property group the script inspects, and every group deliberately excluded with its reason — corner radius, stacking order, element dimensions, outline offset, opacity, and motion held in interaction code (spec Assumptions). Print it in the audit's output so a passing run states what it is claiming
-- [ ] T026 [US3] Write `src/styles/coverage.test.ts`: import the declaration, and assert every property group the script actually scans appears in it, and that every exclusion carries a non-empty reason. This is what stops the declaration becoming prose that drifts from the code — the same failure, one level up, as the drift this work removes
-- [ ] T027 [US3] Prove the test can fail: add a property group to the scan without declaring it, confirm `npm test` fails naming it, then revert. A check that cannot fail is not a gate (feature 009 §8, feature 010 T030)
+- [x] T025 [US3] Add a coverage declaration to `scripts/audit-design-system.mjs`: an exported structure naming every property group the script inspects, and every group deliberately excluded with its reason — corner radius, stacking order, element dimensions, outline offset, opacity, and motion held in interaction code (spec Assumptions). Print it in the audit's output so a passing run states what it is claiming
+- [x] T026 [US3] Write `src/styles/coverage.test.ts`: import the declaration, and assert every property group the script actually scans appears in it, and that every exclusion carries a non-empty reason. This is what stops the declaration becoming prose that drifts from the code — the same failure, one level up, as the drift this work removes
+- [x] T027 [US3] Prove the test can fail: add a property group to the scan without declaring it, confirm `npm test` fails naming it, then revert. A check that cannot fail is not a gate (feature 009 §8, feature 010 T030)
 
 **Checkpoint**: all three stories complete.
 
@@ -118,10 +118,10 @@ Substitution runs **file by file**, not property by property — every literal i
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T028 Run every quickstart.md scenario end to end in one pass, confirming no earlier scenario regressed while a later one was built
-- [ ] T029 [P] Update `AGENTS.md` §3 with the new families (`--tracking-*`, `--font-weight-*`, `--duration-*`, `--ease-*`), the three added line-height steps, and the size/leading pairing rule, so the next session inherits the vocabulary rather than reinventing it
-- [ ] T030 [P] Append this feature's consolidation candidates to `specs/011-typography-motion-tokens/research.md` §6 as a single follow-up alongside feature 010's §3a, so the whole set is argued about in one place rather than two
-- [ ] T031 Record the state of the two remaining exclusions in `specs/011-typography-motion-tokens/research.md`: corner radius and stacking order (genuine token families, deferred on scope), and the 39 motion values in interaction code — including the page-heading reveal stated byte-identically in four files, which is shared-behaviour duplication rather than a token question and survived feature 010 because its check only read stylesheets
+- [x] T028 Run every quickstart.md scenario end to end in one pass, confirming no earlier scenario regressed while a later one was built
+- [x] T029 [P] Update `AGENTS.md` §3 with the new families (`--tracking-*`, `--font-weight-*`, `--duration-*`, `--ease-*`), the three added line-height steps, and the size/leading pairing rule, so the next session inherits the vocabulary rather than reinventing it
+- [x] T030 [P] Append this feature's consolidation candidates to `specs/011-typography-motion-tokens/research.md` §6 as a single follow-up alongside feature 010's §3a, so the whole set is argued about in one place rather than two
+- [x] T031 Record the state of the two remaining exclusions in `specs/011-typography-motion-tokens/research.md`: corner radius and stacking order (genuine token families, deferred on scope), and the 39 motion values in interaction code — including the page-heading reveal stated byte-identically in four files, which is shared-behaviour duplication rather than a token question and survived feature 010 because its check only read stylesheets
 
 ---
 
