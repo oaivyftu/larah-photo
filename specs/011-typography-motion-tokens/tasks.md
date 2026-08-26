@@ -33,7 +33,7 @@ Every definition holds a value **byte-identical** to the literal it replaces (co
 **Purpose**: Make the drift measurable before changing anything, so "we fixed it" is provable.
 
 - [x] T001 Extend `scripts/audit-design-system.mjs` to scan `line-height`, `font-weight`, `letter-spacing`, and durations and `cubic-bezier()` curves inside `transition`/`animation`. Read durations out of shorthands — `transition: opacity 180ms ease` contributes `180ms`, and one declaration may contribute several. Treat `inherit`/`initial`/`unset`/`revert`/`normal` and every form of zero (`0`, `0s`, `0ms`) as keywords, not literals (spec FR-010)
-- [x] T002 Run the audit and save its output to `specs/011-typography-motion-tokens/baseline-audit.txt`. Confirm it reproduces research.md §2: line-height 48/17, font-weight 53/6, letter-spacing 17/8, duration 53/21, easing 14/5 — 185 literals across 57 distinct values in 20 files. If it disagrees, the script is wrong; fix T001 first, because every later task is measured against this
+- [x] T002 Run the audit and save its output to `specs/011-typography-motion-tokens/baseline-audit.txt`. Confirm it reproduces research.md §2: line-height 48/17, font-weight 53/6, letter-spacing 17/8, duration 57/23, easing 14/5 — 189 literals across 59 distinct values in 20 files. The duration figures are corrected: research.md §2 was written against a count that never read the longhand `transition-duration` / `animation-duration` properties, and the extended check found two more values there (research.md §8). If it disagrees, the script is wrong; fix T001 first, because every later task is measured against this
 
 **Checkpoint**: drift is measurable and the baseline is recorded.
 

@@ -98,7 +98,7 @@ A contributor reads that the design system governs the values in this codebase a
 - **SC-001**: No line height appears literally in a component stylesheet. Baseline: 48 literals across 17 distinct values in 15 files.
 - **SC-002**: No font weight appears literally in a component stylesheet. Baseline: 53 literals across 6 distinct values in 18 files.
 - **SC-003**: No letter spacing appears literally in a component stylesheet. Baseline: 17 literals across 8 distinct values in 12 files.
-- **SC-004**: No transition or animation duration appears literally in a component stylesheet. Baseline: 56 literals across 23 distinct values in 11 files.
+- **SC-004**: No transition or animation duration appears literally in a component stylesheet. Baseline: 57 literals across 23 distinct values in 12 files.
 - **SC-005**: No easing curve appears literally in a component stylesheet. Baseline: 14 literals across 5 distinct curves in 6 files.
 - **SC-006**: The 14 declarations that currently write a number the design system already names resolve through that existing name, and no second definition holding the same value is introduced.
 - **SC-007**: Every definition introduced is named for what it serves. A name that restates its own value fails this criterion even though the literal is gone.
@@ -109,7 +109,7 @@ A contributor reads that the design system governs the values in this codebase a
 
 ## Assumptions
 
-- **Measured baseline, 2026-08-25.** 188 literals across 59 distinct values, in the five categories this feature covers:
+- **Measured baseline, 2026-08-25, corrected during implementation.** 189 literals across 59 distinct values, in the five categories this feature covers. The first count of this table read `53 / 21` for duration; the check, once extended, found two more in longhand `transition-duration` and `animation-duration` declarations the counting script never looked at. The correction is this feature's own subject arriving one level up, and is recorded in research.md §8:
 
   | Category       | Literals | Distinct | Files | Using a token today |
   | -------------- | -------- | -------- | ----- | ------------------- |

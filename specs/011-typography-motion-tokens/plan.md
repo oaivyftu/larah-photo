@@ -6,7 +6,7 @@
 
 ## Summary
 
-Extend feature 010's zero-literal rule to the four categories its check never inspected: line height, font weight, letter spacing, and motion. Add the scale families each one needs — three line-height steps beside the four that already exist, a `--tracking-*` family, a `--font-weight-*` family, `--duration-*` and `--ease-*` — then replace all 185 literals across 24 stylesheets. Extend the audit to cover them, and give it a written coverage declaration so a category cannot fall outside the rule unnoticed again, which is how these four drifted. Every value is byte-identical to the literal it replaces, so nothing renders differently and nothing moves at a different speed.
+Extend feature 010's zero-literal rule to the four categories its check never inspected: line height, font weight, letter spacing, and motion. Add the scale families each one needs — three line-height steps beside the four that already exist, a `--tracking-*` family, a `--font-weight-*` family, `--duration-*` and `--ease-*` — then replace all 189 literals across 20 stylesheets. Extend the audit to cover them, and give it a written coverage declaration so a category cannot fall outside the rule unnoticed again, which is how these four drifted. Every value is byte-identical to the literal it replaces, so nothing renders differently and nothing moves at a different speed.
 
 ## Technical Context
 
@@ -26,7 +26,7 @@ Extend feature 010's zero-literal rule to the four categories its check never in
 
 **Constraints**: FR-005 dominates, as FR-010 did in feature 010 — output must be identical, and every transition must run for the same length of time on the same curve. That rules out the tempting cleanup in every category: no rounding `1.15` onto `1.18`, no collapsing `140`/`150`/`160`ms, no promoting `650` to `700`.
 
-**Scale/Scope**: 24 component stylesheets. 185 literals across 57 distinct values: line height 48/17, font weight 53/6, letter spacing 17/8, duration 53/21, easing 14/5. Unlike feature 010, a small recurring set covers 71–98% of each category, so most of this is scale-tier work.
+**Scale/Scope**: 20 of the 24 component stylesheets carry literals. 189 across 59 distinct values: line height 48/17, font weight 53/6, letter spacing 17/8, duration 57/23, easing 14/5. The duration figures are the corrected ones — the first count said 53/21 and never read the longhand `transition-duration` / `animation-duration` properties (research.md §8). Unlike feature 010, a small recurring set covers 71–98% of each category, so most of this is scale-tier work.
 
 ## Constitution Check
 

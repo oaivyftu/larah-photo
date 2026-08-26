@@ -26,7 +26,7 @@ The two that are used are used only by `_typography.scss`, on `body` and on `h1`
 | `font-weight`    | 53           | 6        | 5         | 1         | 98%                          |
 | `line-height`    | 48           | 17       | 5         | 12        | 75%                          |
 | `letter-spacing` | 17           | 8        | 3         | 5         | 71%                          |
-| duration         | 53           | 21       | 13        | 8         | 85%                          |
+| duration         | 57           | 23       | 14        | 9         | 84%                          |
 | easing           | 14           | 5        | 4         | 1         | 93%                          |
 
 **Decision**: this feature is mostly **scale-tier** work. 010 minted 143 single-use tokens out of 219; here the ratio inverts, and the scale tier does the real work. Semantic-tier names are the exception rather than the rule.

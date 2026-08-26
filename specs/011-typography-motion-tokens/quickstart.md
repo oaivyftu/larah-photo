@@ -8,7 +8,7 @@ Validates the feature once implemented. Assumes `npm install` has run.
 npm run audit:design-system
 ```
 
-**Expected**: exits 0, with `line-height`, `font-weight`, `letter-spacing`, `duration` and `easing` all reporting zero alongside the three categories feature 010 already closed. Baseline before this work: 185 literals across 57 distinct values.
+**Expected**: exits 0, with `line-height`, `font-weight`, `letter-spacing`, `duration` and `easing` all reporting zero alongside the three categories feature 010 already closed. Baseline before this work: 189 literals across 59 distinct values.
 
 ## Scenario 2 — The check says what it covers
 

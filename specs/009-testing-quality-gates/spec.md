@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-20
 
-**Status**: Draft
+**Status**: Implemented 2026-08-24 — all 31 tasks. Vitest, Prettier and both Git hooks are in the tree.
 
 **Input**: User description: "Add automated testing and Git quality gates: unit tests and mock tests for the application, plus Husky + lint-staged Git hooks. Pre-commit hook runs ESLint, Prettier, TypeScript type-checking, unit tests, and mock tests. Pre-push hook additionally verifies the production build completes successfully. Investigate whether Playwright end-to-end tests should be included in these hooks or left to manual/CI-only runs, given their AI-token/CI cost versus value."
 
