@@ -9,9 +9,9 @@
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: var(--page-heading-size);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   letter-spacing: 0;
-  line-height: 1.22;
+  line-height: var(--page-heading-leading);
 }
 
 /* `overflow: hidden` is the mask each word slides out of during the intro. */

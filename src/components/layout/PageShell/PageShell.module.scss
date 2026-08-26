@@ -19,8 +19,8 @@
   color: var(--color-paper);
   background: var(--color-ink);
   font-size: var(--font-size-sm);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--skip-link-tracking);
   text-transform: uppercase;
   transform: translateY(-120%);
 }

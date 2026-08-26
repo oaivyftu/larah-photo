@@ -40,9 +40,20 @@ const KEYWORDS = new Set([
   "initial",
   "unset",
   "revert",
+  "normal",
   "auto",
   "0",
+  "0s",
+  "0ms",
 ]);
+
+// Zero is the absence of motion rather than a speed: a reduced-motion
+// override setting a duration to zero is not a violation (spec 011 FR-010),
+// which is why 0s and 0ms sit in KEYWORDS above.
+const DURATION = /(?<![\w.-])\d+(?:\.\d+)?m?s(?![\w-])/g;
+const EASING = /cubic-bezier\([^)]*\)/g;
+const MOTION_PROPS =
+  /^(transition|animation|(transition|animation)-(duration|timing-function))$/;
 
 // A raw length, or a clamp() of them. Decides whether a component-local
 // custom property is holding a design decision that belongs in src/styles/.
@@ -124,6 +135,23 @@ for (const file of FILES) {
     ) {
       record("type-size", value, file, bufferStart);
     }
+    for (const name of ["line-height", "font-weight", "letter-spacing"]) {
+      if (prop === name && !KEYWORDS.has(value) && !value.includes("var(--")) {
+        record(name, value, file, bufferStart);
+      }
+    }
+
+    // Durations and curves hide inside shorthands, and one declaration may
+    // carry several: `transition: opacity 180ms ease, transform 220ms ease`
+    // holds two of each kind. So scan the value rather than judge it whole.
+    if (MOTION_PROPS.test(prop)) {
+      for (const match of value.match(DURATION) ?? []) {
+        if (!KEYWORDS.has(match)) record("duration", match, file, bufferStart);
+      }
+      for (const match of value.match(EASING) ?? []) {
+        record("easing", match, file, bufferStart);
+      }
+    }
     if (SPACING_PROPS.test(prop)) {
       for (const part of splitValues(value)) {
         if (!KEYWORDS.has(part) && !part.includes("var(--")) {
@@ -182,7 +210,17 @@ const lone = entries.filter((e) => e.uses.length === 1);
 
 const short = (f) => f.replace(/^src\//, "").replace(/\.module\.scss$/, "");
 const byKind = (list, kind) => list.filter((e) => e.kind === kind);
-const KINDS = ["colour", "type-size", "spacing", "local-token"];
+const KINDS = [
+  "colour",
+  "type-size",
+  "line-height",
+  "font-weight",
+  "letter-spacing",
+  "spacing",
+  "duration",
+  "easing",
+  "local-token",
+];
 const rule = (n) => "-".repeat(n);
 
 const out = [];

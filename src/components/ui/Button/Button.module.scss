@@ -6,15 +6,15 @@
   justify-content: center;
   border: 0;
   font-family: inherit;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
   transition:
-    opacity 180ms ease,
-    background 180ms ease,
-    color 180ms ease;
+    opacity var(--duration-fast) ease,
+    background var(--duration-fast) ease,
+    color var(--duration-fast) ease;
 }
 
 .button:focus-visible {
@@ -55,7 +55,7 @@
   gap: var(--space-2xs);
   padding: var(--space-xs) var(--space-sm);
   font-size: var(--font-size-fluid-base);
-  line-height: 1.25;
+  line-height: var(--line-height-compact);
 }
 
 .button--primary.button--small .button__icon {
@@ -66,7 +66,7 @@
   gap: var(--space-xs);
   padding: var(--space-control-pad) var(--space-sm);
   font-size: var(--font-size-fluid-md);
-  line-height: 1.2;
+  line-height: var(--line-height-control);
 }
 
 .button--primary.button--medium .button__icon {
@@ -77,7 +77,7 @@
   gap: var(--space-xs);
   padding: var(--space-sm) var(--space-md);
   font-size: var(--font-size-control-lg);
-  line-height: 1.2;
+  line-height: var(--line-height-control);
 }
 
 .button--primary.button--large .button__icon {
@@ -88,7 +88,7 @@
 .button--secondary.button--small {
   gap: var(--space-2xs);
   font-size: var(--font-size-fluid-base);
-  line-height: 1.25;
+  line-height: var(--line-height-compact);
 }
 
 .button--secondary.button--small .button__icon {
@@ -98,8 +98,8 @@
 .button--secondary.button--medium {
   gap: var(--space-2xs);
   font-size: var(--font-size-fluid-md);
-  font-weight: 600;
-  line-height: 1.4;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-body);
 }
 
 .button--secondary.button--medium .button__icon {
@@ -109,7 +109,7 @@
 .button--secondary.button--large {
   gap: var(--space-2xs);
   font-size: var(--font-size-control-lg);
-  line-height: 1.4;
+  line-height: var(--line-height-body);
 }
 
 .button--secondary.button--large .button__icon {

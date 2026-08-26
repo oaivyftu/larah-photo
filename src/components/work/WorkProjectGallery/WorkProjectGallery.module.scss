@@ -56,8 +56,8 @@
 
 .work-project-gallery__title {
   font-size: var(--gallery-title-size);
-  font-weight: 400;
-  line-height: 1.05;
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-heading);
 }
 
 .work-project-gallery__title span {
@@ -69,8 +69,8 @@
   max-width: 42rem;
   color: var(--on-surface-dark-body);
   font-size: var(--gallery-copy-size);
-  font-weight: 400;
-  line-height: 1.35;
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-loose);
 }
 
 .work-project-gallery__details {
@@ -88,16 +88,16 @@
 .work-project-gallery__detail dt {
   color: var(--on-surface-dark-muted);
   font-size: var(--gallery-detail-label-size);
-  font-weight: 400;
-  line-height: 1.1;
+  font-weight: var(--font-weight-regular);
+  line-height: var(--gallery-detail-label-leading);
 }
 
 .work-project-gallery__detail dd {
   margin: 0;
   color: var(--on-surface-dark-strong);
   font-size: var(--gallery-detail-value-size);
-  font-weight: 650;
-  line-height: 1.25;
+  font-weight: var(--font-weight-label);
+  line-height: var(--line-height-compact);
 }
 
 .work-project-gallery__close {
@@ -111,8 +111,8 @@
   border-radius: 0.5rem;
   cursor: pointer;
   transition:
-    background-color 180ms ease,
-    transform 180ms ease;
+    background-color var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
 }
 
 .work-project-gallery__close span::before,
@@ -240,8 +240,8 @@
   pointer-events: none;
   transform: translate3d(0, 12px, 0);
   transition:
-    opacity 280ms ease,
-    transform 280ms ease;
+    opacity var(--gallery-duration) ease,
+    transform var(--gallery-duration) ease;
 }
 
 .work-project-gallery__float-nav--visible {
@@ -298,8 +298,8 @@
   border-radius: 999px;
   cursor: pointer;
   transition:
-    background-color 220ms ease,
-    min-width 350ms cubic-bezier(0.104, 0.204, 0.492, 1);
+    background-color var(--duration-base) ease,
+    min-width var(--duration-slower) var(--ease-glass);
 }
 
 .work-project-gallery__float-close-content {
@@ -323,14 +323,14 @@
   margin-right: 0;
   opacity: 0;
   font-size: var(--font-size-glass-label);
-  font-weight: 650;
-  letter-spacing: 0.09em;
-  line-height: 1;
+  font-weight: var(--font-weight-label);
+  letter-spacing: var(--gallery-float-close-tracking);
+  line-height: var(--line-height-tight);
   text-transform: uppercase;
   transition:
-    grid-template-columns 350ms cubic-bezier(0.104, 0.204, 0.492, 1),
-    margin-right 350ms cubic-bezier(0.104, 0.204, 0.492, 1),
-    opacity 240ms ease;
+    grid-template-columns var(--duration-slower) var(--ease-glass),
+    margin-right var(--duration-slower) var(--ease-glass),
+    opacity var(--gallery-thumb-duration) ease;
 }
 
 .work-project-gallery__float-close-label span {
@@ -388,7 +388,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  animation: float-thumb-in 320ms ease both;
+  animation: float-thumb-in var(--duration-slow) ease both;
 }
 
 .work-project-gallery__float-main {
@@ -403,8 +403,8 @@
   overflow: hidden;
   color: var(--overlay-glass-label);
   font-size: var(--gallery-float-sub-size);
-  font-weight: 400;
-  line-height: 1.15;
+  font-weight: var(--font-weight-regular);
+  line-height: var(--gallery-float-sub-leading);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -412,10 +412,10 @@
 .work-project-gallery__float-title {
   margin-top: var(--gallery-float-title-offset);
   font-size: var(--font-size-base);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  line-height: 1.25;
+  letter-spacing: var(--tracking-glass-label);
+  line-height: var(--line-height-compact);
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -446,8 +446,8 @@
     0 3px 6px var(--overlay-glass-drop);
   cursor: pointer;
   transition:
-    color 180ms ease,
-    background-color 180ms ease;
+    color var(--duration-fast) ease,
+    background-color var(--duration-fast) ease;
 }
 
 /* The arrows are the only way to page the gallery on touch, but the pill is

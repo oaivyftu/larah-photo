@@ -56,8 +56,8 @@
   margin-bottom: var(--space-label-gap);
   color: var(--color-muted-text);
   font-size: var(--font-size-xs);
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
@@ -65,16 +65,16 @@
   max-width: 12ch;
   font-family: var(--font-serif);
   font-size: var(--work-detail-title-size);
-  font-weight: 400;
-  letter-spacing: -0.045em;
-  line-height: 0.92;
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--work-detail-title-tracking);
+  line-height: var(--work-detail-title-leading);
 }
 
 .work-detail__description {
   align-self: end;
   max-width: 38rem;
   font-size: var(--work-detail-copy-size);
-  line-height: 1.55;
+  line-height: var(--work-detail-copy-leading);
 }
 
 .work-detail__meta {
@@ -95,16 +95,16 @@
 .work-detail__meta dt {
   color: var(--color-muted-text);
   font-size: var(--font-size-2xs);
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
 .work-detail__meta dd {
   margin: 0;
   font-size: var(--font-size-sm);
-  font-weight: 600;
-  line-height: 1.25;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-compact);
 }
 
 .work-detail__gallery {
@@ -118,7 +118,7 @@
 
 .work-detail__gallery--ready {
   opacity: 1;
-  transition: opacity 220ms ease;
+  transition: opacity var(--duration-base) ease;
 }
 
 // Every card is exactly one column wide. Mixed widths are what leave holes
@@ -169,8 +169,8 @@
   width: 100%;
   height: auto;
   transition:
-    opacity 300ms ease,
-    transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity var(--work-detail-image-fade) ease,
+    transform var(--work-detail-image-shift) var(--ease-settle);
 }
 
 .work-detail__image-button:hover .work-detail__image,

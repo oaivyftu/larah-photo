@@ -27,9 +27,9 @@
 .about__copy p {
   max-width: 51rem;
   font-size: var(--about-copy-size);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   letter-spacing: 0;
-  line-height: 1.16;
+  line-height: var(--about-copy-leading);
 }
 
 .about__media {
@@ -55,9 +55,9 @@
   z-index: 1;
   color: var(--color-paper-warm);
   font-size: var(--about-caption-size);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 0.95;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--about-caption-leading);
   text-transform: uppercase;
   mix-blend-mode: difference;
 }

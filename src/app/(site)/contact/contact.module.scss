@@ -34,9 +34,9 @@
 
 .contact__detail-label {
   font-size: var(--font-size-xs);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  line-height: 1.2;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-label);
+  line-height: var(--line-height-control);
   text-transform: uppercase;
 }
 
@@ -59,9 +59,9 @@
   max-width: 100%;
   overflow-wrap: anywhere;
   font-size: var(--contact-detail-size);
-  font-weight: 500;
-  letter-spacing: -0.025em;
-  line-height: 1.08;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--contact-detail-tracking);
+  line-height: var(--contact-detail-leading);
 }
 
 .contact__detail-value:hover,

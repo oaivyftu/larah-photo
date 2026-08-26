@@ -1,0 +1,107 @@
+DESIGN SYSTEM AUDIT
+------------------------------------------------------------------------
+Scanned 24 component stylesheets.
+Every value below must resolve through src/styles/. Use count sets
+the order to fix them in, not whether they must be fixed.
+A local-token entry is a component-local custom property holding a
+raw value: a private token, the anti-pattern Principle VII names.
+
+(b) USED 2+ TIMES -- already drifting; fix first
+------------------------------------------------------------------------
+
+  line-height: 5 values, 36 uses
+    1.2                                    x12  [app/(site)/contact/contact, app/(site)/home, app/(site)/service/service, components/layout/SiteFooter/SiteFooter, components/ui/Button/Button, components/ui/Input/Input, components/work/WorkCard/WorkCard]
+    1                                      x11  [app/(site)/service/service, components/layout/SiteFooter/SiteFooter, components/navigation/MainNav/MainNav, components/ui/GlassPointer/GlassPointer, components/work/WorkCard/WorkCard, components/work/WorkDetailModal/WorkDetailModal, components/work/WorkFilters/WorkFilters, components/work/WorkProjectGallery/WorkProjectGallery]
+    1.25                                   x8  [app/(site)/home, components/layout/SiteFooter/SiteFooter, components/ui/Button/Button, components/ui/Input/Input, components/work/WorkDetailGallery/WorkDetailGallery, components/work/WorkProjectGallery/WorkProjectGallery]
+    1.35                                   x3  [app/(site)/home, components/work/WorkProjectGallery/WorkProjectGallery]
+    1.4                                    x2  [components/ui/Button/Button]
+
+  font-weight: 5 values, 52 uses
+    500                                    x17  [app/(site)/about/about, app/(site)/contact/contact, app/(site)/home, app/(site)/service/service, components/layout/SiteFooter/SiteFooter, components/navigation/MainNav/MainNav, components/ui/Button/Button, components/ui/Input/Input, components/work/WorkCard/WorkCard]
+    600                                    x14  [app/(site)/contact/contact, app/(site)/home, components/layout/PageShell/PageShell, components/layout/SiteFooter/SiteFooter, components/navigation/MainNav/MainNav, components/ui/Button/Button, components/ui/GlassPointer/GlassPointer, components/ui/Input/Input, components/work/WorkCard/WorkCard, components/work/WorkDetailGallery/WorkDetailGallery, components/work/WorkDetailModal/WorkDetailModal, components/work/WorkProjectGallery/WorkProjectGallery]
+    400                                    x12  [app/(site)/about/about, app/(site)/home, app/(site)/service/service, app/not-found, components/ui/Input/Input, components/ui/PageHeading/PageHeading, components/work/WorkDetailGallery/WorkDetailGallery, components/work/WorkProjectGallery/WorkProjectGallery]
+    700                                    x5  [app/(site)/service/service, components/work/WorkCard/WorkCard, components/work/WorkDetailModal/WorkDetailModal, components/work/WorkFilters/WorkFilters]
+    650                                    x4  [components/ui/ShareButton/ShareButton, components/work/WorkDetailModal/WorkDetailModal, components/work/WorkProjectGallery/WorkProjectGallery]
+
+  letter-spacing: 3 values, 12 uses
+    0.08em                                 x6  [app/(site)/contact/contact, components/layout/SiteFooter/SiteFooter, components/ui/ShareButton/ShareButton, components/work/WorkDetailGallery/WorkDetailGallery, components/work/WorkDetailModal/WorkDetailModal]
+    -0.02em                                x4  [app/(site)/about/about, app/(site)/home, components/navigation/MainNav/MainNav]
+    0.02em                                 x2  [components/ui/GlassPointer/GlassPointer, components/work/WorkProjectGallery/WorkProjectGallery]
+
+  duration: 14 values, 48 uses
+    180ms                                  x9  [components/navigation/MainNav/MainNav, components/ui/Button/Button, components/work/WorkProjectGallery/WorkProjectGallery]
+    220ms                                  x7  [components/navigation/MainNav/MainNav, components/work/WorkDetailGallery/WorkDetailGallery, components/work/WorkDetailModal/WorkDetailModal, components/work/WorkProjectGallery/WorkProjectGallery]
+    250ms                                  x4  [components/ui/GlassPointer/GlassPointer]
+    350ms                                  x4  [components/ui/GlassPointer/GlassPointer, components/work/WorkProjectGallery/WorkProjectGallery]
+    1ms                                    x3  [app/(site)/home, components/work/WorkDetailModal/WorkDetailModal]
+    700ms                                  x3  [components/layout/PageTransition/PageTransition]
+    200ms                                  x3  [components/ui/ShareButton/ShareButton]
+    140ms                                  x3  [components/work/WorkMasonryGrid/WorkMasonryGrid]
+    780ms                                  x2  [components/layout/PageTransition/PageTransition]
+    90ms                                   x2  [components/layout/PageTransition/PageTransition]
+    320ms                                  x2  [components/work/WorkCard/WorkCard, components/work/WorkProjectGallery/WorkProjectGallery]
+    360ms                                  x2  [components/work/WorkDetailModal/WorkDetailModal]
+    160ms                                  x2  [components/work/WorkFilters/WorkFilters]
+    280ms                                  x2  [components/work/WorkProjectGallery/WorkProjectGallery]
+
+  easing: 4 values, 13 uses
+    cubic-bezier(0.104, 0.204, 0.492, 1)   x6  [components/ui/GlassPointer/GlassPointer, components/work/WorkProjectGallery/WorkProjectGallery]
+    cubic-bezier(0.16, 1, 0.3, 1)          x3  [components/layout/PageTransition/PageTransition, components/work/WorkDetailModal/WorkDetailModal]
+    cubic-bezier(0.7, 0, 0.2, 1)           x2  [components/layout/PageTransition/PageTransition]
+    cubic-bezier(0.22, 1, 0.36, 1)         x2  [components/navigation/MainNav/MainNav, components/work/WorkDetailGallery/WorkDetailGallery]
+
+(c) USED ONCE -- not drifting yet, and equally not owned
+------------------------------------------------------------------------
+
+  line-height: 12
+    1.16                                   app/(site)/about/about:32
+    0.95                                   app/(site)/about/about:60
+    1.08                                   app/(site)/contact/contact:64
+    0.76                                   app/(site)/home:176
+    0.96                                   app/(site)/service/service:60
+    1.14                                   components/layout/SiteFooter/SiteFooter:22
+    1.22                                   components/ui/PageHeading/PageHeading:14
+    0.92                                   components/work/WorkDetailGallery/WorkDetailGallery:70
+    1.55                                   components/work/WorkDetailGallery/WorkDetailGallery:77
+    1.05                                   components/work/WorkProjectGallery/WorkProjectGallery:60
+    1.1                                    components/work/WorkProjectGallery/WorkProjectGallery:92
+    1.15                                   components/work/WorkProjectGallery/WorkProjectGallery:407
+
+  font-weight: 1
+    800                                    components/work/WorkFilters/WorkFilters:18
+
+  letter-spacing: 5
+    -0.025em                               app/(site)/contact/contact:63
+    0.18em                                 app/not-found:16
+    0.04em                                 components/layout/PageShell/PageShell:23
+    -0.045em                               components/work/WorkDetailGallery/WorkDetailGallery:69
+    0.09em                                 components/work/WorkProjectGallery/WorkProjectGallery:327
+
+  duration: 9
+    450ms                                  components/ui/GlassPointer/GlassPointer:49
+    150ms                                  components/ui/GlassPointer/GlassPointer:95
+    100ms                                  components/ui/GlassPointer/GlassPointer:95
+    300ms                                  components/work/WorkDetailGallery/WorkDetailGallery:171
+    500ms                                  components/work/WorkDetailGallery/WorkDetailGallery:171
+    420ms                                  components/work/WorkDetailModal/WorkDetailModal:10
+    620ms                                  components/work/WorkDetailModal/WorkDetailModal:16
+    1.8s                                   components/work/WorkMasonryGrid/WorkMasonryGrid:67
+    240ms                                  components/work/WorkProjectGallery/WorkProjectGallery:330
+
+  easing: 1
+    cubic-bezier(0.7, 0, 0.84, 0)          components/work/WorkDetailModal/WorkDetailModal:151
+
+(a) TOTALS
+------------------------------------------------------------------------
+  colour      0 distinct values to tokenise ( 0 repeated across   0 uses,   0 used once)
+  type-size   0 distinct values to tokenise ( 0 repeated across   0 uses,   0 used once)
+  line-height 17 distinct values to tokenise ( 5 repeated across  36 uses,  12 used once)
+  font-weight  6 distinct values to tokenise ( 5 repeated across  52 uses,   1 used once)
+  letter-spacing  8 distinct values to tokenise ( 3 repeated across  12 uses,   5 used once)
+  spacing     0 distinct values to tokenise ( 0 repeated across   0 uses,   0 used once)
+  duration   23 distinct values to tokenise (14 repeated across  48 uses,   9 used once)
+  easing      5 distinct values to tokenise ( 4 repeated across  13 uses,   1 used once)
+  local-token  0 distinct values to tokenise ( 0 repeated across   0 uses,   0 used once)
+
+------------------------------------------------------------------------
+FAIL -- see (b) and (c) above

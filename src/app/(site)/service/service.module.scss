@@ -40,9 +40,9 @@
 
 .service-row__index {
   font-size: var(--service-index-size);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   letter-spacing: 0;
-  line-height: 1;
+  line-height: var(--line-height-tight);
 }
 
 .service-row__summary {
@@ -55,17 +55,17 @@
 .service-row__summary h2 {
   max-width: 18rem;
   font-size: var(--service-row-title-size);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   letter-spacing: 0;
-  line-height: 0.96;
+  line-height: var(--service-row-title-leading);
 }
 
 .service-row__summary p,
 .service-row__details li {
   font-size: var(--service-row-copy-size);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   letter-spacing: 0;
-  line-height: 1.2;
+  line-height: var(--line-height-control);
 }
 
 .service-row__summary p {
@@ -104,17 +104,17 @@
   display: block;
   margin-bottom: var(--service-detail-label-offset);
   font-size: var(--service-detail-label-size);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0;
-  line-height: 1;
+  line-height: var(--line-height-tight);
 }
 
 .service-row__details strong {
   display: block;
   font-size: var(--service-detail-figure-size);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   letter-spacing: 0;
-  line-height: 1;
+  line-height: var(--line-height-tight);
 }
 
 @include media-max("desktop") {

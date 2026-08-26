@@ -17,9 +17,9 @@
 .site-footer__statement {
   max-width: 34rem;
   font-size: var(--footer-statement-size);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   letter-spacing: 0;
-  line-height: 1.14;
+  line-height: var(--footer-statement-leading);
   text-transform: uppercase;
 }
 
@@ -30,15 +30,15 @@
   align-items: flex-start;
   font-style: normal;
   font-size: var(--footer-contact-size);
-  font-weight: 500;
-  line-height: 1.25;
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-compact);
 }
 
 .site-footer__label {
   color: var(--color-ink);
   font-size: var(--font-size-xs);
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
@@ -50,9 +50,9 @@
   padding: var(--footer-bar-pad-top) var(--page-gutter)
     var(--footer-bar-pad-bottom);
   font-size: var(--font-size-xs);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   letter-spacing: 0;
-  line-height: 1;
+  line-height: var(--line-height-tight);
   text-transform: uppercase;
 }
 
@@ -122,6 +122,6 @@
 
   .site-footer__bar {
     gap: var(--footer-bar-gap-phone);
-    line-height: 1.2;
+    line-height: var(--line-height-control);
   }
 }

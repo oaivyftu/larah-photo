@@ -7,13 +7,14 @@
   padding-top: var(--work-modal-pad-top);
   overflow: hidden;
   background: var(--overlay-modal-backdrop);
-  animation: modal-backdrop-in 420ms ease both;
+  animation: modal-backdrop-in var(--work-modal-backdrop-duration) ease both;
   overscroll-behavior: contain;
 }
 
 .work-modal__dialog {
   height: 100%;
-  animation: modal-sheet-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: modal-sheet-in var(--work-modal-sheet-duration)
+    var(--ease-entrance) both;
 }
 
 .work-modal__document {
@@ -49,19 +50,19 @@
   gap: var(--work-modal-identity-gap);
   min-width: 0;
   font-size: var(--font-size-xs);
-  line-height: 1;
+  line-height: var(--line-height-tight);
 }
 
 .work-modal__identity strong {
   overflow: hidden;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .work-modal__identity span {
   color: var(--color-muted-text);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .work-modal__actions {
@@ -75,8 +76,8 @@
 .work-modal__hint {
   color: var(--color-muted-text);
   font-size: var(--font-size-2xs);
-  font-weight: 650;
-  letter-spacing: 0.08em;
+  font-weight: var(--font-weight-label);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
@@ -97,10 +98,10 @@
   box-shadow: 0 0.8rem 2.5rem var(--overlay-modal-close);
   cursor: pointer;
   transition:
-    color 220ms ease,
-    background-color 220ms ease,
-    opacity 220ms ease,
-    transform 220ms ease;
+    color var(--duration-base) ease,
+    background-color var(--duration-base) ease,
+    opacity var(--duration-base) ease,
+    transform var(--duration-base) ease;
 }
 
 .work-modal__close span,
@@ -144,11 +145,12 @@
 }
 
 .work-modal--closing {
-  animation: modal-backdrop-out 360ms ease both;
+  animation: modal-backdrop-out var(--work-modal-duration) ease both;
 }
 
 .work-modal--closing .work-modal__dialog {
-  animation: modal-sheet-out 360ms cubic-bezier(0.7, 0, 0.84, 0) both;
+  animation: modal-sheet-out var(--work-modal-duration) var(--ease-accelerate)
+    both;
 }
 
 .work-modal--closing .work-modal__close {
@@ -185,7 +187,7 @@
   .work-modal__dialog,
   .work-modal--closing,
   .work-modal--closing .work-modal__dialog {
-    animation-duration: 1ms;
+    animation-duration: var(--duration-reduced-motion);
   }
 }
 

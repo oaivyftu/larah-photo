@@ -151,8 +151,108 @@
 
   --line-height-tight: 1;
   --line-height-heading: 1.05;
+  /* Kept at 1.18 and deliberately unused. No literal in the tree matches it,
+     and the codebase's most-used leading is --line-height-control at 1.2, two
+     hundredths away. Retuning this to 1.2 would make it useful but is a design
+     decision taken on no evidence; deleting it would drop a primitive that has
+     no consumer, which Principle VII keeps. Recorded as the clearest
+     consolidation candidate in specs/011 research.md section 6. */
   --line-height-copy: 1.18;
+  --line-height-control: 1.2;
+  --line-height-compact: 1.25;
+  --line-height-loose: 1.35;
   --line-height-body: 1.4;
+
+  /* Tracking */
+  --tracking-label: 0.08em;
+  --tracking-display: -0.02em;
+  /* Named for the control rather than the width: its two call sites are the
+     cursor readout and the gallery float label, which are one control at two
+     sizes -- the pairing --font-size-glass-label already recognises. */
+  --tracking-glass-label: 0.02em;
+
+  --not-found-code-tracking: 0.18em;
+  --skip-link-tracking: 0.04em;
+  --contact-detail-tracking: -0.025em;
+  --work-detail-title-tracking: -0.045em;
+  --gallery-float-close-tracking: 0.09em;
+
+  /* Font weight */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  /* A non-standard step, between semibold and bold, on compact label and value
+     text in four unrelated components -- the weight that keeps small type
+     legible where 600 reads thin. Not rounded to 600 or 700: that changes
+     rendering (spec FR-005). Recorded as a consolidation candidate. */
+  --font-weight-label: 650;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Leading paired with a size, one element each. The name matches its size
+     token and differs only in the property, so a reader changing one sees the
+     other (spec FR-003a). */
+  --about-copy-leading: 1.16;
+  --about-caption-leading: 0.95;
+  --contact-detail-leading: 1.08;
+  --home-manifesto-leading: 0.76;
+  --service-row-title-leading: 0.96;
+  --footer-statement-leading: 1.14;
+  --page-heading-leading: 1.22;
+  --work-detail-title-leading: 0.92;
+  --work-detail-copy-leading: 1.55;
+  --gallery-detail-label-leading: 1.1;
+  --gallery-float-sub-leading: 1.15;
+
+  /* Easing -- named for the motion each describes, never for its control
+     points. Five curves that together were already a deliberate vocabulary;
+     this only writes it down. */
+  --ease-glass: cubic-bezier(0.104, 0.204, 0.492, 1);
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.7, 0, 0.2, 1);
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-accelerate: cubic-bezier(0.7, 0, 0.84, 0);
+
+  /* Duration -- scale tier: values that cross unrelated components, so a
+     second call site wants them for the same reason. */
+  --duration-fast: 180ms;
+  --duration-base: 220ms;
+  --duration-slow: 320ms;
+  --duration-slower: 350ms;
+  /* The reduced-motion kill switch. 1ms rather than 0s on purpose: a zero
+     duration makes some browsers skip the animationend event that cleanup
+     code listens for. */
+  --duration-reduced-motion: 1ms;
+
+  /* Duration -- semantic tier: values that recur only inside one component,
+     which makes them that component's speed rather than a step anyone should
+     reach for. Twenty-three durations between 1ms and 1.8s is not a scale; it
+     is what happens when each transition is tuned alone. Naming them is what
+     puts the case for consolidating them in one place (specs/011
+     research.md section 6). */
+  --glass-fade-duration: 250ms;
+  --glass-fade-delay: 150ms;
+  --glass-shift-delay: 100ms;
+  --glass-collapse-duration: 450ms;
+
+  --page-transition-in: 780ms;
+  --page-transition-out: 700ms;
+  --page-transition-delay: 90ms;
+
+  --share-button-duration: 200ms;
+  --work-grid-duration: 140ms;
+  --work-skeleton-shimmer: 1.8s;
+  --work-filters-duration: 160ms;
+
+  --work-modal-duration: 360ms;
+  --work-modal-backdrop-duration: 420ms;
+  --work-modal-sheet-duration: 620ms;
+
+  --work-detail-image-fade: 300ms;
+  --work-detail-image-shift: 500ms;
+
+  --gallery-duration: 280ms;
+  --gallery-thumb-duration: 240ms;
 
   /* Layout */
   --page-gutter-min: 1.5rem;

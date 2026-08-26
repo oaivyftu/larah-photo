@@ -65,25 +65,27 @@
 }
 
 .page-transition--covering .page-transition__curtain {
-  animation: curtain-in 780ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: curtain-in var(--page-transition-in) var(--ease-entrance) both;
 }
 
 .page-transition--covered .page-transition__accent,
 .page-transition--covering .page-transition__accent {
-  animation: accent-sweep 780ms 90ms linear infinite backwards;
+  animation: accent-sweep var(--page-transition-in) var(--page-transition-delay)
+    linear infinite backwards;
 }
 
 .page-transition--covered .page-transition__logo,
 .page-transition--covering .page-transition__logo {
-  animation: logo-sweep-in 700ms 90ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: logo-sweep-in var(--page-transition-out)
+    var(--page-transition-delay) var(--ease-entrance) both;
 }
 
 .page-transition--revealing .page-transition__curtain {
-  animation: curtain-out 700ms cubic-bezier(0.7, 0, 0.2, 1) both;
+  animation: curtain-out var(--page-transition-out) var(--ease-exit) both;
 }
 
 .page-transition--revealing .page-transition__logo {
-  animation: logo-sweep-out 700ms cubic-bezier(0.7, 0, 0.2, 1) both;
+  animation: logo-sweep-out var(--page-transition-out) var(--ease-exit) both;
 }
 
 .page-transition--idle .page-transition__accent,

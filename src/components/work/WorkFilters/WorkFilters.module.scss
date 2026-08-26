@@ -11,11 +11,11 @@
   align-items: center;
   justify-content: flex-end;
   font-size: var(--work-filters-size);
-  line-height: 1;
+  line-height: var(--line-height-tight);
 }
 
 .work-filters__label {
-  font-weight: 800;
+  font-weight: var(--font-weight-extrabold);
 }
 
 .work-filters__list {
@@ -48,8 +48,8 @@
      aligns on baseline, so the padding does not move the text. */
   padding: var(--work-filters-button-pad-y) var(--work-filters-button-pad-x);
   transition:
-    color 160ms ease,
-    opacity 160ms ease;
+    color var(--work-filters-duration) ease,
+    opacity var(--work-filters-duration) ease;
 }
 
 /* "All" is only ~15px wide. Widening sideways is safe — the only neighbours
@@ -75,7 +75,7 @@
 }
 
 .work-filters__button--active {
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 @include reduced-motion {

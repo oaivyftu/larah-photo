@@ -22,9 +22,9 @@
   align-items: flex-start;
   color: var(--color-ink);
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   letter-spacing: 0;
-  line-height: 1.2;
+  line-height: var(--line-height-control);
   text-transform: uppercase;
 }
 
@@ -50,9 +50,9 @@
   color: var(--color-ink);
   font-family: inherit;
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   letter-spacing: 0;
-  line-height: 1.2;
+  line-height: var(--line-height-control);
   outline: none;
 }
 
@@ -60,12 +60,12 @@
    something. Covers `select` and `date`, which have no `::placeholder`. */
 .input:not([data-filled]) .input__field {
   color: var(--color-muted-text);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .input__field::placeholder {
   color: var(--color-muted-text);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   opacity: 1;
 }
 
@@ -92,9 +92,9 @@
   min-height: 0.9375rem;
   color: var(--color-accent-text);
   font-size: var(--font-size-xs);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   letter-spacing: 0;
-  line-height: 1.25;
+  line-height: var(--line-height-compact);
 }
 
 .input[data-filled] .input__control {

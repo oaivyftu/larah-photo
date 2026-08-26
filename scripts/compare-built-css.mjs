@@ -64,12 +64,80 @@ function resolve(css) {
 const LENGTH = String.raw`-?[\d.]+(?:px)?`;
 
 function normalise(decl) {
-  return decl
-    .replace(/\s*,\s*/g, ",")
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace("linear-gradient(180deg,", "linear-gradient(")
-    .replace(new RegExp(`(${LENGTH}) (${LENGTH}) 0 (#|rgb)`, "g"), "$1 $2 $3");
+  return (
+    decl
+      .replace(/\s*,\s*/g, ",")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace("linear-gradient(180deg,", "linear-gradient(")
+      .replace(new RegExp(`(${LENGTH}) (${LENGTH}) 0 (#|rgb)`, "g"), "$1 $2 $3")
+      // `ease` is the default timing function, so the minifier drops it when a
+      // transition is all literals and keeps it once a var() appears. Guard
+      // the boundaries: ease-in and ease-out are different functions.
+      .replace(/(?<![-\w])ease(?![-\w])/g, "")
+      .replace(/\s{2,}/g, " ")
+      .replace(/\s+,/g, ",")
+      .trim()
+  );
+}
+
+// The animation shorthand is order-independent apart from its two times, and
+// the minifier reorders it only when every part is a literal. Sort the parts
+// so `animation:<name> .42s both` and `animation:.42s both <name>` compare
+// equal -- they set the same thing.
+// The animation shorthand accepts its parts in almost any order, and the
+// minifier moves the animation NAME when every part is a literal but cannot
+// once a var() appears. Move the name to the end on both sides so the two
+// forms compare equal.
+//
+// Only the name is moved. Sorting the whole layer would be wrong: the first
+// time in the shorthand is the duration and the second is the delay, so
+// `700ms 90ms` and `90ms 700ms` are different animations and must not compare
+// equal.
+const ANIMATION_KEYWORD =
+  /^(normal|reverse|alternate|alternate-reverse|none|forwards|backwards|both|running|paused|infinite|linear|ease|ease-in|ease-out|ease-in-out|step-start|step-end)$/;
+
+function canonicalAnimation(decl) {
+  const m = decl.match(/^animation:(.*)$/);
+  if (!m) return decl;
+  const layers = splitTopLevel(m[1], ",").map((layer) => {
+    const parts = splitTopLevel(layer.trim(), " ").filter(Boolean);
+    const isName = (part) =>
+      !ANIMATION_KEYWORD.test(part) &&
+      !/^-?[\d.]+m?s$/.test(part) &&
+      !/^-?[\d.]+$/.test(part) &&
+      !/^(cubic-bezier|steps|linear)\(/.test(part);
+    // The two <time> values are positional -- the first is the duration and
+    // the second is the delay -- so their order is preserved. Everything
+    // else in the shorthand is order-free per spec, so it is sorted, which
+    // is what makes `.7s linear 90ms` and `.7s 90ms linear` compare equal.
+    const isTime = (part) => /^-?[\d.]+m?s$/.test(part);
+    const times = parts.filter(isTime);
+    const names = parts.filter((part) => !isTime(part) && isName(part));
+    const rest = parts.filter((part) => !isTime(part) && !isName(part)).sort();
+    return [...times, ...rest, ...names].join(" ");
+  });
+  return "animation:" + layers.join(",");
+}
+
+// Split on separators that are not inside brackets, so cubic-bezier(.7,0,.2,1)
+// survives a comma split intact.
+function splitTopLevel(value, sep) {
+  const out = [];
+  let depth = 0;
+  let current = "";
+  for (const char of value) {
+    if (char === "(") depth += 1;
+    if (char === ")") depth -= 1;
+    if (char === sep && depth === 0) {
+      out.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  out.push(current);
+  return out;
 }
 
 function declarations(css) {
@@ -78,6 +146,11 @@ function declarations(css) {
     for (const raw of body.split(";")) {
       const decl = normalise(raw);
       if (!decl || decl.startsWith("--")) continue;
+      const decl2 = canonicalAnimation(decl);
+      if (decl2 !== decl) {
+        out.push(decl2);
+        continue;
+      }
       const gap = decl.match(/^gap:(\S+) (\S+)$/);
       if (gap) out.push(`row-gap:${gap[1]}`, `column-gap:${gap[2]}`);
       else out.push(decl);

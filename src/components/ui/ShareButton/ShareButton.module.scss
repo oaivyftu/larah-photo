@@ -13,15 +13,15 @@
   color: var(--color-ink);
   background: transparent;
   font-size: var(--font-size-2xs);
-  font-weight: 650;
-  letter-spacing: 0.08em;
+  font-weight: var(--font-weight-label);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
   transition:
-    color 200ms ease,
-    border-color 200ms ease,
-    background-color 200ms ease;
+    color var(--share-button-duration) ease,
+    border-color var(--share-button-duration) ease,
+    background-color var(--share-button-duration) ease;
 }
 
 .share-button:hover {

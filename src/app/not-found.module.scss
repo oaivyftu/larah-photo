@@ -13,7 +13,7 @@
 .not-found__code {
   color: var(--color-muted-text);
   font-size: var(--font-size-xs);
-  letter-spacing: 0.18em;
+  letter-spacing: var(--not-found-code-tracking);
   text-transform: uppercase;
 }
 
@@ -22,7 +22,7 @@
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: clamp(2rem, 5vw, var(--font-size-2xl));
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: var(--line-height-heading);
 }
 
