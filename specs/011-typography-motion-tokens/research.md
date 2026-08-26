@@ -1,0 +1,142 @@
+# Phase 0 Research: Typography and Motion Tokens
+
+## 1. Why these four categories drifted
+
+**Finding**: feature 010's audit inspected three property groups — colour, `font-size`, and the spacing properties. Nothing else. That list was never written down anywhere; it lived only in the script's regexes. So "the audit passes" and "the design system governs" stopped meaning the same thing the moment anyone asked about a fourth property.
+
+**The sharpest evidence is in the token file itself.** `src/styles/_tokens.scss` defines four line heights. Two of them have **zero consumers**:
+
+| Token                   | Value | Times referenced |
+| ----------------------- | ----- | ---------------- |
+| `--line-height-tight`   | 1     | **0**            |
+| `--line-height-heading` | 1.05  | 2                |
+| `--line-height-copy`    | 1.18  | **0**            |
+| `--line-height-body`    | 1.4   | 2                |
+
+The two that are used are used only by `_typography.scss`, on `body` and on `h1`–`h4`. Not one component stylesheet references any of them. Meanwhile 48 declarations across 15 component stylesheets write the number — including `1` eleven times, which is exactly `--line-height-tight`.
+
+**Implication**: this is not a gap in the design system. The design system was right and was ignored, for as long as nothing checked. That makes FR-008 — a written coverage declaration — the requirement that stops this feature being redone in six months, rather than a piece of documentation hygiene.
+
+## 2. The shape of this feature is the inverse of 010's
+
+**Finding**: 010's hardest problem was that `font-size` had almost no recurring values — 84 one-off `clamp()` ramps forced a semantic naming tier into existence. These four categories are the opposite. A small recurring set dominates each one:
+
+| Category         | Declarations | Distinct | Recurring | Used once | Covered by the recurring set |
+| ---------------- | ------------ | -------- | --------- | --------- | ---------------------------- |
+| `font-weight`    | 53           | 6        | 5         | 1         | 98%                          |
+| `line-height`    | 48           | 17       | 5         | 12        | 75%                          |
+| `letter-spacing` | 17           | 8        | 3         | 5         | 71%                          |
+| duration         | 53           | 21       | 13        | 8         | 85%                          |
+| easing           | 14           | 5        | 4         | 1         | 93%                          |
+
+**Decision**: this feature is mostly **scale-tier** work. 010 minted 143 single-use tokens out of 219; here the ratio inverts, and the scale tier does the real work. Semantic-tier names are the exception rather than the rule.
+
+**Why that matters for the plan**: the risk profile changes with it. 010's danger was 156 tokens named badly. Here it is the opposite — the temptation to force a one-off onto a nearby scale step because the scale looks so tidy. `1.15` is not `1.18`, and rounding it changes rendering (spec FR-005).
+
+## 3. Naming the typography scales
+
+**Decision**: extend the existing `--line-height-*` family; introduce `--tracking-*` and `--font-weight-*`.
+
+### Line height
+
+The family already exists and already reads as a tightness ladder. Three steps are added to it, and the two existing tokens that match literals in use are simply adopted.
+
+| Value  | Uses | Token                   | Status                                 |
+| ------ | ---- | ----------------------- | -------------------------------------- |
+| `1`    | 11   | `--line-height-tight`   | exists, unused — pure substitution     |
+| `1.05` | 1    | `--line-height-heading` | exists — pure substitution             |
+| `1.18` | 0    | `--line-height-copy`    | exists, unused, and matches no literal |
+| `1.2`  | 12   | `--line-height-control` | **new** — the workhorse                |
+| `1.25` | 8    | `--line-height-compact` | **new**                                |
+| `1.35` | 3    | `--line-height-loose`   | **new**                                |
+| `1.4`  | 2    | `--line-height-body`    | exists — pure substitution             |
+
+**`--line-height-copy` stays at 1.18 and stays unused.** Feature 010's FR-011 keeps primitives that have no consumer, and retuning it to 1.2 to make it useful would be a design decision taken on no evidence. That it sits 0.02 from the codebase's most-used leading, while itself being used nowhere, is recorded in §6 as a consolidation candidate — it is the clearest case in the set of a value nobody actually wanted.
+
+### Letter spacing
+
+New `--tracking-*` family. Three recurring values, five one-offs.
+
+| Value     | Uses | Where                                          | Token                    |
+| --------- | ---- | ---------------------------------------------- | ------------------------ |
+| `0.08em`  | 6    | eyebrows and uppercase labels, five components | `--tracking-label`       |
+| `-0.02em` | 4    | large display text — nav, about, home          | `--tracking-display`     |
+| `0.02em`  | 2    | `GlassPointer` and the gallery float label     | `--tracking-glass-label` |
+
+The third is named semantically rather than by width because those two call sites are **the same control at two sizes** — the pairing feature 010 already recognised when it minted `--font-size-glass-label`. Naming it `--tracking-wide` would imply a general step that anything could reach for, which is not what it is.
+
+### Font weight
+
+New `--font-weight-*` family, six values, five of them standard.
+
+| Value | Uses | Token                     |
+| ----- | ---- | ------------------------- |
+| `400` | 12   | `--font-weight-regular`   |
+| `500` | 17   | `--font-weight-medium`    |
+| `600` | 14   | `--font-weight-semibold`  |
+| `650` | 4    | named at implementation   |
+| `700` | 5    | `--font-weight-bold`      |
+| `800` | 1    | `--font-weight-extrabold` |
+
+**`650` is the one that needs a look rather than a rename.** It is not a standard step and appears in three unrelated components. Rounding it to 600 or 700 changes rendering and FR-005 forbids that here, so it is tokenised as it stands — but named for the role it plays at those three call sites, decided with the code open, not from the number. It is also recorded in §6.
+
+## 4. Naming motion
+
+**Decision**: `--duration-*` and `--ease-*`, with the tier chosen by whether a value crosses component boundaries.
+
+Feature 010's rule applies unchanged: scale tier when a second call site would want the value **for the same reason**, semantic tier when sharing it would be coincidence. For durations that resolves cleanly, because the data separates into two obvious groups.
+
+- **Crosses unrelated components** → scale tier. `180ms` in `Button`, `MainNav` and the gallery is one decision about how fast small UI feedback should be.
+- **Recurs only inside one component** → semantic tier. `250ms` four times inside `GlassPointer` is that component's transition speed, not a step anyone else should reach for.
+
+**Why not a duration ladder of three or four steps**: because building one means collapsing 21 values onto it, which changes how the site moves. Twenty-one durations between 90ms and 1.8s is not a scale — it is what happens when each transition is tuned in isolation, and this feature's job is to make that visible, not to overwrite it. Naming them puts all 21 in one file where the argument for consolidating them can finally be had with the evidence in view (§6).
+
+### Easing
+
+Five curves, four of them recurring, and they read as a deliberate motion language:
+
+| Curve                                  | Uses | Where                                  |
+| -------------------------------------- | ---- | -------------------------------------- |
+| `cubic-bezier(0.104, 0.204, 0.492, 1)` | 6    | `GlassPointer`, gallery float controls |
+| `cubic-bezier(0.16, 1, 0.3, 1)`        | 3    | page transition, modal entrance        |
+| `cubic-bezier(0.7, 0, 0.2, 1)`         | 2    | page transition                        |
+| `cubic-bezier(0.22, 1, 0.36, 1)`       | 2    | nav, work detail                       |
+| `cubic-bezier(0.7, 0, 0.84, 0)`        | 1    | modal exit                             |
+
+Named for the motion each describes — entrance, exit, glass — rather than for its control points. This is the cheapest win in the feature: five names settle a vocabulary that already exists.
+
+## 5. Pairing a size with its leading (FR-003a)
+
+**Decision**: where an element has both a size token and a one-off leading, the leading takes the same element name with `-leading` in place of `-size`. `--gallery-title-size` pairs with `--gallery-title-leading`.
+
+**Why not a single composite definition** holding size, leading, tracking and weight together, which is the pattern that stops the four drifting apart at all: measured, it does not fit. Across the 50 blocks that set both a size and a leading there are **49 distinct combinations of the four properties**, and exactly one recurs, twice. A composite style presupposes a small set of text treatments; this codebase has close to one per place. Building them anyway yields 49 definitions each used once — a dictionary, not a type scale.
+
+Note what §2 already showed, because the two findings look contradictory and are not: the _leadings_ recur (5 values cover 75% of uses) and the _sizes_ do not. It is the **combination** that is unique, because the sizes are. Composite styles therefore become available only after the sizes are consolidated, which changes rendering. Recorded in §6 as what that consolidation would unlock.
+
+**Alternatives considered**:
+
+- **A Sass mixin per text style** rather than custom properties. Same problem: 49 mixins used once. The mechanism was not the obstacle.
+- **Pair only where the leading is also one-off**, leaving scale-tier leadings unpaired. Adopted implicitly — an element using `--line-height-control` is already reading a shared decision, and giving it a private alias would hide that.
+
+## 6. Deferred consolidation
+
+Recorded rather than performed, on the same reasoning as feature 010 §3a: each of these changes rendering, and `npm run audit:css-diff` makes any proposed merge checkable rather than arguable.
+
+| Candidate                                                    | Why it is a candidate                                                                                                                                                           |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--line-height-copy` (1.18) vs `--line-height-control` (1.2) | 0.02 apart; the first has never been used and matches no literal in the tree, the second is the most-used leading in it. The clearest case of a token nobody wanted.            |
+| `1.14` / `1.15` / `1.16` / `1.2` / `1.22`                    | Five leadings inside 0.08 across unrelated components. Almost certainly nobody chose five.                                                                                      |
+| `--font-weight` `650`                                        | A non-standard step, four uses, three components. Either a deliberate variable-font choice or a typo that propagated.                                                           |
+| The 21 durations                                             | `140`/`150`/`160`ms, and `340`/`350`/`360`ms, are differences no one can perceive. This is the largest consolidation opportunity in the codebase and the least risky to act on. |
+| Composite text styles                                        | Unlocked by consolidating the 49 size treatments (§5). The end state this whole line of work points at.                                                                         |
+
+## 7. Extending the check, and declaring what it covers
+
+**Decision**: add the four categories to `scripts/audit-design-system.mjs`, and add a **coverage declaration** the script prints and a test asserts.
+
+The declaration is the actual deliverable of US3. A list of property groups inside a regex is not a declaration — it is what allowed this feature's four categories to sit outside the rule unnoticed. The script states which property groups it inspects and which it deliberately does not, with the reason, and the audit's own output carries that statement so a passing run says what it is claiming.
+
+**Alternatives considered**:
+
+- **A stylesheet linter** (`stylelint` with `declaration-strict-value`), which would report violations in the editor as they are typed. Rejected: it does not clear the constitution's bar for a new dependency, and more importantly the off-the-shelf rule cannot express the three checks that have actually found defects here — splitting a shorthand into its individual values, detecting a component-local variable holding a literal, and reading a declaration that mixes a token with a literal. Adopting it would give one rule two sources of truth, which is the failure this work exists to remove. The existing check moved into `pre-commit` instead, at no cost.
+- **Leaving coverage implicit and just adding the regexes.** Rejected: that is precisely what produced this feature.
