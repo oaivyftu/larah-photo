@@ -24,5 +24,11 @@ export default defineConfig({
     // Colocated tests only. Async Server Components under src/app are not
     // testable here (research.md §2) and none of them get a .test file.
     include: ["src/**/*.test.{ts,tsx}"],
+    coverage: {
+      provider: "v8",
+      reporter: ["json-summary"],
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/**/*.test.{ts,tsx}", "src/**/*.d.ts"],
+    },
   },
 });
