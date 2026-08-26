@@ -16,6 +16,8 @@ Someone adjusts how tightly the site's text sits — its line height, its weight
 
 **Why this priority**: This is the same failure feature 010 fixed for colour, type size and spacing, sitting untouched in the next category along. It is also the clearest evidence available that a design system is only as good as the check behind it: the line-height tokens have existed the whole time, unused, because nothing ever looked.
 
+Line height is singled out because it is the value most likely to drift **away from the size it belongs to**. A size and its leading are one decision made together and then written on two lines, and only one of those lines is currently governed. Fifty blocks in this codebase set both; twenty set a size and leave the leading to be inherited from somewhere else.
+
 **Independent Test**: Change one line-height, font-weight or letter-spacing definition in the design system, rebuild, and confirm every screen that visually used that value changed with it. No screen keeps the old value.
 
 **Acceptance Scenarios**:
@@ -23,6 +25,7 @@ Someone adjusts how tightly the site's text sits — its line height, its weight
 1. **Given** the design system defines a line height, **When** a component needs that line height, **Then** it references the shared definition rather than restating the number.
 2. **Given** a component needs a weight or tracking the design system does not yet define, **When** it is added, **Then** the value is added to the design system first and referenced from there.
 3. **Given** a typography value is changed in the design system, **When** the site is rebuilt, **Then** no screen still renders the previous value.
+4. **Given** an element's size and its line height are one decision, **When** both are defined, **Then** their names identify them as belonging to the same element, so a reader changing one can see the other.
 
 ---
 
@@ -73,6 +76,7 @@ A contributor reads that the design system governs the values in this codebase a
 - **FR-001**: Every line height, font weight and letter spacing used in a component stylesheet MUST reference a design-system definition rather than restating the value. This holds regardless of how many places use it, on the same reasoning as feature 010: a use count of one means a decision has not been copied anywhere yet, not that it is not a decision.
 - **FR-002**: Every transition and animation duration, and every easing curve, MUST reference a design-system definition.
 - **FR-003**: Where the design system already defines a value, the existing definition MUST be used. Introducing a second definition holding a value the system already names is a violation, not a convenience.
+- **FR-003a**: Where a size and its line height belong to the same element, their definitions MUST be named so that the pairing is visible — the same element name, differing only in which property each governs. A reader changing one must be able to see the other without searching.
 - **FR-004**: Where the design system cannot express a value with a shared, reusable name, it MUST still own the value — under a name describing the element or surface the value serves. Being hard to name generically is not grounds for leaving a value at the point of use.
 - **FR-005**: Every definition introduced MUST hold a value identical to the literal it replaces. This feature changes where values are defined; it does not change what any screen renders or how fast anything moves.
 - **FR-006**: Near-identical values MUST be kept distinct rather than merged. Consolidating them is a separate, deliberate decision and MUST be recorded as such rather than performed here.
@@ -98,6 +102,7 @@ A contributor reads that the design system governs the values in this codebase a
 - **SC-005**: No easing curve appears literally in a component stylesheet. Baseline: 14 literals across 5 distinct curves in 6 files.
 - **SC-006**: The 14 declarations that currently write a number the design system already names resolve through that existing name, and no second definition holding the same value is introduced.
 - **SC-007**: Every definition introduced is named for what it serves. A name that restates its own value fails this criterion even though the literal is gone.
+- **SC-007a**: For every element whose size and line height are both defined, the two names differ only in the property they govern, so the pair reads as a pair.
 - **SC-008**: The compliance check's coverage is stated in writing, and every category named by SC-001 to SC-005 is inspected by it.
 - **SC-009**: The site renders identically before and after this work, and every transition runs for the same length of time on the same curve.
 - **SC-010**: A literal reintroduced in any covered category fails the existing pre-push gate.
@@ -122,12 +127,24 @@ A contributor reads that the design system governs the values in this codebase a
 
 - **Easing is the opposite: a coherent set that was simply never written down.** Five curves, one of them used six times. This is a motion language, and naming it costs nothing and settles it.
 
+- **Composite text styles were considered and rejected, on measurement.** The stronger version of FR-003a is a single definition holding size, leading, tracking and weight together — the pattern that stops the four drifting apart at all. It does not fit this codebase yet. Across the 50 blocks that set both a size and a leading there are **49 distinct combinations of the four properties**, and exactly one recurs, twice. A composite style presupposes a small set of text treatments; this site has close to one treatment per place. Building them anyway would produce 49 definitions each used once — not a type scale but a dictionary, which is the failure FR-007 exists to prevent.
+
+  Composite styles are therefore the **goal state, reachable only after those 49 treatments are consolidated into a small set**, and that consolidation changes rendering, which FR-005 does not permit here. FR-003a is the part available now: name the pair so it reads as a pair. The composite version is recorded as what consolidation would unlock, not as something declined for convenience.
+
+- **The motion values held in interaction code are deliberately out of scope, and this is the boundary most likely to be regretted.** This feature governs motion written in stylesheets. The animation code holds 39 more: 14 durations across 10 distinct values, 13 staggers across 7, and 12 easing references across 3, in 5 files. Two consequences follow and are accepted knowingly.
+
+  First, the motion vocabulary stays in two places under two rules — stylesheet durations named and governed, animation durations not. The units differ too (seconds in the animation code, milliseconds in stylesheets), so unifying them later is a translation rather than a rename.
+
+  Second, and more concretely: the page-heading reveal is stated **byte-identically in four separate files** — all seven of its properties, including its duration, its stagger and its easing. That is the same duplication feature 010 removed elsewhere, and it is not a token substitution but a shared-behaviour consolidation of the kind FR-006 in that feature covers. It survived 010 because the check only ever read stylesheets. It survives this feature too, on purpose, and is named here so the next reader finds it recorded rather than rediscovers it.
+
 - **Deliberately out of scope, and recorded here so the boundary is a decision rather than an omission**: corner radius (13 literals, 9 distinct), stacking order (13 / 10), element dimensions — width, height, min/max (94 / 81), outline offset (12 / 6), and opacity (24 / 10). Two different reasons apply. Dimensions and opacity are mostly layout arithmetic and one-off visual states rather than shared design decisions, and a rule covering them would generate noise faster than value. Corner radius and stacking order are genuine token families in most design systems and are excluded only to keep this feature's scope honest — they are the obvious candidates for a follow-up, and this spec says so rather than leaving the next reader to rediscover them.
 
 - **The two naming tiers from feature 010 carry over unchanged** (`contracts/token-naming.md` in `specs/010-design-system-compliance/`). Scale tier where a value genuinely recurs; semantic tier, named for the element served, where a second call site wanting the same value would be coincidence. Two definitions holding the same value are correct when they encode two decisions — but not when the design system already names the value, which is what FR-003 and SC-006 exist to prevent.
 
 - **Verification is mechanical, not visual.** Feature 010 established a comparison that resolves every custom property on both sides and diffs all ~1600 rendered declarations. It caught three classes of difference during that work and is what makes a claim of "nothing changed" checkable. This feature uses it, and it covers durations and curves as readily as colours.
 
-- **The gate already exists.** Feature 010 put the compliance check into pre-push, where it takes 0.05s beside a production build. Extending what the check covers therefore extends what the gate enforces, with no new hook and no new decision about hooks.
+- **The gate already exists, and now runs earlier.** Feature 010 put the compliance check into pre-push. It also runs in pre-commit as of this feature, so a violation is reported at the commit that introduced it rather than at the end of a session's work. Extending what the check covers therefore extends what the gate enforces, with no new hook and no new decision about hooks.
+
+- **A dedicated stylesheet linter was considered and rejected.** Reporting token violations in the editor as they are typed is genuinely more useful than reporting them at commit, and a standard linter would do it. It does not clear the constitution's bar that a new dependency solve a problem the stack does not already solve. More importantly, the off-the-shelf rule for this — reject any literal in a named set of properties — cannot express the three checks that actually found defects in this codebase: splitting a shorthand into its individual values, detecting a component-local variable holding a literal, and reading a declaration that mixes a shared value with a literal. Adopting it would put a second, weaker checker beside the existing one, giving one rule two sources of truth. That is the precise failure this work exists to remove. Moving the existing check one step earlier was taken instead, at no cost.
 
 - **This specification proposes new work**, like feature 010 and unlike specs 001–008, which document already-shipped behaviour.

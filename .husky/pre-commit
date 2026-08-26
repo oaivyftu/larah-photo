@@ -11,6 +11,16 @@
 # corrected into the commit instead of bouncing back at the developer
 # (spec FR-003a, research.md §9).
 #
+# The design-system audit runs here as well as in pre-push. Adding a new
+# dependency to catch token violations in the editor was considered and
+# rejected: stylelint's declaration-strict-value cannot express the three rules
+# that actually found bugs in this codebase — per-value shorthand splitting,
+# private-token detection, and declarations mixing var() with a literal — so it
+# would be a second, weaker checker for the same rule, which is the failure mode
+# this whole effort exists to remove (constitution: new dependencies for
+# problems the stack already solves require justification). Running the existing
+# check at 0.05s one step earlier gets most of the benefit for nothing.
+#
 # No `next build` here — that belongs to pre-push. No E2E either (FR-007).
 
 echo "▶ lint-staged  (ESLint --fix + Prettier --write, staged files only)"
@@ -21,5 +31,8 @@ npm run typecheck || { echo "✖ pre-commit failed at: typecheck"; exit 1; }
 
 echo "▶ test         (vitest run, whole project)"
 npm test || { echo "✖ pre-commit failed at: test"; exit 1; }
+
+echo "▶ design-system (audit, whole tree)"
+npm run audit:design-system || { echo "✖ pre-commit failed at: design-system"; exit 1; }
 
 echo "✔ pre-commit passed"
