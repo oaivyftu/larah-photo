@@ -32,6 +32,7 @@ are about to change and read it:
 | SEO, metadata, structured data   | `specs/008-seo-metadata/`             |
 | Tests and Git hooks              | `specs/009-testing-quality-gates/`    |
 | Design system, shared components | `specs/010-design-system-compliance/` |
+| Typography and motion tokens     | `specs/011-typography-motion-tokens/` |
 
 `specs/001`–`008` are **retrospective**: they describe what already shipped.
 They have no `plan.md` or `tasks.md` and should not get one — see

@@ -47,16 +47,22 @@ These are specified _before_ being built, so they carry the full artifact set:
 - **`009-testing-quality-gates`** — shipped 2026-08-24. Vitest suite (31 tests),
   Prettier, and Husky pre-commit/pre-push hooks are all in the tree; all 31
   tasks are checked off.
-- **`010-design-system-compliance`** — specified 2026-08-25, not yet planned.
-  Makes the codebase comply with constitution Principle VII: every colour and
-  type size resolves through `src/styles/`, anything needed twice or more lives
-  once in `src/components/ui/`, and the TypeScript breakpoint mirror cannot
-  drift from the stylesheet silently. Next step: `/speckit-plan`.
+- **`010-design-system-compliance`** — shipped 2026-08-25; all 39 tasks checked
+  off. Every colour, type size and spacing value resolves through
+  `src/styles/`, the four-way copy of the page-entry animation is one hook, and
+  the TypeScript breakpoint mirror is test-enforced. `npm run audit:design-system`
+  passes and runs in pre-push.
+- **`011-typography-motion-tokens`** — specified 2026-08-25, not yet planned.
+  Extends 010's zero-literal rule to the categories its check never inspected:
+  line height, font weight, letter spacing, and motion (duration and easing).
+  188 literals across 59 distinct values. Also makes the check's coverage
+  explicit, since implicit coverage is why these four drifted. Next step:
+  `/speckit-plan`.
 
 ## Targeting a feature
 
 `.specify/feature.json` holds the active feature directory and currently points
-at `010-design-system-compliance`. To run a Spec Kit command against a different
+at `011-typography-motion-tokens`. To run a Spec Kit command against a different
 one without editing that file, set the override read by
 `.specify/scripts/bash/common.sh`:
 
