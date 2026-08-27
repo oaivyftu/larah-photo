@@ -1,0 +1,26 @@
+{
+  // Type-checking config for the `typecheck` script and the Git hooks.
+  //
+  // The base tsconfig.json deliberately includes `.next/types/**/*.ts` — those
+  // generated route validators are what give the editor and `next build` their
+  // route type-safety, so they belong there.
+  //
+  // They cannot be part of a hook gate, though: they are build output, so a
+  // stale `.next/` left over from an earlier route layout makes `tsc` fail with
+  // TS2307 "Cannot find module '../../src/app/page.js'" errors that have
+  // nothing to do with the code being committed. A gate that fails for reasons
+  // unrelated to your change is a gate people disable.
+  //
+  // So this config checks the same sources with `.next` dropped from `include`
+  // (an extending config replaces `include` rather than merging it) and
+  // excluded outright, making the result independent of build state.
+  "extends": "./tsconfig.json",
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.mts"],
+  "exclude": [
+    "node_modules",
+    ".next",
+    // Git worktrees live here, each with its own node_modules and sources —
+    // the same reason eslint.config.mjs ignores them.
+    ".claude"
+  ]
+}

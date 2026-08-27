@@ -31,10 +31,19 @@ export const workProject = defineType({
     defineField({ name: "category", title: "Category", type: "string" }),
     defineField({ name: "year", title: "Year", type: "string" }),
     defineField({ name: "location", title: "Location", type: "string" }),
-    defineField({ name: "description", title: "Description", type: "text", rows: 4 }),
+    defineField({
+      name: "description",
+      title: "Description",
+      type: "text",
+      rows: 4,
+    }),
     imageField("cardImage", "Card image"),
     defineField({ name: "featured", title: "Featured", type: "boolean" }),
-    defineField({ name: "featuredOrder", title: "Featured order", type: "number" }),
+    defineField({
+      name: "featuredOrder",
+      title: "Featured order",
+      type: "number",
+    }),
     defineField({
       name: "homepageSpan",
       title: "Homepage span",

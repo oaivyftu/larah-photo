@@ -2,6 +2,7 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import jsxA11y from "eslint-plugin-jsx-a11y";
+import prettierConfig from "eslint-config-prettier/flat";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -12,6 +13,11 @@ const eslintConfig = defineConfig([
   // Only the rules are spread: `eslint-config-next` already registers the
   // plugin, and registering it twice is a config error.
   { rules: jsxA11y.flatConfigs.recommended.rules },
+  // Turns off only the ESLint rules that would fight Prettier over formatting.
+  // Must come after every config that defines rules, so its "off" wins. It
+  // disables no jsx-a11y rule — those are correctness rules, not formatting
+  // ones (Principle II). `globalIgnores` below sets no rules, so it may follow.
+  prettierConfig,
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

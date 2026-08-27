@@ -23,10 +23,7 @@ export function WorkCard({
     usePointerLabel<HTMLSpanElement>("View");
   const content = (
     <>
-      <span
-        className={styles["work-card__media"]}
-        {...pointerLabelHandlers}
-      >
+      <span className={styles["work-card__media"]} {...pointerLabelHandlers}>
         <LarahImage
           className={styles["work-card__image"]}
           src={project.image}

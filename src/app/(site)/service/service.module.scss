@@ -15,13 +15,13 @@
 /* Figma: the title sits 58px under the header with 32px of air before the first
    service row — the same rhythm the work page's hero already uses. */
 .service__header {
-  padding: clamp(2rem, 4.03vw, 3.625rem) 0 clamp(1.5rem, 2.22vw, 2rem);
+  padding: var(--service-header-pad-top) 0 var(--service-header-pad-bottom);
 }
 
 .service__list {
   display: grid;
-  gap: clamp(4.8rem, 6vw, 7rem);
-  padding-bottom: clamp(7rem, 9.5vw, 11rem);
+  gap: var(--service-list-gap);
+  padding-bottom: var(--service-list-pad-bottom);
 }
 
 /* The four intrinsic minimums plus three gaps need ~1230px of viewport, so the
@@ -30,39 +30,42 @@
    width and the three-column fallback now starts where the minimums give out. */
 .service-row {
   display: grid;
-  grid-template-columns: 5.5rem minmax(0, 0.88fr) minmax(0, 1.2fr) minmax(0, 0.78fr);
-  gap: clamp(2.4rem, 5vw, 6rem);
+  grid-template-columns: 5.5rem minmax(0, 0.88fr) minmax(0, 1.2fr) minmax(
+      0,
+      0.78fr
+    );
+  gap: var(--service-row-stack-gap);
   align-items: start;
 }
 
 .service-row__index {
-  font-size: clamp(2.3rem, 3.15vw, 4rem);
-  font-weight: 500;
+  font-size: var(--service-index-size);
+  font-weight: var(--font-weight-medium);
   letter-spacing: 0;
-  line-height: 1;
+  line-height: var(--line-height-tight);
 }
 
 .service-row__summary {
   display: grid;
   min-height: clamp(17rem, 20vw, 24rem);
   align-content: start;
-  gap: clamp(1.2rem, 1.7vw, 2rem);
+  gap: var(--service-summary-gap);
 }
 
 .service-row__summary h2 {
   max-width: 18rem;
-  font-size: clamp(2.15rem, 3.1vw, 4.1rem);
-  font-weight: 400;
+  font-size: var(--service-row-title-size);
+  font-weight: var(--font-weight-regular);
   letter-spacing: 0;
-  line-height: 0.96;
+  line-height: var(--service-row-title-leading);
 }
 
 .service-row__summary p,
 .service-row__details li {
-  font-size: clamp(1rem, 1.22vw, 1.28rem);
-  font-weight: 500;
+  font-size: var(--service-row-copy-size);
+  font-weight: var(--font-weight-medium);
   letter-spacing: 0;
-  line-height: 1.2;
+  line-height: var(--line-height-control);
 }
 
 .service-row__summary p {
@@ -88,35 +91,38 @@
 
 .service-row__details {
   display: grid;
-  gap: 2rem;
+  gap: var(--space-xl);
 }
 
 .service-row__details ul {
   display: grid;
-  gap: 0.58rem;
+  gap: var(--service-detail-list-gap);
   list-style: none;
 }
 
 .service-row__details span {
   display: block;
-  margin-bottom: 1.1rem;
-  font-size: clamp(0.82rem, 0.95vw, 0.96rem);
-  font-weight: 700;
+  margin-bottom: var(--service-detail-label-offset);
+  font-size: var(--service-detail-label-size);
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0;
-  line-height: 1;
+  line-height: var(--line-height-tight);
 }
 
 .service-row__details strong {
   display: block;
-  font-size: clamp(2.2rem, 2.95vw, 3.4rem);
-  font-weight: 400;
+  font-size: var(--service-detail-figure-size);
+  font-weight: var(--font-weight-regular);
   letter-spacing: 0;
-  line-height: 1;
+  line-height: var(--line-height-tight);
 }
 
 @include media-max("desktop") {
   .service-row {
-    grid-template-columns: 4.5rem minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-columns: var(--home-manifesto-pad-y) minmax(0, 1fr) minmax(
+        0,
+        1.1fr
+      );
   }
 
   .service-row__details {
@@ -127,17 +133,17 @@
 
 @include media-max("tablet") {
   .service__header {
-    padding: 2rem 0 1.5rem;
+    padding: var(--space-xl) 0 var(--space-lg);
   }
 
   .service__list {
-    gap: 4rem;
-    padding-bottom: 5rem;
+    gap: var(--space-3xl);
+    padding-bottom: var(--service-list-pad-bottom-tablet);
   }
 
   .service-row {
     grid-template-columns: 1fr;
-    gap: 1.4rem;
+    gap: var(--space-row-gap);
   }
 
   .service-row__summary,

@@ -6,15 +6,15 @@
   justify-content: center;
   border: 0;
   font-family: inherit;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
   transition:
-    opacity 180ms ease,
-    background 180ms ease,
-    color 180ms ease;
+    opacity var(--duration-fast) ease,
+    background var(--duration-fast) ease,
+    color var(--duration-fast) ease;
 }
 
 .button:focus-visible {
@@ -52,10 +52,10 @@
 
 /* Sizes — primary */
 .button--primary.button--small {
-  gap: 0.25rem;
-  padding: 0.5rem 0.75rem;
-  font-size: clamp(0.875rem, 1.11vw, 1rem);
-  line-height: 1.25;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-fluid-base);
+  line-height: var(--line-height-compact);
 }
 
 .button--primary.button--small .button__icon {
@@ -63,10 +63,10 @@
 }
 
 .button--primary.button--medium {
-  gap: 0.5rem;
-  padding: 0.625rem 0.75rem;
-  font-size: clamp(1rem, 1.39vw, 1.25rem);
-  line-height: 1.2;
+  gap: var(--space-xs);
+  padding: var(--space-control-pad) var(--space-sm);
+  font-size: var(--font-size-fluid-md);
+  line-height: var(--line-height-control);
 }
 
 .button--primary.button--medium .button__icon {
@@ -74,10 +74,10 @@
 }
 
 .button--primary.button--large {
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  font-size: clamp(1.15rem, 1.67vw, 1.5rem);
-  line-height: 1.2;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-control-lg);
+  line-height: var(--line-height-control);
 }
 
 .button--primary.button--large .button__icon {
@@ -86,9 +86,9 @@
 
 /* Sizes — secondary */
 .button--secondary.button--small {
-  gap: 0.25rem;
-  font-size: clamp(0.875rem, 1.11vw, 1rem);
-  line-height: 1.25;
+  gap: var(--space-2xs);
+  font-size: var(--font-size-fluid-base);
+  line-height: var(--line-height-compact);
 }
 
 .button--secondary.button--small .button__icon {
@@ -96,10 +96,10 @@
 }
 
 .button--secondary.button--medium {
-  gap: 0.25rem;
-  font-size: clamp(1rem, 1.39vw, 1.25rem);
-  font-weight: 600;
-  line-height: 1.4;
+  gap: var(--space-2xs);
+  font-size: var(--font-size-fluid-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-body);
 }
 
 .button--secondary.button--medium .button__icon {
@@ -107,9 +107,9 @@
 }
 
 .button--secondary.button--large {
-  gap: 0.25rem;
-  font-size: clamp(1.15rem, 1.67vw, 1.5rem);
-  line-height: 1.4;
+  gap: var(--space-2xs);
+  font-size: var(--font-size-control-lg);
+  line-height: var(--line-height-body);
 }
 
 .button--secondary.button--large .button__icon {

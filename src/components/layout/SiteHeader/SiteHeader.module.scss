@@ -5,8 +5,8 @@
   min-height: var(--header-height);
   align-items: center;
   justify-content: space-between;
-  gap: clamp(1.5rem, 3vw, 3rem);
-  padding: 1.25rem var(--page-gutter);
+  gap: var(--space-fluid-header);
+  padding: var(--space-block-gap) var(--page-gutter);
 }
 
 .site-header__brand {
@@ -51,8 +51,8 @@
   .site-header {
     min-height: auto;
     flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem var(--page-gutter);
+    gap: var(--space-md);
+    padding: var(--space-md) var(--page-gutter);
   }
 
   .site-header__brand--hidden {
@@ -60,15 +60,15 @@
   }
 
   .site-header__cta {
-    padding: 0.5rem 0.625rem;
+    padding: var(--space-xs) var(--space-control-pad);
     font-size: var(--font-size-xs);
   }
 }
 
 @include media-max(720px) {
   .site-header {
-    gap: 0.8rem;
-    padding-bottom: 0.75rem;
+    gap: var(--space-label-gap);
+    padding-bottom: var(--space-sm);
   }
 
   .site-header__brand {

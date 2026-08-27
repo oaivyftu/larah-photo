@@ -25,8 +25,7 @@ const CONTROLS_IDLE_DELAY = 1600;
 const CONTROLS_HOVER_IDLE_DELAY = 2600;
 const AUTO_HIDE_MEDIA =
   "(hover: hover) and (pointer: fine) and (min-width: 761px)";
-const DRAGGABLE_MEDIA =
-  "(max-width: 760px), (hover: none), (pointer: coarse)";
+const DRAGGABLE_MEDIA = "(max-width: 760px), (hover: none), (pointer: coarse)";
 const FOCUSABLE_SELECTOR = [
   "a[href]",
   "button:not([disabled])",
@@ -203,9 +202,7 @@ function GalleryFloatNav({
     <nav
       aria-label="Gallery controls"
       className={`${styles["work-project-gallery__float-nav"]} ${
-        isVisible
-          ? styles["work-project-gallery__float-nav--visible"]
-          : ""
+        isVisible ? styles["work-project-gallery__float-nav--visible"] : ""
       }`}
       ref={navRef}
       onFocusCapture={onControlsFocus}

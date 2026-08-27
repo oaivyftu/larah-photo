@@ -10,10 +10,10 @@
   justify-content: center;
   min-width: 60px;
   height: 34px;
-  padding: 0 15px;
+  padding: 0 var(--glass-pointer-pad-x);
   overflow: hidden;
   border-radius: 5px;
-  background: rgba(12, 12, 12, 0.3);
+  background: var(--overlay-glass-fill);
   pointer-events: none;
   // Sits centred just above the cursor so it never covers the magnifier.
   translate: calc(-50% + var(--x, 0px)) calc(-100% + var(--y, 0px) - 15px);
@@ -21,17 +21,17 @@
   backdrop-filter: blur(6px) saturate(180%);
   -webkit-backdrop-filter: blur(6px) saturate(180%);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.0375),
-    inset 1.8px 3px 0 -2px rgba(255, 255, 255, 0.3375),
-    inset -2px -2px 0 -2px rgba(255, 255, 255, 0.3),
-    inset -3px -8px 1px -6px rgba(255, 255, 255, 0.225),
-    inset -0.3px -1px 4px 0 rgba(0, 0, 0, 0.045),
-    inset -1.5px 2.5px 0 -2px rgba(0, 0, 0, 0.075),
-    inset 0 3px 4px -2px rgba(0, 0, 0, 0.075),
-    inset 2px -6.5px 1px -4px rgba(0, 0, 0, 0.038),
-    0 1px 5px rgba(0, 0, 0, 0.038),
-    0 6px 16px rgba(0, 0, 0, 0.03);
-  transition: clip-path 250ms cubic-bezier(0.104, 0.204, 0.492, 1);
+    inset 0 0 0 1px var(--overlay-glass-rim-soft),
+    inset 1.8px 3px 0 -2px var(--overlay-glass-bevel-soft),
+    inset -2px -2px 0 -2px var(--overlay-glass-bevel-under),
+    inset -3px -8px 1px -6px var(--overlay-glass-glow-soft),
+    inset -0.3px -1px 4px 0 var(--overlay-glass-blur-soft),
+    inset -1.5px 2.5px 0 -2px var(--overlay-glass-edge-soft),
+    inset 0 3px 4px -2px var(--overlay-glass-edge-soft),
+    inset 2px -6.5px 1px -4px var(--overlay-glass-hair),
+    0 1px 5px var(--overlay-glass-hair),
+    0 6px 16px var(--overlay-glass-drop);
+  transition: clip-path var(--glass-fade-duration) var(--ease-glass);
   will-change: translate, clip-path;
 }
 
@@ -46,7 +46,7 @@
 
 .glass-pointer[data-active] {
   clip-path: inset(0 0 round 5px);
-  transition-duration: 450ms;
+  transition-duration: var(--glass-collapse-duration);
 }
 
 .glass-pointer__tint,
@@ -58,34 +58,34 @@
 
 .glass-pointer__tint {
   background: linear-gradient(
-    rgba(255, 255, 255, 0.11) 0,
-    rgba(255, 255, 255, 0.04) 32%,
-    rgba(0, 0, 0, 0.02)
+    var(--overlay-glass-tint-top) 0,
+    var(--overlay-glass-rim) 32%,
+    var(--overlay-glass-tint-foot)
   );
 }
 
 .glass-pointer__shine {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.36),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.18),
-    inset -1px -1px 0 rgba(0, 0, 0, 0.04);
+    inset 0 1px 0 var(--overlay-glass-shine-top),
+    inset 0 -1px 0 var(--overlay-glass-under),
+    inset 1px 1px 0 var(--overlay-glass-shine-edge),
+    inset -1px -1px 0 var(--overlay-glass-cast-near);
 }
 
 .glass-pointer__text {
   position: relative;
   display: block;
-  color: #fff;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  line-height: 1;
+  color: var(--on-surface-dark);
+  font-size: var(--font-size-glass-label);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-glass-label);
+  line-height: var(--line-height-tight);
   opacity: 0;
   text-transform: uppercase;
   transform: translateY(35%);
   transition:
-    opacity 0ms linear 250ms,
-    transform 0ms linear 250ms;
+    opacity 0ms linear var(--glass-fade-duration),
+    transform 0ms linear var(--glass-fade-duration);
   white-space: nowrap;
 }
 
@@ -93,8 +93,8 @@
   opacity: 1;
   transform: translateY(0);
   transition:
-    opacity 250ms cubic-bezier(0.104, 0.204, 0.492, 1) 150ms,
-    transform 350ms cubic-bezier(0.104, 0.204, 0.492, 1) 100ms;
+    opacity var(--glass-fade-duration) var(--ease-glass) var(--glass-fade-delay),
+    transform var(--duration-slower) var(--ease-glass) var(--glass-shift-delay);
 }
 
 .glass-pointer__defs {

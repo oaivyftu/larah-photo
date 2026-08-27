@@ -1,3 +1,5 @@
+@use "@/styles/mixins" as *;
+
 .page-shell {
   min-height: 100svh;
   color: var(--color-ink);
@@ -17,8 +19,8 @@
   color: var(--color-paper);
   background: var(--color-ink);
   font-size: var(--font-size-sm);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--skip-link-tracking);
   text-transform: uppercase;
   transform: translateY(-120%);
 }
@@ -33,7 +35,7 @@
 
 /* The skip link's only backdrop is its background colour, which forced-colours
    modes discard — without a border it would read as text over the page. */
-@media (forced-colors: active) {
+@include forced-colors {
   .page-shell__skip {
     border: 1px solid ButtonBorder;
   }

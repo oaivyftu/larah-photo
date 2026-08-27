@@ -1,0 +1,42 @@
+# Each step runs as its own labelled invocation so a failure names itself
+# rather than hiding inside one opaque chain (spec FR-005 / SC-004).
+#
+# Warnings are treated as failures (`--max-warnings=0`, set in the lint-staged
+# config in package.json). This repo had exactly one warning — a dead import —
+# and it was removed rather than tolerated: a gate that permits warnings
+# accumulates them until nobody reads the output.
+#
+# Formatting is absent from the failure list on purpose. lint-staged runs
+# `prettier --write` and re-stages what it rewrote, so badly formatted code is
+# corrected into the commit instead of bouncing back at the developer
+# (spec FR-003a, research.md §9).
+#
+# The design-system audit runs here as well as in pre-push. Adding a new
+# dependency to catch token violations in the editor was considered and
+# rejected: stylelint's declaration-strict-value cannot express the three rules
+# that actually found bugs in this codebase — per-value shorthand splitting,
+# private-token detection, and declarations mixing var() with a literal — so it
+# would be a second, weaker checker for the same rule, which is the failure mode
+# this whole effort exists to remove (constitution: new dependencies for
+# problems the stack already solves require justification). Running the existing
+# check at 0.05s one step earlier gets most of the benefit for nothing.
+#
+# No `next build` here — that belongs to pre-push. No E2E either (FR-007).
+#
+# The test suite runs at pre-push, not here. `vitest run` over the whole
+# project was the slowest step in this hook by an order of magnitude, paid on
+# every commit — including the small, frequent ones that a commit-time gate is
+# supposed to stay out of the way of. Nothing is lost from the branch's
+# guarantee: pre-push runs `npm test` over the whole project before anything
+# leaves the machine, so a commit with a failing test still cannot be pushed.
+
+echo "▶ lint-staged  (ESLint --fix + Prettier --write, staged files only)"
+npx lint-staged || { echo "✖ pre-commit failed at: lint-staged"; exit 1; }
+
+echo "▶ typecheck    (tsc --noEmit, whole project)"
+npm run typecheck || { echo "✖ pre-commit failed at: typecheck"; exit 1; }
+
+echo "▶ design-system (audit, whole tree)"
+npm run audit:design-system || { echo "✖ pre-commit failed at: design-system"; exit 1; }
+
+echo "✔ pre-commit passed"

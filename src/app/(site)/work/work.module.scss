@@ -20,10 +20,10 @@
      on the title's real baseline. */
   align-items: center;
   justify-content: space-between;
-  gap: 0.6rem clamp(1.5rem, 3vw, 3rem);
+  gap: var(--space-control-gap) var(--space-fluid-header);
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
-  padding: clamp(1rem, 1.94vw, 1.75rem) 0 clamp(1.55rem, 2.1vw, 2.2rem);
+  padding: var(--work-hero-pad-top) 0 var(--work-hero-pad-bottom);
 }
 
 .work-page__toolbar {
@@ -45,7 +45,7 @@
 .work-page__grid {
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
-  padding-bottom: clamp(4rem, 8vw, 7rem);
+  padding-bottom: var(--work-grid-pad-bottom);
 }
 
 /* Below this the title needs the full width, so the filters drop to their own
@@ -53,25 +53,25 @@
 @include media-max("tablet-lg") {
   .work-page__hero {
     display: block;
-    padding-top: 1rem;
+    padding-top: var(--space-md);
   }
 
   .work-page__toolbar {
     justify-content: flex-start;
-    margin-top: clamp(1.7rem, 2.5vw, 2.4rem);
+    margin-top: var(--work-toolbar-offset-tablet);
   }
 }
 
 @include media-max("phone") {
   .work-page__hero {
-    padding-top: 1rem;
+    padding-top: var(--space-md);
   }
 
   .work-page__toolbar {
-    margin-top: 1rem;
+    margin-top: var(--space-md);
   }
 
   .work-page__grid {
-    padding-bottom: 4rem;
+    padding-bottom: var(--space-3xl);
   }
 }

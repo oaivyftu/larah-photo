@@ -160,10 +160,7 @@ export function WorkDetailGallery({
             >
               All work
             </Button>
-            <ShareButton
-              path={`/work/${project.slug}`}
-              title={project.title}
-            />
+            <ShareButton path={`/work/${project.slug}`} title={project.title} />
           </div>
         ) : null}
 

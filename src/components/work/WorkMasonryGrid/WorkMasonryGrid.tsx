@@ -58,7 +58,8 @@ export function WorkMasonryGrid({
     const filter = activeFilterRef.current;
 
     return (
-      filter === ALL_FILTER || item.getAttribute("data-work-category") === filter
+      filter === ALL_FILTER ||
+      item.getAttribute("data-work-category") === filter
     );
   }, []);
 
@@ -130,7 +131,7 @@ export function WorkMasonryGrid({
       {!isMasonryReady && (
         <div
           aria-hidden="true"
-          className={`${styles["work-layout__skeleton"]} styles["work-layout__skeleton--visible"]`}
+          className={`${styles["work-layout__skeleton"]} ${styles["work-layout__skeleton--visible"]}`}
         >
           {SKELETON_COLUMNS.map((column, columnIndex) => (
             <div

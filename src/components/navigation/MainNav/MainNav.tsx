@@ -19,7 +19,9 @@ export function MainNav({ activeHref, items }: MainNavProps) {
               aria-current={item.href === activeHref ? "page" : undefined}
               className={[
                 styles["main-nav__link"],
-                item.href === activeHref ? styles["main-nav__link--active"] : "",
+                item.href === activeHref
+                  ? styles["main-nav__link--active"]
+                  : "",
               ]
                 .filter(Boolean)
                 .join(" ")}

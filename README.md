@@ -63,6 +63,41 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Quality gates
+
+`npm install` also installs the Git hooks — there is no separate setup step.
+
+| Command                | What it does                                          |
+| ---------------------- | ----------------------------------------------------- |
+| `npm test`             | Vitest unit + mock tests, one pass                    |
+| `npm run test:watch`   | the same suite, watching                              |
+| `npm run typecheck`    | `tsc --noEmit` against `tsconfig.typecheck.json`      |
+| `npm run lint`         | ESLint, including the full `jsx-a11y` recommended set |
+| `npm run format`       | rewrites the tree with Prettier                       |
+| `npm run format:check` | reports formatting without rewriting                  |
+
+**On `git commit`** — Prettier and ESLint `--fix` run over the staged files, then
+the project type-checks and the test suite runs. Formatting is applied for you
+and re-staged into the commit rather than bounced back, so a commit never fails
+just because of layout. Lint warnings _do_ fail: the gate runs with
+`--max-warnings=0`.
+
+**On `git push`** — the same checks again over the whole project, plus
+`next build`. The build step is what catches breakage that only surfaces at
+prerender time, which type-checking and unit tests cannot see.
+
+Each step prints its own name, so a failure tells you which one to fix.
+
+Browser end-to-end tests are deliberately not in either hook: they need a booted
+app, and a broken build already fails the push without starting a browser. The
+async Server Components under `src/app/` are the coverage gap that leaves — see
+`specs/009-testing-quality-gates/research.md`.
+
+**Bypassing** with `--no-verify` is legitimate when the gate is failing for a
+reason unrelated to your change — a mid-refactor WIP commit on a private branch,
+or debugging the hooks themselves. It is not a way to land a red build on a
+shared branch; the checks it skips are the ones the next person inherits.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

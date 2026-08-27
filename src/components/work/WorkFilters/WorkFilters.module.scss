@@ -3,25 +3,25 @@
 .work-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: var(--work-filters-gap);
   /* Was `baseline`: a 24px-tall button aligned on its text baseline overflows
      the flex line, so the row's box ended a pixel above the buttons and the
      masonry grid below claimed that pixel. Centring makes the row exactly as
      tall as its tallest item. */
   align-items: center;
   justify-content: flex-end;
-  font-size: clamp(0.62rem, 0.54vw, 0.72rem);
-  line-height: 1;
+  font-size: var(--work-filters-size);
+  line-height: var(--line-height-tight);
 }
 
 .work-filters__label {
-  font-weight: 800;
+  font-weight: var(--font-weight-extrabold);
 }
 
 .work-filters__list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: var(--work-filters-gap);
   align-items: center;
 }
 
@@ -46,10 +46,10 @@
      later sibling and paints over anything this row spills into, so an
      overlay would hand back most of the target (WCAG 2.5.8). The parent
      aligns on baseline, so the padding does not move the text. */
-  padding: 0.3rem 0.05rem;
+  padding: var(--work-filters-button-pad-y) var(--work-filters-button-pad-x);
   transition:
-    color 160ms ease,
-    opacity 160ms ease;
+    color var(--work-filters-duration) ease,
+    opacity var(--work-filters-duration) ease;
 }
 
 /* "All" is only ~15px wide. Widening sideways is safe — the only neighbours
@@ -75,7 +75,7 @@
 }
 
 .work-filters__button--active {
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 @include reduced-motion {
@@ -87,6 +87,6 @@
 @include media-max("tablet-lg") {
   .work-filters {
     justify-content: flex-start;
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
   }
 }

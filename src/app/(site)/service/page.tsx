@@ -32,7 +32,12 @@ export async function generateMetadata(): Promise<Metadata> {
       : "Photography session packages, inclusions and pricing from Larah Photo.",
     path: "/service",
     images: leadService
-      ? [toOpenGraphImage({ src: leadService.image, alt: leadService.imageAlt })]
+      ? [
+          toOpenGraphImage({
+            src: leadService.image,
+            alt: leadService.imageAlt,
+          }),
+        ]
       : undefined,
   });
 }

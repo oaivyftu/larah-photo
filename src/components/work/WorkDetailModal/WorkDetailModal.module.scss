@@ -4,16 +4,17 @@
   position: fixed;
   inset: 0;
   z-index: 1200;
-  padding-top: clamp(0.9rem, 2vw, 1.8rem);
+  padding-top: var(--work-modal-pad-top);
   overflow: hidden;
-  background: rgb(18 18 18 / 68%);
-  animation: modal-backdrop-in 420ms ease both;
+  background: var(--overlay-modal-backdrop);
+  animation: modal-backdrop-in var(--work-modal-backdrop-duration) ease both;
   overscroll-behavior: contain;
 }
 
 .work-modal__dialog {
   height: 100%;
-  animation: modal-sheet-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: modal-sheet-in var(--work-modal-sheet-duration)
+    var(--ease-entrance) both;
 }
 
 .work-modal__document {
@@ -22,7 +23,7 @@
   overflow-y: auto;
   border-radius: 0.9rem 0.9rem 0 0;
   background: var(--color-paper);
-  box-shadow: 0 -1.2rem 4rem rgb(0 0 0 / 18%);
+  box-shadow: 0 -1.2rem 4rem var(--overlay-modal-document);
   overscroll-behavior: contain;
 }
 
@@ -35,8 +36,8 @@
   justify-content: space-between;
   // The title truncates to fit, so without a gap it would run right up to the
   // share control and read as one word.
-  gap: clamp(1rem, 3vw, 2rem);
-  min-height: 4.5rem;
+  gap: var(--work-modal-bar-gap);
+  min-height: var(--home-manifesto-pad-y);
   padding: 0 var(--page-gutter);
   border-bottom: 1px solid var(--color-line-soft);
   background: color-mix(in srgb, var(--color-paper) 92%, transparent);
@@ -46,37 +47,37 @@
 .work-modal__identity {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: var(--work-modal-identity-gap);
   min-width: 0;
   font-size: var(--font-size-xs);
-  line-height: 1;
+  line-height: var(--line-height-tight);
 }
 
 .work-modal__identity strong {
   overflow: hidden;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .work-modal__identity span {
   color: var(--color-muted-text);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .work-modal__actions {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: clamp(0.75rem, 1.6vw, 1.5rem);
-  padding: 0.6rem 0;
+  gap: var(--work-modal-actions-gap);
+  padding: var(--space-control-gap) 0;
 }
 
 .work-modal__hint {
   color: var(--color-muted-text);
   font-size: var(--font-size-2xs);
-  font-weight: 650;
-  letter-spacing: 0.08em;
+  font-weight: var(--font-weight-label);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
@@ -94,18 +95,18 @@
   border-radius: 0.65rem;
   color: var(--color-paper);
   background: var(--color-ink);
-  box-shadow: 0 0.8rem 2.5rem rgb(0 0 0 / 22%);
+  box-shadow: 0 0.8rem 2.5rem var(--overlay-modal-close);
   cursor: pointer;
   transition:
-    color 220ms ease,
-    background-color 220ms ease,
-    opacity 220ms ease,
-    transform 220ms ease;
+    color var(--duration-base) ease,
+    background-color var(--duration-base) ease,
+    opacity var(--duration-base) ease,
+    transform var(--duration-base) ease;
 }
 
 .work-modal__close span,
 .work-modal__close span::after {
-  width: 1.35rem;
+  width: var(--footer-bar-pad-top);
   height: 1px;
   background: currentColor;
 }
@@ -144,11 +145,12 @@
 }
 
 .work-modal--closing {
-  animation: modal-backdrop-out 360ms ease both;
+  animation: modal-backdrop-out var(--work-modal-duration) ease both;
 }
 
 .work-modal--closing .work-modal__dialog {
-  animation: modal-sheet-out 360ms cubic-bezier(0.7, 0, 0.84, 0) both;
+  animation: modal-sheet-out var(--work-modal-duration) var(--ease-accelerate)
+    both;
 }
 
 .work-modal--closing .work-modal__close {
@@ -159,7 +161,7 @@
 
 @include media-max(680px) {
   .work-modal {
-    padding-top: 0.5rem;
+    padding-top: var(--space-xs);
   }
 
   .work-modal__document {
@@ -185,19 +187,19 @@
   .work-modal__dialog,
   .work-modal--closing,
   .work-modal--closing .work-modal__dialog {
-    animation-duration: 1ms;
+    animation-duration: var(--duration-reduced-motion);
   }
 }
 
 @keyframes modal-backdrop-in {
   from {
-    background: rgb(18 18 18 / 0%);
+    background: var(--overlay-modal-backdrop-clear);
   }
 }
 
 @keyframes modal-backdrop-out {
   to {
-    background: rgb(18 18 18 / 0%);
+    background: var(--overlay-modal-backdrop-clear);
   }
 }
 

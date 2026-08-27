@@ -6,10 +6,7 @@ import {
   useMemo,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import {
-  claimPointerLabel,
-  releasePointerLabel,
-} from "./pointerLabelStore";
+import { claimPointerLabel, releasePointerLabel } from "./pointerLabelStore";
 
 type PointerLabelHandlers<ElementType extends HTMLElement> = {
   onPointerEnter: (event: ReactPointerEvent<ElementType>) => void;

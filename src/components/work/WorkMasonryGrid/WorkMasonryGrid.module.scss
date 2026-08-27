@@ -2,10 +2,9 @@
 
 .work-layout {
   --work-columns: 12;
-  --work-gap-x: 1.25rem;
-  --work-gap-y: 5rem;
+  --work-gap-x: var(--work-grid-gap-x-narrow);
+  --work-gap-y: var(--work-grid-gap-y-narrow);
   position: relative;
-  width: 100%;
 }
 
 .work-layout__grid {
@@ -25,7 +24,7 @@
   z-index: 2;
   visibility: visible;
   opacity: 1;
-  transition: opacity 140ms ease;
+  transition: opacity var(--work-grid-duration) ease;
 }
 
 .work-layout__skeleton {
@@ -49,14 +48,14 @@
   visibility: hidden;
   opacity: 0;
   transition:
-    opacity 140ms ease,
-    visibility 0s linear 140ms;
+    opacity var(--work-grid-duration) ease,
+    visibility 0s linear var(--work-grid-duration);
 }
 
 .work-layout__skeleton-column {
   display: grid;
   align-content: start;
-  gap: clamp(1rem, 2vw, 2rem);
+  gap: var(--work-skeleton-gap);
 }
 
 .work-layout__skeleton-block {
@@ -64,7 +63,8 @@
   width: 100%;
   background: currentColor;
   opacity: 0.08;
-  animation: work-skeleton-pulse 1.8s ease-in-out infinite;
+  animation: work-skeleton-pulse var(--work-skeleton-shimmer) ease-in-out
+    infinite;
 }
 
 .work-layout__skeleton-block--short {
@@ -109,76 +109,109 @@
 
 .work-layout__item--span-1 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 1)
+    (
+      (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+        var(--work-columns) * 1
+    )
   );
 }
 
 .work-layout__item--span-2 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 2) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 2
+      ) +
       (var(--work-gap-x) * 1)
   );
 }
 
 .work-layout__item--span-3 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 3) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 3
+      ) +
       (var(--work-gap-x) * 2)
   );
 }
 
 .work-layout__item--span-4 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 4) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 4
+      ) +
       (var(--work-gap-x) * 3)
   );
 }
 
 .work-layout__item--span-5 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 5) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 5
+      ) +
       (var(--work-gap-x) * 4)
   );
 }
 
 .work-layout__item--span-6 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 6) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 6
+      ) +
       (var(--work-gap-x) * 5)
   );
 }
 
 .work-layout__item--span-7 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 7) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 7
+      ) +
       (var(--work-gap-x) * 6)
   );
 }
 
 .work-layout__item--span-8 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 8) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 8
+      ) +
       (var(--work-gap-x) * 7)
   );
 }
 
 .work-layout__item--span-9 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 9) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 9
+      ) +
       (var(--work-gap-x) * 8)
   );
 }
 
 .work-layout__item--span-10 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 10) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 10
+      ) +
       (var(--work-gap-x) * 9)
   );
 }
 
 .work-layout__item--span-11 {
   width: calc(
-    ((100% - (var(--work-gap-x) * (var(--work-columns) - 1))) / var(--work-columns) * 11) +
+    (
+        (100% - (var(--work-gap-x) * (var(--work-columns) - 1))) /
+          var(--work-columns) * 11
+      ) +
       (var(--work-gap-x) * 10)
   );
 }
@@ -192,8 +225,8 @@
 // so the masonry packs without holes and only frays along the bottom edge.
 .work-layout--work {
   --work-columns: 4;
-  --work-gap-x: clamp(0.35rem, 0.9vw, 0.9rem);
-  --work-gap-y: clamp(2rem, 3.4vw, 3.75rem);
+  --work-gap-x: var(--work-grid-gap-x);
+  --work-gap-y: var(--work-grid-gap-y);
 }
 
 .work-layout--work .work-layout__item {
@@ -231,8 +264,8 @@
 @include media-max(1180px) {
   .work-layout--homepage {
     --work-columns: 3;
-    --work-gap-x: clamp(0.35rem, 0.9vw, 0.9rem);
-    --work-gap-y: clamp(2rem, 3.4vw, 3.75rem);
+    --work-gap-x: var(--work-grid-gap-x);
+    --work-gap-y: var(--work-grid-gap-y);
   }
 
   .work-layout--homepage .work-layout__item {

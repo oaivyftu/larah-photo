@@ -7,21 +7,21 @@
   // Sized for the longest label so confirming the copy cannot resize the pill
   // or shove the controls beside it.
   min-width: 11rem;
-  padding: 0.55rem 1rem;
+  padding: var(--space-control-pad-sm) var(--space-md);
   border: 1px solid var(--color-line-soft);
   border-radius: 2rem;
   color: var(--color-ink);
   background: transparent;
   font-size: var(--font-size-2xs);
-  font-weight: 650;
-  letter-spacing: 0.08em;
+  font-weight: var(--font-weight-label);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
   transition:
-    color 200ms ease,
-    border-color 200ms ease,
-    background-color 200ms ease;
+    color var(--share-button-duration) ease,
+    border-color var(--share-button-duration) ease,
+    background-color var(--share-button-duration) ease;
 }
 
 .share-button:hover {

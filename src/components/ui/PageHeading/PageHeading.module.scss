@@ -4,21 +4,21 @@
 .page-heading {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.28em;
+  gap: var(--page-heading-gap);
   align-items: baseline;
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: clamp(1.5rem, 2.22vw, 2rem);
-  font-weight: 400;
+  font-size: var(--page-heading-size);
+  font-weight: var(--font-weight-regular);
   letter-spacing: 0;
-  line-height: 1.22;
+  line-height: var(--page-heading-leading);
 }
 
 /* `overflow: hidden` is the mask each word slides out of during the intro. */
 .page-heading > span {
   display: inline-block;
   overflow: hidden;
-  padding-bottom: 0.08em;
+  padding-bottom: var(--page-heading-underline-gap);
 }
 
 .page-heading > span:last-child {
