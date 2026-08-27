@@ -1,5 +1,22 @@
 <!--
-Sync Impact Report (2.2.0)
+Sync Impact Report (2.2.1)
+- Version change: 2.2.0 → 2.2.1 (PATCH: the Development Workflow paragraph now
+  describes what the hooks actually run; no principle added, removed, or
+  redefined)
+- Modified principles: none
+- Modified sections:
+  - Development Workflow: `npm test` moved out of `.husky/pre-commit` and is now
+    named as a pre-push step. It was the slowest check in the commit gate and
+    was paid on every commit; pre-push still runs the whole suite, so a failing
+    test cannot reach a shared branch. The paragraph also now names the
+    design-system audit, which both hooks have run since feature 011.
+- The **Tests** gate itself is unchanged: `npm test` must still pass before code
+  leaves the machine. Only the hook it runs in moved.
+- Added/removed sections: none
+- Downstream: `specs/009-testing-quality-gates/` (spec FR-003/FR-004, SC-001/
+  SC-002, contracts, data-model, plan, quickstart) updated in the same change.
+
+Prior report (2.2.0)
 - Version change: 2.1.2 → 2.2.0 (MINOR: new principle added)
 - Added principles:
   - VII. One Design System, One Place For Shared UI. Names `src/styles/` as the
@@ -261,9 +278,11 @@ before merge:
 
 These gates are enforced automatically. `.husky/pre-commit` runs lint-staged
 (ESLint `--fix` and Prettier `--write` over staged files), then the type-check,
-then the tests. `.husky/pre-push` re-runs lint, type-check and tests across the
-whole project and adds `npm run build`. Both install with `npm install`;
-neither needs a setup step.
+then the design-system audit. `.husky/pre-push` re-runs lint, type-check and the
+audit across the whole project, and adds `npm test` and `npm run build`. The
+test suite runs at push time only: it is the slowest check of the set, and one
+run per push still blocks a failing test from reaching a shared branch. Both
+hooks install with `npm install`; neither needs a setup step.
 
 Formatting is corrected into the commit rather than blocking it, so no commit
 fails over layout and none enters history unformatted. Lint warnings do block:
@@ -297,4 +316,4 @@ Versioning policy:
 - MINOR: New principle/section added or materially expanded guidance.
 - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 2.2.0 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-25
+**Version**: 2.2.1 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-26

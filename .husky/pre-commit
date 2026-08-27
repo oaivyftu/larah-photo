@@ -22,15 +22,19 @@
 # check at 0.05s one step earlier gets most of the benefit for nothing.
 #
 # No `next build` here — that belongs to pre-push. No E2E either (FR-007).
+#
+# The test suite runs at pre-push, not here. `vitest run` over the whole
+# project was the slowest step in this hook by an order of magnitude, paid on
+# every commit — including the small, frequent ones that a commit-time gate is
+# supposed to stay out of the way of. Nothing is lost from the branch's
+# guarantee: pre-push runs `npm test` over the whole project before anything
+# leaves the machine, so a commit with a failing test still cannot be pushed.
 
 echo "▶ lint-staged  (ESLint --fix + Prettier --write, staged files only)"
 npx lint-staged || { echo "✖ pre-commit failed at: lint-staged"; exit 1; }
 
 echo "▶ typecheck    (tsc --noEmit, whole project)"
 npm run typecheck || { echo "✖ pre-commit failed at: typecheck"; exit 1; }
-
-echo "▶ test         (vitest run, whole project)"
-npm test || { echo "✖ pre-commit failed at: test"; exit 1; }
 
 echo "▶ design-system (audit, whole tree)"
 npm run audit:design-system || { echo "✖ pre-commit failed at: design-system"; exit 1; }

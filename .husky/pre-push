@@ -1,8 +1,13 @@
-# The full pre-commit check set, plus a production build.
+# The full pre-commit check set, plus the test suite and a production build.
 #
 # Deliberately not a lighter version of pre-commit (spec Edge Cases): the same
-# lint/type/test steps run again, because what was committed one file at a time
+# lint/type steps run again, because what was committed one file at a time
 # still has to hold together as a whole before it leaves the machine.
+#
+# The test suite lives here and only here. It is the slowest check of the set,
+# and paying it per commit taxed the small, frequent commits a commit-time gate
+# should stay clear of; running it once per push keeps the guarantee that
+# matters — nothing reaches the remote with a failing test.
 #
 # lint runs unscoped here — there are no "staged files" during a push, so the
 # whole project is linted rather than a diff.

@@ -18,13 +18,14 @@ This feature has no runtime domain data — it is developer tooling. The "entiti
 ## Pre-commit Gate (config artifact)
 
 - **File**: `.husky/pre-commit`
-- **Steps** (in order, first failure stops the hook): `lint-staged` (ESLint `--fix` + Prettier `--write` on staged files, with lint-staged re-staging what it rewrote) → `tsc --noEmit -p tsconfig.typecheck.json` (whole project) → `vitest run` (whole project: unit + mock tests).
+- **Steps** (in order, first failure stops the hook): `lint-staged` (ESLint `--fix` + Prettier `--write` on staged files, with lint-staged re-staging what it rewrote) → `tsc --noEmit -p tsconfig.typecheck.json` (whole project) → `audit:design-system` (whole tree, added by feature 010).
+- **Not here**: `vitest run`. The suite was originally a pre-commit step and moved to pre-push only — it is the slowest check in the set and was paid on every commit, while the Pre-push Gate already runs it over the whole project before anything leaves the machine.
 - **Exit behavior**: non-zero exit from any step blocks the commit (standard Husky/Git behavior). Prettier `--write` cannot produce a non-zero exit for badly-formatted input — it fixes it — so formatting corrects rather than blocks (spec FR-003a). ESLint `--fix` still blocks on any violation it cannot auto-fix.
 
 ## Pre-push Gate (config artifact)
 
 - **File**: `.husky/pre-push`
-- **Steps**: the same lint / typecheck / test steps as the Pre-commit Gate, plus `next build` (production build) as a final step. Note the ordering benefit: `next build` regenerates `.next/`, but `typecheck` reads `tsconfig.typecheck.json`, which excludes `.next` — so the type-check result does not depend on whether the build ran first.
+- **Steps**: the Pre-commit Gate's lint / typecheck / design-system steps (lint unscoped, since nothing is "staged" during a push), plus `vitest run` and `next build` (production build) as the final steps. Note the ordering benefit: `next build` regenerates `.next/`, but `typecheck` reads `tsconfig.typecheck.json`, which excludes `.next` — so the type-check result does not depend on whether the build ran first.
 - **Exit behavior**: non-zero exit from any step (including the build) blocks the push.
 
 ## lint-staged Configuration (config artifact)

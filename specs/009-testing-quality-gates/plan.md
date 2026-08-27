@@ -65,8 +65,8 @@ specs/009-testing-quality-gates/
 
 ```text
 .husky/
-├── pre-commit            # lint-staged → typecheck → vitest run
-└── pre-push              # same as pre-commit, plus `next build`
+├── pre-commit            # lint-staged → typecheck
+└── pre-push              # same as pre-commit, plus `vitest run` and `next build`
 
 src/
 ├── **/*.test.ts           # unit tests, colocated next to the module under test

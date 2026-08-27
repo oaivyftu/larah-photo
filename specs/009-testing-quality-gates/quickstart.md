@@ -15,7 +15,7 @@ npm test
 
 **Expected**: Vitest reports both a unit test (e.g. a `src/utils/*` formatter) and a mock test (e.g. `src/sanity/fetchers.ts` with the client mocked) passing, with zero real network calls made. Exit code 0.
 
-## Scenario 2 — Pre-commit blocks a lint/type/test failure
+## Scenario 2 — Pre-commit blocks a lint/type failure
 
 ```bash
 # Introduce one failure at a time and confirm each is caught:
@@ -26,9 +26,12 @@ git add -A && git commit -m "test: trigger pre-commit"
 
 - A lint violation ESLint cannot auto-fix → blocked, hook output names the ESLint step.
 - A type error (assign a `string` to a `number`-typed variable) → blocked by `typecheck`.
-- A broken expectation in an existing test → blocked by `test`.
+- A literal colour or size in a `*.module.scss` → blocked by `design-system`.
 
 **Then**: revert all injected failures, commit again → commit succeeds.
+
+A broken expectation in an existing test is **not** caught here — the suite runs
+at pre-push (Scenario 3a), so the commit is created and the push is what blocks.
 
 ## Scenario 2a — Formatting is corrected, not blocked (FR-003a)
 
@@ -60,6 +63,16 @@ git push
 
 **Expected**: Push is blocked; hook output identifies the `next build` step as the failure, distinct from lint/type/test. Revert the change, push again → push succeeds (assuming pre-commit's checks also pass on the real attempt).
 
+## Scenario 3a — Pre-push blocks a failing test that pre-commit let through
+
+```bash
+# Break an expectation in an existing test
+git commit -am "test: trigger pre-push test failure"   # succeeds — pre-commit no longer runs the suite
+git push
+```
+
+**Expected**: the commit is created, then the push is blocked with the `test` step named as the failure. This is the trade the suite's move to pre-push makes explicit: a failing test can enter local history, but not the remote.
+
 ## Scenario 4 — New contributor gets hooks with zero manual setup
 
 ```bash
@@ -68,7 +81,7 @@ npm install
 git commit --allow-empty -m "test: hooks fire without manual husky install"
 ```
 
-**Expected**: The pre-commit hook fires (visible output from lint-staged/typecheck/test steps) even though no one ran a separate `husky install` command — confirms FR-006.
+**Expected**: The pre-commit hook fires (visible output from the lint-staged/typecheck/design-system steps) even though no one ran a separate `husky install` command — confirms FR-006.
 
 ## Scenario 5 — Playwright is not part of either hook
 

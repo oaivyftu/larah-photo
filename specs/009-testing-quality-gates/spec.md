@@ -63,7 +63,7 @@ A developer runs `git push`, and in addition to the same checks as commit time, 
 
 - What happens when a developer intentionally bypasses hooks (e.g. a standard Git bypass flag)? This remains the developer's explicit choice and is not something the hooks can or should prevent.
 - What happens when there are no staged files relevant to a given check (e.g. no `.ts`/`.tsx` files staged)? That check MUST pass trivially rather than failing or erroring.
-- What happens when the pre-commit and pre-push checks overlap (lint/format/type/tests run at both stages)? Both stages MUST still run their full defined check set; pre-push is not a lighter version of pre-commit.
+- What happens when the pre-commit and pre-push checks overlap (lint/format/type run at both stages)? Both stages MUST still run their full defined check set; pre-push is a superset of pre-commit, never a lighter version of it.
 - What happens with end-to-end (full browser) tests? They are explicitly NOT part of the automated pre-commit or pre-push gates in this feature; see Assumptions for the rationale and how they remain available.
 
 ## Requirements _(mandatory)_
@@ -72,9 +72,9 @@ A developer runs `git push`, and in addition to the same checks as commit time, 
 
 - **FR-001**: Project MUST have an automated unit test suite covering isolated application logic (functions/utilities with no external dependencies).
 - **FR-002**: Project MUST have automated "mock" tests covering code that depends on external services (e.g. the CMS client, network requests, browser-only APIs), with those dependencies replaced by mocks so no real external call is made during the test run.
-- **FR-003**: A pre-commit Git hook MUST run automatically on every commit attempt and MUST block the commit if linting, type-checking, unit tests, or mock tests fail.
+- **FR-003**: A pre-commit Git hook MUST run automatically on every commit attempt and MUST block the commit if linting or type-checking fails. The test suite is deliberately **not** part of this hook — it is the slowest check in the set and belongs to the push gate (FR-004), where it still runs before any code leaves the machine.
 - **FR-003a**: Formatting MUST be applied automatically to staged files during the pre-commit hook, and the reformatted result MUST be included in the commit being created. Formatting is a _correction_ step, not a blocking gate: a developer MUST NOT have to fix formatting by hand and re-run the commit. Consequently no commit can enter history with unformatted content, which is the outcome a blocking format check would have aimed at.
-- **FR-004**: A pre-push Git hook MUST run automatically on every push attempt and MUST block the push if any pre-commit-level check fails, or if the production build fails to complete.
+- **FR-004**: A pre-push Git hook MUST run automatically on every push attempt and MUST block the push if any pre-commit-level check fails, if the unit or mock tests fail, or if the production build fails to complete.
 - **FR-005**: Both hooks MUST report which specific check failed (lint, type-check, unit test, mock test, or build) so a developer can address it directly.
 - **FR-006**: Hooks MUST be installed automatically as part of the project's standard dependency-installation step, requiring no separate manual setup by a new contributor.
 - **FR-007**: Neither hook MUST require running full browser-based end-to-end tests; end-to-end testing remains available as a separate, manually- or CI-triggered process outside these hooks.
@@ -84,15 +84,15 @@ A developer runs `git push`, and in addition to the same checks as commit time, 
 
 - **Unit Test**: An automated test of isolated application logic with no external dependencies.
 - **Mock Test**: An automated test of code that depends on an external service or browser API, where that dependency is replaced with a mock/stub so the test runs without a real network or CMS call.
-- **Pre-commit Gate**: An automatic formatting step applied to staged files, followed by the set of checks (lint, type-check, unit tests, mock tests) that must pass before a commit is created.
-- **Pre-push Gate**: The pre-commit gate plus a production build verification, run before code leaves the developer's machine.
+- **Pre-commit Gate**: An automatic formatting step applied to staged files, followed by the set of checks (lint, type-check) that must pass before a commit is created.
+- **Pre-push Gate**: The pre-commit gate plus the test suite and a production build verification, run before code leaves the developer's machine.
 
 ## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% of commits that fail linting, type-checking, unit tests, or mock tests are blocked before entering history; and 100% of commits that enter history contain correctly formatted content, without the developer having formatted it by hand.
-- **SC-002**: 100% of pushes that fail any pre-commit-level check or fail to build are blocked before reaching the remote.
+- **SC-001**: 100% of commits that fail linting or type-checking are blocked before entering history; and 100% of commits that enter history contain correctly formatted content, without the developer having formatted it by hand.
+- **SC-002**: 100% of pushes that fail any pre-commit-level check, fail the test suite, or fail to build are blocked before reaching the remote.
 - **SC-003**: A new contributor can go from cloning the repository to having working commit-time quality checks with zero manual hook-setup steps beyond the standard install command.
 - **SC-004**: A developer can identify which specific check failed within the hook's own output, without needing to re-run checks individually to find out.
 - **SC-005**: Routine commits and pushes that pass all checks complete without the developer needing to wait on a full end-to-end browser test run.
