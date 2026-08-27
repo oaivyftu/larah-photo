@@ -330,7 +330,17 @@ export function HomeExperience({
               />
             </div>
 
-            <h1 className={styles["hero__tagline"]} id="home-title">
+            {/* Each word is its own span so the intro can mask-reveal them,
+                and they are separated by `margin-right` rather than by a text
+                node -- so the accessible name would otherwise concatenate into
+                "Photographsthatstaywithyou". The label restores the spacing for
+                assistive tech without adding inline whitespace that would
+                change the measured line breaks. */}
+            <h1
+              aria-label={content.heroTagline}
+              className={styles["hero__tagline"]}
+              id="home-title"
+            >
               {taglineWords.map((word, index) => (
                 <span className={styles["hero__word"]} key={`${word}-${index}`}>
                   <span data-hero-word>{word}</span>
