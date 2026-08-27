@@ -21,14 +21,23 @@ export default defineConfig({
     // No `globals: true`: test files import `describe`/`it`/`expect` from
     // "vitest" explicitly, so `tsc` type-checks them without needing
     // "vitest/globals" added to tsconfig's `types`.
-    // Colocated tests only. Async Server Components under src/app are not
-    // testable here (research.md §2) and none of them get a .test file.
     include: ["src/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",
       reporter: ["json-summary"],
       include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/**/*.test.{ts,tsx}", "src/**/*.d.ts"],
+      exclude: [
+        "src/**/*.test.{ts,tsx}",
+        "src/**/*.d.ts",
+        // Sanity Studio schema definitions: declarative objects handed to
+        // `defineType`/`defineField` that configure the Studio's editing UI.
+        // None of it runs on the site, and a test over it could only assert
+        // the object literal back at itself -- coverage that reads as
+        // reassurance while proving nothing. Their real check is the Studio
+        // loading and the fetchers validating what editors produce, which
+        // fetchers.test.ts covers.
+        "src/sanity/schemaTypes/**",
+      ],
     },
   },
 });

@@ -250,3 +250,78 @@ describe("intercepted work detail modal", () => {
     expect(notFound).toHaveBeenCalled();
   });
 });
+
+describe("the other pages' metadata", () => {
+  it("titles the home page absolutely, so the brand is not appended twice", async () => {
+    resetAll({
+      getHomePage: {
+        heroTagline: "Photographs that stay.",
+        heroPortraitImage: image,
+        heroImage: image,
+        heroCtaLabel: "See",
+        heroCtaHref: "/work",
+        manifestoWords: ["A", "B", "C"],
+        manifestoImageOne: image,
+        manifestoImageTwo: image,
+        selectedWorkEyebrow: "Selected",
+        servicesEyebrow: "Services",
+      },
+    });
+    const page = await import("./page");
+
+    const metadata = await page.generateMetadata();
+
+    // The `%s | Larah Photo` template would otherwise stutter, since the
+    // brand already leads this title.
+    expect(metadata.title).toEqual({
+      absolute: "Larah Photo — Photographs that stay.",
+    });
+  });
+
+  it("counts the galleries in the work page snippet", async () => {
+    resetAll({ getWorkProjects: [project("a"), project("b")] });
+    const page = await import("./work/page");
+
+    const metadata = await page.generateMetadata();
+
+    expect(metadata.description).toContain("2 galleries");
+  });
+
+  it("omits the work social image when nothing is published", async () => {
+    resetAll({ getWorkProjects: [] });
+    const page = await import("./work/page");
+
+    expect(await page.generateMetadata()).not.toHaveProperty(
+      "openGraph.images",
+    );
+  });
+
+  it("uses the photographer's own opening paragraph for the about snippet", async () => {
+    // Not boilerplate: the snippet is what a searcher reads before clicking.
+    resetAll({
+      getAboutPage: {
+        titleWords: ["About"],
+        portraitOne: image,
+        story: ["I photograph the hour before anyone is ready.", "Second."],
+      },
+    });
+    const page = await import("./about/page");
+
+    const metadata = await page.generateMetadata();
+
+    expect(metadata.description).toBe(
+      "I photograph the hour before anyone is ready.",
+    );
+  });
+
+  it("puts the studio's real contact details in the contact snippet", async () => {
+    resetAll();
+    const page = await import("./contact/page");
+
+    const metadata = await page.generateMetadata();
+
+    expect(metadata.description).toContain("Ontario");
+    expect(metadata.description).toContain("hi@larah.photo");
+    expect(metadata.description).toContain("+1 555 0100");
+  });
+});

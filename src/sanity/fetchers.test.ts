@@ -451,3 +451,96 @@ describe("getWorkProjectSlugs", () => {
     await expect(getWorkProjectSlugs()).resolves.toEqual([]);
   });
 });
+
+describe("getFeaturedWorkProjects", () => {
+  function featured(
+    id: string,
+    overrides: Record<string, unknown> = {},
+  ): Record<string, unknown> {
+    return { ...projectDoc, _id: id, slug: id, title: id, ...overrides };
+  }
+
+  it("takes only the projects an editor marked featured", async () => {
+    // The homepage collage is curated, not "the most recent few".
+    fetchMock.mockResolvedValue([
+      featured("a", { featured: true }),
+      featured("b", { featured: false }),
+      featured("c"),
+    ]);
+    const { getFeaturedWorkProjects } = await loadFetchers();
+
+    await expect(getFeaturedWorkProjects()).resolves.toMatchObject([
+      { slug: "a" },
+    ]);
+  });
+
+  it("orders them by the curated position, not by document order", async () => {
+    fetchMock.mockResolvedValue([
+      featured("c", { featured: true, featuredOrder: 3 }),
+      featured("a", { featured: true, featuredOrder: 1 }),
+      featured("b", { featured: true, featuredOrder: 2 }),
+    ]);
+    const { getFeaturedWorkProjects } = await loadFetchers();
+
+    const projects = await getFeaturedWorkProjects();
+    expect(projects.map((project) => project.slug)).toEqual(["a", "b", "c"]);
+  });
+
+  it("puts an unordered project first rather than dropping it", async () => {
+    fetchMock.mockResolvedValue([
+      featured("b", { featured: true, featuredOrder: 2 }),
+      featured("a", { featured: true }),
+    ]);
+    const { getFeaturedWorkProjects } = await loadFetchers();
+
+    const projects = await getFeaturedWorkProjects();
+    expect(projects.map((project) => project.slug)).toEqual(["a", "b"]);
+  });
+
+  it("returns an empty collage rather than falling back to everything", async () => {
+    // A homepage with nothing curated shows nothing; silently showing all
+    // projects would misrepresent an unfinished edit as a choice.
+    fetchMock.mockResolvedValue([featured("a"), featured("b")]);
+    const { getFeaturedWorkProjects } = await loadFetchers();
+
+    await expect(getFeaturedWorkProjects()).resolves.toEqual([]);
+  });
+});
+
+describe("slug and span shapes the CMS can return", () => {
+  it("accepts a slug object as well as a bare string", async () => {
+    // Sanity's slug type is `{ current }`; older documents hold a plain string.
+    fetchMock.mockResolvedValue([
+      { ...projectDoc, slug: { current: "from-object" } },
+    ]);
+    const { getWorkProjects } = await loadFetchers();
+
+    await expect(getWorkProjects()).resolves.toMatchObject([
+      { slug: "from-object" },
+    ]);
+  });
+
+  it.each([
+    ["full", "full"],
+    ["6", 6],
+    ["1", 1],
+    ["12", 12],
+  ])("reads a homepage span of %o as %o", async (given, expected) => {
+    fetchMock.mockResolvedValue([{ ...projectDoc, homepageSpan: given }]);
+    const { getWorkProjects } = await loadFetchers();
+
+    const [project] = await getWorkProjects();
+    expect(project?.placement?.homepageSpan).toBe(expected);
+  });
+
+  it.each(["0", "13", "wide", ""])(
+    "ignores an out-of-range or unparseable span of %o",
+    async (given) => {
+      fetchMock.mockResolvedValue([{ ...projectDoc, homepageSpan: given }]);
+      const { getWorkProjects } = await loadFetchers();
+
+      const [project] = await getWorkProjects();
+      expect(project?.placement?.homepageSpan).toBeUndefined();
+    },
+  );
+});
