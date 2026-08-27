@@ -57,6 +57,12 @@ These are specified _before_ being built, so they carry the full artifact set:
   resolve through `src/styles/`. The audit now carries a written coverage
   declaration, and a test holds it to what the script actually scans — implicit
   coverage is why these five categories drifted in the first place.
+- **`012-browser-e2e-tests`** — specified 2026-08-26, not yet planned. Covers
+  what a headless DOM cannot reach: the gallery carousel, the scroll
+  choreography, the page-transition curtain and the pointer follower — 170 of
+  the 186 statements the unit and integration suite leaves uncovered. Runs on
+  demand, not in a Git hook, which is what feature 009 already anticipated
+  rather than something this reverses. Next step: `/speckit-plan`.
 
 ## Targeting a feature
 

@@ -33,6 +33,7 @@ are about to change and read it:
 | Tests and Git hooks              | `specs/009-testing-quality-gates/`    |
 | Design system, shared components | `specs/010-design-system-compliance/` |
 | Typography and motion tokens     | `specs/011-typography-motion-tokens/` |
+| Browser end-to-end tests         | `specs/012-browser-e2e-tests/`        |
 
 `specs/001`–`008` are **retrospective**: they describe what already shipped.
 They have no `plan.md` or `tasks.md` and should not get one — see
