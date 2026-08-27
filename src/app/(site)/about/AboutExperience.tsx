@@ -56,11 +56,16 @@ export function AboutExperience({ content }: AboutExperienceProps) {
             className={styles["about__media-visual"]}
             data-about-media-visual
           >
+            {/* No `placeholder="blur"` here. `blurDataURL` is optional — a
+                Sanity asset with no lqip metadata resolves it undefined — and
+                next/image throws at render when told to blur with nothing to
+                blur. LarahImage derives the placeholder from whether a
+                blurDataURL actually arrived, which is what it is for;
+                hardcoding it overrode exactly that safety. */}
             <LarahImage
               preload
               src={content.portraitOne.src}
               alt={content.portraitOne.alt}
-              placeholder="blur"
               blurDataURL={content.portraitOne.blurDataURL}
               width={content.portraitOne.width}
               height={content.portraitOne.height}
