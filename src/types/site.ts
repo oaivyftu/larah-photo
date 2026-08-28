@@ -14,6 +14,8 @@ export type PostalAddress = {
 export type SiteSettings = {
   name: string;
   instagramUrl: string;
+  /** Structured data only: joins this site to the Maps listing via `sameAs`. */
+  googleBusinessUrl?: string;
   email: string;
   phone: string;
   location: string;

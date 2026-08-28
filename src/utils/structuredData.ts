@@ -60,7 +60,7 @@ export function buildBusinessSchema(settings: SiteSettings): JsonLdGraph {
     telephone: settings.phone,
     address: buildPostalAddress(settings.postalAddress),
     areaServed: settings.location,
-    sameAs: [settings.instagramUrl],
+    sameAs: [settings.instagramUrl, settings.googleBusinessUrl].filter(Boolean),
     knowsAbout: [
       "Portrait photography",
       "Wedding photography",

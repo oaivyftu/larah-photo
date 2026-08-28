@@ -22,7 +22,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata({
     // The one title not run through the `%s | Larah Photo` template — the
     // brand is already the subject here, and appending it reads as a stutter.
-    title: `${settings.name} — ${homePage.heroTagline}`,
+    // The trade names the city because this is the title a local search
+    // matches against; the tagline stays where a reader sees it, in the hero.
+    title: `${settings.name} — Photographer in ${settings.location}`,
     absoluteTitle: true,
     description: siteDescription,
     path: "/",

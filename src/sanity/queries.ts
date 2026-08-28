@@ -15,6 +15,7 @@ export const imageFields = `
 export const siteSettingsQuery = `*[_type == "siteSettings"][0]{
   name,
   instagramUrl,
+  googleBusinessUrl,
   email,
   phone,
   location,

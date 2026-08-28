@@ -4,7 +4,10 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { pageMetadata } from "@/constants/seo";
 import { getAboutPage } from "@/sanity/fetchers";
 import { toOpenGraphImage } from "@/sanity/image";
-import { buildAboutPageSchema } from "@/utils/structuredData";
+import {
+  buildAboutPageSchema,
+  buildBreadcrumbSchema,
+} from "@/utils/structuredData";
 import { AboutExperience } from "./AboutExperience";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,6 +29,12 @@ export default async function AboutPage() {
   return (
     <PageShell variant="about">
       <JsonLd data={buildAboutPageSchema(content.story)} />
+      <JsonLd
+        data={buildBreadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "About", path: "/about" },
+        ])}
+      />
       <AboutExperience content={content} />
     </PageShell>
   );

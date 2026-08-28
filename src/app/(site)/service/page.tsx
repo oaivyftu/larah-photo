@@ -15,7 +15,10 @@ import {
 import { ServiceExperience } from "./ServiceExperience";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const services = await getServices();
+  const [services, settings] = await Promise.all([
+    getServices(),
+    getSiteSettings(),
+  ]);
   // `Math.min()` of nothing is Infinity, which would ship "starting at $Infinity"
   // into the search snippet if the packages were ever unpublished.
   const startingPrice = services.length
@@ -26,10 +29,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata({
     title: "Services",
     description: services.length
-      ? `Photography session packages from Larah Photo — ${services.length} ` +
-        `options covering ${services.map((service) => service.title).join(", ")}, ` +
+      ? `Photography session packages from Larah Photo in ${settings.location} ` +
+        `— ${services.length} options covering ` +
+        `${services.map((service) => service.title).join(", ")}, ` +
         `starting at $${startingPrice}.`
-      : "Photography session packages, inclusions and pricing from Larah Photo.",
+      : `Photography session packages, inclusions and pricing from Larah ` +
+        `Photo in ${settings.location}.`,
     path: "/service",
     images: leadService
       ? [
