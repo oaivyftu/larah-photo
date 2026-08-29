@@ -160,6 +160,19 @@ describe("buildBusinessSchema", () => {
     });
   });
 
+  it("adds the Google Business Profile to sameAs once the CMS has one", () => {
+    // sameAs is what tells Google the Maps listing and this site are one
+    // business, so the reviews on the listing count towards this entity.
+    const listed = {
+      ...settings,
+      googleBusinessUrl: "https://maps.google.com/?cid=1",
+    } as unknown as SiteSettings;
+
+    expect(buildBusinessSchema(listed)).toMatchObject({
+      sameAs: ["https://instagram.com/larah", "https://maps.google.com/?cid=1"],
+    });
+  });
+
   it("omits the address entirely when the CMS has none", () => {
     expect(buildBusinessSchema(settings)).not.toHaveProperty("address");
   });

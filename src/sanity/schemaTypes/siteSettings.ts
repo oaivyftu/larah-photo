@@ -19,6 +19,16 @@ export const siteSettings = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "googleBusinessUrl",
+      title: "Google Business Profile URL",
+      description:
+        "Link to the studio's Google Business Profile or Maps listing. " +
+        "Never shown on the site — it tells Google that the listing and " +
+        "this site are the same business, so reviews and the map card " +
+        "attach to the right entity.",
+      type: "url",
+    }),
+    defineField({
       name: "email",
       title: "Business email",
       type: "email",

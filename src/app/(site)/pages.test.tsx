@@ -274,7 +274,7 @@ describe("the other pages' metadata", () => {
     // The `%s | Larah Photo` template would otherwise stutter, since the
     // brand already leads this title.
     expect(metadata.title).toEqual({
-      absolute: "Larah Photo — Photographs that stay.",
+      absolute: "Larah Photo — Photographer in Ontario",
     });
   });
 
@@ -285,6 +285,8 @@ describe("the other pages' metadata", () => {
     const metadata = await page.generateMetadata();
 
     expect(metadata.description).toContain("2 galleries");
+    // The city is what a local search matches on, so it belongs in the snippet.
+    expect(metadata.description).toContain("Ontario");
   });
 
   it("omits the work social image when nothing is published", async () => {

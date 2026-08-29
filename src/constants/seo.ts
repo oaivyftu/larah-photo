@@ -34,9 +34,22 @@ export const siteUrl = configuredSiteUrl.replace(/\/+$/, "");
 
 export const siteName = "Larah Photo";
 
+/**
+ * Google Search Console domain verification, and the GA4 measurement ID.
+ * Both are optional and undefined until set — the root layout only renders
+ * the corresponding `<meta>`/script when a value is present, so an empty
+ * environment produces no broken tags.
+ */
+export const googleSiteVerification =
+  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined;
+
+export const gaMeasurementId =
+  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || undefined;
+
 export const siteDescription =
-  "Larah Photo is a photography studio shooting portrait, wedding and editorial " +
-  "work. Browse selected projects, session packages and enquire about a booking.";
+  "Larah Photo is a London, Ontario photography studio shooting portrait, " +
+  "wedding and editorial work. Browse selected projects, session packages " +
+  "and enquire about a booking.";
 
 /**
  * Absolute URL for a site-relative path. The sitemap and JSON-LD both need

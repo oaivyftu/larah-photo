@@ -3,10 +3,13 @@ import type { Metadata } from "next";
 // that the reset below — which styles bare `html`, `body`, `*`, `a`, `svg` —
 // never reaches Sanity Studio, whose own theme leaves those selectors alone.
 import "./globals.scss";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Montserrat } from "next/font/google";
 import { PageTransition } from "@/components/layout/PageTransition/PageTransition";
 import { GlassPointer } from "@/components/ui/GlassPointer/GlassPointer";
 import {
+  gaMeasurementId,
+  googleSiteVerification,
   isIndexable,
   siteDescription,
   siteName,
@@ -48,6 +51,9 @@ export const metadata: Metadata = {
   // Safari turns bare digits in the footer's phone number into tel: links of
   // its own, which rewrites the markup crawlers see.
   formatDetection: { telephone: false, address: false, email: false },
+  ...(googleSiteVerification
+    ? { verification: { google: googleSiteVerification } }
+    : {}),
   robots: isIndexable
     ? undefined
     : {
@@ -77,6 +83,11 @@ export default function RootLayout({
         <PageTransition />
         <GlassPointer />
       </body>
+      {/* Gated on the indexing switch as well as the ID, so preview deploys
+          never report their traffic into the production property. */}
+      {isIndexable && gaMeasurementId ? (
+        <GoogleAnalytics gaId={gaMeasurementId} />
+      ) : null}
     </html>
   );
 }

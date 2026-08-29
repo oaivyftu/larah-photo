@@ -31,6 +31,7 @@ import {
 type SanitySiteSettings = {
   name?: string;
   instagramUrl?: string;
+  googleBusinessUrl?: string;
   email?: string;
   phone?: string;
   location?: string;
@@ -210,6 +211,9 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   return {
     name: requireString(settings.name, "siteSettings.name"),
     instagramUrl,
+    // Not `requireString`: optional in the Studio, and existing documents
+    // predate the field.
+    googleBusinessUrl: settings.googleBusinessUrl,
     email: requireString(settings.email, "siteSettings.email"),
     phone: requireString(settings.phone, "siteSettings.phone"),
     location: requireString(settings.location, "siteSettings.location"),
