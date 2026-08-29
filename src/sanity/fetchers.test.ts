@@ -76,6 +76,31 @@ describe("success path", () => {
     });
   });
 
+  it("passes googleBusinessUrl through when the CMS has one", async () => {
+    // Regression: the field was added to the schema, type and GROQ query but
+    // never mapped onto the object this function returns, so it silently
+    // reached buildBusinessSchema()'s sameAs as undefined despite editors
+    // filling it in.
+    fetchMock.mockResolvedValue({
+      ...siteSettingsDoc,
+      googleBusinessUrl: "https://maps.google.com/?cid=1",
+    });
+    const { getSiteSettings } = await loadFetchers();
+
+    await expect(getSiteSettings()).resolves.toMatchObject({
+      googleBusinessUrl: "https://maps.google.com/?cid=1",
+    });
+  });
+
+  it("leaves googleBusinessUrl undefined for documents that predate it", async () => {
+    fetchMock.mockResolvedValue(siteSettingsDoc);
+    const { getSiteSettings } = await loadFetchers();
+
+    const settings = await getSiteSettings();
+
+    expect(settings.googleBusinessUrl).toBeUndefined();
+  });
+
   it("returns null for an unknown slug instead of throwing", async () => {
     fetchMock.mockResolvedValue(null);
     const { getWorkProjectBySlug } = await loadFetchers();
