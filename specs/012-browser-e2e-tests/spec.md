@@ -99,16 +99,21 @@ A visitor who has asked their operating system to reduce motion gets a site that
 
 ## Assumptions
 
-- **Measured position, 2026-08-26.** After the unit and integration work: 544 tests, 81.4% of statements, 74.0% of branches, 84.0% of functions, with Sanity Studio schema definitions excluded from the denominator as declarative configuration that never runs on the site. Of the 186 statements still uncovered, **170 — 91% — are browser-coupled**:
+- **Measured position, re-measured 2026-08-29.** After the unit and integration work: 544 tests, 81.4% of statements, 74.0% of branches, 84.0% of functions, with Sanity Studio schema definitions excluded from the denominator as declarative configuration that never runs on the site. Of the 186 statements still uncovered, **169 — 91% — are browser-coupled**:
 
-  | Area                                  | Uncovered | Why it resists a headless test        |
-  | ------------------------------------- | --------- | ------------------------------------- |
-  | Project gallery carousel and controls | 96        | Carousel library, pointer-idle timers |
-  | Home page scroll choreography         | 48        | Scroll-position-driven animation      |
-  | Pointer follower                      | 15        | Frame-by-frame easing loop            |
-  | Project album layout                  | 6         | Layout measurement                    |
+  | Area                                    | Uncovered | Why it resists a headless test        |
+  | --------------------------------------- | --------- | ------------------------------------- |
+  | Project gallery carousel and controls   | 96        | Carousel library, pointer-idle timers |
+  | Home page scroll choreography           | 48        | Scroll-position-driven animation      |
+  | Pointer follower                        | 15        | Frame-by-frame easing loop            |
+  | Project album layout                    | 6         | Layout measurement                    |
+  | Page-entry intro callbacks, four routes | 4         | Timeline built only outside `reduce`  |
+
+  The last row and the corrected total are a fix, recorded rather than quietly applied. The first version of this table listed four rows summing to 165 beside a stated total of 170, and the missing row is the one that matters most to this feature: the four route intro callbacks are the duplicated page-heading reveal that FR-007 requires consolidated before it is tested. The remaining 17 of the 186 are not counted here — a `catch` branch in the contact page's Instagram-label helper, the Studio route, and a scatter of single statements across layouts and fetchers — so the browser-coupled figure is 169, and 169/186 is the 91% the sentence already claimed. Two of those 17 are a judgement call rather than a fact: the focus-and-`inert` handling in the work detail modal, and one statement in the page transition, are browser behaviour by nature but sit inside components the existing tests already cover well. Counted out, and named here so the next person can disagree with the reasoning rather than the arithmetic.
 
   Reaching these without a browser means replacing both libraries with stand-ins and asserting the stand-ins were called, which passes when the gallery is completely broken and fails when a library version changes. That is the reason they were left, and the reason this feature exists.
+
+- **This feature covers 115 of those 169, not all of them.** The gallery (96), the pointer follower (15) and the four intro callbacks are in scope. The home page's scroll choreography (48) and the project album layout's measurement code (6) are **out of scope** — no user story above describes a home-page scroll journey or an album-layout journey, and FR-002's list is exhaustive rather than illustrative. Stated here so the headline reads honestly: this closes roughly two thirds of the browser-coupled gap and leaves a named third for a following feature, which will be able to reuse this one's configuration, server setup and reduced-motion variant pattern rather than building them again.
 
 - **This does not reverse feature 009, contrary to how it was first described.** 009's FR-007 requires that neither Git hook depend on browser tests, and says in the same sentence that end-to-end testing "remains available as a separate, manually- or CI-triggered process outside these hooks". The constitution says the same: E2E "is deliberately excluded from the commit and push gates and stays a manual command." So this feature fulfils what both documents already anticipated. What it must not do is quietly move the suite into a hook, which FR-004 and SC-005 prevent.
 
@@ -116,7 +121,7 @@ A visitor who has asked their operating system to reduce motion gets a site that
 
 - **The repeated page-entry animation is consolidated first, not tested around.** The heading reveal is currently written out identically in four route components — the same seven properties in each. A test asserting the reveal on one route would say nothing about the other three, which is exactly the false assurance this feature exists to avoid (FR-007, SC-008). The shared hook that already owns the surrounding machinery gains the reveal itself, and the four copies go. This was found during feature 011 and deliberately recorded as out of scope there; it is in scope here because testing makes it load-bearing.
 
-- **The dependency is justified, not assumed.** A browser automation tool is a genuine addition and the constitution requires a reason. The reason is that the stack does not solve this problem: the existing runner has no layout, no compositor, and no scrolling, so the untested 170 statements are unreachable by construction rather than by omission. This is the case the constraint asks for, and it is written into the plan rather than left implied.
+- **The dependency is justified, not assumed.** A browser automation tool is a genuine addition and the constitution requires a reason. The reason is that the stack does not solve this problem: the existing runner has no layout, no compositor, and no scrolling, so the untested 169 statements are unreachable by construction rather than by omission. This is the case the constraint asks for, and it is written into the plan rather than left implied.
 
 - **Verification, not appearance.** The suite asserts that behaviour happens. Screenshot comparison is a different tool with a different maintenance profile — it fails on font rendering and animation timing, which on a site built around motion would produce failures nobody trusts. Excluded deliberately (FR-009), and revisitable on its own merits.
 

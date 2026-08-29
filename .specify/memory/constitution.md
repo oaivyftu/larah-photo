@@ -1,5 +1,29 @@
 <!--
-Sync Impact Report (2.2.1)
+Sync Impact Report (2.2.2)
+- Version change: 2.2.1 → 2.2.2 (PATCH: two factual corrections to Principle V;
+  no principle added, removed, or redefined)
+- Modified principles:
+  - V. Critical User Flows Require Test Coverage. Two statements stopped being
+    true and are replaced with what is:
+    1. "Work gallery navigation is covered only at the component level
+       (`WorkFilters.test.tsx`)" — untrue since `WorkGalleryClient.test.tsx`
+       landed, and untrue a second way now that feature 012 covers the flow in a
+       browser.
+    2. "that flow's end-to-end path remains uncovered until an E2E tool is
+       adopted" — this is the adoption. `@playwright/test` is in the tree, nine
+       journeys run against a real browser, and the justification the Technology
+       Constraints require is `specs/012-browser-e2e-tests/research.md` §1–2.
+- **The exclusion is unchanged and deliberately restated**: E2E stays out of the
+  commit and push gates and stays a manual command. Feature 012 fulfils what 009
+  and this document already anticipated rather than reversing either. The
+  written statement of where it does run is
+  `specs/012-browser-e2e-tests/contracts/run-location.md`, and moving the suite
+  into a hook requires amending this principle alongside it.
+- Added/removed sections: none
+- Downstream: `README.md` and `AGENTS.md` gained the command and the run
+  location in the same change.
+
+Prior report (2.2.1)
 - Version change: 2.2.0 → 2.2.1 (PATCH: the Development Workflow paragraph now
   describes what the hooks actually run; no principle added, removed, or
   redefined)
@@ -172,19 +196,27 @@ the contact page and posts to an `/api/contact` route that does not exist — se
 `specs/005-contact-page/spec.md` Assumptions. It becomes a critical flow, and
 falls under this principle, the moment it is actually wired up.)
 
-**Vitest is the selected framework** — unit tests for isolated logic, and mock
-tests for code depending on the Sanity client, with that dependency replaced at
-the module boundary rather than over the network. Playwright/E2E is
-deliberately excluded from the commit and push gates and stays a manual
-command.
+**Vitest is the selected framework** — unit tests for isolated logic, and tests
+that replace the Sanity client at the module boundary rather than over the
+network, for code depending on it. **Playwright is the selected E2E framework**
+(feature 012), and it is deliberately excluded from the commit and push gates
+and stays a manual command, `npm run test:e2e`.
 
-Of the two flows named above, Sanity content error handling has direct coverage
+Both named flows are covered. Sanity content error handling has direct coverage
 (`src/sanity/fetchers.test.ts` asserts that missing, blank, and unfetchable
 content raises rather than degrading into a placeholder). Work gallery
-navigation is covered only at the component level
-(`WorkFilters.test.tsx`); the gallery pages themselves are async Server
-Components, which Vitest cannot render, so that flow's end-to-end path remains
-uncovered until an E2E tool is adopted.
+navigation is covered at the component level (`WorkFilters.test.tsx`), as an
+integration flow (`WorkGalleryClient.test.tsx`), and end to end in a real
+browser (`e2e/gallery.spec.ts`) — the last of these being the only place the
+carousel actually runs, since in a headless DOM it does nothing and a test there
+can pass while the gallery is broken.
+
+The E2E suite runs when a person runs it and in no hook. That is not a gap left
+open: there is no CI pipeline, so a hooked browser run is paid entirely by the
+developer pushing, for a signal that changes far less often than lint, type and
+unit feedback. Where it does run, and the condition for revisiting that, is
+written down in `specs/012-browser-e2e-tests/contracts/run-location.md`. Moving
+it into a hook is an amendment to this principle, not a hook edit.
 
 **Rationale**: The project ran with no regression safety net at all until
 2026-08-24. Coverage is now enforced mechanically at commit and push time
@@ -316,4 +348,4 @@ Versioning policy:
 - MINOR: New principle/section added or materially expanded guidance.
 - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 2.2.1 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-26
+**Version**: 2.2.2 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-29

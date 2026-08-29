@@ -45,8 +45,12 @@
   overturning a prior decision invites re-litigating it.
 - **Counts in the Assumptions are deliberate**, as in features 010 and 011. A
   success criterion like "a visitor can move through a project's photographs" is
-  only meaningful against a known starting point, and the 170-of-186 figure is
-  what makes the case for a browser at all.
+  only meaningful against a known starting point, and the 169-of-186 figure is
+  what makes the case for a browser at all. It was 170 in the first draft, beside
+  a table whose rows summed to 165; re-measuring on 2026-08-29 found the missing
+  row and the off-by-one. Being deliberate about a count is worth nothing if the
+  count is not checked, which is why `tasks.md` T038 makes re-measuring a task
+  rather than a habit.
 - **FR-007 and SC-008 exist because of one specific known duplicate**: the page
   heading reveal, written out identically in four route components. Testing one
   route would leave three copies free to drift while the suite reported success —
@@ -55,3 +59,33 @@
 - **FR-009 excludes visual comparison on its merits**, not by omission. On a site
   built around motion, screenshot diffing fails on font rendering and animation
   timing, and a suite nobody trusts is worse than no suite.
+
+## What shipped (2026-08-29)
+
+- **115 of the 169 browser-coupled statements are now exercised** — the gallery
+  (96), the pointer follower (15) and the four route intro callbacks. The home
+  page's scroll choreography (48) and the album layout's measurement code (6)
+  are the named remainder, out of scope because FR-002 does not list them and no
+  user story describes them. Roughly two thirds, said out loud rather than
+  rounded up.
+- **The Vitest coverage number does not move, and should not be expected to.**
+  Re-measured after the work: 186 uncovered statements, the same four areas at
+  the same counts. A browser suite reports no statement coverage into that
+  number, so a reader comparing before and after will see nothing change. What
+  changed is that the code is now exercised by something that fails when it
+  breaks.
+- **The suite found a real bug on its first honest run.** `PageTransition` set
+  its "have we navigated yet" flag inside a 780 ms timeout, so a visitor who
+  followed a link sooner than that lost the focus move and the route
+  announcement for that navigation — hitting reduced-motion visitors hardest,
+  because their content is on screen immediately and they can click sooner.
+  Fixed, with a unit test that fails against the old code, so the push gate
+  catches it without needing a browser.
+- **Two silent-pass traps were hit while building this and are now designed
+  out.** `test.use({ reducedMotion })` at file scope applies to a whole file, so
+  the reduced-motion half would have run with motion on while the report still
+  claimed two variants — the `underBothMotionPreferences` helper places it
+  inside the describe by construction. And `reuseExistingServer` pointed the
+  browser at another worktree's dev server for a whole run, passing six
+  journeys against code that was not under change — hence `E2E_FRESH_BUILD` and
+  `PORT`.

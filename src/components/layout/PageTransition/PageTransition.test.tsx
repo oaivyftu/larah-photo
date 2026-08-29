@@ -117,6 +117,35 @@ describe("the reveal cycle", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Work — Larah Photo");
   });
 
+  it("still moves focus when the visitor navigates before the first cycle ends", () => {
+    // The regression this guards: the "have we navigated yet" flag used to be
+    // set inside the idle timeout. A visitor who followed a link sooner than
+    // TRANSITION_DURATION after load cancelled that timeout on the way out, so
+    // the flag was still false when the next cycle checked it -- and that
+    // navigation silently skipped both the focus move and the announcement.
+    //
+    // Reduced-motion visitors hit it most: their content is on screen straight
+    // away, so they can click sooner. Found by the browser journey for US2 AS2
+    // in spec 012, and pinned here so the push gate catches it without one.
+    const main = document.createElement("div");
+    main.id = "main-content";
+    main.tabIndex = -1;
+    document.body.append(main);
+    document.title = "About — Larah Photo";
+
+    const { rerender } = render(<PageTransition />);
+
+    // Deliberately short of a full cycle -- this is the whole point.
+    act(() => void vi.advanceTimersByTime(TRANSITION_DURATION - 100));
+
+    pathname = "/about";
+    rerender(<PageTransition />);
+    settle();
+
+    expect(main).toHaveFocus();
+    expect(screen.getByRole("status")).toHaveTextContent("About — Larah Photo");
+  });
+
   it("skips the whole cycle for a modal navigation", () => {
     // The modal owns focus and announces itself, and the page underneath has
     // not changed.

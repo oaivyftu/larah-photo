@@ -30,26 +30,17 @@ export function ContactExperience({
   const phoneHref = contactDetails.phone.replace(/[^\d+]/g, "");
 
   const rootRef = usePageIntro<HTMLDivElement>((intro) => {
-    intro
-      .from("[data-page-heading] > span", {
-        yPercent: 115,
+    intro.from(
+      "[data-contact-direct]",
+      {
+        y: 34,
         opacity: 0,
-        rotate: 2,
-        duration: 0.82,
-        stagger: 0.07,
-        ease: "power4.out",
-      })
-      .from(
-        "[data-contact-direct]",
-        {
-          y: 34,
-          opacity: 0,
-          duration: 0.78,
-          stagger: 0.1,
-          ease: "power3.out",
-        },
-        "-=0.42",
-      );
+        duration: 0.78,
+        stagger: 0.1,
+        ease: "power3.out",
+      },
+      "-=0.42",
+    );
   });
 
   return (

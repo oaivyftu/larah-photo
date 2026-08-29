@@ -147,6 +147,22 @@ are the one gate a commit does not wait for — run them yourself while you work
 or the push is where you will find out. Formatting is applied for you — never
 hand-fix layout.
 
+```bash
+npm run test:e2e   # browser journeys — no hook runs this
+```
+
+Run it when your change touches **the project gallery, the page transition, the
+pointer follower, or a route's entry animation**, and before a release. Nothing
+forces it: it needs a booted app and a real browser, and this project has no CI,
+so it stays a command a person types. The hooks still type-check and lint
+`e2e/`, so a broken spec file cannot be committed — only running it is manual.
+The reasoning, and the condition for revisiting it, is in
+`specs/012-browser-e2e-tests/contracts/run-location.md`.
+
+Add `E2E_FRESH_BUILD=1` whenever the run must reflect a change you just made: by
+default it reuses whatever is serving port 3000, which will happily be the old
+code — or another worktree's dev server.
+
 New or changed behaviour in a critical flow (work gallery navigation, Sanity
 content error handling) needs a test. Both flows have integration coverage:
 `src/app/(site)/work/WorkGalleryClient.test.tsx` and the guard suites in
@@ -158,6 +174,15 @@ what either of them does at a boundary it cannot use for real — the Sanity
 client, `navigator.clipboard`, Isotope. Browser-only behaviour (GSAP timelines,
 Flickity, the page-transition curtain) is not faked into a unit test, because a
 mocked timeline asserts nothing about whether the animation runs.
+
+That behaviour has a home now: `e2e/`, run by `npm run test:e2e` (feature 012).
+Nine journeys covering the gallery, page-to-page navigation and the
+reduced-motion variant of each — roughly two thirds of the browser-coupled code
+the unit suite structurally cannot reach. The home page's scroll choreography is
+the named remainder, deliberately out of scope. Selectors there follow
+`specs/012-browser-e2e-tests/contracts/test-surface.md`: role and accessible name
+first, `data-*` identity attributes second, never a CSS-module class name — those
+are hashed in a production build.
 
 **Async Server Components under `src/app/` are testable**, contrary to what this
 file said before. `render(<Page />)` does not work, but a Server Component is a

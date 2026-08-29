@@ -13,14 +13,6 @@ type AboutExperienceProps = {
 export function AboutExperience({ content }: AboutExperienceProps) {
   const rootRef = usePageIntro<HTMLDivElement>((intro) => {
     intro
-      .from("[data-page-heading] > span", {
-        yPercent: 115,
-        opacity: 0,
-        rotate: 2,
-        duration: 0.82,
-        stagger: 0.07,
-        ease: "power4.out",
-      })
       .from(
         "[data-about-copy] p, [data-about-media-visual]",
         {

@@ -47,6 +47,18 @@ export function PageTransition() {
       return;
     }
 
+    // Read and set synchronously, before any timer. This used to be flipped
+    // inside the timeout below, which lost the flag whenever a visitor followed
+    // a link within TRANSITION_DURATION of the page loading: the effect re-ran,
+    // cleanup cancelled the first timeout before it could mark the initial load
+    // as seen, and that navigation silently skipped both the focus move and the
+    // announcement. Reduced-motion visitors hit it most often, because their
+    // content is on screen immediately and they can click sooner -- so the bug
+    // fell hardest on the users Principle II exists for. Found by the browser
+    // journey for spec 012 US2 AS2, which is what that journey is for.
+    const isInitialLoad = !hasNavigatedRef.current;
+    hasNavigatedRef.current = true;
+
     document.documentElement.dataset.pageTransition = "revealing";
     const revealTimeout = setTimeout(() => setState("revealing"), 0);
 
@@ -55,7 +67,7 @@ export function PageTransition() {
       setState("idle");
       window.dispatchEvent(new CustomEvent("larah:page-ready"));
 
-      if (hasNavigatedRef.current) {
+      if (!isInitialLoad) {
         // Next.js leaves focus on <body> after a client-side navigation, so a
         // keyboard user would resume tabbing from the top of the document with
         // no signal that the page changed.
@@ -64,8 +76,6 @@ export function PageTransition() {
           ?.focus({ preventScroll: true });
         setRouteAnnouncement(document.title);
       }
-
-      hasNavigatedRef.current = true;
     }, TRANSITION_DURATION);
 
     return () => {

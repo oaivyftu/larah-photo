@@ -201,6 +201,11 @@ function GalleryFloatNav({
   return (
     <nav
       aria-label="Gallery controls"
+      // An identity hook, not a state mirror: it names the element, and stays
+      // true whatever the controls are doing. Whether they are visible or have
+      // receded is still read from computed opacity, which is the thing that
+      // actually decides it (spec 012 contracts/test-surface.md).
+      data-gallery-controls
       className={`${styles["work-project-gallery__float-nav"]} ${
         isVisible ? styles["work-project-gallery__float-nav--visible"] : ""
       }`}

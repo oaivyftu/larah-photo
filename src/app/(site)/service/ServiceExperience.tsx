@@ -18,26 +18,17 @@ export function ServiceExperience({
   services,
 }: ServiceExperienceProps) {
   const rootRef = usePageIntro<HTMLDivElement>((intro) => {
-    intro
-      .from("[data-page-heading] > span", {
-        yPercent: 115,
+    intro.from(
+      "[data-service-row]",
+      {
+        y: 38,
         opacity: 0,
-        rotate: 2,
-        duration: 0.82,
-        stagger: 0.07,
-        ease: "power4.out",
-      })
-      .from(
-        "[data-service-row]",
-        {
-          y: 38,
-          opacity: 0,
-          duration: 0.76,
-          stagger: 0.12,
-          ease: "power3.out",
-        },
-        "-=0.4",
-      );
+        duration: 0.76,
+        stagger: 0.12,
+        ease: "power3.out",
+      },
+      "-=0.4",
+    );
   });
 
   return (
