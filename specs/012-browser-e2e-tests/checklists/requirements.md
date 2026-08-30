@@ -80,7 +80,17 @@
   announcement for that navigation — hitting reduced-motion visitors hardest,
   because their content is on screen immediately and they can click sooner.
   Fixed, with a unit test that fails against the old code, so the push gate
-  catches it without needing a browser.
+  catches it without needing a browser. **The first fix was itself wrong**:
+  setting the flag synchronously cured the race but broke under React Strict
+  Mode, whose initial-mount replay then read as a navigation. Keyed on the
+  pathname instead — the replay carries the same one, a real navigation does
+  not. Caught in review, not by the suite.
+- **One of the nine journeys could not fail, and review caught that too.** J8
+  asserted only the finished state of the entrance animation, which is exactly
+  what a page with no animation has. It now samples the heading's opacity at
+  `larah:page-ready` — parked at `"0"` with motion, `"1"` under `reduce`. Worth
+  recording plainly: this feature exists to stop tests passing while the thing
+  they name is broken, and one of its own tests did that for a whole day.
 - **Two silent-pass traps were hit while building this and are now designed
   out.** `test.use({ reducedMotion })` at file scope applies to a whole file, so
   the reduced-motion half would have run with motion on while the report still

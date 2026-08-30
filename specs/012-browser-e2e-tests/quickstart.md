@@ -17,10 +17,18 @@ npm install
 ```
 
 That is the whole setup. `npm install` brings in `@playwright/test` and its
-`postinstall` script fetches the Chromium binary, the same way `prepare` already
+`postinstall` step fetches the Chromium binary, the same way `prepare` already
 installs the Git hooks — FR-006 says no manual setup beyond what the project
 already requires, and a second command you have to be told about is exactly the
 manual setup it forbids.
+
+That step is `scripts/install-e2e-browser.mjs` rather than the bare
+`playwright install chromium` it replaced. npm runs root lifecycle scripts even
+under `--omit=dev`, where the dev-only Playwright package is not installed, so
+the bare command exited with "playwright: not found" and failed the whole
+production install. The script resolves the package first and exits quietly when
+it is absent — which is the correct outcome, since the suite is a manual command
+and nothing about an environment without it is broken.
 
 The cost is honest rather than hidden: that is a one-time download of roughly
 150 MB, paid by every contributor whether or not they ever run the suite. Anyone
@@ -129,10 +137,12 @@ Ask the question a new contributor would, from the documentation alone:
 - Both point at [contracts/run-location.md](./contracts/run-location.md) for the
   long form.
 
-**Expect**: three places, one answer, no contradiction. While you are there:
-`README.md` currently claims the test suite runs on commit. It has run on push
-since the constitution's v2.2.1 amendment. Fix it in the same pass — a document
-that is wrong about one gate is not evidence for another.
+**Expect**: three places, one answer, no contradiction. Two stale claims in
+`README.md` were corrected in the same pass, both found by asking this question:
+it said the test suite runs on commit (it has run on push since the
+constitution's v2.2.1 amendment), and it described `npm test` as "unit + mock
+tests", which contradicts AGENTS.md's own rule that mock is a technique rather
+than a level. A document wrong about one gate is not evidence for another.
 
 ### 4. A broken behaviour actually fails — SC-007
 
@@ -183,12 +193,23 @@ npm run test:e2e -- --grep "reduce"
 ```
 
 **Expect**: passing, and — the part that matters — passing for the right reason.
-Confirm by reading one spec: the preference is set with
-`test.use({ reducedMotion: "reduce" })`, which emulates it at the browser level.
-Nowhere in `e2e/` is `window.matchMedia` assigned to. If it were, the test would
-be asserting that the code reads a preference rather than that it honours one,
-which is the thing the unit suite already does and the thing this feature exists
+
+Two things make that checkable rather than assumed. First, the preference is set
+with `test.use({ contextOptions: { reducedMotion: "reduce" } })`, which emulates
+it at the browser level; nowhere in `e2e/` is `window.matchMedia` assigned to. If
+it were, the test would assert that the code reads a preference rather than that
+it honours one — what the unit suite already does, and what this feature exists
 to stop being satisfied by.
+
+Second, and more useful, J8 asserts _evidence_ of the preference rather than the
+label on the describe block: it samples the heading's opacity at
+`larah:page-ready` and requires `"1"` under `reduce`, against `"0"` with motion.
+If the browser never received the preference, that run reads `"0"` and fails.
+This matters because the top-level `test.use({ reducedMotion })` form most
+examples show is out of date for this Playwright version — and an unrecognised
+key there is ignored at runtime rather than rejected, so the reduced-motion half
+would otherwise have run with motion fully on while still reporting two
+variants.
 
 ---
 

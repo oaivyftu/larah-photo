@@ -155,6 +155,23 @@ requirements, not tidying.
 - [x] T037 Tick the boxes in `specs/012-browser-e2e-tests/checklists/requirements.md` that this feature discharges, and add a note recording what shipped short of the headline: 115 of the 169 browser-coupled statements, with the home page's scroll choreography (48) and the project album layout's measurement code (6) deliberately out of scope (spec.md → Assumptions, research.md §11, plan.md → Scope boundary)
 - [x] T038 Re-measure and confirm the coverage claim rather than inheriting it: run `npx vitest run --coverage` and check that the browser-coupled areas named in the spec's Assumptions table still carry the statement counts it lists. The table was wrong once — four rows summing to 165 beside a stated total of 170 — and the correction is only durable if the next person checks it instead of copying it forward
 
+---
+
+## Phase 7: Review Response
+
+**Purpose**: four P2 findings from automated review on
+[PR #26](https://github.com/oaivyftu/larah-photo/pull/26). Three were defects in
+work already merged into the branch; one was a test that could not fail.
+
+- [x] T039 Guard the browser download for production installs: `postinstall` now runs `scripts/install-e2e-browser.mjs`, which resolves `@playwright/test` first and exits 0 when it is absent. `npm ci --omit=dev` runs root lifecycle scripts but does not install dev dependencies, so the bare `playwright install chromium` exited with "playwright: not found" and took the whole production install down with it. Verified against a package tree with no Playwright in it. A genuine download failure still fails
+- [x] T040 Key `PageTransition`'s navigation detection on the pathname rather than on "has this effect run before". Setting the boolean synchronously fixed the timing race but broke under React Strict Mode, which replays effect setup on the initial mount while preserving refs: the replay read as a navigation and announced the title over a screen reader already reading the page. Confirmed the double-invoke happens in this test environment before writing the fix, and the new Strict Mode test fails against the version committed in `be475cc`
+- [x] T041 Give J8 an observable from _during_ the entrance animation, not only after it. Both of its assertions inspected the finished state, which is exactly what a page with no animation has — deleting the reveal from `usePageIntro` left the test green. An init script now samples the heading's `opacity` at `larah:page-ready`: `"0"` with motion, `"1"` under `reduce`. Demonstrated: with the reveal deleted the journey fails with `Expected "0", Received "1"`
+- [x] T042 Stop assuming the first project card has several photographs. `workProject.images` has no minimum in the schema, so an editor reordering the index could break the gallery journeys while gallery navigation worked perfectly — a test reporting on the dataset rather than on the software. `openProjectWithSeveralPhotographs` walks up to five cards for one that qualifies, memoised for the run, and names the dataset prerequisite if none does
+
+**Checkpoint**: 18/18 journeys pass, and three of the four fixes were each shown failing first.
+
+---
+
 **Checkpoint**: the feature is done. The run location is written in three places, the suite has been proven to fail on a real break, and the commit and push gates are as fast as they were.
 
 ---

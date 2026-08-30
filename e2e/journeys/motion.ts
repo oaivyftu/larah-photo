@@ -1,9 +1,11 @@
 import { expect, type Page } from "@playwright/test";
 import { openWorkIndex } from "../support/content";
 import {
+  expectIntroStartState,
   expectPageContentAtRest,
   expectPointerLabelActive,
   glassPointer,
+  watchIntroStartState,
 } from "../support/observables";
 
 /**
@@ -22,12 +24,15 @@ import {
 
 /** J8, default motion -- the entrance animation runs and completes (US3 AS3). */
 export async function pageEntryAnimationCompletes(page: Page) {
+  await watchIntroStartState(page);
   await page.goto("/about");
 
-  // The heading is parked at opacity 0 and tweened up once the curtain lifts.
-  // Asserting only the end state would pass on a page that never animated, so
-  // the timeline's existence is asserted first: under no-preference the intro
-  // is built, and until it plays the heading is not yet at rest.
+  // Both halves are needed, and the first earns its keep: the heading was
+  // parked at opacity 0 when the page announced itself ready, which is only
+  // true if a timeline was built -- delete the reveal and this reads "1". Then
+  // it finishes at rest, which is the animation completing rather than
+  // stalling half way.
+  await expectIntroStartState(page, "0");
   await expectPageContentAtRest(page);
   await expect(
     page.locator("[data-page-heading]"),
@@ -44,8 +49,15 @@ export async function pageEntryAnimationCompletes(page: Page) {
  * and today nothing notices.
  */
 export async function pageArrivesWithoutAnimation(page: Page) {
+  await watchIntroStartState(page);
   await page.goto("/about");
 
+  // Never parked: under `reduce` the timeline is not built at all, so the
+  // heading was already at rest when the page announced itself ready. This is
+  // what distinguishes the two variants by evidence rather than by the name on
+  // the describe block -- and it fails loudly if the browser never actually
+  // received the preference.
+  await expectIntroStartState(page, "1");
   await expectPageContentAtRest(page);
 }
 

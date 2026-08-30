@@ -40,6 +40,66 @@ export async function openFirstProjectPage(page: Page) {
   return href as string;
 }
 
+/** Album items on a project page, one button per photograph. */
+export function photographButtons(scope: Page | Locator) {
+  return scope.getByRole("button", { name: /^Open image \d+:/ });
+}
+
+// How many projects to try before giving up. Bounded so a dataset of
+// single-photograph projects reports that, rather than walking all of them.
+const CANDIDATE_LIMIT = 5;
+
+// Memoised for the run. Workers are 1 (playwright.config.ts), so the walk below
+// is paid once and every later journey goes straight to the project it found.
+let projectWithSeveralPhotographs: string | null = null;
+
+/**
+ * A project that actually has photographs to move between.
+ *
+ * Not "the first card": `workProject`'s `images` array carries no minimum in
+ * `src/sanity/schemaTypes/workProject.ts`, so a project with one photograph --
+ * or none -- is a permitted content state, and an editor reordering the index
+ * could put one first tomorrow. The gallery journeys would then fail in setup
+ * while gallery navigation worked perfectly, which is a test reporting on the
+ * dataset rather than on the software.
+ *
+ * So the suite asks the site for a project that meets the precondition, and
+ * says so plainly if the dataset has none.
+ */
+export async function openProjectWithSeveralPhotographs(page: Page) {
+  if (projectWithSeveralPhotographs) {
+    await page.goto(projectWithSeveralPhotographs);
+
+    return projectWithSeveralPhotographs;
+  }
+
+  await openWorkIndex(page);
+
+  const hrefs = (
+    await page
+      .locator("[data-work-card] a[href]")
+      .evaluateAll((links) =>
+        links.map((link) => link.getAttribute("href") ?? ""),
+      )
+  ).filter(Boolean);
+
+  for (const href of hrefs.slice(0, CANDIDATE_LIMIT)) {
+    await page.goto(href);
+
+    if ((await photographButtons(page).count()) > 1) {
+      projectWithSeveralPhotographs = href;
+
+      return href;
+    }
+  }
+
+  throw new Error(
+    `No project among the first ${CANDIDATE_LIMIT} on the work index has more ` +
+      "than one photograph. The gallery journeys need one that does — add " +
+      "photographs to a project in Sanity, or move one that has them earlier.",
+  );
+}
+
 /** The project preview: click a card, let the intercepting route take over. */
 export async function openFirstProjectPreview(page: Page) {
   const cards = await openWorkIndex(page);
@@ -62,7 +122,7 @@ export async function openFirstProjectPreview(page: Page) {
  * preview dialog for J3.
  */
 export async function openPhotographFullScreen(scope: Page | Locator) {
-  const zoom = scope.getByRole("button", { name: /^Open image \d+:/ });
+  const zoom = photographButtons(scope);
 
   await expect(
     zoom.first(),

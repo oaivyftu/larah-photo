@@ -26,8 +26,12 @@ of this suite.
 
 - A journey MUST NOT reference a project slug, a photograph count, or a piece of
   page copy. Content is editor-owned (Principle I), so it is discovered at run
-  time — the first project card on the work index, the count read from the
-  gallery's own live region (research.md §5).
+  time — a project card followed from the work index, the count read from the
+  gallery's own live region (research.md §5). J1 and J2 go further and pick a
+  project that _has_ several photographs rather than assuming the first one
+  does: `workProject.images` carries no minimum in the schema, so a
+  one-photograph project first on the index is a permitted content state, and
+  the journeys would then fail on the dataset rather than on the software.
 - A journey's `outcome` MUST be an Observable from the table below. "A function
   was called" and "state updated" are not outcomes (FR-003).
 - A journey body is defined once and imported by each of its variants. Copying
@@ -67,19 +71,20 @@ journey — the same one, with a different expected ending.
 
 **Rules**
 
-- Set on the browser context (`test.use({ reducedMotion })`), never by
-  overriding `matchMedia` (research.md §4). A faked query asserts that the code
-  reads a preference, not that it honours one.
+- Set on the browser context — `test.use({ contextOptions: { reducedMotion } })`
+  in this Playwright version, not the top-level form most examples show — never
+  by overriding `matchMedia` (research.md §4). A faked query asserts that the
+  code reads a preference, not that it honours one.
 - Every journey has both variants (SC-004). Where the ending is identical under
   both — J1 through J7 all end on the same observable — the variant is a
   `test.use` wrapper around the same imported body, not a second copy.
 - Only J8 has genuinely different endings, and that difference is the point:
 
-| Journey | `no-preference` ending                           | `reduce` ending                                              |
-| ------- | ------------------------------------------------ | ------------------------------------------------------------ |
-| J1–J7   | same observable                                  | same observable                                              |
-| J8      | entrance animation runs, then content is at rest | content is at rest immediately; no `opacity: 0` parked state |
-| J9      | label appears, trailing follow enabled           | label appears, no trailing animation                         |
+| Journey | `no-preference` ending                        | `reduce` ending                      |
+| ------- | --------------------------------------------- | ------------------------------------ |
+| J1–J7   | same observable                               | same observable                      |
+| J8      | parked at `opacity: 0`, then animates to rest | never parked; at rest from the start |
+| J9      | label appears, trailing follow enabled        | label appears, no trailing animation |
 
 J8's `reduce` ending is the one that catches a real regression: `usePageIntro`
 never builds the timeline under `reduce`, so nothing is parked at `opacity: 0`.
@@ -99,16 +104,18 @@ reader looking for its scenario stops looking rather than assuming one was lost.
 The vocabulary of endings. A journey's outcome must be one of these; anything
 else is either an implementation detail or a visual assertion (FR-009).
 
-| Observable           | Read from                                                       | Used by    |
-| -------------------- | --------------------------------------------------------------- | ---------- |
-| Selected photograph  | `is-selected` on the `<figure>` cell, plus its `aria-label`     | J1, J2     |
-| Photograph position  | The gallery's `aria-live` region — "Image _n_ of _N_"           | J1, J2     |
-| Dialog still open    | `[role="dialog"]` visible, and `aria-modal`                     | J3         |
-| Route                | `page.url()`                                                    | J3, J5, J7 |
-| Control visibility   | The float-nav's `--visible` class                               | J4         |
-| Focus location       | `document.activeElement`, and whether the page root contains it | J6         |
-| Content at rest      | Computed `opacity` of the page heading spans reaching `1`       | J8         |
-| Pointer label active | `data-active` on the glass pointer                              | J9         |
+| Observable           | Read from                                                          | Used by    |
+| -------------------- | ------------------------------------------------------------------ | ---------- |
+| Selected photograph  | `is-selected` on the `<figure>` cell, plus its `aria-label`        | J1, J2     |
+| Photograph position  | The gallery's `aria-live` region — "Image _n_ of _N_"              | J1, J2     |
+| Dialog still open    | `[role="dialog"]` visible, and `aria-modal`                        | J3         |
+| Route                | `page.url()`                                                       | J3, J5, J7 |
+| Control visibility   | Computed `opacity` of `[data-gallery-controls]`                    | J4         |
+| Focus moved          | `document.activeElement.id` is `main-content` after navigating     | J6         |
+| Tab continues        | Next focus is inside `#main-content` or follows it in the document | J6         |
+| Intro parked         | Heading `opacity` sampled at `larah:page-ready`                    | J8         |
+| Content at rest      | Computed `opacity` of the page heading spans reaching `1`          | J8         |
+| Pointer label active | `data-active` on the glass pointer                                 | J9         |
 
 The labelled targets are the three `usePointerLabel` call sites — the work card
 ("View"), the detail gallery's zoom buttons ("Zoom"), and the project gallery

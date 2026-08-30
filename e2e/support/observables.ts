@@ -166,6 +166,69 @@ export async function expectPageContentAtRest(page: Page) {
   ).toHaveCSS("opacity", "1");
 }
 
+const INTRO_START_KEY = "__larahHeadingOpacityAtPageReady";
+
+/**
+ * Record what the heading's opacity was at the moment the page announced
+ * itself ready. Must be called before `page.goto`.
+ *
+ * J8's first draft asserted only the finished state, and a finished state is
+ * exactly what a page with no entrance animation has: delete the reveal and the
+ * heading sits at opacity 1 from the start, so the test passed while proving
+ * nothing. That is this feature's own failure mode -- a test that stays green
+ * while the thing it names is gone -- so it needed an observable from *during*
+ * the cycle rather than after it.
+ *
+ * `larah:page-ready` is that moment. `usePageIntro` parks the heading at its
+ * `from` state (opacity 0) when it builds the timeline, and plays it in a
+ * listener for that event. This listener is registered from an init script, so
+ * it runs before the app's and sees the parked value:
+ *
+ *   - no-preference: "0" -- a timeline exists and has not played yet
+ *   - reduce:        "1" -- no timeline was built, nothing was ever parked
+ *
+ * Which makes the two variants distinguishable by evidence rather than by the
+ * label on the describe block.
+ */
+export async function watchIntroStartState(page: Page) {
+  await page.addInitScript((key: string) => {
+    const store = window as unknown as Record<string, string | undefined>;
+
+    window.addEventListener("larah:page-ready", () => {
+      // First cycle only; a later navigation must not overwrite it.
+      if (store[key] !== undefined) {
+        return;
+      }
+
+      const span = document.querySelector("[data-page-heading] > span");
+
+      store[key] = span
+        ? getComputedStyle(span).opacity
+        : "no page heading found";
+    });
+  }, INTRO_START_KEY);
+}
+
+/** The value `watchIntroStartState` recorded. */
+export async function expectIntroStartState(page: Page, expected: string) {
+  await expect
+    .poll(
+      () =>
+        page.evaluate(
+          (key: string) =>
+            (window as unknown as Record<string, string | undefined>)[key],
+          INTRO_START_KEY,
+        ),
+      {
+        message:
+          expected === "0"
+            ? "the heading should have been parked, ready to animate in"
+            : "the heading should never have been parked under reduced motion",
+      },
+    )
+    .toBe(expected);
+}
+
 export function glassPointer(page: Page) {
   return page.locator("[data-glass-pointer]");
 }

@@ -118,6 +118,9 @@ compile cannot be committed. Only running it is manual.
 
 `npm install` fetches Chromium once, roughly 150 MB. Skip it with
 `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install` if you will not run the suite.
+A production install (`npm ci --omit=dev`) skips it on its own — the step checks
+whether Playwright is actually installed before reaching for it, because npm runs
+lifecycle scripts even when it has not installed the dev dependency they need.
 The journeys need content, so `.env.local` must be filled in — without it the
 suite refuses to start and names the missing variable.
 

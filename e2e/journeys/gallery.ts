@@ -3,6 +3,7 @@ import {
   openFirstProjectPage,
   openFirstProjectPreview,
   openPhotographFullScreen,
+  openProjectWithSeveralPhotographs,
   readPosition,
 } from "../support/content";
 import {
@@ -30,7 +31,7 @@ import {
 
 /** J1 -- advance the gallery with the next control (US1 AS1, SC-001). */
 export async function advanceWithControl(page: Page) {
-  await openFirstProjectPage(page);
+  await openProjectWithSeveralPhotographs(page);
   await openPhotographFullScreen(page);
   await expectCarouselReady(page);
 
@@ -57,7 +58,7 @@ export async function advanceWithControl(page: Page) {
 
 /** J2 -- move the gallery with the arrow keys (US1 AS2, SC-001). */
 export async function moveWithArrowKeys(page: Page) {
-  await openFirstProjectPage(page);
+  await openProjectWithSeveralPhotographs(page);
   await openPhotographFullScreen(page);
   await expectCarouselReady(page);
 

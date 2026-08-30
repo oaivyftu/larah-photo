@@ -80,19 +80,32 @@ rendering.
 
 The handles above locate elements; these are the assertions made on them.
 
-| State                       | Assertion                                                                          | Journey |
-| --------------------------- | ---------------------------------------------------------------------------------- | ------- |
-| The carousel initialised    | The carousel region has class `flickity-enabled`                                   | J1, J2  |
-| Which photograph is current | `figure.is-selected` has the expected `aria-label` prefix (`"2 of 6:"`)            | J1, J2  |
-| The photograph changed      | The selected figure's `aria-label` differs from the one captured before            | J1, J2  |
-| The controls are visible    | Computed `opacity` of `[data-gallery-controls]` is `"1"`                           | J4      |
-| The controls have receded   | Computed `opacity` of `[data-gallery-controls]` is `"0"`                           | J4      |
-| The preview is still open   | `[role="dialog"]` is attached, and the URL is still the project's                  | J3      |
-| The navigation completed    | `document.documentElement.dataset.pageTransition === "ready"`                      | J5      |
-| Focus moved to the content  | `document.activeElement.id === "main-content"` after a navigation                  | J6      |
-| Tab continues from there    | The next focused element is inside `#main-content` or follows it in document order | J6      |
-| The page content arrived    | Computed `opacity` of `[data-page-heading] > span` is `"1"`                        | J8      |
-| The pointer label is on     | `[data-glass-pointer]` has attribute `data-active`                                 | J9      |
+| State                       | Assertion                                                                                 | Journey |
+| --------------------------- | ----------------------------------------------------------------------------------------- | ------- |
+| The carousel initialised    | The carousel region has class `flickity-enabled`                                          | J1, J2  |
+| Which photograph is current | `figure.is-selected` has the expected `aria-label` prefix (`"2 of 6:"`)                   | J1, J2  |
+| The photograph changed      | The selected figure's `aria-label` differs from the one captured before                   | J1, J2  |
+| The controls are visible    | Computed `opacity` of `[data-gallery-controls]` is `"1"`                                  | J4      |
+| The controls have receded   | Computed `opacity` of `[data-gallery-controls]` is `"0"`                                  | J4      |
+| The preview is still open   | `[role="dialog"]` is attached, and the URL is still the project's                         | J3      |
+| The navigation completed    | `document.documentElement.dataset.pageTransition === "ready"`                             | J5      |
+| Focus moved to the content  | `document.activeElement.id === "main-content"` after a navigation                         | J6      |
+| Tab continues from there    | The next focused element is inside `#main-content` or follows it in document order        | J6      |
+| The intro was parked        | Heading `opacity` sampled at `larah:page-ready` — `"0"` with motion, `"1"` under `reduce` | J8      |
+| The page content arrived    | Computed `opacity` of `[data-page-heading] > span` is `"1"`                               | J8      |
+| The pointer label is on     | `[data-glass-pointer]` has attribute `data-active`                                        | J9      |
+
+**On the parked-intro row, which review added.** J8 first asserted only the
+finished state — and a finished state is exactly what a page with no entrance
+animation has, so deleting the reveal left the test green. An end-state
+assertion cannot tell "the animation ran and finished" apart from "there was no
+animation". The fix is an observable from _during_ the cycle: an init script
+records the heading's opacity when the page fires `larah:page-ready`, which is
+after `usePageIntro` parks it and before it plays. `"0"` means a timeline
+exists; `"1"` means none was built. It is also what makes the two motion
+variants distinguishable by evidence rather than by the label on the describe
+block — if the browser never received the preference, the `reduce` run reads
+`"0"` and fails.
 
 **On J6's two rows, which were one row until the journey was written.** The
 first draft asserted that after Tab the focused element is inside `<main>`. That

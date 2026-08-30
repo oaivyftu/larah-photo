@@ -5,6 +5,7 @@ import {
   render,
   screen,
 } from "@testing-library/react";
+import { StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // This component intercepts every click on the site and decides whether to
@@ -144,6 +145,46 @@ describe("the reveal cycle", () => {
 
     expect(main).toHaveFocus();
     expect(screen.getByRole("status")).toHaveTextContent("About — Larah Photo");
+  });
+
+  it("stays an initial load when Strict Mode replays the first effect", () => {
+    // Strict Mode runs effect setup, cleanup, then setup again on the initial
+    // mount, and refs survive that. So "has this effect run before?" answers
+    // yes on a page nobody navigated to -- which would announce the title over
+    // a screen reader already reading it, the exact thing the initial-load
+    // branch exists to prevent. Keyed on the pathname instead: the replay
+    // carries the same one, so it is not a navigation.
+    const main = document.createElement("div");
+    main.id = "main-content";
+    main.tabIndex = -1;
+    document.body.append(main);
+    document.title = "Larah Photo";
+
+    render(
+      <StrictMode>
+        <PageTransition />
+      </StrictMode>,
+    );
+    settle();
+
+    expect(main).not.toHaveFocus();
+    expect(screen.getByRole("status")).toHaveTextContent("");
+  });
+
+  it("does not treat a re-render on the same route as a navigation", () => {
+    // A parent re-render, or any effect replay, must not read as a page change.
+    const main = document.createElement("div");
+    main.id = "main-content";
+    main.tabIndex = -1;
+    document.body.append(main);
+
+    const { rerender } = render(<PageTransition />);
+    settle();
+
+    rerender(<PageTransition />);
+    settle();
+
+    expect(main).not.toHaveFocus();
   });
 
   it("skips the whole cycle for a modal navigation", () => {

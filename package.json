@@ -16,7 +16,7 @@
     "audit:design-system": "node scripts/audit-design-system.mjs",
     "audit:css-diff": "node scripts/compare-built-css.mjs",
     "test:e2e": "playwright test",
-    "postinstall": "playwright install chromium"
+    "postinstall": "node scripts/install-e2e-browser.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
