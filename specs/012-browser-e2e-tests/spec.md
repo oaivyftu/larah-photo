@@ -71,7 +71,7 @@ A visitor who has asked their operating system to reduce motion gets a site that
 - **FR-001**: The suite MUST exercise the site in a real browser, with the real animation and carousel libraries running, rather than substituting them.
 - **FR-002**: The suite MUST cover gallery navigation, page-to-page navigation, and the reduced-motion variants of both.
 - **FR-003**: Each test MUST assert an observable outcome a visitor could describe — a different photograph on screen, a page reached, a control gone — rather than that an internal function was called.
-- **FR-004**: The suite MUST NOT run as part of the commit gate, and MUST NOT be required for a routine push. Where it does run MUST be written down, with the reason.
+- **FR-004**: The suite MUST NOT run as part of the commit gate. It MUST run as part of the push gate (constitution v2.3.0 — see Assumptions). Where it does and does not run MUST be written down, with the reason.
 - **FR-005**: A failing test MUST report what was expected and what was found, so that a failure is actionable without re-running it locally to see.
 - **FR-006**: The suite MUST be runnable on demand by one documented command, with no manual setup beyond what the project already requires.
 - **FR-007**: Where a behaviour under test is currently written out separately in several places, it MUST be reduced to one definition before being tested, or the test's limited reach MUST be recorded against it.
@@ -92,7 +92,7 @@ A visitor who has asked their operating system to reduce motion gets a site that
 - **SC-002**: Dismissing a full-screen photograph returns the visitor to the project preview, not past it — verified for the nested case specifically, which is where it fails.
 - **SC-003**: An internal navigation completes and leaves focus inside the destination content.
 - **SC-004**: Every journey has a reduced-motion counterpart that reaches the same end state.
-- **SC-005**: A commit and a routine push complete without waiting for a browser, unchanged from today.
+- **SC-005**: A commit completes without waiting for a browser, unchanged from today. A routine push waits for one — this is now the point of the gate, not a regression to guard against.
 - **SC-006**: The command that runs the suite, and the statement of where it runs and does not, are both discoverable from the project's own contributor documentation.
 - **SC-007**: A deliberately broken behaviour — a disabled control, a removed key handler — fails the suite, demonstrated once rather than assumed.
 - **SC-008**: No behaviour is asserted on one route while identical copies of it remain untested on others.
@@ -116,6 +116,18 @@ A visitor who has asked their operating system to reduce motion gets a site that
 - **This feature covers 115 of those 169, not all of them.** The gallery (96), the pointer follower (15) and the four intro callbacks are in scope. The home page's scroll choreography (48) and the project album layout's measurement code (6) are **out of scope** — no user story above describes a home-page scroll journey or an album-layout journey, and FR-002's list is exhaustive rather than illustrative. Stated here so the headline reads honestly: this closes roughly two thirds of the browser-coupled gap and leaves a named third for a following feature, which will be able to reuse this one's configuration, server setup and reduced-motion variant pattern rather than building them again.
 
 - **This does not reverse feature 009, contrary to how it was first described.** 009's FR-007 requires that neither Git hook depend on browser tests, and says in the same sentence that end-to-end testing "remains available as a separate, manually- or CI-triggered process outside these hooks". The constitution says the same: E2E "is deliberately excluded from the commit and push gates and stays a manual command." So this feature fulfils what both documents already anticipated. What it must not do is quietly move the suite into a hook, which FR-004 and SC-005 prevent.
+
+- **Amended 2026-08-31: the suite moved from manual-only to the push gate**
+  (constitution v2.3.0, Principle V). The two bullets above described the
+  position taken when this feature shipped and are left as written — they were
+  true then, and the reasoning in them (no CI, so a hooked run is paid entirely
+  by whoever pushes) is still true now and still not disputed. What changed is
+  the judgement call sitting on top of that reasoning: the suite has since
+  caught a real accessibility regression and one of its own tests that could
+  not fail (`PageTransition`'s focus restoration, and J8 — PR #26's review
+  round), and that record moved the trade from "not worth the cost" to "worth
+  the cost". FR-004 and SC-005 above reflect the new position; the full
+  statement is `contracts/run-location.md`, rewritten in the same change.
 
 - **The suite runs on demand, not on a hook.** 009's reasoning is unchanged: the project has no continuous-integration pipeline, so a browser run in a hook executes entirely on the developer's machine for a signal that changes far less often than lint, type and unit feedback. A push-time gate would need a CI pipeline to justify it, and introducing one is a larger decision than this feature should make. Recorded here so that the day CI arrives, the reason to revisit is on the record rather than rediscovered.
 

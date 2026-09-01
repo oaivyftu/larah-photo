@@ -172,6 +172,29 @@ work already merged into the branch; one was a test that could not fail.
 
 ---
 
+---
+
+## Phase 8: Push Gate Promotion (2026-08-31)
+
+**Purpose**: constitution v2.3.0 reverses the position taken through v2.2.2 —
+`npm run test:e2e` now runs in `.husky/pre-push`, not only on request. FR-004
+and SC-005 amended accordingly; the full reasoning is
+[contracts/run-location.md](./contracts/run-location.md), rewritten to keep
+both the old argument and the new one rather than discarding either.
+
+- [x] T043 Amend the constitution to 2.3.0 (MINOR): Principle V's E2E paragraph, and the Development Workflow gates list and hook description, both updated to say the suite runs at push
+- [x] T044 Add an `▶ e2e` step to `.husky/pre-push`, after `build`: `PORT=3100 E2E_FRESH_BUILD=1 npm run test:e2e`. Both flags are load-bearing, not decoration — `E2E_FRESH_BUILD` so the gate tests the code actually being pushed rather than reusing a stray server; `PORT` so the hook cannot fail with `EADDRINUSE` just because a developer has a dev server open elsewhere, the exact collision research.md §8 documents hitting once already
+- [x] T045 Update `specs/012-browser-e2e-tests/spec.md`: FR-004 and SC-005 reworded for the new gate, with a dated Assumptions note that keeps the original reasoning legible rather than deleting it
+- [x] T046 Rewrite `contracts/run-location.md`: new Statement and Where-it-runs sections, a Why-it-moved section citing the specific bugs the review round caught (the `PageTransition` focus regression, and J8's unfalsifiable assertion) as the evidence that tipped the trade, and the prior reasoning kept under its own heading rather than removed
+- [x] T047 [P] Update `data-model.md`'s Run location table and `quickstart.md` scenarios 2 and 3 to match — scenario 2 now measures that the _commit_ path stayed fast, not that push did
+- [x] T048 [P] Update `README.md` and `AGENTS.md`: both said "no hook runs this"; both now say which one does and why, without deleting the reasoning for why it stayed out of `pre-commit`
+- [x] T049 Add a superseded-pointer note to `specs/009-testing-quality-gates/spec.md`'s Assumptions, next to the entry this reverses. Left as originally written rather than edited — it correctly described what 009 shipped
+- [x] T050 Verify the hook actually blocks: mutated the gallery (disabled arrow-key paging without tripping lint, since the first mutation attempt — removing `onNext`'s handler — left an unused variable that lint caught before e2e ever ran), ran `bash .husky/pre-push` directly, confirmed exit code 1 and `✖ pre-push failed at: e2e`. Restored, confirmed a clean `git diff` and 18/18 passing again
+
+**Checkpoint**: `bash .husky/pre-push` on a clean tree passes end to end, including a fresh build and 18/18 browser tests on port 3100; on a broken tree it fails at the e2e step with exit code 1, demonstrated rather than assumed.
+
+---
+
 **Checkpoint**: the feature is done. The run location is written in three places, the suite has been proven to fail on a real break, and the commit and push gates are as fast as they were.
 
 ---

@@ -140,14 +140,19 @@ failure mode is that it never leaves.
 The written statement of where the suite executes and where it deliberately does
 not, with the reason. New in this feature, and the thing FR-004 makes checkable.
 
-| Field      | Value                                                                        |
-| ---------- | ---------------------------------------------------------------------------- |
-| `command`  | `npm run test:e2e`                                                           |
-| `trigger`  | A person, on demand                                                          |
-| `excluded` | `.husky/pre-commit`, `.husky/pre-push`, any future hook                      |
-| `reason`   | No CI pipeline; a hooked browser run is paid entirely by the developer       |
-| `revisit`  | The day CI exists — recorded so the reason is inherited, not rediscovered    |
-| `written`  | `README.md` quality-gates table, `AGENTS.md` §5, `contracts/run-location.md` |
+**Amended 2026-08-31** (constitution v2.3.0): moved from manual-only to the
+push gate. The table below is the current state; `contracts/run-location.md`
+keeps the prior state's reasoning alongside the new one rather than discarding
+it.
+
+| Field      | Value                                                                                                                                                                                                                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `command`  | `PORT=3100 E2E_FRESH_BUILD=1 npm run test:e2e` (hook) · `npm run test:e2e` (manual)                                                                                                                                                               |
+| `trigger`  | `.husky/pre-push`, automatically — plus a person, on demand, any time                                                                                                                                                                             |
+| `excluded` | `.husky/pre-commit` only                                                                                                                                                                                                                          |
+| `reason`   | The push gate already pays for the two slowest checks (`npm test`, `npm run build`); the suite earned the same treatment by catching what those two missed (a real focus-restoration bug, and a test that could not fail — PR #26's review round) |
+| `revisit`  | The day CI exists — the cost can move off the developer's machine regardless of whether the suite stays in the hook                                                                                                                               |
+| `written`  | `README.md` quality-gates table, `AGENTS.md` §5, `contracts/run-location.md`, constitution Principle V                                                                                                                                            |
 
 The full statement, in the form the contract requires, is
 [contracts/run-location.md](./contracts/run-location.md). It is a deliverable,

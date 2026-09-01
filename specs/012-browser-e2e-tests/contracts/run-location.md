@@ -1,130 +1,205 @@
 # Contract: Run Location
 
-**Feature**: 012-browser-e2e-tests | **Date**: 2026-08-29
+**Feature**: 012-browser-e2e-tests | **Created**: 2026-08-29 | **Amended**: 2026-08-31
 
-FR-004: "The suite MUST NOT run as part of the commit gate, and MUST NOT be
-required for a routine push. **Where it does run MUST be written down, with the
-reason.**" This file is that statement. SC-006 requires it to be discoverable
+FR-004: "The suite MUST NOT run as part of the commit gate. It MUST run as part
+of the push gate. Where it does and does not run MUST be written down, with the
+reason." This file is that statement. SC-006 requires it to be discoverable
 from the project's own contributor documentation, so it is also summarised in
 `README.md` and `AGENTS.md`; this is the long form both point at.
+
+**This is the second version of this contract.** The first kept the suite
+manual-only, with the same status as `--headed` or `--ui`: something a person
+types. Constitution v2.3.0 reversed that. The reasoning for the first version is
+kept below, in **Why it was manual-only until 2026-08-31**, because it was
+correct when written and most of it is still true — what changed is a judgement
+call sitting on top of it, not the facts underneath.
 
 ---
 
 ## The statement
 
-**The browser end-to-end suite runs when a person runs it, and nowhere else.**
+**The browser end-to-end suite runs automatically on `git push`, and only
+there.**
+
+```bash
+PORT=3100 E2E_FRESH_BUILD=1 npm run test:e2e
+```
+
+is what `.husky/pre-push` runs. A push whose suite fails does not leave the
+machine, the same guarantee `npm test` and `npm run build` already give.
+
+It does **not** run on `git commit` — a browser suite is too slow to pay on
+every small commit, the same reasoning that already keeps `npm test` out of
+`pre-commit`. And a person can still run it directly, any time:
 
 ```bash
 npm run test:e2e
 ```
 
-It does not run on `git commit`. It does not run on `git push`. It is not
-required for either, and no hook may be changed to require it without amending
-this file and the constitution's Principle V alongside it.
+for a manual check before opening a PR, with `--headed`, `--ui`, or a `--grep`
+filter — see `README.md`.
 
 ---
 
 ## Where it does run
 
-| Situation                                                                                           | Runs? | Who triggers it                                        |
-| --------------------------------------------------------------------------------------------------- | ----- | ------------------------------------------------------ |
-| While changing the gallery, the page transition, the pointer follower, or a route's entry animation | Yes   | The author, before opening the PR                      |
-| Before a release                                                                                    | Yes   | The person releasing, against a fresh production build |
-| After upgrading GSAP, Flickity or Next.js                                                           | Yes   | Whoever ran the upgrade                                |
-| `git commit`                                                                                        | No    | —                                                      |
-| `git push`                                                                                          | No    | —                                                      |
-| Continuous integration                                                                              | N/A   | There is no pipeline                                   |
-
-The first three are expectations on people, not mechanisms. That is a real
-weakness and naming it is part of the contract: nothing forces this suite to
-run. What the project gets in exchange is that the commit and push gates stay
-as fast as they are today (SC-005), which is what keeps them from being
-bypassed.
+| Situation                                                                                           | Runs?                                                                  | Who / what triggers it                |
+| --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------- |
+| `git push`                                                                                          | Yes, automatically                                                     | `.husky/pre-push`                     |
+| `git commit`                                                                                        | No                                                                     | —                                     |
+| Manually, any time                                                                                  | Yes, on request                                                        | `npm run test:e2e`, typed by a person |
+| While changing the gallery, the page transition, the pointer follower, or a route's entry animation | Yes, twice — once manually while iterating, once automatically at push | The author, then the hook             |
+| Continuous integration                                                                              | N/A                                                                    | There is no pipeline                  |
 
 ---
 
-## Why not in a hook
+## Why it moved to the push gate
 
-Three reasons, in the order they matter:
+The push hook already runs the two slowest checks in the project — `npm test`
+and `npm run build` — because a signal that only fires once per push is still
+strong enough to keep a broken change off a shared branch, and paying it on
+every commit would be worse. The E2E suite is the same shape of check, just
+slower again, and it earned the same treatment by doing what a gate is supposed
+to do: catching something the faster checks could not.
+
+**The specific evidence.** The review round on
+[PR #26](https://github.com/oaivyftu/larah-photo/pull/26) — the same PR that
+first shipped this suite — found two things that a green `npm test` and a green
+`npm run build` both missed:
+
+1. **A real accessibility regression.** `PageTransition` lost the ability to
+   move keyboard focus into a newly-loaded page whenever a visitor clicked a
+   link within 780ms of the page loading — hitting reduced-motion visitors
+   hardest, since their content appears immediately and they click sooner. The
+   unit suite could not see this because it depends on the App Router's actual
+   navigation lifecycle timing, which jsdom does not have.
+2. **A test that could not fail.** One of the nine journeys asserted only the
+   _finished_ state of an entrance animation, which is indistinguishable from a
+   page that never had one. Demonstrated by deleting the animation and watching
+   the suite stay green.
+
+Both were caught by _running the suite_, not by writing it — which is the
+argument for making that running automatic rather than optional. A suite that
+only executes when someone remembers to type the command is a suite that can
+silently stop protecting anything, and there would be no signal that it had.
+
+**What did not change.** There is still no CI pipeline. This cost is still paid
+entirely on the machine of whoever is pushing, not amortised across a shared
+runner. That fact was the whole argument for keeping the suite manual in the
+first version of this contract, and it has not gotten weaker — it has been
+outweighed, not refuted. Recording that plainly here is the difference between
+a decision and a correction: nothing was factually wrong before, a different
+trade was made this time. See the constitution's Sync Impact Report (2.3.0) for
+the same argument in that document's own voice.
+
+---
+
+## What the hook actually runs, and why it differs from the plain command
+
+```bash
+PORT=3100 E2E_FRESH_BUILD=1 npm run test:e2e
+```
+
+not the bare `npm run test:e2e` a person would type. Two deliberate departures:
+
+- **`E2E_FRESH_BUILD=1`** forces Playwright to build and start its own server
+  rather than reusing whatever answers on the port. A push gate that reused a
+  stray server would be testing whatever that server happened to be serving —
+  possibly a different branch, possibly stale code — instead of the change
+  actually being pushed. That defeats the entire point of a gate.
+- **`PORT=3100`** moves the suite off the default port so the hook cannot fail
+  with `EADDRINUSE` just because a developer has `npm run dev` open in another
+  terminal, or another Git worktree's dev server is holding 3000. This is not a
+  hypothetical: building this feature hit that exact collision once, and it
+  silently pointed the browser at another worktree's server for an entire run
+  (see `research.md` §8's account of it).
+
+`.env.local` must still be configured with working Sanity credentials for the
+hook to pass — but this is not a new requirement the E2E step introduces. The
+`build` step immediately before it in the same hook already needs those
+credentials to statically generate the work pages, so a push that could not
+have built before this change cannot push now either.
+
+---
+
+## What the hooks do to the suite regardless of whether they execute it
+
+Independent of the question above, both hooks type-check and lint `e2e/`
+because nothing excludes that directory from `tsconfig.typecheck.json` or
+`eslint.config.mjs`. So a spec file that does not compile has always failed
+`pre-commit`, before this amendment and after it — verified by putting a type
+error in `e2e/gallery.spec.ts` and watching `npm run typecheck` reject it. What
+this amendment changes is whether the suite's tests are _executed_, which used
+to happen only on request and now also happens on every push.
+
+`next build`'s own TypeScript pass also covers `e2e/`, for the same reason —
+found the way these things usually are, when a type error in
+`e2e/support/variants.ts` failed a build that had nothing to do with it.
+
+Two directories of generated output — `playwright-report/` and `test-results/`
+— are ignored by Git **and** by ESLint. They contain bundled JavaScript, so
+without the ESLint ignore a run's own report would fail the next lint pass on
+code nobody wrote.
+
+---
+
+## Why it was manual-only until 2026-08-31
+
+Kept for the reasoning, not as the current state — everything below describes a
+position this contract no longer holds.
 
 1. **There is no CI, so a hooked run is paid entirely by the developer.** Every
    push would boot a browser and a production server on the machine of whoever
-   is pushing. The existing push gate already runs lint, type-check, the audit,
-   the whole Vitest suite and `next build`; adding a browser run on top changes
+   is pushing. The existing push gate already ran lint, type-check, the audit,
+   the whole Vitest suite and `next build`; adding a browser run on top changed
    the cost of pushing by a different order of magnitude, for a signal that
-   changes far less often.
-2. **This was already decided, twice.** Feature 009's FR-007 requires that
-   neither Git hook depend on browser tests and says in the same sentence that
-   E2E "remains available as a separate, manually- or CI-triggered process
-   outside these hooks". The constitution's Principle V says E2E "is
-   deliberately excluded from the commit and push gates and stays a manual
-   command." This feature fulfils what both anticipated rather than reversing
-   either.
-3. **A gate people skip is worse than no gate.** The project already learned
-   this from the design-system audit, which was deliberately kept out of the
-   hooks until the tree passed it, because a check that fails on every run is
-   noise a developer learns to bypass. A slow gate produces the same habit by a
-   different route, and `--no-verify` is final here — nothing downstream
-   re-runs what a bypass skipped.
+   changed far less often. _(Still true. See "What did not change" above — this
+   was outweighed, not disproven.)_
+2. **This was already decided, twice.** Feature 009's FR-007 required that
+   neither Git hook depend on browser tests. The constitution's Principle V said
+   E2E "is deliberately excluded from the commit and push gates and stays a
+   manual command." Feature 012 was written to fulfil what both anticipated
+   rather than reverse either. _(This amendment is what changed that — a third,
+   explicit decision, not a quiet reversal of the first two.)_
+3. **A gate people skip is worse than no gate.** The project had already learned
+   this from the design-system audit, kept out of the hooks until the tree
+   passed it, because a check that fails on every run is noise a developer
+   learns to bypass. _(The mitigation for moving E2E in anyway: the suite had
+   already been proven stable — 18/18 passing, demonstrated failing correctly
+   when broken on purpose — before this amendment, which is the same bar the
+   audit had to clear first.)_
 
 ---
 
-## What the hooks still do to this suite
+## The revisit condition, updated
 
-Excluded from the hooks is not excluded from the gates, and the difference is
-deliberate:
+The original revisit condition was "the day the project gains a CI pipeline."
+That day still matters, but for a different reason now: once CI exists, the
+cost this contract accepts — every push paying for a browser run on the
+developer's own machine — can move to a shared runner instead, which is worth
+doing regardless of whether the suite stays in the hook. At that point,
+reconsider together:
 
-| Check                         | Covers `e2e/`? | Why                                                        |
-| ----------------------------- | -------------- | ---------------------------------------------------------- |
-| `npm run typecheck`           | Yes            | `tsconfig.typecheck.json` includes `**/*.ts`               |
-| `npm run lint`                | Yes            | Nothing in `eslint.config.mjs` ignores `e2e/`              |
-| `npm test` (Vitest)           | No             | `vitest.config.mts` includes only `src/**/*.test.{ts,tsx}` |
-| `npm run audit:design-system` | No             | No stylesheets in `e2e/`                                   |
-| `npm run build`               | Yes            | `next build` type-checks the project, and `e2e/` is in it  |
-
-So a spec file that does not compile, or that trips a lint rule, still fails the
-commit — verified by putting a type error in `e2e/gallery.spec.ts` and watching
-`npm run typecheck` reject it. Only _executing_ the suite is manual. This is the
-correct split: the checks that cost milliseconds stay automatic, the one that
-costs minutes stays deliberate.
-
-The build row is a correction. This table first said `next build` does not cover
-`e2e/`, on the reasoning that the suite is not part of the app bundle. True, and
-irrelevant: `next build` runs its own TypeScript pass over the project, and the
-base `tsconfig.json` includes `**/*.ts`. It was found the way these things
-usually are — a type error in `e2e/support/variants.ts` failed a build that had
-nothing to do with it.
-
-Two directories of generated output — `playwright-report/` and `test-results/` —
-must be ignored by Git **and** by ESLint. They contain bundled JavaScript, so
-without the ESLint ignore the next `npm run lint` lints Playwright's own report
-and the push gate fails on code nobody wrote.
-
----
-
-## The revisit condition
-
-**Reconsider this contract the day the project gains a CI pipeline.**
-
-At that point the run cost moves off the developer's machine and the argument in
-reason 1 stops holding. What should then be reconsidered together:
-
-- Running the suite on pull requests (and only there — still not on `commit`).
+- Running the suite in CI instead of (or in addition to) the local hook.
 - Adding the `firefox` and `webkit` projects that
-  [research.md §3](../research.md) leaves out for the same cost reason. WebKit
-  is the stronger of the two: `WorkProjectGalleryClient.tsx` already carries a
-  comment about Safari not focusing a button on click, which is evidence of a
-  divergence this project has actually hit.
+  [research.md §3](../research.md) leaves out for cost reasons — cheap on a
+  shared runner, expensive on a laptop.
 
-Recorded here so that the reason to revisit is inherited rather than
-rediscovered, which is the whole point of writing a run location down.
+If the push-time cost ever becomes the wrong trade again — flakiness, a growing
+journey count, a runner arriving that makes local execution redundant — moving
+it back to manual-only is a legitimate direction too, and follows the same
+process as this amendment did: constitution Principle V, this file's Statement,
+`spec.md` FR-004/SC-005, `.husky/pre-push`, `README.md`, `AGENTS.md`, all in one
+change.
 
 ---
 
 ## Changing this contract
 
-Moving the suite into a hook, or making it required for a push, is a change to
-Principle V of the constitution as well as to FR-004 and SC-005 of this spec.
-It needs all three updated in the same change, with the rationale. A hook edit
-on its own is a defect, and `specs/012-browser-e2e-tests/` is where a reviewer
-should look to find that out.
+Moving the suite to a different gate — back to manual, or into CI once one
+exists — is a change to Principle V of the constitution as well as to FR-004
+and SC-005 of this spec, and to `.husky/pre-push` itself. It needs all three
+updated in the same change, with the rationale. A hook edit on its own is a
+defect, and `specs/012-browser-e2e-tests/` is where a reviewer should look to
+find out why the hook looks the way it does.

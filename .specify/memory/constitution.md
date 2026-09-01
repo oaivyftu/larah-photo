@@ -1,5 +1,41 @@
 <!--
-Sync Impact Report (2.2.2)
+Sync Impact Report (2.3.0)
+- Version change: 2.2.2 → 2.3.0 (MINOR: Principle V's normative content
+  changes — E2E moves from excluded-from-both-gates to required-at-push;
+  no principle added or removed)
+- Modified principles:
+  - V. Critical User Flows Require Test Coverage. The suite this principle
+    names is no longer a manual-only command: `npm run test:e2e` now runs in
+    `.husky/pre-push`, alongside `npm test` and `npm run build`. The commit
+    hook is unchanged — the same reasoning that already keeps the unit suite
+    out of `pre-commit` (paid on every small commit, for a signal that
+    changes far less often) applies with more force to a slower browser
+    suite.
+- **Why now, having been argued against twice** (009's FR-007, and this
+  principle's own text through v2.2.2): the suite has since demonstrated it
+  catches real regressions a build and a unit pass do not — the review round
+  on PR #26 found a live accessibility bug (`PageTransition` losing focus
+  restoration under a timing race) and a test that could not fail, both only
+  visible in a real browser. The prior reasoning — no CI, so a hooked run is
+  paid entirely by whoever pushes — still holds and is not disputed; it is
+  outweighed here by wanting that catch to be mechanical rather than
+  dependent on someone remembering to run `npm run test:e2e` by hand. This is
+  a judgement call the project could reasonably make either way, which is why
+  it is recorded as a decision rather than a correction.
+- Modified sections:
+  - Development Workflow: added an **End-to-end** gate, and the `.husky/
+    pre-push` description now names `npm run test:e2e` among what it runs.
+- Added/removed sections: none
+- Downstream: `specs/012-browser-e2e-tests/spec.md` (FR-004, SC-005),
+  `specs/012-browser-e2e-tests/contracts/run-location.md` (rewritten — the
+  written statement this principle points to), `specs/012-browser-e2e-tests/
+  data-model.md`, `quickstart.md`, `.husky/pre-push`, `README.md`, `AGENTS.md`
+  updated in the same change. `specs/009-testing-quality-gates/spec.md`
+  carries a pointer note in its Assumptions rather than an edit to FR-007 or
+  SC-005 — those described 009's shipped state accurately and are left as the
+  historical record; the constitution is what is authoritative going forward.
+
+Prior report (2.2.2)
 - Version change: 2.2.1 → 2.2.2 (PATCH: two factual corrections to Principle V;
   no principle added, removed, or redefined)
 - Modified principles:
@@ -199,8 +235,7 @@ falls under this principle, the moment it is actually wired up.)
 **Vitest is the selected framework** — unit tests for isolated logic, and tests
 that replace the Sanity client at the module boundary rather than over the
 network, for code depending on it. **Playwright is the selected E2E framework**
-(feature 012), and it is deliberately excluded from the commit and push gates
-and stays a manual command, `npm run test:e2e`.
+(feature 012).
 
 Both named flows are covered. Sanity content error handling has direct coverage
 (`src/sanity/fetchers.test.ts` asserts that missing, blank, and unfetchable
@@ -211,12 +246,18 @@ browser (`e2e/gallery.spec.ts`) — the last of these being the only place the
 carousel actually runs, since in a headless DOM it does nothing and a test there
 can pass while the gallery is broken.
 
-The E2E suite runs when a person runs it and in no hook. That is not a gap left
-open: there is no CI pipeline, so a hooked browser run is paid entirely by the
-developer pushing, for a signal that changes far less often than lint, type and
-unit feedback. Where it does run, and the condition for revisiting that, is
-written down in `specs/012-browser-e2e-tests/contracts/run-location.md`. Moving
-it into a hook is an amendment to this principle, not a hook edit.
+**The E2E suite runs automatically at push time**, in `.husky/pre-push`
+alongside `npm test` and `npm run build`. It stays out of the commit hook —
+paying a browser suite on every small commit is a worse trade than paying it
+once per push, the same reasoning that already keeps the unit suite out of
+`pre-commit`. This reverses the position both this principle and 009's FR-007
+held through v2.2.2: there is still no CI pipeline, so the cost still falls
+entirely on whoever is pushing, and that cost is now judged worth paying so the
+suite's own record of catching real bugs (see the Sync Impact Report) is backed
+by a mechanical gate rather than a habit. The full statement of what runs where,
+and the condition for reconsidering it again, is
+`specs/012-browser-e2e-tests/contracts/run-location.md`. Moving it back to
+manual-only is an amendment to this principle, not a hook edit.
 
 **Rationale**: The project ran with no regression safety net at all until
 2026-08-24. Coverage is now enforced mechanically at commit and push time
@@ -307,14 +348,21 @@ before merge:
 - **Build**: `npm run build` completes. A change that type-checks but breaks the
   production build MUST NOT reach a shared branch.
 - **Tests**: `npm test` passes.
+- **End-to-end**: `npm run test:e2e` passes (Playwright, feature 012). Runs at
+  push time only, for the same reason `npm test` does — it is slower than the
+  commit-time checks and one run per push is enough to keep a broken journey
+  off a shared branch.
 
 These gates are enforced automatically. `.husky/pre-commit` runs lint-staged
 (ESLint `--fix` and Prettier `--write` over staged files), then the type-check,
 then the design-system audit. `.husky/pre-push` re-runs lint, type-check and the
-audit across the whole project, and adds `npm test` and `npm run build`. The
-test suite runs at push time only: it is the slowest check of the set, and one
-run per push still blocks a failing test from reaching a shared branch. Both
-hooks install with `npm install`; neither needs a setup step.
+audit across the whole project, and adds `npm test`, `npm run build`, and
+`npm run test:e2e`. The test suite and the end-to-end suite both run at push
+time only: they are the two slowest checks of the set, and one run per push
+still blocks a failing test or a broken journey from reaching a shared branch.
+Both hooks install with `npm install`; neither needs a setup step beyond the
+one-time Playwright browser download that `npm install` already performs
+(`scripts/install-e2e-browser.mjs`).
 
 Formatting is corrected into the commit rather than blocking it, so no commit
 fails over layout and none enters history unformatted. Lint warnings do block:
@@ -348,4 +396,4 @@ Versioning policy:
 - MINOR: New principle/section added or materially expanded guidance.
 - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 2.2.2 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-29
+**Version**: 2.3.0 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-31

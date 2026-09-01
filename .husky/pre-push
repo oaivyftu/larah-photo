@@ -1,19 +1,18 @@
-# The full pre-commit check set, plus the test suite and a production build.
+# The full pre-commit check set, plus the test suite, the browser suite, and a
+# production build.
 #
 # Deliberately not a lighter version of pre-commit (spec Edge Cases): the same
 # lint/type steps run again, because what was committed one file at a time
 # still has to hold together as a whole before it leaves the machine.
 #
-# The test suite lives here and only here. It is the slowest check of the set,
-# and paying it per commit taxed the small, frequent commits a commit-time gate
-# should stay clear of; running it once per push keeps the guarantee that
-# matters — nothing reaches the remote with a failing test.
+# The unit test suite lives here and only here. It is one of the two slowest
+# checks of the set, and paying it per commit taxed the small, frequent
+# commits a commit-time gate should stay clear of; running it once per push
+# keeps the guarantee that matters — nothing reaches the remote with a
+# failing test.
 #
 # lint runs unscoped here — there are no "staged files" during a push, so the
 # whole project is linted rather than a diff.
-#
-# Still no E2E (FR-007, research.md §4): Playwright needs a booted app, and a
-# broken build already fails this hook without starting a browser.
 #
 # The design-system audit joins here, and only here, as of feature 010. It was
 # left out of the hooks entirely when it was written, for a good reason: it
@@ -21,6 +20,24 @@
 # to skip. The tree passes it now, which is what makes it a gate rather than a
 # complaint. Tree-wide, so pre-push rather than pre-commit, and 0.05s beside a
 # next build.
+#
+# E2E joins here as of the constitution's 2.3.0 amendment (Principle V),
+# reversing the position held through v2.2.2 and 009's FR-007. The reasoning
+# for keeping it manual-only never stopped being true — there is still no CI,
+# so this cost still lands entirely on whoever is pushing — but the suite has
+# since caught a real accessibility regression and one of its own tests that
+# could not fail (specs/012-browser-e2e-tests, PR #26 review round), and that
+# record moved the trade. Still not in pre-commit: a browser suite is the
+# wrong cost to pay on every small commit, the same reasoning that already
+# kept `npm test` out of it.
+#
+# A dedicated port and a forced fresh build, not the defaults `npm run
+# test:e2e` uses standalone: this hook must test the code actually being
+# pushed, not whatever a stray `next dev` elsewhere on the machine happens to
+# be serving on 3000 — the exact bug the config's `E2E_FRESH_BUILD`/`PORT`
+# escape hatches exist for (research.md §8). The full statement of where this
+# suite runs, and the condition for reconsidering this again, is
+# specs/012-browser-e2e-tests/contracts/run-location.md.
 
 echo "▶ lint         (eslint, whole project, warnings fail)"
 npx eslint --max-warnings=0 || { echo "✖ pre-push failed at: lint"; exit 1; }
@@ -36,5 +53,8 @@ npm run audit:design-system || { echo "✖ pre-push failed at: design-system"; e
 
 echo "▶ build        (next build, production)"
 npm run build || { echo "✖ pre-push failed at: build"; exit 1; }
+
+echo "▶ e2e          (playwright, fresh build, dedicated port)"
+PORT=3100 E2E_FRESH_BUILD=1 npm run test:e2e || { echo "✖ pre-push failed at: e2e"; exit 1; }
 
 echo "✔ pre-push passed"

@@ -71,7 +71,7 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 | ---------------------- | ----------------------------------------------------- |
 | `npm test`             | Vitest unit + integration tests, one pass             |
 | `npm run test:watch`   | the same suite, watching                              |
-| `npm run test:e2e`     | Playwright browser journeys — see below, run by hand  |
+| `npm run test:e2e`     | Playwright browser journeys — see below, runs on push |
 | `npm run typecheck`    | `tsc --noEmit` against `tsconfig.typecheck.json`      |
 | `npm run lint`         | ESLint, including the full `jsx-a11y` recommended set |
 | `npm run format`       | rewrites the tree with Prettier                       |
@@ -83,11 +83,13 @@ for you and re-staged into the commit rather than bounced back, so a commit neve
 fails just because of layout. Lint warnings _do_ fail: the gate runs with
 `--max-warnings=0`.
 
-**On `git push`** — the same checks again over the whole project, plus `npm test`
-and `next build`. The test suite runs here and only here: it is the slowest check
-of the set, and once per push is enough to keep a failing test off a shared
-branch. The build step catches breakage that only surfaces at prerender time,
-which type-checking and unit tests cannot see.
+**On `git push`** — the same checks again over the whole project, plus `npm test`,
+`next build`, and the Playwright browser suite. All three run here and only
+here: they're the slowest checks of the set, and once per push is enough to
+keep a failing test, a broken build, or a broken journey off a shared branch.
+The build step catches breakage that only surfaces at prerender time, which
+type-checking and unit tests cannot see; the browser suite catches breakage
+that only surfaces in an actual browser, which the build cannot see either.
 
 Each step prints its own name, so a failure tells you which one to fix.
 
@@ -105,16 +107,18 @@ exercise the real GSAP and Flickity, which is the point — in a headless DOM
 those libraries do nothing, so a test there can pass while the gallery is
 broken.
 
-**This is the one check no hook runs.** It needs a booted app and about a
-minute, this project has no CI, so a hooked run would be paid entirely by
-whoever is pushing. Run it yourself when you change the gallery, the page
-transition, the pointer follower or a route's entry animation — and before a
-release. The full statement of where it runs and why, with the condition for
-revisiting it, is
+**This runs automatically on `git push`, not on `git commit`.** It needs a
+booted app and about a minute; this project has no CI, so that cost is paid
+entirely by whoever is pushing — accepted because the suite has caught real
+regressions a green build and a green unit pass both missed. Run it yourself
+too, any time, while you're changing the gallery, the page transition, the
+pointer follower or a route's entry animation — catching it before you push is
+still better than catching it at push. The full statement of where it runs and
+why, with the reasoning for keeping it out of `pre-commit`, is
 [`specs/012-browser-e2e-tests/contracts/run-location.md`](specs/012-browser-e2e-tests/contracts/run-location.md).
 
-The hooks do still type-check and lint `e2e/`, so a spec file that does not
-compile cannot be committed. Only running it is manual.
+Both hooks type-check and lint `e2e/` regardless, so a spec file that does not
+compile cannot be committed even though only `pre-push` executes it.
 
 `npm install` fetches Chromium once, roughly 150 MB. Skip it with
 `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install` if you will not run the suite.

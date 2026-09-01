@@ -82,9 +82,9 @@ npm run test:e2e -- --ui
 npm run test:e2e -- gallery
 ```
 
-**It does not run on commit or push, and that is deliberate.** See
-[contracts/run-location.md](./contracts/run-location.md) for where it does run
-and why.
+**As of 2026-08-31, it also runs automatically on `git push`** — not on
+commit. See [contracts/run-location.md](./contracts/run-location.md) for the
+full statement of where it runs and why that changed.
 
 ---
 
@@ -105,32 +105,36 @@ npm run test:e2e
 skips. The reduced-motion runs are named as such in the output, so SC-004 is
 readable from the report rather than inferred.
 
-### 2. A commit and a push are unchanged — SC-005
+### 2. A commit stays fast; a push now waits on the browser suite — SC-005
 
 ```bash
 git commit --allow-empty -m "timing check"
 ```
 
+**Expect**: `pre-commit` boots no browser, same as before. It prints
+lint-staged, typecheck, design-system, and nothing else — wall-clock time is
+within noise of what it was before this feature.
+
 ```bash
-git push --dry-run origin HEAD
+git push
 ```
 
-**Expect**: neither hook boots a browser. `pre-commit` still prints
-lint-staged, typecheck, design-system; `pre-push` still prints lint, typecheck,
-test, design-system, build. Wall-clock time is within noise of what it was
-before this feature.
+**Expect**: `pre-push` prints lint, typecheck, test, design-system, build, then
+`▶ e2e`, and takes noticeably longer than it used to — a production build plus
+18 browser tests, on a dedicated port. That extra time _is_ the point after the
+2026-08-31 amendment: SC-005 now measures that the commit path stayed fast, not
+that the push path did.
 
-**Also expect**, and this is the half that is easy to miss: both hooks still
-type-check and lint `e2e/`. Introduce a type error into a spec file and the
-commit fails. Excluded from the hooks means not _executed_ by them, not
-invisible to them.
+**Also worth confirming**: both hooks type-check and lint `e2e/` regardless of
+whether they execute it. Introduce a type error into a spec file and `pre-commit`
+still fails, even though `pre-commit` never runs the suite itself.
 
 ### 3. The run location is discoverable — SC-006
 
 Ask the question a new contributor would, from the documentation alone:
 
 - `README.md` → the quality-gates table lists `npm run test:e2e` beside
-  `npm test`, and the paragraph below says it is not in either hook, and why.
+  `npm test`, and the paragraph below says which hook runs it and why.
 - `AGENTS.md` §5 → the "Before you call it done" block names it as the command
   to run when the change touches the gallery, the transition, the pointer
   follower or a route's entry animation.
