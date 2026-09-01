@@ -45,10 +45,6 @@ export function photographButtons(scope: Page | Locator) {
   return scope.getByRole("button", { name: /^Open image \d+:/ });
 }
 
-// How many projects to try before giving up. Bounded so a dataset of
-// single-photograph projects reports that, rather than walking all of them.
-const CANDIDATE_LIMIT = 5;
-
 // Memoised for the run. Workers are 1 (playwright.config.ts), so the walk below
 // is paid once and every later journey goes straight to the project it found.
 let projectWithSeveralPhotographs: string | null = null;
@@ -64,7 +60,12 @@ let projectWithSeveralPhotographs: string | null = null;
  * dataset rather than on the software.
  *
  * So the suite asks the site for a project that meets the precondition, and
- * says so plainly if the dataset has none.
+ * says so plainly if the dataset has none. It checks every project on the
+ * index, not a truncated prefix -- an early cap here just moves the same
+ * content-order fragility further down the list rather than removing it: five
+ * single-photograph projects placed first would still fail the search even
+ * though a sixth qualifies. The dataset is small enough (dozens of projects,
+ * not thousands) that walking all of it costs seconds, not minutes.
  */
 export async function openProjectWithSeveralPhotographs(page: Page) {
   if (projectWithSeveralPhotographs) {
@@ -83,7 +84,7 @@ export async function openProjectWithSeveralPhotographs(page: Page) {
       )
   ).filter(Boolean);
 
-  for (const href of hrefs.slice(0, CANDIDATE_LIMIT)) {
+  for (const href of hrefs) {
     await page.goto(href);
 
     if ((await photographButtons(page).count()) > 1) {
@@ -94,9 +95,9 @@ export async function openProjectWithSeveralPhotographs(page: Page) {
   }
 
   throw new Error(
-    `No project among the first ${CANDIDATE_LIMIT} on the work index has more ` +
-      "than one photograph. The gallery journeys need one that does — add " +
-      "photographs to a project in Sanity, or move one that has them earlier.",
+    `None of the ${hrefs.length} projects on the work index has more than ` +
+      "one photograph. The gallery journeys need one that does — add " +
+      "photographs to a project in Sanity.",
   );
 }
 

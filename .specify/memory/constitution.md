@@ -1,5 +1,28 @@
 <!--
-Sync Impact Report (2.3.0)
+Sync Impact Report (2.3.1)
+- Version change: 2.3.0 → 2.3.1 (PATCH: the Development Workflow paragraph
+  now describes what `.husky/pre-push` actually runs; no principle added,
+  removed, or redefined — the same class of correction as v2.2.1)
+- Modified principles: none
+- Modified sections:
+  - Development Workflow: the standalone `npm run build` step that 2.3.0
+    added to `.husky/pre-push` is gone. It was redundant the moment E2E
+    joined the same hook: `npm run test:e2e`'s own Playwright `webServer`
+    already runs `npm run build && npm run start` to have something to test
+    against, so the explicit step meant every push built the app twice for
+    no gain. The **Build** gate itself is unchanged — a broken production
+    build still cannot reach a shared branch — only the mechanism enforcing
+    it moved, the same relationship v2.2.1 recorded when `npm test` moved
+    from `pre-commit` to `pre-push`.
+- Found in PR #26's review round, the same source as the 2.3.0 decision this
+  patches: a hooked build-then-e2e sequence pays for the build twice on every
+  single push, which is exactly the kind of unnecessary cost the decision to
+  add E2E to the gate was supposed to be weighed carefully against.
+- Added/removed sections: none
+- Downstream: `.husky/pre-push`, `specs/012-browser-e2e-tests/quickstart.md`
+  (scenario 2's expected hook output) updated in the same change.
+
+Prior report (2.3.0)
 - Version change: 2.2.2 → 2.3.0 (MINOR: Principle V's normative content
   changes — E2E moves from excluded-from-both-gates to required-at-push;
   no principle added or removed)
@@ -356,11 +379,16 @@ before merge:
 These gates are enforced automatically. `.husky/pre-commit` runs lint-staged
 (ESLint `--fix` and Prettier `--write` over staged files), then the type-check,
 then the design-system audit. `.husky/pre-push` re-runs lint, type-check and the
-audit across the whole project, and adds `npm test`, `npm run build`, and
-`npm run test:e2e`. The test suite and the end-to-end suite both run at push
-time only: they are the two slowest checks of the set, and one run per push
-still blocks a failing test or a broken journey from reaching a shared branch.
-Both hooks install with `npm install`; neither needs a setup step beyond the
+audit across the whole project, and adds `npm test` and `npm run test:e2e`. The
+**Build** gate is not a separate command in the hook: `npm run test:e2e`'s own
+Playwright `webServer` runs `npm run build && npm run start` to have something
+to test against, so that build already enforces the gate. A standalone
+`npm run build` step existed here briefly and was removed — it meant every push
+built the app twice, once for that step and once more inside the e2e step,
+for no gain. The test suite and the end-to-end suite both run at push time
+only: they are the two slowest checks of the set, and one run per push still
+blocks a failing test or a broken journey from reaching a shared branch. Both
+hooks install with `npm install`; neither needs a setup step beyond the
 one-time Playwright browser download that `npm install` already performs
 (`scripts/install-e2e-browser.mjs`).
 
@@ -396,4 +424,4 @@ Versioning policy:
 - MINOR: New principle/section added or materially expanded guidance.
 - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 2.3.0 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-31
+**Version**: 2.3.1 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-31

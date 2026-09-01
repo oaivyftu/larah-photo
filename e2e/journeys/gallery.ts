@@ -62,7 +62,7 @@ export async function moveWithArrowKeys(page: Page) {
   await openPhotographFullScreen(page);
   await expectCarouselReady(page);
 
-  const { total } = await readPosition(page);
+  const { current: start, total } = await readPosition(page);
 
   expect(
     total,
@@ -71,16 +71,40 @@ export async function moveWithArrowKeys(page: Page) {
 
   const first = await selectedPhotograph(page);
 
+  // wrapAround is on (WorkProjectGalleryClient's Flickity options), so moving
+  // right from the last slide wraps to the first rather than stalling.
+  // "Moves in the pressed direction" only means something if the expected
+  // index accounts for that.
+  const nextIndex = start === total ? 1 : start + 1;
+
   await page.keyboard.press("ArrowRight");
   await expectPhotographChangedFrom(page, first);
+
+  // Not just "a different photo" -- the specific one ArrowRight should have
+  // produced. Swapping the ArrowLeft/ArrowRight handlers would still change
+  // and return to the start with a change-only assertion; only checking the
+  // actual index catches that (AS2 says "moves in that direction", not
+  // merely "moves").
+  await expect
+    .poll(() => readPosition(page).then((p) => p.current), {
+      message: `ArrowRight should advance to photograph ${nextIndex}`,
+    })
+    .toBe(nextIndex);
 
   const second = await selectedPhotograph(page);
 
   await page.keyboard.press("ArrowLeft");
   await expectPhotographChangedFrom(page, second);
 
-  // Back where it started, which is what makes this "moves in that direction"
-  // rather than "moves".
+  // ArrowLeft undoes the ArrowRight: from `nextIndex`, moving left always
+  // returns to `start`, wraparound boundary included -- last-then-right wraps
+  // to first, and first-then-left wraps back to last, correctly landing on
+  // whichever slide `start` was.
+  await expect
+    .poll(() => readPosition(page).then((p) => p.current), {
+      message: `ArrowLeft should move back to photograph ${start}`,
+    })
+    .toBe(start);
   await expect
     .poll(() => selectedPhotograph(page), {
       message: "pressing ArrowLeft should return to the previous photograph",

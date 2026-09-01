@@ -119,11 +119,14 @@ within noise of what it was before this feature.
 git push
 ```
 
-**Expect**: `pre-push` prints lint, typecheck, test, design-system, build, then
+**Expect**: `pre-push` prints lint, typecheck, test, design-system, then
 `▶ e2e`, and takes noticeably longer than it used to — a production build plus
-18 browser tests, on a dedicated port. That extra time _is_ the point after the
-2026-08-31 amendment: SC-005 now measures that the commit path stayed fast, not
-that the push path did.
+18 browser tests, on a dedicated port. There is no separate `▶ build` line: the
+e2e step's own Playwright `webServer` builds the app to have something to test
+against, so a standalone build step would only pay for the same build twice
+(constitution v2.3.1). That extra time _is_ the point after the 2026-08-31
+amendment: SC-005 now measures that the commit path stayed fast, not that the
+push path did.
 
 **Also worth confirming**: both hooks type-check and lint `e2e/` regardless of
 whether they execute it. Introduce a type error into a spec file and `pre-commit`

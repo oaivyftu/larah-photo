@@ -4,6 +4,7 @@ import {
   expectIntroStartState,
   expectPageContentAtRest,
   expectPointerLabelActive,
+  expectPointerSnapsWithoutTrailing,
   glassPointer,
   watchIntroStartState,
 } from "../support/observables";
@@ -18,8 +19,12 @@ import {
  * reduce)` branch in `GlassPointer` resolve as they would for a visitor who set
  * it in their operating system.
  *
- * J8 is the one journey whose ending genuinely differs by preference, so its
- * two endings are written out separately rather than shared.
+ * J8 and J9 are the two journeys whose endings genuinely differ by preference,
+ * so both are written out separately rather than shared. J9 first shipped
+ * inside the shared wrapper with the same body for both variants -- the label
+ * showing up was checked, but nothing distinguished "trailing follow enabled"
+ * from "trailing follow disabled", so a `GlassPointer` regression that ignored
+ * `prefers-reduced-motion` entirely would still have passed both halves.
  */
 
 /** J8, default motion -- the entrance animation runs and completes (US3 AS3). */
@@ -61,7 +66,7 @@ export async function pageArrivesWithoutAnimation(page: Page) {
   await expectPageContentAtRest(page);
 }
 
-/** J9 -- hover a labelled target (US3 AS2). */
+/** J9, default motion -- hover a labelled target (US3 AS2, default half). */
 export async function pointerLabelAppears(page: Page) {
   const cards = await openWorkIndex(page);
   const card = cards.first();
@@ -74,4 +79,36 @@ export async function pointerLabelAppears(page: Page) {
   await card.hover();
 
   await expectPointerLabelActive(page, "View");
+}
+
+/**
+ * J9, reduced motion -- the label appears, and the pill has no trailing
+ * catch-up frame (US3 AS2, reduced half).
+ *
+ * A single move cannot show this: `GlassPointer` snaps to the pointer on the
+ * very first move regardless of preference, specifically to avoid an initial
+ * fly-in from the origin. The difference only appears on a *second* move,
+ * which is why this journey moves the mouse twice rather than once.
+ */
+export async function pointerLabelAppearsWithoutTrailing(page: Page) {
+  const cards = await openWorkIndex(page);
+  const card = cards.first();
+  const box = await card.boundingBox();
+
+  expect(box, "the target card should have a bounding box").not.toBeNull();
+
+  const firstPoint = {
+    x: box!.x + box!.width / 3,
+    y: box!.y + box!.height / 2,
+  };
+  const secondPoint = {
+    x: box!.x + (box!.width * 2) / 3,
+    y: box!.y + box!.height / 2,
+  };
+
+  await page.mouse.move(firstPoint.x, firstPoint.y);
+  await expectPointerLabelActive(page, "View");
+
+  await page.mouse.move(secondPoint.x, secondPoint.y);
+  await expectPointerSnapsWithoutTrailing(page, secondPoint.x, secondPoint.y);
 }

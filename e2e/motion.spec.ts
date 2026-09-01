@@ -3,17 +3,15 @@ import {
   pageArrivesWithoutAnimation,
   pageEntryAnimationCompletes,
   pointerLabelAppears,
+  pointerLabelAppearsWithoutTrailing,
 } from "./journeys/motion";
-import { underBothMotionPreferences } from "./support/variants";
 
-// J9 takes the shared wrapper: same journey, same ending, two preferences.
-underBothMotionPreferences("pointer label", {
-  "hovering a labelled target shows the label": pointerLabelAppears,
-});
-
-// J8 does not. Its whole point is that the two preferences end differently, so
-// the two endings are written out rather than shared -- the one place in this
-// suite where a copy is the honest thing to write.
+// J8 and J9 both write their two endings out rather than sharing a body
+// through `underBothMotionPreferences`: for both, the whole point is that the
+// two preferences end differently. J9 first shipped inside the shared
+// wrapper, checking only that the label appeared under both -- which a
+// `GlassPointer` regression that ignored `prefers-reduced-motion` entirely
+// would still have passed.
 test.describe("page entry", () => {
   test("the entrance animation runs and completes", ({ page }) =>
     pageEntryAnimationCompletes(page));
@@ -24,4 +22,16 @@ test.describe("page entry under reduce", () => {
 
   test("the page arrives without an entrance animation", ({ page }) =>
     pageArrivesWithoutAnimation(page));
+});
+
+test.describe("pointer label", () => {
+  test("hovering a labelled target shows the label", ({ page }) =>
+    pointerLabelAppears(page));
+});
+
+test.describe("pointer label under reduce", () => {
+  test.use({ contextOptions: { reducedMotion: "reduce" } });
+
+  test("the label appears with no trailing catch-up frame", ({ page }) =>
+    pointerLabelAppearsWithoutTrailing(page));
 });

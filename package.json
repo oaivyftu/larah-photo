@@ -11,11 +11,11 @@
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "audit:design-system": "node scripts/audit-design-system.mjs",
     "audit:css-diff": "node scripts/compare-built-css.mjs",
-    "test:e2e": "playwright test",
     "postinstall": "node scripts/install-e2e-browser.mjs"
   },
   "dependencies": {

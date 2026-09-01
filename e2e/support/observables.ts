@@ -160,10 +160,31 @@ export async function expectTabContinuesFromPageContent(page: Page) {
  * one.
  */
 export async function expectPageContentAtRest(page: Page) {
+  const spans = page.locator("[data-page-heading] > span");
+
   await expect(
-    page.locator("[data-page-heading] > span").first(),
-    "the page heading should have arrived at its finished state",
-  ).toHaveCSS("opacity", "1");
+    spans.first(),
+    "the page heading should render at least one word",
+  ).toBeAttached();
+
+  // Every word, not just the first. The reveal is staggered (research.md
+  // §10's `stagger: 0.07`), so the first word reaches opacity 1 well before
+  // the rest -- a regression that stalls a later word would still satisfy a
+  // first()-only check.
+  await expect
+    .poll(
+      () =>
+        spans.evaluateAll((elements) =>
+          elements.every(
+            (element) => getComputedStyle(element).opacity === "1",
+          ),
+        ),
+      {
+        message:
+          "every word in the page heading should have arrived at opacity 1",
+      },
+    )
+    .toBe(true);
 }
 
 const INTRO_START_KEY = "__larahHeadingOpacityAtPageReady";
@@ -239,6 +260,44 @@ export async function expectPointerLabelActive(page: Page, label: string) {
     `the pointer label should read "${label}"`,
   ).toHaveAttribute("data-active", "");
   await expect(glassPointer(page)).toContainText(label);
+}
+
+/**
+ * The pill's tracked position -- the `--x`/`--y` custom properties
+ * `GlassPointer` writes on every pointer move, in pixels.
+ */
+async function pillPosition(page: Page) {
+  const raw = await glassPointer(page).evaluate((element) => ({
+    x: element.style.getPropertyValue("--x"),
+    y: element.style.getPropertyValue("--y"),
+  }));
+
+  return { x: parseFloat(raw.x), y: parseFloat(raw.y) };
+}
+
+/**
+ * Reduced motion disables the pointer's trailing follow (US3 AS2): under
+ * `reduce`, `GlassPointer` snaps `--x`/`--y` to the pointer on every move
+ * rather than smoothing toward it over several animation frames.
+ *
+ * A single pointer move cannot distinguish the two -- `GlassPointer` also
+ * snaps on the very *first* move regardless of preference, specifically to
+ * avoid an initial fly-in from the origin. The difference only shows on a
+ * second move: under `reduce` the pill is at the new target immediately
+ * (checked with no wait, right after the move resolves); with motion on, the
+ * smoothing loop has not caught up yet, so it should not already be there.
+ */
+export async function expectPointerSnapsWithoutTrailing(
+  page: Page,
+  x: number,
+  y: number,
+) {
+  const position = await pillPosition(page);
+
+  expect(
+    Math.hypot(position.x - x, position.y - y),
+    `the pointer pill should already be at (${x}, ${y}) with no trailing catch-up frame, was at (${position.x}, ${position.y})`,
+  ).toBeLessThan(1);
 }
 
 /** Used by J3: the lightbox stacked on top of the preview. */

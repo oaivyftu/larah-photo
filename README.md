@@ -83,13 +83,17 @@ for you and re-staged into the commit rather than bounced back, so a commit neve
 fails just because of layout. Lint warnings _do_ fail: the gate runs with
 `--max-warnings=0`.
 
-**On `git push`** — the same checks again over the whole project, plus `npm test`,
-`next build`, and the Playwright browser suite. All three run here and only
-here: they're the slowest checks of the set, and once per push is enough to
-keep a failing test, a broken build, or a broken journey off a shared branch.
-The build step catches breakage that only surfaces at prerender time, which
-type-checking and unit tests cannot see; the browser suite catches breakage
-that only surfaces in an actual browser, which the build cannot see either.
+**On `git push`** — the same checks again over the whole project, plus `npm test`
+and the Playwright browser suite. Both run here and only here: they're the
+slowest checks of the set, and once per push is enough to keep a failing test
+or a broken journey off a shared branch. There's no separate `next build` step
+— the browser suite needs a production build to test against, so its own
+Playwright `webServer` builds the app itself; a standalone build step existed
+briefly and was removed once E2E joined, since it meant building twice on
+every push. That build still catches breakage that only surfaces at prerender
+time, which type-checking and unit tests cannot see; the browser suite catches
+breakage that only surfaces in an actual browser, which the build cannot see
+either.
 
 Each step prints its own name, so a failure tells you which one to fix.
 
