@@ -14,10 +14,9 @@ import type { FullConfig } from "@playwright/test";
  * the fetch below happens.
  */
 
-const REQUIRED_ENV = [
-  "NEXT_PUBLIC_SANITY_PROJECT_ID",
-  "NEXT_PUBLIC_SANITY_DATASET",
-] as const;
+// Dataset is not required here: src/sanity/env.ts falls back to "production"
+// when it is omitted, which is a valid configuration the app runs on.
+const REQUIRED_ENV = ["NEXT_PUBLIC_SANITY_PROJECT_ID"] as const;
 
 function setupError(problem: string, fix: string) {
   return new Error(
