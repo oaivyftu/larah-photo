@@ -1,0 +1,200 @@
+name: Codex review gate
+
+# Blocks merge while an unresolved Codex review comment carries severity P1,
+# P2 or P3. P4 (and anything Codex's badge format doesn't parse) is advisory
+# only and never blocks.
+#
+# Why this exists, and why it isn't simpler:
+#
+# The chatgpt-codex-connector GitHub App reviews every PR in this repo, but it
+# never sets a review state GitHub can gate on natively — every one of its
+# reviews comes back as COMMENTED, never APPROVED or CHANGES_REQUESTED, and it
+# posts no check-run of its own. So "require Codex to pass" has no built-in
+# signal to point a required status check at; this workflow manufactures one,
+# reusing GitHub's own review-thread resolution as the source of truth (the
+# same "Resolved" button a human clicks in the PR's Files Changed tab) rather
+# than inventing a separate resolved/unresolved concept.
+#
+# Severity comes from the badge Codex puts at the top of each comment, e.g.
+# `![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)`. That
+# format is Codex's, not this repo's, and could change — a comment whose
+# badge this workflow can't parse is treated as advisory (logged, not
+# blocking), because a merge gate that silently locks up over a formatting
+# change it can't explain is worse than one that occasionally under-blocks.
+#
+# Three triggers, because "wait for an async bot, then react when a human
+# resolves what it found" cannot be a single event:
+#   - pull_request: the PR opens or gets a new commit. Codex's own review may
+#     not have landed yet, so this run polls briefly for at least one Codex
+#     review before deciding.
+#   - pull_request_review: fires the moment Codex (or anyone) submits a
+#     review, including Codex's own re-review after a push — no need to poll.
+#   - pull_request_review_thread: fires when a human resolves or reopens a
+#     thread, which is what should flip this gate from failing to passing
+#     without waiting for another push.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted]
+  pull_request_review_thread:
+    types: [resolved, unresolved]
+
+permissions:
+  pull-requests: read
+
+concurrency:
+  group: codex-review-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Codex review gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for unresolved P1-P3 Codex findings
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // No "[bot]" suffix here: that's a REST-API-only convention. The
+            // GraphQL API this workflow queries returns the bare login for a
+            // Bot actor -- confirmed by querying this exact field against a
+            // real Codex comment before shipping this workflow, because
+            // getting this wrong would make the gate silently never match a
+            // single Codex thread.
+            const CODEX_LOGIN = "chatgpt-codex-connector";
+            const BLOCKING_MAX_SEVERITY = 3; // P1, P2, P3 block; P4+ is advisory
+            const BADGE_PATTERN = /!\[P(\d+)\s*Badge\]/i;
+            // The finding's title, which Codex bolds right after the badge:
+            // `...</sub></sub>  Guard the browser install...**`. Falls back to
+            // the raw first line if the badge markup ever changes shape, so a
+            // format drift degrades the summary's readability rather than the
+            // gate's correctness.
+            const TITLE_PATTERN = /<\/sub><\/sub>\s*(.+?)\*\*/;
+
+            // Only the `pull_request` trigger can fire before Codex has had a
+            // chance to review at all (a fresh open, or a fresh push); the
+            // review/thread triggers mean Codex (or a human) has already
+            // acted, so there is nothing to wait for.
+            const shouldPoll = context.eventName === "pull_request";
+            const POLL_ATTEMPTS = 6;
+            const POLL_DELAY_MS = 30_000; // 6 x 30s = 3 minutes, matching the
+            // slowest Codex review latency observed on this repo's own PRs.
+
+            const prNumber = context.payload.pull_request.number;
+            const { owner, repo } = context.repo;
+
+            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+            async function fetchCodexThreads() {
+              const threads = [];
+              let cursor = null;
+
+              // Paginated on purpose: a large or long-lived PR can exceed one
+              // page of review threads, and under-counting here would mean
+              // silently missing a blocking finding.
+              for (;;) {
+                const response = await github.graphql(
+                  `
+                    query($owner: String!, $repo: String!, $pr: Int!, $cursor: String) {
+                      repository(owner: $owner, name: $repo) {
+                        pullRequest(number: $pr) {
+                          reviewThreads(first: 100, after: $cursor) {
+                            pageInfo { hasNextPage endCursor }
+                            nodes {
+                              isResolved
+                              comments(first: 1) {
+                                nodes { author { login } body url }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  `,
+                  { owner, repo, pr: prNumber, cursor },
+                );
+
+                const page = response.repository.pullRequest.reviewThreads;
+                threads.push(...page.nodes);
+
+                if (!page.pageInfo.hasNextPage) break;
+                cursor = page.pageInfo.endCursor;
+              }
+
+              return threads
+                .filter((thread) => thread.comments.nodes[0]?.author?.login === CODEX_LOGIN)
+                .map((thread) => {
+                  const root = thread.comments.nodes[0];
+                  const severityMatch = root.body.match(BADGE_PATTERN);
+                  const titleMatch = root.body.match(TITLE_PATTERN);
+                  const fallbackLine = root.body.split("\n").find((line) => line.trim());
+
+                  return {
+                    isResolved: thread.isResolved,
+                    severity: severityMatch ? Number(severityMatch[1]) : null,
+                    url: root.url,
+                    summary: titleMatch?.[1]?.trim() || fallbackLine || "(no summary line)",
+                  };
+                });
+            }
+
+            let codexThreads = await fetchCodexThreads();
+
+            if (shouldPoll) {
+              for (let attempt = 1; attempt <= POLL_ATTEMPTS && codexThreads.length === 0; attempt += 1) {
+                core.info(`No Codex review found yet (attempt ${attempt}/${POLL_ATTEMPTS}) -- waiting ${POLL_DELAY_MS / 1000}s.`);
+                await sleep(POLL_DELAY_MS);
+                codexThreads = await fetchCodexThreads();
+              }
+            }
+
+            if (codexThreads.length === 0) {
+              core.setFailed(
+                "Codex has not reviewed this PR yet. This check re-runs automatically once its " +
+                "review lands (or resolve/unresolve any thread to re-trigger it); no action needed " +
+                "beyond waiting, unless the Codex app itself is not enabled for this repository.",
+              );
+              return;
+            }
+
+            const unresolved = codexThreads.filter((thread) => !thread.isResolved);
+            const blocking = unresolved.filter(
+              (thread) => thread.severity === null || thread.severity <= BLOCKING_MAX_SEVERITY,
+            );
+            const advisory = unresolved.filter(
+              (thread) => thread.severity !== null && thread.severity > BLOCKING_MAX_SEVERITY,
+            );
+
+            const summaryLines = [
+              `Codex left ${codexThreads.length} finding(s) on this PR; ${unresolved.length} unresolved.`,
+              "",
+            ];
+
+            if (blocking.length > 0) {
+              summaryLines.push(`### Blocking (unresolved, severity <= P${BLOCKING_MAX_SEVERITY} or unparsed)`);
+              for (const thread of blocking) {
+                const label = thread.severity === null ? "unparsed severity" : `P${thread.severity}`;
+                summaryLines.push(`- [${label}] ${thread.summary} — ${thread.url}`);
+              }
+              summaryLines.push("");
+            }
+
+            if (advisory.length > 0) {
+              summaryLines.push(`### Advisory only (unresolved, severity > P${BLOCKING_MAX_SEVERITY} -- not blocking)`);
+              for (const thread of advisory) {
+                summaryLines.push(`- [P${thread.severity}] ${thread.summary} — ${thread.url}`);
+              }
+              summaryLines.push("");
+            }
+
+            await core.summary.addRaw(summaryLines.join("\n")).write();
+            core.info(summaryLines.join("\n"));
+
+            if (blocking.length > 0) {
+              core.setFailed(
+                `${blocking.length} unresolved Codex finding(s) at severity P${BLOCKING_MAX_SEVERITY} or ` +
+                "stronger (or with an unparseable severity badge) must be resolved before this PR can merge. " +
+                "Fix them and resolve the thread, or resolve it as a false positive if it does not apply.",
+              );
+            }
