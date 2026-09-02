@@ -1,8 +1,8 @@
 import { expect, type Page } from "@playwright/test";
 import {
   openFirstProjectPage,
-  openFirstProjectPreview,
   openPhotographFullScreen,
+  openPreviewOfProjectWithPhotograph,
   openProjectWithSeveralPhotographs,
   readPosition,
 } from "../support/content";
@@ -121,7 +121,7 @@ export async function moveWithArrowKeys(page: Page) {
  * index instead of the preview they were reading.
  */
 export async function dismissFullScreenInsidePreview(page: Page) {
-  const preview = await openFirstProjectPreview(page);
+  const preview = await openPreviewOfProjectWithPhotograph(page);
   const projectUrl = page.url();
 
   await openPhotographFullScreen(preview);

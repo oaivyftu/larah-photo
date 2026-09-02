@@ -99,3 +99,12 @@
   browser at another worktree's dev server for a whole run, passing six
   journeys against code that was not under change — hence `E2E_FRESH_BUILD` and
   `PORT`.
+- **The same fragile-first-card mistake was made twice, days apart.** T042 fixed
+  it for J1/J2 (the standalone project page); a repo-wide Codex-review merge
+  gate, added afterward, caught the identical gap in J3 (the project preview),
+  which goes through a different navigation path (a click into the intercepting
+  `@modal` route, not `page.goto`) and so was not caught by the same fix. Now
+  one search function (`findProjectHref`), two preconditions, no third copy —
+  and the lesson is that "walks every project instead of assuming the first"
+  needed to be a pattern applied everywhere a journey clicks into an album, not
+  a one-off patch where it was first noticed.

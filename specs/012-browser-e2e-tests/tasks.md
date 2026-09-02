@@ -172,8 +172,6 @@ work already merged into the branch; one was a test that could not fail.
 
 ---
 
----
-
 ## Phase 8: Push Gate Promotion (2026-08-31)
 
 **Purpose**: constitution v2.3.0 reverses the position taken through v2.2.2 —
@@ -192,6 +190,21 @@ both the old argument and the new one rather than discarding either.
 - [x] T050 Verify the hook actually blocks: mutated the gallery (disabled arrow-key paging without tripping lint, since the first mutation attempt — removing `onNext`'s handler — left an unused variable that lint caught before e2e ever ran), ran `bash .husky/pre-push` directly, confirmed exit code 1 and `✖ pre-push failed at: e2e`. Restored, confirmed a clean `git diff` and 18/18 passing again
 
 **Checkpoint**: `bash .husky/pre-push` on a clean tree passes end to end, including a fresh build and 18/18 browser tests on port 3100; on a broken tree it fails at the e2e step with exit code 1, demonstrated rather than assumed.
+
+---
+
+## Phase 9: Second Review Response (2026-09-01)
+
+**Purpose**: a further finding from [PR #26](https://github.com/oaivyftu/larah-photo/pull/26)'s
+review, found after Phase 7 landed and the same shape as T042: another journey
+still assumed the first project card was safe to use unconditionally. Surfaced
+by the Codex-review merge gate this repo's push now also carries (a
+repo-wide GitHub Actions addition, outside this feature's own scope, so its
+own tasks live in its commits and workflow file rather than here).
+
+- [x] T051 J3 (`dismissFullScreenInsidePreview`) called `openFirstProjectPreview`, which opens whichever card is first regardless of whether that project has a photograph to open full-screen — the same permitted-empty-`images`-array gap T042 closed for J1/J2, left open here because J3 goes through the project _preview_ (the intercepting `@modal` route via a click), not the standalone page `openProjectWithSeveralPhotographs` navigates to directly. `openFirstProjectPreview` itself is unchanged and still used by J7, which only opens and closes the preview and has no photograph precondition. New: `openPreviewOfProjectWithPhotograph`, sharing the walk-every-project search with J1/J2's helper (`findProjectHref`, extracted so the two preconditions — "more than one" and "at least one" — are one function parameterised by a predicate, not two copies) but requiring only one photograph, then clicking that specific project's card by href from the work index. Verified: 18/18 passing on a fresh build, including J3 itself
+
+**Checkpoint**: no known unaddressed review findings on PR #26 as of this phase.
 
 ---
 

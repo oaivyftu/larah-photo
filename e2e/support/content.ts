@@ -45,60 +45,78 @@ export function photographButtons(scope: Page | Locator) {
   return scope.getByRole("button", { name: /^Open image \d+:/ });
 }
 
-// Memoised for the run. Workers are 1 (playwright.config.ts), so the walk below
-// is paid once and every later journey goes straight to the project it found.
-let projectWithSeveralPhotographs: string | null = null;
-
 /**
- * A project that actually has photographs to move between.
- *
- * Not "the first card": `workProject`'s `images` array carries no minimum in
- * `src/sanity/schemaTypes/workProject.ts`, so a project with one photograph --
- * or none -- is a permitted content state, and an editor reordering the index
- * could put one first tomorrow. The gallery journeys would then fail in setup
- * while gallery navigation worked perfectly, which is a test reporting on the
- * dataset rather than on the software.
- *
- * So the suite asks the site for a project that meets the precondition, and
- * says so plainly if the dataset has none. It checks every project on the
- * index, not a truncated prefix -- an early cap here just moves the same
- * content-order fragility further down the list rather than removing it: five
- * single-photograph projects placed first would still fail the search even
- * though a sixth qualifies. The dataset is small enough (dozens of projects,
- * not thousands) that walking all of it costs seconds, not minutes.
+ * Every project's href from the work index, in the order the index renders
+ * them -- what the search functions below walk.
  */
-export async function openProjectWithSeveralPhotographs(page: Page) {
-  if (projectWithSeveralPhotographs) {
-    await page.goto(projectWithSeveralPhotographs);
-
-    return projectWithSeveralPhotographs;
-  }
-
+async function allProjectHrefs(page: Page) {
   await openWorkIndex(page);
 
-  const hrefs = (
+  return (
     await page
       .locator("[data-work-card] a[href]")
       .evaluateAll((links) =>
         links.map((link) => link.getAttribute("href") ?? ""),
       )
   ).filter(Boolean);
+}
+
+/**
+ * The first project (by index order) whose standalone page's photograph count
+ * satisfies `predicate`, found by visiting each project page and counting.
+ *
+ * Not "the first card": `workProject`'s `images` array carries no minimum in
+ * `src/sanity/schemaTypes/workProject.ts`, so a project with one photograph --
+ * or none -- is a permitted content state, and an editor reordering the index
+ * could put one first tomorrow. Whichever journey assumed otherwise would then
+ * fail in setup while the behaviour it exists to test worked perfectly, which
+ * is a test reporting on the dataset rather than on the software.
+ *
+ * Checks every project on the index, not a truncated prefix -- an early cap
+ * here just moves the same content-order fragility further down the list
+ * rather than removing it: five projects that fail `predicate` placed first
+ * would still fail the search even though a sixth qualifies. The dataset is
+ * small enough (dozens of projects, not thousands) that walking all of it
+ * costs seconds, not minutes.
+ */
+async function findProjectHref(
+  page: Page,
+  predicate: (photographCount: number) => boolean,
+  whatItNeeds: string,
+) {
+  const hrefs = await allProjectHrefs(page);
 
   for (const href of hrefs) {
     await page.goto(href);
 
-    if ((await photographButtons(page).count()) > 1) {
-      projectWithSeveralPhotographs = href;
-
+    if (predicate(await photographButtons(page).count())) {
       return href;
     }
   }
 
   throw new Error(
-    `None of the ${hrefs.length} projects on the work index has more than ` +
-      "one photograph. The gallery journeys need one that does — add " +
-      "photographs to a project in Sanity.",
+    `None of the ${hrefs.length} projects on the work index has ${whatItNeeds}. ` +
+      "Add photographs to a project in Sanity.",
   );
+}
+
+// Memoised for the run, one cache per precondition. Workers are 1
+// (playwright.config.ts), so each search is paid once and every later journey
+// needing the same precondition goes straight to the project already found.
+let projectWithSeveralPhotographs: string | null = null;
+let projectWithAPhotograph: string | null = null;
+
+/** A project that actually has photographs to move between (J1, J2). */
+export async function openProjectWithSeveralPhotographs(page: Page) {
+  projectWithSeveralPhotographs ??= await findProjectHref(
+    page,
+    (count) => count > 1,
+    "more than one photograph",
+  );
+
+  await page.goto(projectWithSeveralPhotographs);
+
+  return projectWithSeveralPhotographs;
 }
 
 /** The project preview: click a card, let the intercepting route take over. */
@@ -112,6 +130,36 @@ export async function openFirstProjectPreview(page: Page) {
   await expect(
     preview,
     "clicking a project card should open the project preview",
+  ).toBeVisible();
+
+  return preview;
+}
+
+/**
+ * The preview of a project that has a photograph to open full-screen (J3).
+ *
+ * Distinct from `openFirstProjectPreview`: J7 (which uses that one) only ever
+ * opens and closes the preview itself, so the first card is fine regardless of
+ * its gallery. J3 opens a photograph *inside* the preview, which the first
+ * card cannot guarantee -- the same precondition `openProjectWithSeveralPhotographs`
+ * exists for, just needing one photograph rather than several.
+ */
+export async function openPreviewOfProjectWithPhotograph(page: Page) {
+  projectWithAPhotograph ??= await findProjectHref(
+    page,
+    (count) => count >= 1,
+    "even one photograph",
+  );
+
+  const cards = await openWorkIndex(page);
+
+  await cards.locator(`a[href="${projectWithAPhotograph}"]`).click();
+
+  const preview = page.locator("[data-work-modal]");
+
+  await expect(
+    preview,
+    "clicking the project card should open the project preview",
   ).toBeVisible();
 
   return preview;
