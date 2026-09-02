@@ -22,16 +22,26 @@ name: Codex review gate
 # blocking), because a merge gate that silently locks up over a formatting
 # change it can't explain is worse than one that occasionally under-blocks.
 #
-# Three triggers, because "wait for an async bot, then react when a human
-# resolves what it found" cannot be a single event:
+# Two triggers, because "wait for an async bot" and "react to what it found"
+# aren't the same event:
 #   - pull_request: the PR opens or gets a new commit. Codex's own review may
 #     not have landed yet, so this run polls briefly for at least one Codex
 #     review before deciding.
 #   - pull_request_review: fires the moment Codex (or anyone) submits a
 #     review, including Codex's own re-review after a push — no need to poll.
-#   - pull_request_review_thread: fires when a human resolves or reopens a
-#     thread, which is what should flip this gate from failing to passing
-#     without waiting for another push.
+#
+# What this does NOT auto-trigger on: a human resolving a thread through the
+# PR's "Resolve conversation" button. That action has no corresponding Actions
+# event -- GitHub's `on:` triggers are a curated subset of its webhooks, and
+# review-thread resolution isn't one of them (confirmed the hard way: an
+# earlier draft of this file listed `pull_request_review_thread` as a third
+# trigger, which is a real webhook GitHub Apps can subscribe to but not a
+# workflow trigger, and it made this entire file invalid -- GitHub rejected it
+# before scheduling a single job, for every event, not just that one). So
+# after resolving threads, re-run this check from the PR's checks tab (or push
+# an empty commit) to pick up the new state; there is no way around a manual
+# nudge for that specific action without adding scheduled polling, which is
+# more ongoing cost than a rarely-needed manual re-run justifies.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
