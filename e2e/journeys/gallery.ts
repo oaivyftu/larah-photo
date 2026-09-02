@@ -1,8 +1,8 @@
 import { expect, type Page } from "@playwright/test";
 import {
-  openFirstProjectPage,
   openPhotographFullScreen,
   openPreviewOfProjectWithPhotograph,
+  openProjectPageWithPhotograph,
   openProjectWithSeveralPhotographs,
   readPosition,
 } from "../support/content";
@@ -145,7 +145,7 @@ export async function dismissFullScreenInsidePreview(page: Page) {
 
 /** J4 -- the controls recede when the pointer idles, and return (US1 AS4). */
 export async function controlsRecedeWhenPointerIdles(page: Page) {
-  await openFirstProjectPage(page);
+  await openProjectPageWithPhotograph(page);
   await openPhotographFullScreen(page);
   await expectCarouselReady(page);
 

@@ -24,22 +24,6 @@ export async function openWorkIndex(page: Page) {
   return cards;
 }
 
-/**
- * The standalone project page, reached by reading the first card's href rather
- * than by clicking it -- clicking opens the intercepting `@modal` route, which
- * is a different surface with its own journeys (J3, J7).
- */
-export async function openFirstProjectPage(page: Page) {
-  const cards = await openWorkIndex(page);
-  const href = await cards.first().getByRole("link").getAttribute("href");
-
-  expect(href, "the first project card should link to a project").toBeTruthy();
-
-  await page.goto(href as string);
-
-  return href as string;
-}
-
 /** Album items on a project page, one button per photograph. */
 export function photographButtons(scope: Page | Locator) {
   return scope.getByRole("button", { name: /^Open image \d+:/ });
@@ -136,24 +120,50 @@ export async function openFirstProjectPreview(page: Page) {
 }
 
 /**
- * The preview of a project that has a photograph to open full-screen (J3).
- *
- * Distinct from `openFirstProjectPreview`: J7 (which uses that one) only ever
- * opens and closes the preview itself, so the first card is fine regardless of
- * its gallery. J3 opens a photograph *inside* the preview, which the first
- * card cannot guarantee -- the same precondition `openProjectWithSeveralPhotographs`
- * exists for, just needing one photograph rather than several.
+ * A project with a photograph to open full-screen (J3, J4). Not "several" --
+ * that precondition is `openProjectWithSeveralPhotographs`'s, above; this one
+ * is the weaker "at least one", shared by both journeys that only ever open a
+ * photograph and don't need to move between several.
  */
-export async function openPreviewOfProjectWithPhotograph(page: Page) {
+async function ensureProjectWithAPhotograph(page: Page) {
   projectWithAPhotograph ??= await findProjectHref(
     page,
     (count) => count >= 1,
     "even one photograph",
   );
 
+  return projectWithAPhotograph;
+}
+
+/**
+ * The standalone page of a project with a photograph to open full-screen
+ * (J4). The first card cannot guarantee that -- an empty `images` array is a
+ * permitted content state (see `openProjectWithSeveralPhotographs`) -- so this
+ * shares `ensureProjectWithAPhotograph`'s search with the preview variant
+ * below rather than assuming.
+ */
+export async function openProjectPageWithPhotograph(page: Page) {
+  const href = await ensureProjectWithAPhotograph(page);
+
+  await page.goto(href);
+
+  return href;
+}
+
+/**
+ * The preview of a project that has a photograph to open full-screen (J3).
+ *
+ * Distinct from `openFirstProjectPreview`: J7 (which uses that one) only ever
+ * opens and closes the preview itself, so the first card is fine regardless of
+ * its gallery. J3 opens a photograph *inside* the preview, which the first
+ * card cannot guarantee.
+ */
+export async function openPreviewOfProjectWithPhotograph(page: Page) {
+  const href = await ensureProjectWithAPhotograph(page);
+
   const cards = await openWorkIndex(page);
 
-  await cards.locator(`a[href="${projectWithAPhotograph}"]`).click();
+  await cards.locator(`a[href="${href}"]`).click();
 
   const preview = page.locator("[data-work-modal]");
 

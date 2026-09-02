@@ -25,10 +25,21 @@ name: Codex review gate
 # Two triggers, because "wait for an async bot" and "react to what it found"
 # aren't the same event:
 #   - pull_request: the PR opens or gets a new commit. Codex's own review may
-#     not have landed yet, so this run polls briefly for at least one Codex
-#     review before deciding.
+#     not have landed yet, so this run polls briefly for Codex to have acted
+#     on the current head specifically -- a review comment, or (Codex found
+#     nothing) a 👍 reaction -- before deciding.
 #   - pull_request_review: fires the moment Codex (or anyone) submits a
 #     review, including Codex's own re-review after a push — no need to poll.
+#
+# "Acted on the current head specifically" took two rounds to get right, both
+# found by Codex reviewing this file rather than assumed correct on the first
+# pass: the original check treated any Codex thread anywhere on the PR as
+# proof of review, which stayed true forever after the first one regardless
+# of what the current push contained; and once fixed to check the head commit
+# precisely, a clean review (no findings at all) turned out to leave no
+# review object to find, which would have kept a genuinely clean PR red
+# forever. See the `codexHasReviewed`/`codexReactedClean` functions below for
+# both, in full.
 #
 # What this does NOT auto-trigger on: a human resolving a thread through the
 # PR's "Resolve conversation" button. That action has no corresponding Actions
@@ -114,19 +125,29 @@ jobs:
             // are both queried fresh, not read from the event payload, so this
             // is correct regardless of which of the two trigger types fired or
             // how stale that payload might be.
-            async function fetchHeadSha() {
+            async function fetchHead() {
               const response = await github.graphql(
                 `
                   query($owner: String!, $repo: String!, $pr: Int!) {
                     repository(owner: $owner, name: $repo) {
-                      pullRequest(number: $pr) { headRefOid }
+                      pullRequest(number: $pr) {
+                        headRefOid
+                        commits(last: 1) {
+                          nodes { commit { committedDate } }
+                        }
+                      }
                     }
                   }
                 `,
                 { owner, repo, pr: prNumber },
               );
 
-              return response.repository.pullRequest.headRefOid;
+              const pr = response.repository.pullRequest;
+
+              return {
+                sha: pr.headRefOid,
+                committedDate: pr.commits.nodes[0]?.commit.committedDate ?? null,
+              };
             }
 
             async function codexHasReviewed(headSha) {
@@ -162,6 +183,51 @@ jobs:
                 if (!page.pageInfo.hasNextPage) return false;
                 cursor = page.pageInfo.endCursor;
               }
+            }
+
+            // A clean review -- Codex looked and found nothing -- creates no
+            // review at all, per the connector's own description: "If Codex
+            // has suggestions, it will comment; otherwise it will react with
+            // 👍." Without this, `codexHasReviewed` can never become true for
+            // a clean revision, and the "re-run this check" advice in the
+            // original failure message was actively wrong for that case:
+            // re-running re-evaluates the same GraphQL state, which never
+            // changes on its own, so a clean PR would stay red forever. Found
+            // by Codex reviewing this file, a second time, one poll cycle
+            // after the first fix landed.
+            //
+            // `committedDate` gates which reactions count: a 👍 left on an
+            // earlier revision must not be read as approval of this one. This
+            // repo has not yet had a genuinely clean Codex pass to observe
+            // directly, so this trusts the connector's documented behaviour
+            // rather than a confirmed empirical signal -- unlike the rest of
+            // this file. If that documented behaviour turns out wrong, a repo
+            // admin still has GitHub's own "merge without waiting for
+            // requirements" override (available because this workflow leaves
+            // enforce_admins off), which is the fallback of last resort this
+            // relies on rather than inventing a second, redundant one here.
+            async function codexReactedClean(committedDate) {
+              if (!committedDate) return false;
+
+              const response = await github.graphql(
+                `
+                  query($owner: String!, $repo: String!, $pr: Int!) {
+                    repository(owner: $owner, name: $repo) {
+                      pullRequest(number: $pr) {
+                        reactions(first: 100, content: THUMBS_UP) {
+                          nodes { user { login } createdAt }
+                        }
+                      }
+                    }
+                  }
+                `,
+                { owner, repo, pr: prNumber },
+              );
+
+              return response.repository.pullRequest.reactions.nodes.some(
+                (reaction) =>
+                  reaction.user?.login === CODEX_LOGIN && reaction.createdAt >= committedDate,
+              );
             }
 
             async function fetchCodexThreads() {
@@ -217,38 +283,52 @@ jobs:
                 });
             }
 
-            const headSha = await fetchHeadSha();
-            let reviewed = await codexHasReviewed(headSha);
+            const head = await fetchHead();
+
+            async function headReviewed() {
+              return (
+                (await codexHasReviewed(head.sha)) || (await codexReactedClean(head.committedDate))
+              );
+            }
+
+            let reviewed = await headReviewed();
 
             if (shouldPoll) {
               for (let attempt = 1; attempt <= POLL_ATTEMPTS && !reviewed; attempt += 1) {
                 core.info(
-                  `Codex has not reviewed ${headSha.slice(0, 7)} yet (attempt ${attempt}/${POLL_ATTEMPTS}) -- waiting ${POLL_DELAY_MS / 1000}s.`,
+                  `Codex has not reviewed ${head.sha.slice(0, 7)} yet (attempt ${attempt}/${POLL_ATTEMPTS}) -- waiting ${POLL_DELAY_MS / 1000}s.`,
                 );
                 await sleep(POLL_DELAY_MS);
-                reviewed = await codexHasReviewed(headSha);
+                reviewed = await headReviewed();
               }
             }
 
             if (!reviewed) {
               core.setFailed(
-                `Codex has not reviewed ${headSha.slice(0, 7)} (the current head) yet. This check ` +
-                "re-runs automatically once a review lands on this commit specifically -- old threads " +
-                "from earlier commits do not count, which is the point. One case this cannot detect: " +
-                "if Codex reviewed this commit and found nothing at all, it leaves only a reaction, not " +
-                "a review, and this check has no way to tell that apart from not having reviewed yet. " +
-                "Confirm manually in the PR's activity if that seems likely, then re-run this check.",
+                `Codex has not reviewed ${head.sha.slice(0, 7)} (the current head) yet -- neither a ` +
+                "review comment nor a clean-pass reaction has landed on it. This check re-runs " +
+                "automatically once either does; re-running it manually changes nothing on its own. " +
+                "If Codex has genuinely reviewed this commit outside what this check can see, a repo " +
+                "admin can merge anyway via GitHub's \"Merge without waiting for requirements\" option.",
               );
               return;
             }
 
             const codexThreads = await fetchCodexThreads();
             const unresolved = codexThreads.filter((thread) => !thread.isResolved);
+            // `severity === null` (an unparseable badge) belongs in `advisory`,
+            // not `blocking` -- the header comment says a comment this workflow
+            // can't parse should never block, and the first version of this
+            // predicate said the opposite of what it meant to, blocking on
+            // exactly the case it was written to exempt. Found by Codex
+            // reviewing this file; fixed by reading the two filters as a
+            // matched pair (each `severity === null` check must land on
+            // opposite sides) rather than independently.
             const blocking = unresolved.filter(
-              (thread) => thread.severity === null || thread.severity <= BLOCKING_MAX_SEVERITY,
+              (thread) => thread.severity !== null && thread.severity <= BLOCKING_MAX_SEVERITY,
             );
             const advisory = unresolved.filter(
-              (thread) => thread.severity !== null && thread.severity > BLOCKING_MAX_SEVERITY,
+              (thread) => thread.severity === null || thread.severity > BLOCKING_MAX_SEVERITY,
             );
 
             const summaryLines = [
@@ -257,18 +337,20 @@ jobs:
             ];
 
             if (blocking.length > 0) {
-              summaryLines.push(`### Blocking (unresolved, severity <= P${BLOCKING_MAX_SEVERITY} or unparsed)`);
+              summaryLines.push(`### Blocking (unresolved, severity <= P${BLOCKING_MAX_SEVERITY})`);
               for (const thread of blocking) {
-                const label = thread.severity === null ? "unparsed severity" : `P${thread.severity}`;
-                summaryLines.push(`- [${label}] ${thread.summary} — ${thread.url}`);
+                summaryLines.push(`- [P${thread.severity}] ${thread.summary} — ${thread.url}`);
               }
               summaryLines.push("");
             }
 
             if (advisory.length > 0) {
-              summaryLines.push(`### Advisory only (unresolved, severity > P${BLOCKING_MAX_SEVERITY} -- not blocking)`);
+              summaryLines.push(
+                `### Advisory only (unresolved, severity > P${BLOCKING_MAX_SEVERITY} or unparseable -- not blocking)`,
+              );
               for (const thread of advisory) {
-                summaryLines.push(`- [P${thread.severity}] ${thread.summary} — ${thread.url}`);
+                const label = thread.severity === null ? "unparsed severity" : `P${thread.severity}`;
+                summaryLines.push(`- [${label}] ${thread.summary} — ${thread.url}`);
               }
               summaryLines.push("");
             }
@@ -279,7 +361,7 @@ jobs:
             if (blocking.length > 0) {
               core.setFailed(
                 `${blocking.length} unresolved Codex finding(s) at severity P${BLOCKING_MAX_SEVERITY} or ` +
-                "stronger (or with an unparseable severity badge) must be resolved before this PR can merge. " +
-                "Fix them and resolve the thread, or resolve it as a false positive if it does not apply.",
+                "stronger must be resolved before this PR can merge. Fix them and resolve the thread, " +
+                "or resolve it as a false positive if it does not apply.",
               );
             }
