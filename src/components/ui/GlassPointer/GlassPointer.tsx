@@ -166,6 +166,10 @@ export function GlassPointer() {
         aria-hidden="true"
         className={styles["glass-pointer"]}
         data-active={label === null ? undefined : ""}
+        // This pill is `aria-hidden` by design -- it is decoration -- so it has
+        // no accessible name to select by. Names the element; `data-active`
+        // above already carries the state (spec 012 contracts/test-surface.md).
+        data-glass-pointer
         ref={pillRef}
       >
         <span className={styles["glass-pointer__tint"]} />

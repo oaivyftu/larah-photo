@@ -32,9 +32,11 @@ export function PageTransition() {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
-  // The first pass is the initial page load, not a navigation — moving focus or
-  // announcing there would talk over the screen reader reading the new page.
-  const hasNavigatedRef = useRef(false);
+  // The route this component last ran a reveal cycle for, or null before the
+  // first. A navigation is a *change* of pathname — deliberately not "the
+  // effect has run before", which is a different question with a different
+  // answer under React Strict Mode (see the effect below).
+  const revealedPathnameRef = useRef<string | null>(null);
   const [state, setState] = useState<TransitionState>("covered");
   const [routeAnnouncement, setRouteAnnouncement] = useState("");
 
@@ -47,6 +49,32 @@ export function PageTransition() {
       return;
     }
 
+    // Recorded synchronously, before any timer, and keyed on the pathname.
+    //
+    // Two failures shaped this, and each one rules out the other's fix:
+    //
+    //   - It used to be a boolean flipped *inside* the timeout below. A visitor
+    //     who followed a link within TRANSITION_DURATION of the page loading
+    //     cancelled that timeout on the way out, so the flag was still false
+    //     when the next cycle checked it, and that navigation silently skipped
+    //     both the focus move and the announcement. Reduced-motion visitors hit
+    //     it most: their content is on screen immediately, so they click
+    //     sooner — the bug fell hardest on the users Principle II exists for.
+    //
+    //   - Setting that boolean synchronously fixes the race but breaks under
+    //     React Strict Mode, which replays effect setup and cleanup on the
+    //     initial mount while preserving refs. The replay would see "we have
+    //     run before", and announce the title over a screen reader already
+    //     reading the page it just loaded.
+    //
+    // A pathname is immune to both. The replay carries the same one, so it is
+    // not a navigation; a real navigation carries a different one, whether it
+    // arrives in 200ms or 2s.
+    const previousPathname = revealedPathnameRef.current;
+    const isNavigation =
+      previousPathname !== null && previousPathname !== pathname;
+    revealedPathnameRef.current = pathname;
+
     document.documentElement.dataset.pageTransition = "revealing";
     const revealTimeout = setTimeout(() => setState("revealing"), 0);
 
@@ -55,7 +83,7 @@ export function PageTransition() {
       setState("idle");
       window.dispatchEvent(new CustomEvent("larah:page-ready"));
 
-      if (hasNavigatedRef.current) {
+      if (isNavigation) {
         // Next.js leaves focus on <body> after a client-side navigation, so a
         // keyboard user would resume tabbing from the top of the document with
         // no signal that the page changed.
@@ -64,8 +92,6 @@ export function PageTransition() {
           ?.focus({ preventScroll: true });
         setRouteAnnouncement(document.title);
       }
-
-      hasNavigatedRef.current = true;
     }, TRANSITION_DURATION);
 
     return () => {

@@ -142,10 +142,29 @@ npm run build      # catches prerender-time breakage the others cannot see
 ```
 
 The Git hooks run these for you: lint, typecheck and the design-system audit on
-commit, all of those plus `npm test` and `npm run build` on push. So the tests
-are the one gate a commit does not wait for — run them yourself while you work,
-or the push is where you will find out. Formatting is applied for you — never
-hand-fix layout.
+commit, all of those plus `npm test`, `npm run build`, and the browser suite
+(`npm run test:e2e`) on push. So both test suites are gates a commit does not
+wait for — run them yourself while you work, or the push is where you will find
+out. Formatting is applied for you — never hand-fix layout.
+
+```bash
+npm run test:e2e   # browser journeys — runs automatically on push
+```
+
+Run it yourself too, any time your change touches **the project gallery, the
+page transition, the pointer follower, or a route's entry animation** — the
+hook will catch a regression there either way, but catching it before you push
+is faster than catching it at push. It needs a booted app and a real browser and
+takes about a minute, which is real cost with no CI to absorb it; `.husky/
+pre-push` pays that cost anyway (`PORT=3100 E2E_FRESH_BUILD=1 npm run test:e2e`)
+because the suite has already caught regressions a green build and a green unit
+pass both missed. The full reasoning, including why it stays out of the commit
+hook specifically, is in `specs/012-browser-e2e-tests/contracts/run-location.md`.
+
+Add `E2E_FRESH_BUILD=1` when running it by hand and the run must reflect a
+change you just made: by default it reuses whatever is serving port 3000, which
+will happily be the old code — or another worktree's dev server. The push hook
+always sets this, plus a dedicated `PORT`, so it never has that problem.
 
 New or changed behaviour in a critical flow (work gallery navigation, Sanity
 content error handling) needs a test. Both flows have integration coverage:
@@ -158,6 +177,15 @@ what either of them does at a boundary it cannot use for real — the Sanity
 client, `navigator.clipboard`, Isotope. Browser-only behaviour (GSAP timelines,
 Flickity, the page-transition curtain) is not faked into a unit test, because a
 mocked timeline asserts nothing about whether the animation runs.
+
+That behaviour has a home now: `e2e/`, run by `npm run test:e2e` (feature 012).
+Nine journeys covering the gallery, page-to-page navigation and the
+reduced-motion variant of each — roughly two thirds of the browser-coupled code
+the unit suite structurally cannot reach. The home page's scroll choreography is
+the named remainder, deliberately out of scope. Selectors there follow
+`specs/012-browser-e2e-tests/contracts/test-surface.md`: role and accessible name
+first, `data-*` identity attributes second, never a CSS-module class name — those
+are hashed in a production build.
 
 **Async Server Components under `src/app/` are testable**, contrary to what this
 file said before. `render(<Page />)` does not work, but a Server Component is a

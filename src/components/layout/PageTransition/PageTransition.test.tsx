@@ -5,6 +5,7 @@ import {
   render,
   screen,
 } from "@testing-library/react";
+import { StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // This component intercepts every click on the site and decides whether to
@@ -115,6 +116,75 @@ describe("the reveal cycle", () => {
     // top of the document with no signal that anything changed.
     expect(main).toHaveFocus();
     expect(screen.getByRole("status")).toHaveTextContent("Work — Larah Photo");
+  });
+
+  it("still moves focus when the visitor navigates before the first cycle ends", () => {
+    // The regression this guards: the "have we navigated yet" flag used to be
+    // set inside the idle timeout. A visitor who followed a link sooner than
+    // TRANSITION_DURATION after load cancelled that timeout on the way out, so
+    // the flag was still false when the next cycle checked it -- and that
+    // navigation silently skipped both the focus move and the announcement.
+    //
+    // Reduced-motion visitors hit it most: their content is on screen straight
+    // away, so they can click sooner. Found by the browser journey for US2 AS2
+    // in spec 012, and pinned here so the push gate catches it without one.
+    const main = document.createElement("div");
+    main.id = "main-content";
+    main.tabIndex = -1;
+    document.body.append(main);
+    document.title = "About — Larah Photo";
+
+    const { rerender } = render(<PageTransition />);
+
+    // Deliberately short of a full cycle -- this is the whole point.
+    act(() => void vi.advanceTimersByTime(TRANSITION_DURATION - 100));
+
+    pathname = "/about";
+    rerender(<PageTransition />);
+    settle();
+
+    expect(main).toHaveFocus();
+    expect(screen.getByRole("status")).toHaveTextContent("About — Larah Photo");
+  });
+
+  it("stays an initial load when Strict Mode replays the first effect", () => {
+    // Strict Mode runs effect setup, cleanup, then setup again on the initial
+    // mount, and refs survive that. So "has this effect run before?" answers
+    // yes on a page nobody navigated to -- which would announce the title over
+    // a screen reader already reading it, the exact thing the initial-load
+    // branch exists to prevent. Keyed on the pathname instead: the replay
+    // carries the same one, so it is not a navigation.
+    const main = document.createElement("div");
+    main.id = "main-content";
+    main.tabIndex = -1;
+    document.body.append(main);
+    document.title = "Larah Photo";
+
+    render(
+      <StrictMode>
+        <PageTransition />
+      </StrictMode>,
+    );
+    settle();
+
+    expect(main).not.toHaveFocus();
+    expect(screen.getByRole("status")).toHaveTextContent("");
+  });
+
+  it("does not treat a re-render on the same route as a navigation", () => {
+    // A parent re-render, or any effect replay, must not read as a page change.
+    const main = document.createElement("div");
+    main.id = "main-content";
+    main.tabIndex = -1;
+    document.body.append(main);
+
+    const { rerender } = render(<PageTransition />);
+    settle();
+
+    rerender(<PageTransition />);
+    settle();
+
+    expect(main).not.toHaveFocus();
   });
 
   it("skips the whole cycle for a modal navigation", () => {

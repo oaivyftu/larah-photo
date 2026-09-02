@@ -57,26 +57,17 @@ export function WorkGalleryClient({
   }
 
   const rootRef = usePageIntro<HTMLElement>((intro) => {
-    intro
-      .from("[data-page-heading] > span", {
-        yPercent: 115,
+    intro.from(
+      "[data-work-filter], [data-work-card]",
+      {
+        y: 28,
         opacity: 0,
-        rotate: 2,
-        duration: 0.82,
-        stagger: 0.07,
-        ease: "power4.out",
-      })
-      .from(
-        "[data-work-filter], [data-work-card]",
-        {
-          y: 28,
-          opacity: 0,
-          duration: 0.72,
-          stagger: 0.035,
-          ease: "power3.out",
-        },
-        "-=0.38",
-      );
+        duration: 0.72,
+        stagger: 0.035,
+        ease: "power3.out",
+      },
+      "-=0.38",
+    );
   });
 
   return (

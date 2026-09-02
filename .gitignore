@@ -13,6 +13,10 @@
 # testing
 /coverage
 
+# browser end-to-end tests
+/playwright-report/
+/test-results/
+
 # next.js
 /.next/
 /out/

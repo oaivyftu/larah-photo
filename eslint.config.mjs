@@ -27,6 +27,13 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Git worktrees live here, each with its own node_modules and build output.
     ".claude/**",
+    // Playwright's generated output. Both directories contain its own bundled
+    // report JavaScript, so without these the next `npm run lint` fails the
+    // push gate on code nobody in this project wrote. The e2e specs themselves
+    // are deliberately NOT ignored -- the suite is excluded from the hooks,
+    // not from the gates (specs/012-browser-e2e-tests/contracts/run-location.md).
+    "playwright-report/**",
+    "test-results/**",
   ]),
 ]);
 

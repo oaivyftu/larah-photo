@@ -11,10 +11,12 @@
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "audit:design-system": "node scripts/audit-design-system.mjs",
-    "audit:css-diff": "node scripts/compare-built-css.mjs"
+    "audit:css-diff": "node scripts/compare-built-css.mjs",
+    "postinstall": "node scripts/install-e2e-browser.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -33,6 +35,7 @@
     "styled-components": "^6.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",

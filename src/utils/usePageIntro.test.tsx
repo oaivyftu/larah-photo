@@ -73,6 +73,24 @@ function Page({ build = vi.fn() }: { build?: (intro: unknown) => void }) {
   return <div data-testid="root" ref={ref} />;
 }
 
+/** The same page, but carrying a heading for the reveal to find. */
+function PageWithHeading({
+  build = vi.fn(),
+}: {
+  build?: (intro: unknown) => void;
+}) {
+  const ref = usePageIntro<HTMLDivElement>(build);
+
+  return (
+    <div data-testid="root" ref={ref}>
+      <h1 data-page-heading>
+        <span>Selected</span>
+        <span>work</span>
+      </h1>
+    </div>
+  );
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -159,5 +177,60 @@ describe("usePageIntro", () => {
 
     expect(matchMediaAdd).toHaveBeenCalledOnce();
     expect(build).toHaveBeenCalledOnce();
+  });
+});
+
+describe("usePageIntro heading reveal", () => {
+  // Feature 012 moved this tween here from four route components that each
+  // carried a byte-identical copy. The point of the move is that a browser
+  // test asserting the reveal now says something about all four routes rather
+  // than one, so these tests guard the thing that makes that true.
+
+  it("reveals the page heading before the caller's own tweens", () => {
+    const build = vi.fn((intro: unknown) => {
+      (intro as typeof timeline).from("[data-work-card]", {});
+    });
+    render(<PageWithHeading build={build} />);
+
+    runNoPreferenceBranch();
+
+    const targets = timeline.from.mock.calls.map(([target]) => target);
+
+    expect(targets).toEqual(["[data-page-heading] > span", "[data-work-card]"]);
+  });
+
+  it("reveals it with the values the four copies shared", () => {
+    render(<PageWithHeading />);
+
+    runNoPreferenceBranch();
+
+    expect(timeline.from).toHaveBeenCalledWith("[data-page-heading] > span", {
+      yPercent: 115,
+      opacity: 0,
+      rotate: 2,
+      duration: 0.82,
+      stagger: 0.07,
+      ease: "power4.out",
+    });
+  });
+
+  it("adds no heading tween when the page has no heading", () => {
+    // Without the guard GSAP gets a selector matching nothing, which warns and
+    // leaves the page's own tweens positioned against an empty slot -- so a
+    // relative offset like "-=0.42" would silently mean something else.
+    const build = vi.fn();
+    render(<Page build={build} />);
+
+    runNoPreferenceBranch();
+
+    expect(timeline.from).not.toHaveBeenCalled();
+    expect(build).toHaveBeenCalledOnce();
+  });
+
+  it("does not reveal it under reduced motion", () => {
+    // The branch never runs, so the heading is never parked at opacity: 0.
+    render(<PageWithHeading />);
+
+    expect(timeline.from).not.toHaveBeenCalled();
   });
 });

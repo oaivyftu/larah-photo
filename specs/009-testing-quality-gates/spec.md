@@ -101,5 +101,8 @@ A developer runs `git push`, and in addition to the same checks as commit time, 
 
 - "Mock tests" refers to automated tests that exercise code with external dependencies (CMS client calls, network requests, browser-only APIs) replaced by mocks/stubs — not a separate testing framework from unit tests, but a distinct category of test target.
 - Full end-to-end (real-browser) testing is deliberately excluded from both Git hooks in this feature. Given the project has no CI pipeline configured today, running a full browser suite on every commit/push would run entirely on the developer's machine (or consume paid CI/AI-agent minutes if later automated), for a signal that changes far less often than lint/type/unit feedback. This feature treats end-to-end testing as a manual, developer-triggered activity, revisited separately if/when a CI pipeline is introduced.
+
+  **Superseded 2026-08-31** (constitution v2.3.0, Principle V): once feature 012 delivered the suite this assumption anticipated, it moved to `.husky/pre-push` — the reasoning above (no CI, cost falls on the pusher) is still accurate and was outweighed rather than disproven; see `specs/012-browser-e2e-tests/contracts/run-location.md` for the decision and the evidence behind it. This entry is left as written because it correctly describes what 009 shipped; it is not the current state.
+
 - No CI pipeline currently exists in this repository; these Git hooks are the only automated quality gate in scope for this feature. CI-based enforcement (e.g. re-running the same checks on a hosted runner) is out of scope.
 - Bypassing hooks via a standard Git override flag remains possible, as with any local Git hook; preventing bypass entirely would require server-side enforcement, which is out of scope.

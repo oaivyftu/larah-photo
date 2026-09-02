@@ -1,0 +1,329 @@
+name: Codex review gate
+
+# Blocks merge while an unresolved Codex review comment carries severity P1,
+# P2 or P3. P4 (and anything Codex's badge format doesn't parse) is advisory
+# only and never blocks.
+#
+# Why this exists, and why it isn't simpler:
+#
+# The chatgpt-codex-connector GitHub App reviews every PR in this repo, but it
+# never sets a review state GitHub can gate on natively — every one of its
+# reviews comes back as COMMENTED, never APPROVED or CHANGES_REQUESTED, and it
+# posts no check-run of its own. So "require Codex to pass" has no built-in
+# signal to point a required status check at; this workflow manufactures one,
+# reusing GitHub's own review-thread resolution as the source of truth (the
+# same "Resolved" button a human clicks in the PR's Files Changed tab) rather
+# than inventing a separate resolved/unresolved concept.
+#
+# Severity comes from the badge Codex puts at the top of each comment, e.g.
+# `![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)`. That
+# format is Codex's, not this repo's, and could change — a comment whose
+# badge this workflow can't parse is treated as advisory (logged, not
+# blocking), because a merge gate that silently locks up over a formatting
+# change it can't explain is worse than one that occasionally under-blocks.
+#
+# One trigger, deliberately, not two. The first version of this file also
+# listened for `pull_request` (open/push), so a check could exist even before
+# Codex had reviewed, and polled up to three minutes waiting for Codex to
+# catch up. That produced its own failure mode, found by watching it happen
+# rather than reasoning about it in advance: GitHub tracks each triggering
+# event as its own required-check instance under the same job name, not "the
+# latest result wins" -- so a `pull_request` run that timed out while Codex
+# was still working stayed red for that commit *forever*, sitting alongside a
+# later, correct, green `pull_request_review` run for the exact same SHA, both
+# marked Required, both demanded before merge. There is no fix for that
+# within a two-trigger design short of re-running the stale one by hand every
+# time it happens. Dropping `pull_request` removes the failure mode instead
+# of working around it: this check now runs only when a review has actually
+# been submitted, so it can never observe "not reviewed yet" as a real state
+# to report on -- only "reviewed, and here's what was found."
+#
+# The tradeoff, stated plainly: a brand new PR shows this check as pending
+# ("Expected — waiting for status to be reported"), not failing, until Codex's
+# first review lands -- which happens automatically on open in practice, so in
+# the common case there is nothing to wait on that wasn't already true before.
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  pull-requests: read
+
+concurrency:
+  group: codex-review-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Codex review gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for unresolved P1-P3 Codex findings
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // No "[bot]" suffix here: that's a REST-API-only convention. The
+            // GraphQL API this workflow queries returns the bare login for a
+            // Bot actor -- confirmed by querying this exact field against a
+            // real Codex comment before shipping this workflow, because
+            // getting this wrong would make the gate silently never match a
+            // single Codex thread.
+            const CODEX_LOGIN = "chatgpt-codex-connector";
+            const BLOCKING_MAX_SEVERITY = 3; // P1, P2, P3 block; P4+ is advisory
+            const BADGE_PATTERN = /!\[P(\d+)\s*Badge\]/i;
+            // The finding's title, which Codex bolds right after the badge:
+            // `...</sub></sub>  Guard the browser install...**`. Falls back to
+            // the raw first line if the badge markup ever changes shape, so a
+            // format drift degrades the summary's readability rather than the
+            // gate's correctness.
+            const TITLE_PATTERN = /<\/sub><\/sub>\s*(.+?)\*\*/;
+
+            const prNumber = context.payload.pull_request.number;
+            const { owner, repo } = context.repo;
+
+            // "Acted on the current head specifically" took two rounds to get
+            // right, both found by Codex reviewing this file rather than
+            // assumed correct on the first pass: the original check treated
+            // any Codex thread anywhere on the PR as proof of review, which
+            // stayed true forever after the first one regardless of what the
+            // current push contained; and once fixed to check the head
+            // commit precisely, a clean review (no findings at all) turned
+            // out to leave no review object to find at all. See
+            // `codexHasReviewed`/`codexReactedClean` below for both, in full.
+            async function fetchHead() {
+              const response = await github.graphql(
+                `
+                  query($owner: String!, $repo: String!, $pr: Int!) {
+                    repository(owner: $owner, name: $repo) {
+                      pullRequest(number: $pr) {
+                        headRefOid
+                        commits(last: 1) {
+                          nodes { commit { committedDate } }
+                        }
+                      }
+                    }
+                  }
+                `,
+                { owner, repo, pr: prNumber },
+              );
+
+              const pr = response.repository.pullRequest;
+
+              return {
+                sha: pr.headRefOid,
+                committedDate: pr.commits.nodes[0]?.commit.committedDate ?? null,
+              };
+            }
+
+            async function codexHasReviewed(headSha) {
+              let cursor = null;
+
+              for (;;) {
+                const response = await github.graphql(
+                  `
+                    query($owner: String!, $repo: String!, $pr: Int!, $cursor: String) {
+                      repository(owner: $owner, name: $repo) {
+                        pullRequest(number: $pr) {
+                          reviews(first: 100, after: $cursor) {
+                            pageInfo { hasNextPage endCursor }
+                            nodes { author { login } commit { oid } }
+                          }
+                        }
+                      }
+                    }
+                  `,
+                  { owner, repo, pr: prNumber, cursor },
+                );
+
+                const page = response.repository.pullRequest.reviews;
+
+                if (
+                  page.nodes.some(
+                    (review) => review.author?.login === CODEX_LOGIN && review.commit?.oid === headSha,
+                  )
+                ) {
+                  return true;
+                }
+
+                if (!page.pageInfo.hasNextPage) return false;
+                cursor = page.pageInfo.endCursor;
+              }
+            }
+
+            // A clean review -- Codex looked and found nothing -- creates no
+            // review at all, per the connector's own description: "If Codex
+            // has suggestions, it will comment; otherwise it will react with
+            // 👍." Without this, `codexHasReviewed` can never become true for
+            // a clean revision, and re-running this check would not have
+            // helped either: it would re-evaluate the same GraphQL state,
+            // which never changes on its own, so a clean PR would stay red
+            // forever. Found by Codex reviewing this file, one poll cycle
+            // after the first fix landed.
+            //
+            // `committedDate` gates which reactions count: a 👍 left on an
+            // earlier revision must not be read as approval of this one. This
+            // is keyed on the commit's own author timestamp rather than the
+            // reaction's relationship to a specific push -- Codex flagged
+            // that too (a force-push or reset back to a commit whose
+            // `committedDate` predates an existing 👍 would accept it
+            // immediately), and that residual gap is accepted rather than
+            // fixed: it requires a maintainer deliberately rewriting this
+            // branch's history back past an already-clean revision, on a
+            // repo with one maintainer and no external contributors, and that
+            // same maintainer already holds GitHub's "merge without waiting
+            // for requirements" override, a strictly larger capability than
+            // this gap could grant.
+            //
+            // This repo has not yet had a genuinely clean Codex pass to
+            // observe directly, so this trusts the connector's documented
+            // behaviour rather than a confirmed empirical signal -- unlike
+            // the rest of this file. If that documented behaviour turns out
+            // wrong, the same admin override is the fallback of last resort
+            // this relies on rather than inventing a second, redundant one
+            // here.
+            async function codexReactedClean(committedDate) {
+              if (!committedDate) return false;
+
+              const response = await github.graphql(
+                `
+                  query($owner: String!, $repo: String!, $pr: Int!) {
+                    repository(owner: $owner, name: $repo) {
+                      pullRequest(number: $pr) {
+                        reactions(first: 100, content: THUMBS_UP) {
+                          nodes { user { login } createdAt }
+                        }
+                      }
+                    }
+                  }
+                `,
+                { owner, repo, pr: prNumber },
+              );
+
+              return response.repository.pullRequest.reactions.nodes.some(
+                (reaction) =>
+                  reaction.user?.login === CODEX_LOGIN && reaction.createdAt >= committedDate,
+              );
+            }
+
+            async function fetchCodexThreads() {
+              const threads = [];
+              let cursor = null;
+
+              // Paginated on purpose: a large or long-lived PR can exceed one
+              // page of review threads, and under-counting here would mean
+              // silently missing a blocking finding.
+              for (;;) {
+                const response = await github.graphql(
+                  `
+                    query($owner: String!, $repo: String!, $pr: Int!, $cursor: String) {
+                      repository(owner: $owner, name: $repo) {
+                        pullRequest(number: $pr) {
+                          reviewThreads(first: 100, after: $cursor) {
+                            pageInfo { hasNextPage endCursor }
+                            nodes {
+                              isResolved
+                              comments(first: 1) {
+                                nodes { author { login } body url }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  `,
+                  { owner, repo, pr: prNumber, cursor },
+                );
+
+                const page = response.repository.pullRequest.reviewThreads;
+                threads.push(...page.nodes);
+
+                if (!page.pageInfo.hasNextPage) break;
+                cursor = page.pageInfo.endCursor;
+              }
+
+              return threads
+                .filter((thread) => thread.comments.nodes[0]?.author?.login === CODEX_LOGIN)
+                .map((thread) => {
+                  const root = thread.comments.nodes[0];
+                  const severityMatch = root.body.match(BADGE_PATTERN);
+                  const titleMatch = root.body.match(TITLE_PATTERN);
+                  const fallbackLine = root.body.split("\n").find((line) => line.trim());
+
+                  return {
+                    isResolved: thread.isResolved,
+                    severity: severityMatch ? Number(severityMatch[1]) : null,
+                    url: root.url,
+                    summary: titleMatch?.[1]?.trim() || fallbackLine || "(no summary line)",
+                  };
+                });
+            }
+
+            const head = await fetchHead();
+            const reviewed =
+              (await codexHasReviewed(head.sha)) || (await codexReactedClean(head.committedDate));
+
+            if (!reviewed) {
+              // Reachable when this run was triggered by someone else's
+              // review landing before Codex's own -- e.g. a human replying to
+              // a thread, which also submits a review. Not a poll timeout:
+              // there is no polling any more. This re-runs on its own the
+              // next time any review is submitted, which includes Codex's.
+              core.setFailed(
+                `Codex has not reviewed ${head.sha.slice(0, 7)} (the current head) yet. This run was ` +
+                "triggered by a different review landing first. It re-runs automatically the next " +
+                "time any review is submitted on this PR, which includes Codex's own.",
+              );
+              return;
+            }
+
+            const codexThreads = await fetchCodexThreads();
+            const unresolved = codexThreads.filter((thread) => !thread.isResolved);
+            // `severity === null` (an unparseable badge) belongs in `advisory`,
+            // not `blocking` -- the header comment says a comment this workflow
+            // can't parse should never block, and the first version of this
+            // predicate said the opposite of what it meant to, blocking on
+            // exactly the case it was written to exempt. Found by Codex
+            // reviewing this file; fixed by reading the two filters as a
+            // matched pair (each `severity === null` check must land on
+            // opposite sides) rather than independently.
+            const blocking = unresolved.filter(
+              (thread) => thread.severity !== null && thread.severity <= BLOCKING_MAX_SEVERITY,
+            );
+            const advisory = unresolved.filter(
+              (thread) => thread.severity === null || thread.severity > BLOCKING_MAX_SEVERITY,
+            );
+
+            const summaryLines = [
+              `Codex left ${codexThreads.length} finding(s) on this PR; ${unresolved.length} unresolved.`,
+              "",
+            ];
+
+            if (blocking.length > 0) {
+              summaryLines.push(`### Blocking (unresolved, severity <= P${BLOCKING_MAX_SEVERITY})`);
+              for (const thread of blocking) {
+                summaryLines.push(`- [P${thread.severity}] ${thread.summary} — ${thread.url}`);
+              }
+              summaryLines.push("");
+            }
+
+            if (advisory.length > 0) {
+              summaryLines.push(
+                `### Advisory only (unresolved, severity > P${BLOCKING_MAX_SEVERITY} or unparseable -- not blocking)`,
+              );
+              for (const thread of advisory) {
+                const label = thread.severity === null ? "unparsed severity" : `P${thread.severity}`;
+                summaryLines.push(`- [${label}] ${thread.summary} — ${thread.url}`);
+              }
+              summaryLines.push("");
+            }
+
+            await core.summary.addRaw(summaryLines.join("\n")).write();
+            core.info(summaryLines.join("\n"));
+
+            if (blocking.length > 0) {
+              core.setFailed(
+                `${blocking.length} unresolved Codex finding(s) at severity P${BLOCKING_MAX_SEVERITY} or ` +
+                "stronger must be resolved before this PR can merge. Fix them and resolve the thread, " +
+                "or resolve it as a false positive if it does not apply.",
+              );
+            }
