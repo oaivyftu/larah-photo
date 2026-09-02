@@ -22,40 +22,27 @@ name: Codex review gate
 # blocking), because a merge gate that silently locks up over a formatting
 # change it can't explain is worse than one that occasionally under-blocks.
 #
-# Two triggers, because "wait for an async bot" and "react to what it found"
-# aren't the same event:
-#   - pull_request: the PR opens or gets a new commit. Codex's own review may
-#     not have landed yet, so this run polls briefly for Codex to have acted
-#     on the current head specifically -- a review comment, or (Codex found
-#     nothing) a 👍 reaction -- before deciding.
-#   - pull_request_review: fires the moment Codex (or anyone) submits a
-#     review, including Codex's own re-review after a push — no need to poll.
+# One trigger, deliberately, not two. The first version of this file also
+# listened for `pull_request` (open/push), so a check could exist even before
+# Codex had reviewed, and polled up to three minutes waiting for Codex to
+# catch up. That produced its own failure mode, found by watching it happen
+# rather than reasoning about it in advance: GitHub tracks each triggering
+# event as its own required-check instance under the same job name, not "the
+# latest result wins" -- so a `pull_request` run that timed out while Codex
+# was still working stayed red for that commit *forever*, sitting alongside a
+# later, correct, green `pull_request_review` run for the exact same SHA, both
+# marked Required, both demanded before merge. There is no fix for that
+# within a two-trigger design short of re-running the stale one by hand every
+# time it happens. Dropping `pull_request` removes the failure mode instead
+# of working around it: this check now runs only when a review has actually
+# been submitted, so it can never observe "not reviewed yet" as a real state
+# to report on -- only "reviewed, and here's what was found."
 #
-# "Acted on the current head specifically" took two rounds to get right, both
-# found by Codex reviewing this file rather than assumed correct on the first
-# pass: the original check treated any Codex thread anywhere on the PR as
-# proof of review, which stayed true forever after the first one regardless
-# of what the current push contained; and once fixed to check the head commit
-# precisely, a clean review (no findings at all) turned out to leave no
-# review object to find, which would have kept a genuinely clean PR red
-# forever. See the `codexHasReviewed`/`codexReactedClean` functions below for
-# both, in full.
-#
-# What this does NOT auto-trigger on: a human resolving a thread through the
-# PR's "Resolve conversation" button. That action has no corresponding Actions
-# event -- GitHub's `on:` triggers are a curated subset of its webhooks, and
-# review-thread resolution isn't one of them (confirmed the hard way: an
-# earlier draft of this file listed `pull_request_review_thread` as a third
-# trigger, which is a real webhook GitHub Apps can subscribe to but not a
-# workflow trigger, and it made this entire file invalid -- GitHub rejected it
-# before scheduling a single job, for every event, not just that one). So
-# after resolving threads, re-run this check from the PR's checks tab (or push
-# an empty commit) to pick up the new state; there is no way around a manual
-# nudge for that specific action without adding scheduled polling, which is
-# more ongoing cost than a rarely-needed manual re-run justifies.
+# The tradeoff, stated plainly: a brand new PR shows this check as pending
+# ("Expected — waiting for status to be reported"), not failing, until Codex's
+# first review lands -- which happens automatically on open in practice, so in
+# the common case there is nothing to wait on that wasn't already true before.
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
   pull_request_review:
     types: [submitted]
 
@@ -91,40 +78,18 @@ jobs:
             // gate's correctness.
             const TITLE_PATTERN = /<\/sub><\/sub>\s*(.+?)\*\*/;
 
-            // Only the `pull_request` trigger can fire before Codex has had a
-            // chance to review the *current* head at all (a fresh open, or a
-            // fresh push); the review trigger means Codex has just acted, so
-            // there is nothing to wait for.
-            const shouldPoll = context.eventName === "pull_request";
-            const POLL_ATTEMPTS = 6;
-            const POLL_DELAY_MS = 30_000; // 6 x 30s = 3 minutes, matching the
-            // slowest Codex review latency observed on this repo's own PRs.
-
             const prNumber = context.payload.pull_request.number;
             const { owner, repo } = context.repo;
 
-            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-            // The bug this fixes, found by Codex reviewing this very file: the
-            // original version treated "any Codex thread exists on the PR" as
-            // "Codex has reviewed" -- but review threads outlive the commit
-            // that prompted them. Once a PR has had a single Codex comment
-            // ever, EVERY later `synchronize` run would see a non-empty thread
-            // list immediately, skip the poll entirely, and evaluate against
-            // whatever threads already existed -- even ones from commits
-            // pushed minutes ago, before Codex had reviewed the new one. If
-            // those happened to be the only threads and they were resolved,
-            // the check went green in the same instant as the push, during
-            // the exact window Codex was still working. A contributor could
-            // merge in that window and the gate would never have looked at
-            // their latest change at all.
-            //
-            // The fix: ask specifically whether Codex has submitted a review
-            // against the current head SHA, not whether any thread exists
-            // anywhere on the PR. `headRefOid` and each review's `commit.oid`
-            // are both queried fresh, not read from the event payload, so this
-            // is correct regardless of which of the two trigger types fired or
-            // how stale that payload might be.
+            // "Acted on the current head specifically" took two rounds to get
+            // right, both found by Codex reviewing this file rather than
+            // assumed correct on the first pass: the original check treated
+            // any Codex thread anywhere on the PR as proof of review, which
+            // stayed true forever after the first one regardless of what the
+            // current push contained; and once fixed to check the head
+            // commit precisely, a clean review (no findings at all) turned
+            // out to leave no review object to find at all. See
+            // `codexHasReviewed`/`codexReactedClean` below for both, in full.
             async function fetchHead() {
               const response = await github.graphql(
                 `
@@ -189,36 +154,33 @@ jobs:
             // review at all, per the connector's own description: "If Codex
             // has suggestions, it will comment; otherwise it will react with
             // 👍." Without this, `codexHasReviewed` can never become true for
-            // a clean revision, and the "re-run this check" advice in the
-            // original failure message was actively wrong for that case:
-            // re-running re-evaluates the same GraphQL state, which never
-            // changes on its own, so a clean PR would stay red forever. Found
-            // by Codex reviewing this file, a second time, one poll cycle
+            // a clean revision, and re-running this check would not have
+            // helped either: it would re-evaluate the same GraphQL state,
+            // which never changes on its own, so a clean PR would stay red
+            // forever. Found by Codex reviewing this file, one poll cycle
             // after the first fix landed.
             //
             // `committedDate` gates which reactions count: a 👍 left on an
             // earlier revision must not be read as approval of this one. This
-            // repo has not yet had a genuinely clean Codex pass to observe
-            // directly, so this trusts the connector's documented behaviour
-            // rather than a confirmed empirical signal -- unlike the rest of
-            // this file. If that documented behaviour turns out wrong, a repo
-            // admin still has GitHub's own "merge without waiting for
-            // requirements" override (available because this workflow leaves
-            // enforce_admins off), which is the fallback of last resort this
-            // relies on rather than inventing a second, redundant one here.
+            // is keyed on the commit's own author timestamp rather than the
+            // reaction's relationship to a specific push -- Codex flagged
+            // that too (a force-push or reset back to a commit whose
+            // `committedDate` predates an existing 👍 would accept it
+            // immediately), and that residual gap is accepted rather than
+            // fixed: it requires a maintainer deliberately rewriting this
+            // branch's history back past an already-clean revision, on a
+            // repo with one maintainer and no external contributors, and that
+            // same maintainer already holds GitHub's "merge without waiting
+            // for requirements" override, a strictly larger capability than
+            // this gap could grant.
             //
-            // One more gap this doesn't close, found by Codex reviewing this
-            // very fix: GitHub has no Actions trigger for "a reaction was
-            // added", so a clean-pass 👍 landing after the `pull_request`
-            // trigger's poll window closes does not auto-retrigger this check
-            // the way a real review does via `pull_request_review`. Scheduled
-            // polling would close that gap too, at the same ongoing cost the
-            // header comment already declined to pay for thread-resolution --
-            // the same tradeoff, so declined here for the same reason. Unlike
-            // that case, though, a manual re-run of this specific check DOES
-            // help here: it re-queries this function fresh, so once the
-            // reaction actually exists, re-running finds it immediately. The
-            // failure message below says so.
+            // This repo has not yet had a genuinely clean Codex pass to
+            // observe directly, so this trusts the connector's documented
+            // behaviour rather than a confirmed empirical signal -- unlike
+            // the rest of this file. If that documented behaviour turns out
+            // wrong, the same admin override is the fallback of last resort
+            // this relies on rather than inventing a second, redundant one
+            // here.
             async function codexReactedClean(committedDate) {
               if (!committedDate) return false;
 
@@ -297,37 +259,19 @@ jobs:
             }
 
             const head = await fetchHead();
-
-            async function headReviewed() {
-              return (
-                (await codexHasReviewed(head.sha)) || (await codexReactedClean(head.committedDate))
-              );
-            }
-
-            let reviewed = await headReviewed();
-
-            if (shouldPoll) {
-              for (let attempt = 1; attempt <= POLL_ATTEMPTS && !reviewed; attempt += 1) {
-                core.info(
-                  `Codex has not reviewed ${head.sha.slice(0, 7)} yet (attempt ${attempt}/${POLL_ATTEMPTS}) -- waiting ${POLL_DELAY_MS / 1000}s.`,
-                );
-                await sleep(POLL_DELAY_MS);
-                reviewed = await headReviewed();
-              }
-            }
+            const reviewed =
+              (await codexHasReviewed(head.sha)) || (await codexReactedClean(head.committedDate));
 
             if (!reviewed) {
+              // Reachable when this run was triggered by someone else's
+              // review landing before Codex's own -- e.g. a human replying to
+              // a thread, which also submits a review. Not a poll timeout:
+              // there is no polling any more. This re-runs on its own the
+              // next time any review is submitted, which includes Codex's.
               core.setFailed(
-                `Codex has not reviewed ${head.sha.slice(0, 7)} (the current head) yet -- neither a ` +
-                "review comment nor a clean-pass reaction has landed on it. If Codex leaves a review " +
-                "(the common case, something to fix), this check re-runs on its own the moment that " +
-                "happens -- nothing to do but wait. A clean-pass reaction is different: GitHub has no " +
-                "Actions trigger for a reaction being added, so nothing re-runs this check " +
-                "automatically for that case specifically. If a 👍 from Codex is genuinely what's " +
-                "waiting to land (or already has), re-running this check by hand picks it up " +
-                "immediately -- unlike resolving a thread, re-running here does re-query live state, so " +
-                "it actually helps. Failing that, a repo admin can merge anyway via GitHub's " +
-                '"Merge without waiting for requirements" option.',
+                `Codex has not reviewed ${head.sha.slice(0, 7)} (the current head) yet. This run was ` +
+                "triggered by a different review landing first. It re-runs automatically the next " +
+                "time any review is submitted on this PR, which includes Codex's own.",
               );
               return;
             }
