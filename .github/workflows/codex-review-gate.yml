@@ -81,9 +81,9 @@ jobs:
             const TITLE_PATTERN = /<\/sub><\/sub>\s*(.+?)\*\*/;
 
             // Only the `pull_request` trigger can fire before Codex has had a
-            // chance to review at all (a fresh open, or a fresh push); the
-            // review/thread triggers mean Codex (or a human) has already
-            // acted, so there is nothing to wait for.
+            // chance to review the *current* head at all (a fresh open, or a
+            // fresh push); the review trigger means Codex has just acted, so
+            // there is nothing to wait for.
             const shouldPoll = context.eventName === "pull_request";
             const POLL_ATTEMPTS = 6;
             const POLL_DELAY_MS = 30_000; // 6 x 30s = 3 minutes, matching the
@@ -93,6 +93,76 @@ jobs:
             const { owner, repo } = context.repo;
 
             const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+            // The bug this fixes, found by Codex reviewing this very file: the
+            // original version treated "any Codex thread exists on the PR" as
+            // "Codex has reviewed" -- but review threads outlive the commit
+            // that prompted them. Once a PR has had a single Codex comment
+            // ever, EVERY later `synchronize` run would see a non-empty thread
+            // list immediately, skip the poll entirely, and evaluate against
+            // whatever threads already existed -- even ones from commits
+            // pushed minutes ago, before Codex had reviewed the new one. If
+            // those happened to be the only threads and they were resolved,
+            // the check went green in the same instant as the push, during
+            // the exact window Codex was still working. A contributor could
+            // merge in that window and the gate would never have looked at
+            // their latest change at all.
+            //
+            // The fix: ask specifically whether Codex has submitted a review
+            // against the current head SHA, not whether any thread exists
+            // anywhere on the PR. `headRefOid` and each review's `commit.oid`
+            // are both queried fresh, not read from the event payload, so this
+            // is correct regardless of which of the two trigger types fired or
+            // how stale that payload might be.
+            async function fetchHeadSha() {
+              const response = await github.graphql(
+                `
+                  query($owner: String!, $repo: String!, $pr: Int!) {
+                    repository(owner: $owner, name: $repo) {
+                      pullRequest(number: $pr) { headRefOid }
+                    }
+                  }
+                `,
+                { owner, repo, pr: prNumber },
+              );
+
+              return response.repository.pullRequest.headRefOid;
+            }
+
+            async function codexHasReviewed(headSha) {
+              let cursor = null;
+
+              for (;;) {
+                const response = await github.graphql(
+                  `
+                    query($owner: String!, $repo: String!, $pr: Int!, $cursor: String) {
+                      repository(owner: $owner, name: $repo) {
+                        pullRequest(number: $pr) {
+                          reviews(first: 100, after: $cursor) {
+                            pageInfo { hasNextPage endCursor }
+                            nodes { author { login } commit { oid } }
+                          }
+                        }
+                      }
+                    }
+                  `,
+                  { owner, repo, pr: prNumber, cursor },
+                );
+
+                const page = response.repository.pullRequest.reviews;
+
+                if (
+                  page.nodes.some(
+                    (review) => review.author?.login === CODEX_LOGIN && review.commit?.oid === headSha,
+                  )
+                ) {
+                  return true;
+                }
+
+                if (!page.pageInfo.hasNextPage) return false;
+                cursor = page.pageInfo.endCursor;
+              }
+            }
 
             async function fetchCodexThreads() {
               const threads = [];
@@ -147,25 +217,32 @@ jobs:
                 });
             }
 
-            let codexThreads = await fetchCodexThreads();
+            const headSha = await fetchHeadSha();
+            let reviewed = await codexHasReviewed(headSha);
 
             if (shouldPoll) {
-              for (let attempt = 1; attempt <= POLL_ATTEMPTS && codexThreads.length === 0; attempt += 1) {
-                core.info(`No Codex review found yet (attempt ${attempt}/${POLL_ATTEMPTS}) -- waiting ${POLL_DELAY_MS / 1000}s.`);
+              for (let attempt = 1; attempt <= POLL_ATTEMPTS && !reviewed; attempt += 1) {
+                core.info(
+                  `Codex has not reviewed ${headSha.slice(0, 7)} yet (attempt ${attempt}/${POLL_ATTEMPTS}) -- waiting ${POLL_DELAY_MS / 1000}s.`,
+                );
                 await sleep(POLL_DELAY_MS);
-                codexThreads = await fetchCodexThreads();
+                reviewed = await codexHasReviewed(headSha);
               }
             }
 
-            if (codexThreads.length === 0) {
+            if (!reviewed) {
               core.setFailed(
-                "Codex has not reviewed this PR yet. This check re-runs automatically once its " +
-                "review lands (or resolve/unresolve any thread to re-trigger it); no action needed " +
-                "beyond waiting, unless the Codex app itself is not enabled for this repository.",
+                `Codex has not reviewed ${headSha.slice(0, 7)} (the current head) yet. This check ` +
+                "re-runs automatically once a review lands on this commit specifically -- old threads " +
+                "from earlier commits do not count, which is the point. One case this cannot detect: " +
+                "if Codex reviewed this commit and found nothing at all, it leaves only a reaction, not " +
+                "a review, and this check has no way to tell that apart from not having reviewed yet. " +
+                "Confirm manually in the PR's activity if that seems likely, then re-run this check.",
               );
               return;
             }
 
+            const codexThreads = await fetchCodexThreads();
             const unresolved = codexThreads.filter((thread) => !thread.isResolved);
             const blocking = unresolved.filter(
               (thread) => thread.severity === null || thread.severity <= BLOCKING_MAX_SEVERITY,
