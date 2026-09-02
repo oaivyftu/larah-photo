@@ -206,6 +206,19 @@ jobs:
             // requirements" override (available because this workflow leaves
             // enforce_admins off), which is the fallback of last resort this
             // relies on rather than inventing a second, redundant one here.
+            //
+            // One more gap this doesn't close, found by Codex reviewing this
+            // very fix: GitHub has no Actions trigger for "a reaction was
+            // added", so a clean-pass 👍 landing after the `pull_request`
+            // trigger's poll window closes does not auto-retrigger this check
+            // the way a real review does via `pull_request_review`. Scheduled
+            // polling would close that gap too, at the same ongoing cost the
+            // header comment already declined to pay for thread-resolution --
+            // the same tradeoff, so declined here for the same reason. Unlike
+            // that case, though, a manual re-run of this specific check DOES
+            // help here: it re-queries this function fresh, so once the
+            // reaction actually exists, re-running finds it immediately. The
+            // failure message below says so.
             async function codexReactedClean(committedDate) {
               if (!committedDate) return false;
 
@@ -306,10 +319,15 @@ jobs:
             if (!reviewed) {
               core.setFailed(
                 `Codex has not reviewed ${head.sha.slice(0, 7)} (the current head) yet -- neither a ` +
-                "review comment nor a clean-pass reaction has landed on it. This check re-runs " +
-                "automatically once either does; re-running it manually changes nothing on its own. " +
-                "If Codex has genuinely reviewed this commit outside what this check can see, a repo " +
-                "admin can merge anyway via GitHub's \"Merge without waiting for requirements\" option.",
+                "review comment nor a clean-pass reaction has landed on it. If Codex leaves a review " +
+                "(the common case, something to fix), this check re-runs on its own the moment that " +
+                "happens -- nothing to do but wait. A clean-pass reaction is different: GitHub has no " +
+                "Actions trigger for a reaction being added, so nothing re-runs this check " +
+                "automatically for that case specifically. If a 👍 from Codex is genuinely what's " +
+                "waiting to land (or already has), re-running this check by hand picks it up " +
+                "immediately -- unlike resolving a thread, re-running here does re-query live state, so " +
+                "it actually helps. Failing that, a repo admin can merge anyway via GitHub's " +
+                '"Merge without waiting for requirements" option.',
               );
               return;
             }
