@@ -61,6 +61,8 @@ While viewing a project's full gallery (either in the overlay or on its standalo
 
 1. **Given** a visitor is viewing a project's image grid, **When** they click a thumbnail, **Then** an enlarged view of that image opens, starting at the clicked image.
 2. **Given** the enlarged image view is open on top of the project preview overlay, **When** the visitor presses Escape, **Then** only the enlarged image view closes, leaving the project preview open underneath.
+3. **Given** the enlarged view is open on a touch device, **When** the visitor swipes across the photo — including a swipe that is not perfectly horizontal — **Then** the photos travel with their finger and the view settles on exactly one photo.
+4. **Given** the enlarged view is open on a device with a precise pointer, **When** the visitor uses the stepping controls or the arrow keys, **Then** the photos cross-fade from one to the next.
 
 ---
 
@@ -85,6 +87,7 @@ While viewing a project's full gallery (either in the overlay or on its standalo
 - **FR-006**: Requesting a project's permalink directly (not via an in-app card click) MUST render a full standalone page with the same project content, plus a link back to the full work listing.
 - **FR-007**: Every project detail view (overlay or standalone) MUST include a control to share/copy that project's permalink.
 - **FR-008**: Clicking a thumbnail within a project's image gallery MUST open an enlarged, navigable view of that image, starting at the clicked image, layered above the project detail view.
+- **FR-008a**: The enlarged view MUST be navigable by the means the visitor's device actually offers: on a touch or otherwise coarse pointer the photos MUST move with a swipe, and on a precise pointer they MUST cross-fade under the stepping controls and arrow keys. Whichever it is, the view MUST always come to rest showing exactly one photo, never stopping part-way between two. If the available pointer changes while the view is open — a phone rotated, a window resized across the breakpoint — the view MUST switch modes while keeping the photo the visitor is looking at.
 - **FR-009**: When the enlarged image view is open above the overlay preview, Escape MUST close only the enlarged image view, and the preview's own close control MUST be inert while the enlarged view is open.
 - **FR-010**: Requesting a project slug that does not correspond to a published project MUST result in a not-found outcome rather than an empty or partial detail view.
 - **FR-011**: On viewports and settings with no reduced-motion preference, the work page's heading, filter controls, and initial set of cards MUST animate into view in a staggered sequence on load; with a reduced-motion preference, the same content MUST render fully visible with no animation.

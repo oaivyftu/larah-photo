@@ -6,7 +6,9 @@ import {
   openProjectWithSeveralPhotographs,
   readPosition,
 } from "../support/content";
+import { swipeHorizontally } from "../support/gestures";
 import {
+  carousel,
   expectCarouselReady,
   expectControlsReceded,
   expectControlsVisible,
@@ -46,6 +48,23 @@ export async function advanceWithControl(page: Page) {
   ).toBeGreaterThan(1);
 
   const before = await selectedPhotograph(page);
+
+  // A fine pointer gets the crossfade, which is the mode this control exists
+  // to drive -- there is no drag here to move a photograph with. `is-fade` is
+  // flickity-fade's own statement that it is on.
+  await expect(
+    carousel(page),
+    "a fine pointer should get the crossfading carousel",
+  ).toHaveClass(/is-fade/);
+
+  // Wake the controls first, the way a visitor reaching for them does. They
+  // recede when the pointer idles (J4) and a receded nav is `pointer-events:
+  // none`, so a click aimed at it lands on the photograph instead -- and the
+  // reveal only fires on a pointer that actually moved, which a retried click
+  // at unchanged coordinates is not.
+  await page.mouse.move(400, 400);
+  await page.mouse.move(420, 420);
+  await expectControlsVisible(page);
 
   await page.getByRole("button", { name: "Next image" }).click();
 
@@ -110,6 +129,69 @@ export async function moveWithArrowKeys(page: Page) {
       message: "pressing ArrowLeft should return to the previous photograph",
     })
     .toBe(first);
+}
+
+/**
+ * J10 -- swipe to the next photograph on a touch device (US1 AS5, SC-009).
+ *
+ * What this proves, stated narrowly because it was measured rather than
+ * assumed: a finger dragged across the photograph moves the gallery on, and the
+ * carousel a coarse pointer gets is the sliding one rather than the crossfade.
+ * Both fail if touch dragging is switched off or the modes are swapped.
+ *
+ * What it does not prove, and what was checked by reintroducing each bug and
+ * watching this journey pass anyway:
+ *
+ *   - **Where the slider comes to rest.** `handleDragEnd` calls `select()`
+ *     regardless, so the selected cell and the live region advance even when
+ *     `freeScroll` leaves the slider itself parked between two photographs.
+ *     Seeing that needs the slider's offset, and a transform is exactly what
+ *     FR-009 rules out. `freeScroll: false` is asserted in the unit suite
+ *     instead, and the visible result of getting it wrong -- the opacity pop at
+ *     the end of a fade -- is a device check.
+ *   - **The gesture surviving the browser.** Synthetic touch events dispatched
+ *     through CDP do not reproduce a real scroll claiming the gesture, so this
+ *     passes with `touch-action: pan-y` restored. That fix is verified on a
+ *     device, not here.
+ */
+export async function swipeToNextPhotograph(page: Page) {
+  await openProjectWithSeveralPhotographs(page);
+  await openPhotographFullScreen(page);
+  await expectCarouselReady(page);
+
+  const { current: start, total } = await readPosition(page);
+
+  expect(
+    total,
+    "this journey needs a project with several photographs",
+  ).toBeGreaterThan(1);
+
+  // A coarse pointer gets the sliding carousel, not the crossfade.
+  await expect(
+    carousel(page),
+    "a touch device should get the sliding carousel",
+  ).not.toHaveClass(/is-fade/);
+
+  const before = await selectedPhotograph(page);
+  const box = await carousel(page).boundingBox();
+
+  // Right to left: forwards, the way the counter reads.
+  await swipeHorizontally(page, carousel(page), {
+    distance: -Math.round((box?.width ?? 320) * 0.6),
+  });
+
+  await expectPhotographChangedFrom(page, before);
+
+  // The next photograph specifically, not merely a different one: a swipe that
+  // flings several slides on is as wrong as one that does not move.
+  const expected = start === total ? 1 : start + 1;
+
+  await expect
+    .poll(() => readPosition(page).then((position) => position.current), {
+      message: `the swipe should settle on photograph ${expected}`,
+    })
+    .toBe(expected);
+  await selectedPhotograph(page);
 }
 
 /**

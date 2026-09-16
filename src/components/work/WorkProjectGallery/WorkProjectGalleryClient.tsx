@@ -25,7 +25,17 @@ const CONTROLS_IDLE_DELAY = 1600;
 const CONTROLS_HOVER_IDLE_DELAY = 2600;
 const AUTO_HIDE_MEDIA =
   "(hover: hover) and (pointer: fine) and (min-width: 761px)";
-const DRAGGABLE_MEDIA = "(max-width: 760px), (hover: none), (pointer: coarse)";
+// Who gets a carousel that slides under the finger. The same query decides
+// `draggable` and `fade` together, because those two are one decision: a drag
+// is only worth offering when something visibly follows it, and a crossfade
+// spread over a viewport-wide drag follows nothing.
+const SLIDE_MEDIA = "(max-width: 760px), (hover: none), (pointer: coarse)";
+// Flickity's defaults (0.025 and 0.28) are tuned for a strip of cells that
+// coasts past several of them. A lightbox shows one photograph at a time, so
+// the slide is pulled in harder and damped more -- that is what stops a flick
+// sailing past the photograph the visitor asked for.
+const SLIDE_SELECTED_ATTRACTION = 0.1;
+const SLIDE_FRICTION = 0.6;
 const FOCUSABLE_SELECTOR = [
   "a[href]",
   "button:not([disabled])",
@@ -42,6 +52,10 @@ const FOCUSABLE_SELECTOR = [
 // does the browser's native lazy loading, because fade mode stacks every cell
 // at the same coordinates — all of them read as on-screen, so opening the
 // lightbox used to fetch the whole album at once.
+//
+// A radius of one is also what slide mode needs: the neighbouring cell is
+// uncovered as the finger drags, so it has to be a photograph by then rather
+// than a placeholder waiting on a fetch.
 const PRELOAD_RADIUS = 1;
 
 function collectWindowIndexes(center: number, total: number) {
@@ -321,6 +335,10 @@ export function WorkProjectGalleryClient({
   // <img> — starting at 0 would fetch the wrong photo and leave the one the user
   // actually clicked waiting on the bundle.
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  // Read when the carousel is rebuilt at a breakpoint crossing, which happens
+  // outside React's render — an effect reading `currentIndex` would have to
+  // re-subscribe the media listener on every slide change to stay current.
+  const currentIndexRef = useRef(initialIndex);
   const [loadedIndexes, setLoadedIndexes] = useState(() =>
     collectWindowIndexes(initialIndex, images.length),
   );
@@ -477,6 +495,13 @@ export function WorkProjectGalleryClient({
     }
 
     const handlePointerActivity = (event: PointerEvent) => {
+      // Touch keeps the controls on screen permanently (the `touch` mixin in
+      // the stylesheet pins them), so a finger mid-swipe would be paying for a
+      // state update and a timer per move to reveal what is already revealed.
+      if (event.pointerType !== "mouse") {
+        return;
+      }
+
       const last = lastPointerPositionRef.current;
 
       // Hiding the nav flips it to `pointer-events: none`, which can hand the
@@ -505,6 +530,7 @@ export function WorkProjectGalleryClient({
   // `currentIndex`, so the window moves in the same tick as the slide.
   const selectIndex = useCallback(
     (index: number) => {
+      currentIndexRef.current = index;
       setCurrentIndex(index);
       // The set only ever grows: once a photo has been fetched, dropping it out
       // of the window would just make paging back re-decode it for nothing.
@@ -537,54 +563,63 @@ export function WorkProjectGalleryClient({
     }
 
     let cancelled = false;
+    let Constructor: typeof Flickity | null = null;
     let instance: Flickity | null = null;
     let handleChange: ((index: number) => void) | null = null;
-    const initializeFlickity = async () => {
-      const { default: FlickityConstructor } = await import("flickity");
-      await import("flickity-fade");
+    const slideMedia = window.matchMedia(SLIDE_MEDIA);
 
-      if (cancelled) {
-        return;
-      }
+    const optionsFor = (index: number) => {
+      const slides = slideMedia.matches;
 
-      const flickityOptions = {
-        adaptiveHeight: false,
+      return {
         cellAlign: "left",
-        contain: true,
         dragThreshold: 10,
-        draggable: window.matchMedia(DRAGGABLE_MEDIA).matches,
-        // friction: 1,
-        // selectedAttraction: 0.5,
-        imagesLoaded: true,
-        initialIndex,
+        draggable: slides,
+        fade: !slides,
+        // Never free-scroll. `handleDragEnd` only clears `isFreeScrolling`
+        // when `!isWrapping`, so with `wrapAround` a flick coasts on friction
+        // alone and comes to rest between two photographs rather than on one:
+        // in fade mode that is two images left at partial opacity, which
+        // `onSettleFade` then snaps apart — the visible pop at the end of
+        // every swipe. Selected-attraction is what pulls it onto a slide, and
+        // free-scroll is exactly what switches that off.
+        freeScroll: false,
+        initialIndex: index,
         pageDots: false,
         percentPosition: true,
         prevNextButtons: false,
         setGallerySize: false,
-        freeScroll: true,
         wrapAround: true,
-        fade: true,
+        // Only in slide mode: fade has no travel to tune, and passing these
+        // explicitly would override Flickity's defaults for a mode that never
+        // moves the slider.
+        ...(slides
+          ? {
+              friction: SLIDE_FRICTION,
+              selectedAttraction: SLIDE_SELECTED_ATTRACTION,
+            }
+          : {}),
+        // No `imagesLoaded`: its progress callback calls
+        // `positionSliderAtSelected()` whenever a photograph finishes loading
+        // and free-scroll is off, which would yank the slider out from under
+        // a drag in progress. Nothing needs it — every cell is a fixed 100%
+        // wide and `setGallerySize` is off, so a loaded image changes no size.
       } satisfies Flickity.Options & { fade: boolean };
-
-      instance = new FlickityConstructor(carousel, flickityOptions);
-      flickityRef.current = instance;
-      handleChange = (index) => selectIndex(index);
-      instance.on("change", handleChange);
-      selectIndex(instance.selectedIndex);
-
-      if (cancelled) {
-        instance.off("change", handleChange);
-        instance.destroy();
-        instance = null;
-        flickityRef.current = null;
-      }
     };
 
-    void initializeFlickity();
+    const build = (index: number) => {
+      if (!Constructor) {
+        return;
+      }
 
-    return () => {
-      cancelled = true;
+      instance = new Constructor(carousel, optionsFor(index));
+      flickityRef.current = instance;
+      handleChange = (changedIndex) => selectIndex(changedIndex);
+      instance.on("change", handleChange);
+      selectIndex(instance.selectedIndex);
+    };
 
+    const teardown = () => {
       if (instance) {
         if (handleChange) {
           instance.off("change", handleChange);
@@ -593,7 +628,47 @@ export function WorkProjectGalleryClient({
         instance = null;
       }
 
+      handleChange = null;
       flickityRef.current = null;
+    };
+
+    // Rotating a phone, or dragging a desktop window across the breakpoint,
+    // changes which carousel the visitor should be holding. Flickity reads
+    // `fade` and `draggable` once, at construction, so switching means
+    // building it again — on the photograph they are looking at, not back at
+    // the one they opened.
+    const rebuild = () => {
+      const index = currentIndexRef.current;
+
+      teardown();
+      build(index);
+    };
+
+    const initializeFlickity = async () => {
+      const { default: FlickityConstructor } = await import("flickity");
+      await import("flickity-fade");
+
+      if (cancelled) {
+        return;
+      }
+
+      Constructor = FlickityConstructor;
+      build(initialIndex);
+
+      if (cancelled) {
+        teardown();
+        return;
+      }
+
+      slideMedia.addEventListener("change", rebuild);
+    };
+
+    void initializeFlickity();
+
+    return () => {
+      cancelled = true;
+      slideMedia.removeEventListener("change", rebuild);
+      teardown();
     };
   }, [images, initialIndex, selectIndex]);
 
@@ -799,27 +874,39 @@ export function WorkProjectGalleryClient({
           role="region"
           onClick={handleCarouselClick}
           onDragStart={(event) => event.preventDefault()}
+          // Mouse only, and checked here rather than inside `usePointerLabel`:
+          // the hint it drives is already mouse-only, but `isPointerOverControls`
+          // runs first and measures the nav with `getBoundingClientRect()`. That
+          // is a forced layout, and on touch it landed on every move of a finger
+          // that was mid-drag — interleaved with the writes Flickity makes each
+          // frame.
           onPointerEnter={(event) => {
-            if (isModal) {
-              if (isPointerOverControls(event)) {
-                hideCloseHint();
-              } else {
-                closeHintHandlers.onPointerEnter(event);
-              }
+            if (!isModal || event.pointerType !== "mouse") {
+              return;
+            }
+
+            if (isPointerOverControls(event)) {
+              hideCloseHint();
+            } else {
+              closeHintHandlers.onPointerEnter(event);
             }
           }}
           onPointerLeave={(event) => {
-            if (isModal) {
-              closeHintHandlers.onPointerLeave(event);
+            if (!isModal || event.pointerType !== "mouse") {
+              return;
             }
+
+            closeHintHandlers.onPointerLeave(event);
           }}
           onPointerMove={(event) => {
-            if (isModal) {
-              if (isPointerOverControls(event)) {
-                hideCloseHint();
-              } else {
-                closeHintHandlers.onPointerMove(event);
-              }
+            if (!isModal || event.pointerType !== "mouse") {
+              return;
+            }
+
+            if (isPointerOverControls(event)) {
+              hideCloseHint();
+            } else {
+              closeHintHandlers.onPointerMove(event);
             }
           }}
           ref={carouselRef}
