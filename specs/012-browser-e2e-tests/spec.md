@@ -22,6 +22,7 @@ Someone changes the project gallery — a carousel option, a control, the lazy-l
 2. **Given** the gallery is open, **When** the visitor presses the arrow keys, **Then** the gallery moves in that direction.
 3. **Given** the visitor is looking at a photograph full-screen inside the project preview, **When** they dismiss it, **Then** the project preview is still open behind it.
 4. **Given** the visitor has not moved the pointer for a while, **When** they look at the screen, **Then** the controls have receded; **When** they move the pointer again, **Then** the controls return.
+5. **Given** a visitor on a touch device with the gallery open, **When** they swipe across a photograph, **Then** the gallery moves on to the next photograph, dragged rather than cross-faded.
 
 ---
 
@@ -96,6 +97,7 @@ A visitor who has asked their operating system to reduce motion gets a site that
 - **SC-006**: The command that runs the suite, and the statement of where it runs and does not, are both discoverable from the project's own contributor documentation.
 - **SC-007**: A deliberately broken behaviour — a disabled control, a removed key handler — fails the suite, demonstrated once rather than assumed.
 - **SC-008**: No behaviour is asserted on one route while identical copies of it remain untested on others.
+- **SC-009**: A visitor on a touch device can swipe from one photograph to the next, and gets the dragging carousel rather than the crossfade. Where the slider comes to rest, and whether a leaning swipe survives the browser's own scrolling, are outside what this suite can see — see the note in [contracts/test-surface.md](./contracts/test-surface.md).
 
 ## Assumptions
 

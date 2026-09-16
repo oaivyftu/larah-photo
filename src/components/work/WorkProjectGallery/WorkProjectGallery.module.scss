@@ -11,6 +11,10 @@
   inset: 0;
   display: grid;
   background: color-mix(in srgb, var(--color-ink) 38%, transparent);
+  /* The lightbox sits inside the work detail panel, which is itself a scroll
+     container. Without this, a swipe that runs out of carousel hands the
+     scroll to that panel behind the photograph. */
+  overscroll-behavior: contain;
 }
 
 /* `svh`, not `vh`: on mobile browsers `100vh` measures the viewport with the
@@ -170,6 +174,21 @@
 
 .work-project-gallery__carousel :global(.flickity-viewport) {
   overflow: hidden;
+}
+
+/* The gesture belongs to the carousel. Flickity's own CSS leaves the viewport
+   at `touch-action: pan-y`, and it only calls `preventDefault` on a touchmove
+   once the finger has travelled past the drag threshold horizontally. A swipe
+   with any vertical lean therefore starts as a browser scroll of the panel
+   behind, at which point the touchmove is no longer cancelable and Flickity's
+   own scroll watcher cancels the drag outright — the swipe that "sticks".
+   Nothing is lost by claiming it: the lightbox fills the screen, so there is
+   nothing beneath the finger to scroll, and `pan-y` had already ruled out
+   pinch-zoom. */
+.work-project-gallery--modal
+  .work-project-gallery__carousel
+  :global(.flickity-viewport) {
+  touch-action: none;
 }
 
 .work-project-gallery__carousel :global(.flickity-slider) {

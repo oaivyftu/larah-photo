@@ -41,23 +41,24 @@ the carousel, not accepting from the component.
 
 ### Already in the tree — no change needed
 
-| Handle                                                   | Element                                          | Read by        |
-| -------------------------------------------------------- | ------------------------------------------------ | -------------- |
-| `role="region"` + name `"{title} image gallery"`         | The carousel                                     | J1, J2         |
-| `aria-roledescription="carousel"`                        | The carousel                                     | J1, J2         |
-| `.flickity-enabled`                                      | The carousel, once Flickity boots                | J1, J2         |
-| `.is-selected`                                           | The selected `<figure>` cell                     | J1, J2         |
-| `aria-label="{n} of {N}: {alt}"`                         | Each `<figure>` slide                            | J1, J2         |
-| `aria-live="polite"` text `"Image {n} of {N}"`           | Inside the float nav                             | J1, J2         |
-| `role="button"` name `"Next image"` / `"Previous image"` | Float-nav controls                               | J1             |
-| `role="button"` name `"Close gallery"`                   | Float-nav close, modal only                      | J3             |
-| `role="dialog"` + `aria-modal`                           | Work detail preview and the lightbox             | J3, J7         |
-| `data-work-modal`                                        | The project preview dialog                       | J3, J7         |
-| `data-page-heading`                                      | `PageHeading`                                    | J8             |
-| `data-active`                                            | The glass pointer pill                           | J9             |
-| `data-work-card`                                         | Project cards on the work index                  | J3, J5, J7, J9 |
-| `document.documentElement.dataset.pageTransition`        | `<html>`, set by `PageTransition`                | J5             |
-| `document.documentElement.dataset.imageLightbox`         | `<html>`, set while the lightbox owns the screen | J3             |
+| Handle                                                   | Element                                             | Read by        |
+| -------------------------------------------------------- | --------------------------------------------------- | -------------- |
+| `role="region"` + name `"{title} image gallery"`         | The carousel                                        | J1, J2         |
+| `aria-roledescription="carousel"`                        | The carousel                                        | J1, J2         |
+| `.flickity-enabled`                                      | The carousel, once Flickity boots                   | J1, J2, J10    |
+| `.is-fade`                                               | The carousel, when it crossfades rather than slides | J1, J10        |
+| `.is-selected`                                           | The selected `<figure>` cell                        | J1, J2, J10    |
+| `aria-label="{n} of {N}: {alt}"`                         | Each `<figure>` slide                               | J1, J2, J10    |
+| `aria-live="polite"` text `"Image {n} of {N}"`           | Inside the float nav                                | J1, J2, J10    |
+| `role="button"` name `"Next image"` / `"Previous image"` | Float-nav controls                                  | J1             |
+| `role="button"` name `"Close gallery"`                   | Float-nav close, modal only                         | J3             |
+| `role="dialog"` + `aria-modal`                           | Work detail preview and the lightbox                | J3, J7         |
+| `data-work-modal`                                        | The project preview dialog                          | J3, J7         |
+| `data-page-heading`                                      | `PageHeading`                                       | J8             |
+| `data-active`                                            | The glass pointer pill                              | J9             |
+| `data-work-card`                                         | Project cards on the work index                     | J3, J5, J7, J9 |
+| `document.documentElement.dataset.pageTransition`        | `<html>`, set by `PageTransition`                   | J5             |
+| `document.documentElement.dataset.imageLightbox`         | `<html>`, set while the lightbox owns the screen    | J3             |
 
 Note how much of this is accessibility markup that already had to be right for
 Principle II. That is not a coincidence and it is the argument for preferring
@@ -80,20 +81,22 @@ rendering.
 
 The handles above locate elements; these are the assertions made on them.
 
-| State                       | Assertion                                                                                 | Journey |
-| --------------------------- | ----------------------------------------------------------------------------------------- | ------- |
-| The carousel initialised    | The carousel region has class `flickity-enabled`                                          | J1, J2  |
-| Which photograph is current | `figure.is-selected` has the expected `aria-label` prefix (`"2 of 6:"`)                   | J1, J2  |
-| The photograph changed      | The selected figure's `aria-label` differs from the one captured before                   | J1, J2  |
-| The controls are visible    | Computed `opacity` of `[data-gallery-controls]` is `"1"`                                  | J4      |
-| The controls have receded   | Computed `opacity` of `[data-gallery-controls]` is `"0"`                                  | J4      |
-| The preview is still open   | `[role="dialog"]` is attached, and the URL is still the project's                         | J3      |
-| The navigation completed    | `document.documentElement.dataset.pageTransition === "ready"`                             | J5      |
-| Focus moved to the content  | `document.activeElement.id === "main-content"` after a navigation                         | J6      |
-| Tab continues from there    | The next focused element is inside `#main-content` or follows it in document order        | J6      |
-| The intro was parked        | Heading `opacity` sampled at `larah:page-ready` — `"0"` with motion, `"1"` under `reduce` | J8      |
-| The page content arrived    | Computed `opacity` of `[data-page-heading] > span` is `"1"`                               | J8      |
-| The pointer label is on     | `[data-glass-pointer]` has attribute `data-active`                                        | J9      |
+| State                       | Assertion                                                                                   | Journey     |
+| --------------------------- | ------------------------------------------------------------------------------------------- | ----------- |
+| The carousel initialised    | The carousel region has class `flickity-enabled`                                            | J1, J2      |
+| Which photograph is current | `figure.is-selected` has the expected `aria-label` prefix (`"2 of 6:"`)                     | J1, J2      |
+| The photograph changed      | The selected figure's `aria-label` differs from the one captured before                     | J1, J2, J10 |
+| Which carousel is running   | The carousel region has class `is-fade` on a fine pointer, and does not on a coarse one     | J1, J10     |
+| The swipe advanced          | `"Image {n} of {N}"` reads the next photograph, and exactly one `figure.is-selected` exists | J10         |
+| The controls are visible    | Computed `opacity` of `[data-gallery-controls]` is `"1"`                                    | J4          |
+| The controls have receded   | Computed `opacity` of `[data-gallery-controls]` is `"0"`                                    | J4          |
+| The preview is still open   | `[role="dialog"]` is attached, and the URL is still the project's                           | J3          |
+| The navigation completed    | `document.documentElement.dataset.pageTransition === "ready"`                               | J5          |
+| Focus moved to the content  | `document.activeElement.id === "main-content"` after a navigation                           | J6          |
+| Tab continues from there    | The next focused element is inside `#main-content` or follows it in document order          | J6          |
+| The intro was parked        | Heading `opacity` sampled at `larah:page-ready` — `"0"` with motion, `"1"` under `reduce`   | J8          |
+| The page content arrived    | Computed `opacity` of `[data-page-heading] > span` is `"1"`                                 | J8          |
+| The pointer label is on     | `[data-glass-pointer]` has attribute `data-active`                                          | J9          |
 
 **On the parked-intro row, which review added.** J8 first asserted only the
 finished state — and a finished state is exactly what a page with no entrance
@@ -114,6 +117,25 @@ focusable element in their content at all, so the correct next stop is the
 footer -- which is still continuing forwards. What must never happen is landing
 back in the header, which is what "back at the top of the document" means. The
 assertion is therefore document order, not containment.
+
+**On the two rows J10 added, and the limit that was measured rather than
+assumed.** `is-fade` is flickity-fade's own class, set only where the crossfade
+is on, so which of the two carousels a pointer got is the library's statement
+rather than the test's inference — the third selector tier, same as
+`flickity-enabled`. Together with the advance, that is what a touch journey can
+honestly assert here.
+
+What it cannot reach is where the slider comes to _rest_, which is the defect
+that prompted the journey: `freeScroll` with `wrapAround` left a flick coasting
+to a stop between two photographs. `handleDragEnd` calls `select()` regardless,
+so the selected cell and the live region both advance anyway — the journey was
+run with the bug reinstated and passed. Distinguishing the two needs the
+slider's offset, and a transform is precisely what FR-009 excludes. So the
+option is asserted in the unit suite (`freeScroll: false`) and the rest position
+is a device check. The same applies to `touch-action`: CDP touch events do not
+reproduce a real scroll claiming the gesture, so that fix is also verified on a
+device. Recorded here because a row on this list reads as a guarantee, and these
+two are narrower than they look.
 
 **On the three computed-`opacity` reads and FR-009**: FR-009 excludes asserting
 visual _appearance_ — colours, spacing, exact positions, screenshot diffs. These
