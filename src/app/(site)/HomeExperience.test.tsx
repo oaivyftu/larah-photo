@@ -219,6 +219,40 @@ describe("HomeExperience", () => {
     expect(container.querySelectorAll("svg").length).toBeGreaterThan(0);
   });
 
+  it("gives each real package its own mark, not the fallback", () => {
+    // The test above cannot catch a mapping gone stale: the fallback is an
+    // svg too, so it passes whether or not a package found its own icon. That
+    // is how Engagement rendered a plain circle -- its Sanity id is
+    // `couple-and-engagement`, and the map still said `couple-session`.
+    //
+    // These ids are the ones the dataset actually holds. If an editor renames
+    // one, this is where that stops being silent -- though the lasting fix is
+    // an icon field on the package, which removes the id coupling.
+    const packages = [
+      ["portrait-session", "Portrait Session", "user"],
+      ["couple-and-engagement", "Engagement", "user-group"],
+      ["family-session", "Family Session", "people-roof"],
+      ["graduation-session", "Graduation Session", "graduation"],
+    ] as const;
+
+    renderHome({
+      services: packages.map(([id, title]) => service(id, title)),
+    });
+
+    for (const [, title, expectedIcon] of packages) {
+      // The card's own icon is its first svg; the button's arrow comes later.
+      const icon = screen
+        .getByRole("heading", { name: title })
+        .closest("article")
+        ?.querySelector("svg");
+
+      expect(icon, `${title} should render an icon`).toHaveAttribute(
+        "data-icon",
+        expectedIcon,
+      );
+    }
+  });
+
   it("renders with no services rather than failing", () => {
     renderHome({ services: [] });
 
