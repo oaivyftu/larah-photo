@@ -31,7 +31,7 @@ type HomeExperienceProps = {
 
 const serviceIcons: Record<string, typeof icons.portrait> = {
   "portrait-session": icons.portrait,
-  "couple-session": icons.userGroup,
+  "couple-and-engagement": icons.userGroup,
   "wedding-session": icons.ring,
   "family-session": icons.family,
   "graduation-session": icons.graduation,
