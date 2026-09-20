@@ -26,7 +26,7 @@ An editor signs in to the content editing interface, hosted as part of the site,
 
 **Acceptance Scenarios**:
 
-1. **Given** an authorized editor navigates to the Studio route, **When** it loads, **Then** they see a content editing interface covering every content type the site uses (site settings, pages, work projects, service packages).
+1. **Given** an authorized editor navigates to the Studio route, **When** it loads, **Then** they see a content editing interface covering every content type the site uses (site settings, pages, work projects, service packages, journal posts and journal page settings).
 2. **Given** the Studio interface renders, **When** it loads, **Then** it displays with its own complete visual design, unaffected by the public site's styling.
 3. **Given** a search engine or crawler reaches the Studio route, **When** it requests the page, **Then** the response indicates the page must not be indexed or followed.
 
@@ -60,7 +60,7 @@ After an editor publishes a change in the Studio, that change becomes visible on
 
 ### Functional Requirements
 
-- **FR-001**: The site MUST provide an embedded content editing interface, reachable at a dedicated route, covering every content type the public site renders (site settings, home/about/service/contact/work page content, work projects, service packages).
+- **FR-001**: The site MUST provide an embedded content editing interface, reachable at a dedicated route, covering every content type the public site renders (site settings, home/about/service/contact/work/journal page content, work projects, service packages, journal posts).
 - **FR-002**: The editing interface MUST render with its own visual design, isolated from the public site's global styling.
 - **FR-003**: The editing interface's route MUST be excluded from search engine indexing and following.
 - **FR-004**: The system MUST expose a notification endpoint that, given a valid signed request identifying a changed content type, invalidates the site's cached content so subsequent requests reflect the change.
@@ -70,7 +70,7 @@ After an editor publishes a change in the Studio, that change becomes visible on
 
 ### Key Entities
 
-- **Content Document**: Any CMS-managed record the public site depends on (site settings, page content documents, work projects, service packages), each with a content type used to route change notifications.
+- **Content Document**: Any CMS-managed record the public site depends on (site settings, page content documents, work projects, service packages, journal posts), each with a content type used to route change notifications. The notification endpoint invalidates one site-wide cache tag for any content type, so types added later (such as spec 013's journal) are covered without a change to it.
 - **Cache Invalidation Notification**: A signed request identifying which content type changed, used to trigger a targeted cache refresh.
 
 ## Success Criteria _(mandatory)_
