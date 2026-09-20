@@ -55,13 +55,14 @@ A search engine renders enhanced ("rich") results for the studio's business iden
 
 ### Functional Requirements
 
-- **FR-001**: System MUST generate a sitemap listing every static public page and every published work project's detail page, with each project entry including its card image and full gallery images.
+- **FR-001**: System MUST generate a sitemap listing every static public page (including the journal listing), every published work project's detail page, and every live journal post's page. Each project entry includes its card image and full gallery images. Each journal post entry includes its cover and body images, and carries the post's own last-edit time rather than the build time (spec 013). Scheduled journal posts are not listed until their date arrives.
 - **FR-002**: Every public page MUST expose a distinct page title, meta description, canonical URL, and Open Graph/social preview metadata derived from that page's own content.
 - **FR-003**: System MUST generate robots rules that fully disallow crawling when the site is not marked ready for indexing, and that otherwise allow crawling of public pages while disallowing the CMS Studio route and internal API routes, referencing the sitemap.
 - **FR-004**: System MUST generate a web app manifest declaring the site's name, short name, description, start URL, display mode, background color, theme color, and an icon set including a maskable icon.
 - **FR-005**: Every public page MUST embed structured data describing the studio's business identity, emitted once from the shared page shell so no individual page can omit it.
-- **FR-005a**: Pages that sit below the site root MUST additionally embed a breadcrumb trail reflecting their position in the hierarchy. This applies to the work listing, project detail, services, about, and contact pages. The home page carries a site-level descriptor instead of a breadcrumb (it _is_ the root, so a trail would have a single entry).
+- **FR-005a**: Pages that sit below the site root MUST additionally embed a breadcrumb trail reflecting their position in the hierarchy. This applies to the work listing, project detail, services, about, contact, journal listing and journal post pages. The home page carries a site-level descriptor instead of a breadcrumb (it _is_ the root, so a trail would have a single entry).
 - **FR-006**: The work listing page MUST embed structured data describing the collection of work projects; each project detail page MUST embed structured data describing that specific project. The in-app overlay does not emit its own structured data and does not need to: interception occurs only on client-side navigation, so any crawler, shared link, or page refresh receives the standalone project page and its structured data instead.
+- **FR-006a**: The journal listing page MUST embed structured data describing the collection of live journal articles, in the same form as the work listing. Each journal post page MUST embed structured data describing that post as a blog article: headline, dates published and modified, cover image, category, location, and the studio as author and publisher, referenced rather than restated (spec 013).
 - **FR-007**: The services page MUST embed structured data describing the list of service packages, including pricing in the site's configured currency.
 - **FR-008**: The about and contact pages MUST embed structured data describing their respective content.
 - **FR-009**: A project's URL MUST resolve to exactly one canonical URL, so search engines and shared links never see duplicate content. The in-app overlay does not declare its own canonical URL; because interception applies only to client-side navigation, every crawler or direct request to a project URL renders the standalone page and reads that page's canonical.
@@ -79,7 +80,7 @@ A search engine renders enhanced ("rich") results for the studio's business iden
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% of public pages and published work projects appear in the sitemap.
+- **SC-001**: 100% of public pages, published work projects and live journal posts appear in the sitemap.
 - **SC-002**: 100% of public pages expose a distinct title, description, canonical URL, and preview image matching their own content — zero pages share another page's metadata.
 - **SC-003**: When the site is not marked ready for indexing, 0% of routes are crawlable; once marked ready, 100% of public routes are crawlable and the CMS Studio and API routes remain disallowed.
 - **SC-004**: A link to any public page, when shared, unfurls with that page's own title, description, and image in social/messaging previews.
@@ -90,5 +91,5 @@ A search engine renders enhanced ("rich") results for the studio's business iden
 
 - This specification documents the site's current, already-implemented SEO and metadata behavior as a baseline, rather than proposing new functionality.
 - Site indexability is controlled by a single site-wide setting that defaults to "not indexable," requiring an explicit, deliberate opt-in before launch.
-- "Public pages" refers to the home, work listing, project detail, about, service, and contact pages; the CMS Studio and internal API routes are explicitly excluded from indexing and structured data.
+- "Public pages" refers to the home, work listing, project detail, about, service, contact, journal listing and journal post pages; the CMS Studio and internal API routes are explicitly excluded from indexing and structured data.
 - The about page was originally missing the breadcrumb every other sub-page emits (FR-005a). That gap was an oversight rather than a design choice, and has since been closed: the page now emits the same two-entry trail as the contact page.

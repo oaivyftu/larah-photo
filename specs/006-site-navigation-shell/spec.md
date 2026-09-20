@@ -73,7 +73,7 @@ A keyboard or screen-reader user can skip the header to reach the page's main co
 
 - **FR-001**: Every page MUST render a header containing the site logo (except on the home page, where it is hidden to avoid duplicating the hero's own logo), the primary navigation, and an Instagram call-to-action, and a footer containing the studio's statement, business email, business phone, location, an Instagram link, a link to the work page, and a "back to top" control.
 - **FR-002**: Primary navigation items, the site name, and the Instagram URL used in the header and footer MUST be sourced entirely from site-wide CMS settings, not hardcoded.
-- **FR-003**: The primary navigation link matching the visitor's current section MUST be marked as the current page both visually and via an accessible "current page" indicator.
+- **FR-003**: The primary navigation link matching the visitor's current section MUST be marked as the current page both visually and via an accessible "current page" indicator. A page nested inside a section marks that section's link: project pages mark Work, and journal post pages mark Journal (spec 013).
 - **FR-004**: Activating the footer's "back to top" control MUST scroll the page to the top and move keyboard focus there.
 - **FR-005**: Clicking an internal link to a different page (in the same tab, without modifier keys, not a download, and not opening a new tab) MUST trigger a covering transition animation before the browser navigates, and MUST reveal the destination page shortly after navigation completes.
 - **FR-006**: Links that open in a new tab, are modified-clicked, point to a download, point to an external origin, only change the current page's hash, or are marked as opening an in-app overlay MUST NOT trigger the full-page transition animation.
@@ -105,3 +105,4 @@ A keyboard or screen-reader user can skip the header to reach the page's main co
 - Sanity CMS site settings remain the sole source of navigation, contact, and footer content, consistent with the project's content-source-of-truth principle.
 - "In-app overlay" links refer to the work gallery's project-preview links, the only current use of the modal-route navigation exemption.
 - The CMS Studio route intentionally falls outside this shell and its transition system, since it renders its own independent interface.
+- Spec 013 (Journal) added two shell variants, the journal listing and a journal post, and both mark the `/journal` navigation item current. The item itself is added by an editor in site settings, like every other navigation item. Until it exists, the journal is reachable by URL and sitemap but not from the header, which is a valid state.

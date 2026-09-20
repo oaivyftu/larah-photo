@@ -63,6 +63,16 @@ These are specified _before_ being built, so they carry the full artifact set:
   the 186 statements the unit and integration suite leaves uncovered. Runs on
   demand, not in a Git hook, which is what feature 009 already anticipated
   rather than something this reverses. Next step: `/speckit-plan`.
+- **`013-journal-section`** — specified and planned 2026-09-14/15, code
+  complete 2026-09-18, in review. A Journal (blog) section — a listing page and
+  per-post pages published from the Studio — for long-form, location-specific
+  articles targeting local long-tail search. Clarified into five decisions
+  (fixed category list, `/journal`, a shared end-of-post CTA, date-driven
+  scheduling, and a rich body with allow-listed embeds); the plan adds **no new
+  dependency**. 56 of 60 tasks done. The four open ones need a live post or the
+  webhook fixed: the Studio walkthrough (T038), the quickstart scenarios (T060),
+  the browser suite's journal journeys running against a real post (T054), and
+  the revalidation webhook, which returns 500 (T037, not journal-specific).
 
 ## Targeting a feature
 

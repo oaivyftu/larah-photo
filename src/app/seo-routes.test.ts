@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { JournalPostSummary } from "@/types/journal";
 import type { Project } from "@/types/project";
 
 // robots.ts, sitemap.ts and manifest.ts are the three files nobody looks at
@@ -9,10 +10,39 @@ import type { Project } from "@/types/project";
 // module scope from the environment, so each test re-imports after setting it.
 
 const getWorkProjects = vi.fn<() => Promise<Project[]>>();
+const getJournalPosts = vi.fn<() => Promise<JournalPostSummary[]>>();
 
 vi.mock("@/sanity/fetchers", () => ({
   getWorkProjects: () => getWorkProjects(),
+  getJournalPosts: () => getJournalPosts(),
 }));
+
+function journalPost(
+  slug: string,
+  bodyImages: string[] = [],
+): JournalPostSummary {
+  return {
+    slug,
+    title: slug,
+    excerpt: "",
+    publishedAt: "2026-09-01",
+    updatedAt: "2026-09-10T12:00:00.000Z",
+    category: "Location Guide",
+    location: "London, Ontario",
+    coverImage: {
+      src: `https://cdn.sanity.io/${slug}-cover.jpg`,
+      alt: slug,
+      width: 1,
+      height: 1,
+    },
+    bodyImages: bodyImages.map((src) => ({
+      src,
+      alt: slug,
+      width: 1,
+      height: 1,
+    })),
+  };
+}
 
 function project(slug: string, images: string[] = []): Project {
   return {
@@ -37,6 +67,8 @@ const originalEnv = { ...process.env };
 beforeEach(() => {
   vi.resetModules();
   getWorkProjects.mockReset();
+  getJournalPosts.mockReset();
+  getJournalPosts.mockResolvedValue([]);
   process.env["NEXT_PUBLIC_SITE_URL"] = "https://larah.photo";
 });
 
@@ -82,7 +114,7 @@ describe("robots", () => {
 });
 
 describe("sitemap", () => {
-  it("lists the five public routes plus every project", async () => {
+  it("lists the six public routes plus every project", async () => {
     getWorkProjects.mockResolvedValue([project("harbour-light")]);
     const { default: sitemap } = await import("./sitemap");
 
@@ -94,6 +126,7 @@ describe("sitemap", () => {
       "https://larah.photo/service",
       "https://larah.photo/about",
       "https://larah.photo/contact",
+      "https://larah.photo/journal",
       "https://larah.photo/work/harbour-light",
     ]);
   });
@@ -118,7 +151,7 @@ describe("sitemap", () => {
     getWorkProjects.mockResolvedValue([]);
     const { default: sitemap } = await import("./sitemap");
 
-    await expect(sitemap()).resolves.toHaveLength(5);
+    await expect(sitemap()).resolves.toHaveLength(6);
   });
 
   it("gives every entry a lastModified", async () => {
@@ -139,6 +172,72 @@ describe("sitemap", () => {
     const { default: sitemap } = await import("./sitemap");
 
     await expect(sitemap()).rejects.toThrow("Unable to load work projects");
+  });
+});
+
+describe("sitemap: journal posts", () => {
+  beforeEach(() => {
+    getWorkProjects.mockResolvedValue([]);
+  });
+
+  it("lists every live post at its own URL", async () => {
+    getJournalPosts.mockResolvedValue([journalPost("springbank-guide")]);
+    const { default: sitemap } = await import("./sitemap");
+
+    const urls = (await sitemap()).map((entry) => entry.url);
+
+    expect(urls).toContain("https://larah.photo/journal/springbank-guide");
+  });
+
+  it("carries the cover and body photographs as image entries", async () => {
+    getJournalPosts.mockResolvedValue([
+      journalPost("springbank-guide", ["https://cdn.sanity.io/river.jpg"]),
+    ]);
+    const { default: sitemap } = await import("./sitemap");
+
+    const entry = (await sitemap()).find((item) =>
+      item.url.endsWith("/journal/springbank-guide"),
+    );
+
+    expect(entry?.images).toEqual([
+      "https://cdn.sanity.io/springbank-guide-cover.jpg",
+      "https://cdn.sanity.io/river.jpg",
+    ]);
+  });
+
+  it("dates each post by its own last edit, not by the build", async () => {
+    // An edited article's freshness is worth telling a crawler about, and
+    // Sanity already tracks it (research.md §6).
+    getJournalPosts.mockResolvedValue([journalPost("springbank-guide")]);
+    const { default: sitemap } = await import("./sitemap");
+
+    const entry = (await sitemap()).find((item) =>
+      item.url.endsWith("/journal/springbank-guide"),
+    );
+
+    expect(entry?.lastModified).toEqual(new Date("2026-09-10T12:00:00.000Z"));
+  });
+
+  it("lists the journal itself even when no post is live", async () => {
+    // An empty journal is a valid state, not a missing page (spec 013 Edge
+    // Cases), so its index stays discoverable.
+    getJournalPosts.mockResolvedValue([]);
+    const { default: sitemap } = await import("./sitemap");
+
+    const urls = (await sitemap()).map((entry) => entry.url);
+
+    expect(urls).toContain("https://larah.photo/journal");
+  });
+
+  it("lists nothing the query did not return, so scheduled posts stay out", async () => {
+    // The schedule is enforced in the query; the sitemap must not add
+    // anything of its own on top.
+    getJournalPosts.mockResolvedValue([]);
+    const { default: sitemap } = await import("./sitemap");
+
+    const urls = (await sitemap()).map((entry) => entry.url);
+
+    expect(urls.some((url) => url.includes("/journal/"))).toBe(false);
   });
 });
 

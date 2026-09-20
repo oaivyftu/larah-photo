@@ -149,6 +149,19 @@
   --gallery-detail-value-size: clamp(0.78rem, 0.86vw, 0.95rem);
   --gallery-float-sub-size: 0.6875rem;
 
+  /* Journal post (spec 013). Long-form reading type: larger and more open
+     than the portfolio's display copy, because these pages are read top to
+     bottom rather than glanced at. The h4 and meta steps read scale-tier
+     sizes directly and so get no alias here. */
+  --journal-title-size: clamp(2.25rem, 4.2vw, 4.5rem);
+  --journal-title-size-phone: clamp(2rem, 9vw, 2.75rem);
+  --journal-body-size: clamp(1.0625rem, 1.25vw, 1.25rem);
+  --journal-h2-size: clamp(1.5rem, 2.2vw, 2.25rem);
+  --journal-h3-size: clamp(1.25rem, 1.6vw, 1.625rem);
+  --journal-quote-size: clamp(1.5rem, 2.4vw, 2.5rem);
+  --journal-cta-heading-size: clamp(1.75rem, 3vw, 3rem);
+  --journal-card-title-size: clamp(1.25rem, 1.6vw, 1.75rem);
+
   --line-height-tight: 1;
   --line-height-heading: 1.05;
   /* Kept at 1.18 and deliberately unused. No literal in the tree matches it,
@@ -203,6 +216,10 @@
   --work-detail-copy-leading: 1.55;
   --gallery-detail-label-leading: 1.1;
   --gallery-float-sub-leading: 1.15;
+  --journal-title-leading: 1.02;
+  --journal-body-leading: 1.6;
+  --journal-h2-leading: 1.12;
+  --journal-card-title-leading: 1.15;
 
   /* Easing -- named for the motion each describes, never for its control
      points. Five curves that together were already a deliberate vocabulary;
@@ -425,4 +442,41 @@
   --gallery-float-actions-gap-tablet: 8px;
   --gallery-float-nav-gap: 5px;
   --gallery-float-nav-gap-tablet: 4px;
+
+  /* Journal post (spec 013).
+     The measure keeps body lines near 70 characters at the body size; the
+     wider measure lets the cover and the body's figures and embeds break out
+     of the text column, which is what makes a long read feel like a
+     photographer's page rather than a document. */
+  --journal-article-measure: 42rem;
+  --journal-figure-measure: 64rem;
+  --journal-post-pad-top: clamp(3rem, 6vw, 6rem);
+  --journal-post-pad-bottom: clamp(4rem, 8vw, 8rem);
+  --journal-header-gap: clamp(1.25rem, 2vw, 2rem);
+  --journal-meta-gap: clamp(0.75rem, 1.4vw, 1.5rem);
+  --journal-cover-gap: clamp(2rem, 4vw, 4rem);
+  /* In em, so the rhythm scales with the body size it separates. */
+  --journal-flow-gap: 1.1em;
+  --journal-heading-gap: 1.9em;
+  --journal-list-indent: 1.3em;
+  --journal-list-item-gap: 0.45em;
+  --journal-figure-gap: clamp(2rem, 4vw, 3.5rem);
+  --journal-quote-indent: clamp(1rem, 2vw, 1.75rem);
+  --journal-quote-rule: 2px;
+  --journal-link-offset: 0.18em;
+  /* Maps read better closer to square than video does. */
+  --journal-embed-ratio-video: 16 / 9;
+  --journal-embed-ratio-map: 4 / 3;
+  --journal-cta-pad: clamp(2.5rem, 5vw, 4.5rem);
+  --journal-cta-gap: clamp(1rem, 1.6vw, 1.5rem);
+
+  /* Journal index (spec 013). */
+  --journal-index-pad-top: clamp(1.5rem, 3vw, 3rem);
+  --journal-index-pad-bottom: clamp(4rem, 8vw, 7rem);
+  --journal-index-heading-gap: clamp(2rem, 4vw, 4rem);
+  --journal-grid-gap-x: clamp(1.25rem, 2.5vw, 2.5rem);
+  --journal-grid-gap-y: clamp(2.5rem, 4.5vw, 4.5rem);
+  --journal-card-gap: clamp(0.6rem, 1vw, 0.9rem);
+  --journal-card-image-ratio: 3 / 2;
+  --journal-empty-pad: clamp(3rem, 6vw, 6rem);
 }

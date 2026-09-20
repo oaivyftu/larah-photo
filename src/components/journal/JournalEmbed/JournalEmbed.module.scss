@@ -1,0 +1,23 @@
+.journal-embed {
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  // What shows while the frame loads, or instead of it when a browser or an
+  // extension blocks the provider: a calm reserved box, not a collapse.
+  background: var(--color-paper-warm);
+}
+
+.journal-embed--video {
+  aspect-ratio: var(--journal-embed-ratio-video);
+}
+
+.journal-embed--map {
+  aspect-ratio: var(--journal-embed-ratio-map);
+}
+
+.journal-embed__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

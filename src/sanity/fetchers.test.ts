@@ -569,3 +569,362 @@ describe("slug and span shapes the CMS can return", () => {
     },
   );
 });
+
+// ---------------------------------------------------------------------------
+// Journal (spec 013). The same discipline as every other content type: a
+// published post missing required data raises and names the field, it never
+// renders a placeholder or quietly drops out of the list (FR-025).
+// ---------------------------------------------------------------------------
+
+const journalImage = (alt: string) => ({
+  alt,
+  asset: {
+    url: `https://cdn.sanity.io/images/p/d/${alt.replace(/\W/g, "")}.jpg`,
+    metadata: { dimensions: { width: 1600, height: 1067 } },
+  },
+});
+
+// Body members are typed loosely on purpose: the tests below replace single
+// members with deliberately broken ones, which a precisely inferred union
+// would refuse to compile.
+type JournalBodyFixture = Record<string, unknown>;
+
+const journalPostDoc = () => ({
+  _updatedAt: "2026-09-10T12:00:00Z",
+  slug: { current: "springbank-engagement-guide" },
+  title: "Engagement photos at Springbank Park",
+  excerpt: "Where to stand, when to go, and what the light does.",
+  publishedAt: "2026-09-01",
+  category: "Location Guide",
+  location: "Springbank Park, London, Ontario",
+  coverImage: journalImage("Couple on the footbridge"),
+  bodyImages: [journalImage("The river at golden hour")],
+  body: <JournalBodyFixture[]>[
+    {
+      _type: "block",
+      _key: "b1",
+      style: "normal",
+      markDefs: [],
+      children: [{ _type: "span", _key: "s1", text: "Go early.", marks: [] }],
+    },
+    {
+      _type: "bodyImage",
+      _key: "i1",
+      caption: "The east bank, 7pm in June.",
+      ...journalImage("The river at golden hour"),
+    },
+    {
+      _type: "embed",
+      _key: "e1",
+      url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      title: "A walk along the river path",
+    },
+  ],
+});
+
+const journalPageDoc = {
+  titleWords: ["The", "Journal"],
+  emptyStateMessage: "New stories are on their way.",
+  ctaHeading: "Planning something here?",
+  ctaBody: "Tell me about it.",
+  ctaContactLabel: "Get in touch",
+  ctaWorkLabel: "See the work",
+};
+
+describe("getJournalPage", () => {
+  it("maps the settings document", async () => {
+    fetchMock.mockResolvedValue(journalPageDoc);
+    const { getJournalPage } = await loadFetchers();
+
+    await expect(getJournalPage()).resolves.toEqual({
+      titleWords: ["The", "Journal"],
+      emptyStateMessage: "New stories are on their way.",
+      cta: {
+        heading: "Planning something here?",
+        body: "Tell me about it.",
+        contactLabel: "Get in touch",
+        workLabel: "See the work",
+      },
+    });
+  });
+
+  it("raises when the document does not exist", async () => {
+    fetchMock.mockResolvedValue(null);
+    const { getJournalPage } = await loadFetchers();
+
+    await expect(getJournalPage()).rejects.toThrow(
+      'Sanity document "journalPage" is required.',
+    );
+  });
+
+  it.each([
+    "emptyStateMessage",
+    "ctaHeading",
+    "ctaBody",
+    "ctaContactLabel",
+    "ctaWorkLabel",
+  ])("raises, naming the field, when %s is blank", async (field) => {
+    fetchMock.mockResolvedValue({ ...journalPageDoc, [field]: "   " });
+    const { getJournalPage } = await loadFetchers();
+
+    await expect(getJournalPage()).rejects.toThrow(`journalPage.${field}`);
+  });
+
+  it("raises when titleWords is missing", async () => {
+    fetchMock.mockResolvedValue({ ...journalPageDoc, titleWords: undefined });
+    const { getJournalPage } = await loadFetchers();
+
+    await expect(getJournalPage()).rejects.toThrow("journalPage.titleWords");
+  });
+});
+
+describe("getJournalPosts", () => {
+  it("maps a complete post, resolving images and normalising embeds", async () => {
+    fetchMock.mockResolvedValue([journalPostDoc()]);
+    const { getJournalPosts } = await loadFetchers();
+
+    const [post] = await getJournalPosts();
+
+    expect(post).toMatchObject({
+      slug: "springbank-engagement-guide",
+      title: "Engagement photos at Springbank Park",
+      publishedAt: "2026-09-01",
+      category: "Location Guide",
+      location: "Springbank Park, London, Ontario",
+      updatedAt: "2026-09-10T12:00:00Z",
+      coverImage: { alt: "Couple on the footbridge", width: 1600 },
+      bodyImages: [{ alt: "The river at golden hour" }],
+    });
+  });
+
+  it("returns an empty list rather than raising when nothing is live", async () => {
+    // Zero live posts is a valid state (spec Edge Cases), exactly as an empty
+    // set of work projects is.
+    fetchMock.mockResolvedValue([]);
+    const { getJournalPosts } = await loadFetchers();
+
+    await expect(getJournalPosts()).resolves.toEqual([]);
+  });
+
+  it.each(["title", "excerpt", "location"])(
+    "raises, naming the post by position, when %s is blank",
+    async (field) => {
+      fetchMock.mockResolvedValue([
+        journalPostDoc(),
+        { ...journalPostDoc(), [field]: " " },
+      ]);
+      const { getJournalPosts } = await loadFetchers();
+
+      await expect(getJournalPosts()).rejects.toThrow(
+        `journalPost[1].${field}`,
+      );
+    },
+  );
+
+  it("raises when the slug is missing", async () => {
+    fetchMock.mockResolvedValue([{ ...journalPostDoc(), slug: undefined }]);
+    const { getJournalPosts } = await loadFetchers();
+
+    await expect(getJournalPosts()).rejects.toThrow("journalPost[0].slug");
+  });
+
+  it("raises on a category outside the fixed list", async () => {
+    // FR-003: the list is fixed so "Weddings" cannot quietly become a second
+    // category. A value that got past the Studio is a content error.
+    fetchMock.mockResolvedValue([
+      { ...journalPostDoc(), category: "Weddings" },
+    ]);
+    const { getJournalPosts } = await loadFetchers();
+
+    await expect(getJournalPosts()).rejects.toThrow("journalPost[0].category");
+  });
+
+  it("raises on a published date that is not a calendar date", async () => {
+    fetchMock.mockResolvedValue([
+      { ...journalPostDoc(), publishedAt: "2026-09-01T10:00:00Z" },
+    ]);
+    const { getJournalPosts } = await loadFetchers();
+
+    await expect(getJournalPosts()).rejects.toThrow(
+      "journalPost[0].publishedAt",
+    );
+  });
+
+  it("raises when the cover has no alt text", async () => {
+    fetchMock.mockResolvedValue([
+      { ...journalPostDoc(), coverImage: journalImage("") },
+    ]);
+    const { getJournalPosts } = await loadFetchers();
+
+    await expect(getJournalPosts()).rejects.toThrow(
+      "journalPost[0].coverImage",
+    );
+  });
+});
+
+describe("getJournalPostBySlug", () => {
+  it("returns null for an unknown or scheduled slug instead of throwing", async () => {
+    // The live-post predicate lives in the query, so a scheduled post comes
+    // back from Sanity exactly as an unknown one does: as nothing.
+    fetchMock.mockResolvedValue(null);
+    const { getJournalPostBySlug } = await loadFetchers();
+
+    await expect(getJournalPostBySlug("not-yet")).resolves.toBeNull();
+  });
+
+  it("maps the body: blocks pass through, images resolve, embeds normalise", async () => {
+    fetchMock.mockResolvedValue(journalPostDoc());
+    const { getJournalPostBySlug } = await loadFetchers();
+
+    const post = await getJournalPostBySlug("springbank-engagement-guide");
+
+    expect(post?.body).toEqual([
+      expect.objectContaining({ _type: "block", _key: "b1" }),
+      {
+        _type: "bodyImage",
+        _key: "i1",
+        caption: "The east bank, 7pm in June.",
+        image: expect.objectContaining({ alt: "The river at golden hour" }),
+      },
+      {
+        _type: "embed",
+        _key: "e1",
+        provider: "youtube",
+        src: "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+        title: "A walk along the river path",
+      },
+    ]);
+  });
+
+  it("leaves a caption out when the editor did not write one", async () => {
+    const doc = journalPostDoc();
+    doc.body[1] = { ...doc.body[1], caption: undefined };
+    fetchMock.mockResolvedValue(doc);
+    const { getJournalPostBySlug } = await loadFetchers();
+
+    const post = await getJournalPostBySlug("springbank-engagement-guide");
+
+    expect(post?.body[1]).not.toHaveProperty("caption");
+  });
+
+  it("raises on a body image without alt text, naming its position", async () => {
+    const doc = journalPostDoc();
+    doc.body[1] = { ...doc.body[1], alt: "" };
+    fetchMock.mockResolvedValue(doc);
+    const { getJournalPostBySlug } = await loadFetchers();
+
+    await expect(
+      getJournalPostBySlug("springbank-engagement-guide"),
+    ).rejects.toThrow('journalPost("springbank-engagement-guide").body[1]');
+  });
+
+  it("raises on an embed from a provider outside the allow-list", async () => {
+    // FR-002b: refused at publish time in the Studio, and refused again here
+    // in case one ever reaches the site — an unknown third party's frame is
+    // never rendered.
+    const doc = journalPostDoc();
+    doc.body[2] = {
+      ...doc.body[2],
+      url: "https://www.dailymotion.com/video/x7tgad0",
+    };
+    fetchMock.mockResolvedValue(doc);
+    const { getJournalPostBySlug } = await loadFetchers();
+
+    await expect(
+      getJournalPostBySlug("springbank-engagement-guide"),
+    ).rejects.toThrow('journalPost("springbank-engagement-guide").body[2].url');
+  });
+
+  it("raises on an embed with no description", async () => {
+    const doc = journalPostDoc();
+    doc.body[2] = { ...doc.body[2], title: " " };
+    fetchMock.mockResolvedValue(doc);
+    const { getJournalPostBySlug } = await loadFetchers();
+
+    await expect(
+      getJournalPostBySlug("springbank-engagement-guide"),
+    ).rejects.toThrow(
+      'journalPost("springbank-engagement-guide").body[2].title',
+    );
+  });
+
+  it("raises when the body is empty", async () => {
+    fetchMock.mockResolvedValue({ ...journalPostDoc(), body: [] });
+    const { getJournalPostBySlug } = await loadFetchers();
+
+    await expect(
+      getJournalPostBySlug("springbank-engagement-guide"),
+    ).rejects.toThrow('journalPost("springbank-engagement-guide").body');
+  });
+
+  it("treats blank SEO overrides as unset so the fallback applies", async () => {
+    fetchMock.mockResolvedValue({
+      ...journalPostDoc(),
+      seoTitle: "   ",
+      seoDescription: undefined,
+    });
+    const { getJournalPostBySlug } = await loadFetchers();
+
+    const post = await getJournalPostBySlug("springbank-engagement-guide");
+
+    expect(post?.seoTitle).toBeUndefined();
+    expect(post?.seoDescription).toBeUndefined();
+  });
+
+  it("keeps SEO overrides the editor did set, trimmed", async () => {
+    fetchMock.mockResolvedValue({
+      ...journalPostDoc(),
+      seoTitle: " Springbank Park engagement photos ",
+      seoDescription: "A local guide.",
+    });
+    const { getJournalPostBySlug } = await loadFetchers();
+
+    const post = await getJournalPostBySlug("springbank-engagement-guide");
+
+    expect(post).toMatchObject({
+      seoTitle: "Springbank Park engagement photos",
+      seoDescription: "A local guide.",
+    });
+  });
+});
+
+describe("getJournalPostSlugs", () => {
+  it("returns an empty list rather than raising when there are none", async () => {
+    fetchMock.mockResolvedValue([]);
+    const { getJournalPostSlugs } = await loadFetchers();
+
+    await expect(getJournalPostSlugs()).resolves.toEqual([]);
+  });
+});
+
+describe("the journal schedule is applied to every journal read", () => {
+  // FR-007a: `$today` is what keeps a scheduled post off the site. If one
+  // fetcher forgot to pass it, that query would fail in GROQ — or, worse, a
+  // future query written without the shared fragment would leak the post.
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it.each([
+    ["getJournalPosts", [] as unknown[], []],
+    ["getJournalPostSlugs", [], []],
+    ["getJournalPostBySlug", null, ["springbank-engagement-guide"]],
+  ] as const)(
+    "%s passes today's date in the studio's time zone",
+    async (name, resolved, args) => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      // Already the 16th in UTC, still the 15th in Toronto.
+      vi.setSystemTime(new Date("2026-09-16T03:30:00Z"));
+      fetchMock.mockResolvedValue(resolved);
+      const fetchers = await loadFetchers();
+
+      await (fetchers[name] as (...a: string[]) => Promise<unknown>)(...args);
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("publishedAt <= $today"),
+        expect.objectContaining({ today: "2026-09-15" }),
+        expect.anything(),
+      );
+    },
+  );
+});
