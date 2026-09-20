@@ -1,4 +1,5 @@
 import { absoluteUrl, siteDescription, siteName } from "@/constants/seo";
+import type { JournalPost, JournalPostSummary } from "@/types/journal";
 import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
 import type { PostalAddress, SiteSettings } from "@/types/site";
@@ -218,6 +219,64 @@ export function buildProjectSchema(project: Project): JsonLdGraph {
       creator: { "@id": businessId },
       copyrightNotice: `© ${siteName}`,
     })),
+  });
+}
+
+/**
+ * The journal index, described the way the work index is (research.md §5) —
+ * one pattern for both collections rather than `Blog` for one of them.
+ */
+export function buildJournalCollectionSchema(
+  posts: Pick<JournalPostSummary, "slug" | "title">[],
+): JsonLdGraph {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `Journal by ${siteName}`,
+    url: absoluteUrl("/journal"),
+    inLanguage: "en",
+    isPartOf: { "@id": websiteId },
+    about: { "@id": businessId },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: posts.length,
+      itemListElement: posts.map((post, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: post.title,
+        url: absoluteUrl(`/journal/${post.slug}`),
+      })),
+    },
+  };
+}
+
+/**
+ * A journal post. `BlogPosting` is the Article subtype Google documents for
+ * blog posts (research.md §5). The studio is both author and publisher and is
+ * referenced by `@id`, as every other page graph does, rather than restated.
+ * `articleSection` and `contentLocation` carry the category and the place —
+ * the local-search intent the journal exists for.
+ */
+export function buildJournalPostSchema(post: JournalPost): JsonLdGraph {
+  const url = absoluteUrl(`/journal/${post.slug}`);
+
+  return compact({
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${url}#post`,
+    headline: post.title,
+    description: post.seoDescription ?? post.excerpt,
+    url,
+    mainEntityOfPage: url,
+    image: post.coverImage.src,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt,
+    inLanguage: "en",
+    isPartOf: { "@id": websiteId },
+    author: { "@id": businessId },
+    publisher: { "@id": businessId },
+    articleSection: post.category,
+    contentLocation: post.location,
   });
 }
 

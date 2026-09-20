@@ -106,6 +106,28 @@ describe("PageShell", () => {
     },
   );
 
+  it.each(["journal", "journalPost"] as const)(
+    "marks the journal as current on the %s variant",
+    async (variant) => {
+      // The listing and every post sit in one section, as the work index and
+      // its projects do (spec 013 FR-024).
+      getSiteSettings.mockResolvedValue({
+        ...settings,
+        navigationItems: [
+          ...settings.navigationItems,
+          { label: "Journal", href: "/journal" },
+        ],
+      });
+
+      await renderShell(variant);
+
+      expect(document.querySelector("[aria-current='page']")).toHaveAttribute(
+        "href",
+        "/journal",
+      );
+    },
+  );
+
   it("hides the header brand on the home page only", async () => {
     const { container: home } = await renderShell("home");
     const homeBrand = home.querySelector("header a")?.className;

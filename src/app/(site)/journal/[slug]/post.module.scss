@@ -1,0 +1,57 @@
+@use "@/styles/mixins" as *;
+
+.post {
+  width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
+  margin: 0 auto;
+  padding: var(--journal-post-pad-top) 0 var(--journal-post-pad-bottom);
+  color: var(--color-ink);
+}
+
+.post__header {
+  display: grid;
+  gap: var(--journal-header-gap);
+  width: min(100%, var(--journal-article-measure));
+  margin: 0 auto;
+}
+
+.post__category {
+  color: var(--color-muted-text);
+  font-size: var(--font-size-fluid-sm);
+  font-weight: var(--font-weight-label);
+  letter-spacing: var(--tracking-label);
+  line-height: var(--line-height-control);
+  text-transform: uppercase;
+}
+
+.post__title {
+  font-size: var(--journal-title-size);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--journal-title-leading);
+}
+
+.post__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--journal-meta-gap);
+  color: var(--color-muted-text);
+  font-size: var(--font-size-fluid-sm);
+  line-height: var(--line-height-loose);
+}
+
+.post__cover {
+  width: min(100%, var(--journal-figure-measure));
+  margin: var(--journal-cover-gap) auto;
+}
+
+.post__cover-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@include media-max("phone") {
+  .post__title {
+    font-size: var(--journal-title-size-phone);
+  }
+}

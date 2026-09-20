@@ -1,5 +1,15 @@
+import type { PortableTextBlock } from "next-sanity";
 import { cache } from "react";
+import { isJournalCategory } from "@/constants/journalCategories";
+import { isIsoDate, todayInStudioTimeZone } from "@/utils/journalDate";
+import { parseEmbedUrl } from "@/utils/journalEmbed";
 import { normalizeWorkCategory } from "@/utils/formatWorkCategory";
+import type {
+  JournalBodyBlock,
+  JournalPageContent,
+  JournalPost,
+  JournalPostSummary,
+} from "@/types/journal";
 import type { NavigationItem } from "@/types/navigation";
 import type { Project, ProjectImage, WorkPlacement } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
@@ -19,6 +29,10 @@ import {
   aboutPageQuery,
   contactPageQuery,
   homePageQuery,
+  journalPageQuery,
+  journalPostBySlugQuery,
+  journalPostSlugsQuery,
+  journalPostsQuery,
   projectBySlugQuery,
   projectSlugsQuery,
   projectsQuery,
@@ -98,6 +112,35 @@ type SanityProject = {
   featuredOrder?: number;
   homepageSpan?: string;
   images?: SanityImageValue[];
+};
+
+type SanityJournalPage = {
+  titleWords?: string[];
+  emptyStateMessage?: string;
+  ctaHeading?: string;
+  ctaBody?: string;
+  ctaContactLabel?: string;
+  ctaWorkLabel?: string;
+};
+
+type SanityJournalBodyMember =
+  | ({ _type: "block"; _key?: string } & Record<string, unknown>)
+  | ({ _type: "bodyImage"; _key?: string; caption?: string } & SanityImageValue)
+  | { _type: "embed"; _key?: string; url?: string; title?: string };
+
+type SanityJournalPost = {
+  _updatedAt?: string;
+  slug?: { current?: string } | string;
+  title?: string;
+  excerpt?: string;
+  publishedAt?: string;
+  category?: string;
+  location?: string;
+  coverImage?: SanityImageValue;
+  bodyImages?: SanityImageValue[];
+  body?: SanityJournalBodyMember[];
+  seoTitle?: string;
+  seoDescription?: string;
 };
 
 /** Shared by the fetchers and the `/api/revalidate` webhook that busts them. */
@@ -490,4 +533,199 @@ function mapSanityProject(
     },
     images,
   };
+}
+
+export async function getJournalPage(): Promise<JournalPageContent> {
+  const page = requireDocument(
+    await fetchSanity<SanityJournalPage | null>(
+      journalPageQuery,
+      "the journal page",
+    ),
+    "journalPage",
+  );
+
+  return {
+    titleWords: requireStringArray(page.titleWords, "journalPage.titleWords"),
+    emptyStateMessage: requireString(
+      page.emptyStateMessage,
+      "journalPage.emptyStateMessage",
+    ),
+    cta: {
+      heading: requireString(page.ctaHeading, "journalPage.ctaHeading"),
+      body: requireString(page.ctaBody, "journalPage.ctaBody"),
+      contactLabel: requireString(
+        page.ctaContactLabel,
+        "journalPage.ctaContactLabel",
+      ),
+      workLabel: requireString(page.ctaWorkLabel, "journalPage.ctaWorkLabel"),
+    },
+  };
+}
+
+/**
+ * Live posts only, newest first. Every journal read passes `today` — the
+ * query's schedule predicate needs it, and passing it here rather than at
+ * each call site is what keeps a scheduled post from ever being fetched.
+ */
+function journalParams(params: Record<string, unknown> = {}) {
+  return { ...params, today: todayInStudioTimeZone() };
+}
+
+export async function getJournalPosts(): Promise<JournalPostSummary[]> {
+  const posts = await fetchSanity<SanityJournalPost[]>(
+    journalPostsQuery,
+    "journal posts",
+    journalParams(),
+  );
+
+  return posts.map((post, index) =>
+    mapJournalSummary(post, `journalPost[${index}]`),
+  );
+}
+
+/**
+ * `null` for an unknown slug **and** for a scheduled one — the query cannot
+ * tell them apart, and the page should not either (FR-012).
+ */
+export async function getJournalPostBySlug(
+  slug: string,
+): Promise<JournalPost | null> {
+  const post = await fetchSanity<SanityJournalPost | null>(
+    journalPostBySlugQuery,
+    `the "${slug}" journal post`,
+    journalParams({ slug }),
+  );
+
+  return post ? mapJournalPost(post, `journalPost("${slug}")`) : null;
+}
+
+export async function getJournalPostSlugs(): Promise<string[]> {
+  const slugs = await fetchSanity<(string | null)[]>(
+    journalPostSlugsQuery,
+    "journal post slugs",
+    journalParams(),
+  );
+
+  return slugs.filter((slug): slug is string => Boolean(slug?.trim()));
+}
+
+function requireJournalCategory(
+  value: string | null | undefined,
+  field: string,
+) {
+  const category = requireString(value, field);
+
+  if (!isJournalCategory(category)) {
+    throw new Error(
+      `Sanity field "${field}" must be one of the journal categories, received "${category}".`,
+    );
+  }
+
+  return category;
+}
+
+function requireIsoDate(value: string | null | undefined, field: string) {
+  const date = requireString(value, field);
+
+  if (!isIsoDate(date)) {
+    throw new Error(`Sanity field "${field}" must be a YYYY-MM-DD date.`);
+  }
+
+  return date;
+}
+
+/** Blank overrides are unset, so the title/excerpt fallback applies. */
+function optionalString(value: string | null | undefined) {
+  return value?.trim() || undefined;
+}
+
+function mapJournalSummary(
+  post: SanityJournalPost,
+  fieldPrefix: string,
+): JournalPostSummary {
+  return {
+    slug: requireString(getSlug(post.slug), `${fieldPrefix}.slug`),
+    title: requireString(post.title, `${fieldPrefix}.title`),
+    excerpt: requireString(post.excerpt, `${fieldPrefix}.excerpt`),
+    publishedAt: requireIsoDate(post.publishedAt, `${fieldPrefix}.publishedAt`),
+    category: requireJournalCategory(post.category, `${fieldPrefix}.category`),
+    location: requireString(post.location, `${fieldPrefix}.location`),
+    coverImage: resolveSanityImage(
+      post.coverImage,
+      `${fieldPrefix}.coverImage`,
+    ),
+    updatedAt: requireString(post._updatedAt, `${fieldPrefix}._updatedAt`),
+    bodyImages: (post.bodyImages ?? []).map((image, imageIndex) =>
+      resolveSanityImage(image, `${fieldPrefix}.bodyImages[${imageIndex}]`),
+    ),
+  };
+}
+
+function mapJournalPost(
+  post: SanityJournalPost,
+  fieldPrefix: string,
+): JournalPost {
+  const body = requireValue(post.body, `${fieldPrefix}.body`);
+
+  if (!body.length) {
+    throw new Error(
+      `Sanity field "${fieldPrefix}.body" must contain at least one block.`,
+    );
+  }
+
+  return {
+    ...mapJournalSummary(post, fieldPrefix),
+    body: body.map((member, index) =>
+      mapJournalBodyMember(member, `${fieldPrefix}.body[${index}]`),
+    ),
+    seoTitle: optionalString(post.seoTitle),
+    seoDescription: optionalString(post.seoDescription),
+  };
+}
+
+function mapJournalBodyMember(
+  member: SanityJournalBodyMember,
+  field: string,
+): JournalBodyBlock {
+  const key = requireString(member._key, `${field}._key`);
+
+  switch (member._type) {
+    case "bodyImage": {
+      const caption = optionalString(member.caption);
+
+      return {
+        _type: "bodyImage",
+        _key: key,
+        image: resolveSanityImage(member, field),
+        ...(caption ? { caption } : {}),
+      };
+    }
+
+    case "embed": {
+      // Refused in the Studio at publish time; refused again here so an
+      // unrecognised provider can never reach the page (FR-002b).
+      const embed = parseEmbedUrl(requireString(member.url, `${field}.url`));
+
+      if (!embed) {
+        throw new Error(
+          `Sanity field "${field}.url" is not a Google Maps, YouTube or Vimeo embed link.`,
+        );
+      }
+
+      return {
+        _type: "embed",
+        _key: key,
+        provider: embed.provider,
+        src: embed.src,
+        title: requireString(member.title, `${field}.title`),
+      };
+    }
+
+    default:
+      // Portable Text blocks go to the renderer as Sanity sent them. Their
+      // shape (children, marks, styles) is Sanity's own contract and is
+      // bounded by the schema's allowed styles and marks; re-validating every
+      // span here would duplicate the renderer's job for no extra safety.
+      return member as unknown as PortableTextBlock;
+  }
 }

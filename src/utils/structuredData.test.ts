@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { absoluteUrl } from "@/constants/seo";
+import type { JournalPost } from "@/types/journal";
 import type { Project } from "@/types/project";
 import type { SiteSettings } from "@/types/site";
 import {
@@ -8,6 +9,8 @@ import {
   buildBreadcrumbSchema,
   buildBusinessSchema,
   buildContactPageSchema,
+  buildJournalCollectionSchema,
+  buildJournalPostSchema,
   buildProjectSchema,
   buildServiceListSchema,
   buildWebSiteSchema,
@@ -330,6 +333,114 @@ describe("buildWorkCollectionSchema", () => {
 
   it("reports zero rather than omitting the count for an empty portfolio", () => {
     expect(buildWorkCollectionSchema([])["mainEntity"]).toMatchObject({
+      numberOfItems: 0,
+      itemListElement: [],
+    });
+  });
+});
+
+const journalPost: JournalPost = {
+  slug: "springbank-engagement-guide",
+  title: "Engagement photos at Springbank Park",
+  excerpt: "Where to stand, when to go, and what the light does.",
+  publishedAt: "2026-09-01",
+  updatedAt: "2026-09-10T12:00:00Z",
+  category: "Location Guide",
+  location: "Springbank Park, London, Ontario",
+  coverImage: {
+    src: "https://cdn.sanity.io/images/p/d/cover.jpg",
+    alt: "Couple on the footbridge",
+    width: 1600,
+    height: 1067,
+  },
+  bodyImages: [],
+  body: [],
+};
+
+describe("buildJournalPostSchema", () => {
+  const url = absoluteUrl("/journal/springbank-engagement-guide");
+
+  it("describes the post as a BlogPosting at its own URL", () => {
+    expect(buildJournalPostSchema(journalPost)).toMatchObject({
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: journalPost.title,
+      description: journalPost.excerpt,
+      url,
+      mainEntityOfPage: url,
+      inLanguage: "en",
+    });
+  });
+
+  it("credits the studio by reference instead of restating it", () => {
+    const schema = buildJournalPostSchema(journalPost);
+
+    expect(schema["author"]).toEqual({ "@id": businessId });
+    expect(schema["publisher"]).toEqual({ "@id": businessId });
+    expect(schema["isPartOf"]).toEqual({ "@id": websiteId });
+  });
+
+  it("dates the post by the day the editor chose, and its last edit", () => {
+    expect(buildJournalPostSchema(journalPost)).toMatchObject({
+      datePublished: "2026-09-01",
+      dateModified: "2026-09-10T12:00:00Z",
+    });
+  });
+
+  it("carries the category and the place, which is the local-search point", () => {
+    expect(buildJournalPostSchema(journalPost)).toMatchObject({
+      articleSection: "Location Guide",
+      contentLocation: "Springbank Park, London, Ontario",
+      image: journalPost.coverImage.src,
+    });
+  });
+
+  it("uses the search description when the editor set one", () => {
+    expect(
+      buildJournalPostSchema({ ...journalPost, seoDescription: "A guide." }),
+    ).toMatchObject({ description: "A guide." });
+  });
+
+  it("claims nothing empty", () => {
+    const values = Object.values(buildJournalPostSchema(journalPost));
+
+    expect(values).not.toContain(undefined);
+    expect(values).not.toContain("");
+  });
+});
+
+describe("buildJournalCollectionSchema", () => {
+  const posts = [
+    { slug: "springbank-guide", title: "Springbank Park" },
+    { slug: "covent-garden-market", title: "Covent Garden Market" },
+  ] as Parameters<typeof buildJournalCollectionSchema>[0];
+
+  it("describes the journal as a collection, the way the work index is", () => {
+    expect(buildJournalCollectionSchema(posts)).toMatchObject({
+      "@type": "CollectionPage",
+      url: absoluteUrl("/journal"),
+      isPartOf: { "@id": websiteId },
+      about: { "@id": businessId },
+    });
+  });
+
+  it("lists the posts in the order given, newest first as the query returns", () => {
+    expect(buildJournalCollectionSchema(posts)["mainEntity"]).toMatchObject({
+      "@type": "ItemList",
+      numberOfItems: 2,
+      itemListElement: [
+        {
+          position: 1,
+          name: "Springbank Park",
+          url: absoluteUrl("/journal/springbank-guide"),
+        },
+        { position: 2, name: "Covent Garden Market" },
+      ],
+    });
+  });
+
+  it("reports zero rather than omitting the count for an empty journal", () => {
+    expect(buildJournalCollectionSchema([])["mainEntity"]).toMatchObject({
       numberOfItems: 0,
       itemListElement: [],
     });

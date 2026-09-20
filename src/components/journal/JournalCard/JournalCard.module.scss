@@ -1,0 +1,85 @@
+@use "@/styles/mixins" as *;
+
+.journal-card {
+  position: relative;
+  display: grid;
+  gap: var(--journal-card-gap);
+  align-content: start;
+  min-width: 0;
+}
+
+.journal-card__media {
+  overflow: hidden;
+  background: var(--color-paper-warm);
+}
+
+.journal-card__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--journal-card-image-ratio);
+  object-fit: cover;
+  transition: transform var(--duration-slow) var(--ease-settle);
+}
+
+.journal-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-md);
+  color: var(--color-muted-text);
+  font-size: var(--font-size-fluid-sm);
+  line-height: var(--line-height-loose);
+}
+
+.journal-card__title {
+  font-size: var(--journal-card-title-size);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--journal-card-title-leading);
+}
+
+.journal-card__link {
+  color: inherit;
+  text-decoration: none;
+
+  // Stretches the title link over the whole card, so the card is one target
+  // without being one link (see the component's comment).
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible::after {
+    outline: var(--divider-hairline) solid var(--color-ink);
+    outline-offset: var(--space-xs);
+  }
+}
+
+.journal-card__excerpt {
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-fluid-base);
+  line-height: var(--line-height-body);
+}
+
+@include hover-fine {
+  .journal-card:hover .journal-card__image {
+    transform: scale(1.02);
+  }
+
+  .journal-card:hover .journal-card__link {
+    text-decoration: underline;
+    text-decoration-thickness: var(--divider-hairline);
+    text-underline-offset: var(--journal-link-offset);
+  }
+}
+
+@include reduced-motion {
+  .journal-card__image {
+    transition-duration: var(--duration-reduced-motion);
+  }
+}

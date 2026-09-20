@@ -208,3 +208,41 @@ export async function readPosition(page: Page) {
 
   return { current: Number(current), total: Number(total) };
 }
+
+/**
+ * The journal index (spec 013), with whichever of its two states is showing:
+ * the list of posts, or the editor's empty-state message.
+ *
+ * Both are legitimate. The day the journal ships the dataset has no post, and
+ * `.husky/pre-push` runs this suite -- so a journey that required a post would
+ * block every push for a content reason, the exact "test reporting on the
+ * dataset" failure this file exists to prevent
+ * (specs/013-journal-section/contracts/test-surface.md).
+ */
+export async function openJournalIndex(page: Page) {
+  await page.goto("/journal");
+
+  const cards = page.locator("[data-journal-card]");
+  const empty = page.locator("[data-journal-empty]");
+
+  await expect(
+    cards.or(empty).first(),
+    "the journal index should show either its posts or its empty state",
+  ).toBeVisible();
+
+  return { cards, empty };
+}
+
+/**
+ * The first post's href in index order, or `null` when no post is live.
+ * Journeys that need a post skip on `null`; they do not fail.
+ */
+export async function firstJournalPostHref(page: Page) {
+  const { cards } = await openJournalIndex(page);
+
+  if (!(await cards.count())) {
+    return null;
+  }
+
+  return cards.first().getByRole("link").getAttribute("href");
+}

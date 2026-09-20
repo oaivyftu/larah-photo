@@ -1,0 +1,99 @@
+// The article column. Text sits at the reading measure; figures and embeds
+// break out to the wider figure measure. Vertical rhythm is in em so it
+// scales with the body size it separates.
+
+.journal-body {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    min(100%, var(--journal-article-measure))
+    minmax(0, 1fr);
+  color: var(--color-ink);
+  font-size: var(--journal-body-size);
+  line-height: var(--journal-body-leading);
+}
+
+.journal-body > * {
+  grid-column: 2;
+  margin: 0;
+}
+
+.journal-body > * + * {
+  margin-top: var(--journal-flow-gap);
+}
+
+.journal-body h2 {
+  margin-top: var(--journal-heading-gap);
+  font-size: var(--journal-h2-size);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--journal-h2-leading);
+}
+
+.journal-body h3 {
+  margin-top: var(--journal-heading-gap);
+  font-size: var(--journal-h3-size);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-control);
+}
+
+.journal-body h4 {
+  margin-top: var(--journal-heading-gap);
+  font-size: var(--font-size-fluid-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-control);
+}
+
+// A heading pulls the next paragraph close; the space belongs above it.
+.journal-body :is(h2, h3, h4) + * {
+  margin-top: var(--space-sm);
+}
+
+.journal-body :is(ul, ol) {
+  padding-left: var(--journal-list-indent);
+}
+
+.journal-body li + li {
+  margin-top: var(--journal-list-item-gap);
+}
+
+.journal-body a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: var(--divider-hairline);
+  text-underline-offset: var(--journal-link-offset);
+}
+
+.journal-body strong {
+  font-weight: var(--font-weight-semibold);
+}
+
+.journal-body__quote {
+  margin-block: var(--journal-heading-gap);
+  padding-left: var(--journal-quote-indent);
+  border-left: var(--journal-quote-rule) solid var(--color-ink);
+  font-family: var(--font-serif);
+  font-size: var(--journal-quote-size);
+  line-height: var(--line-height-control);
+}
+
+.journal-body__figure,
+.journal-body__embed {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(100%, var(--journal-figure-measure));
+  margin-block: var(--journal-figure-gap);
+}
+
+.journal-body__image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.journal-body__caption {
+  margin-top: var(--space-sm);
+  color: var(--color-muted-text);
+  font-size: var(--font-size-fluid-sm);
+  line-height: var(--line-height-loose);
+}

@@ -1,0 +1,38 @@
+@use "@/styles/mixins" as *;
+
+.journal {
+  width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
+  margin: 0 auto;
+  padding: var(--journal-index-pad-top) 0 var(--journal-index-pad-bottom);
+  color: var(--color-ink);
+}
+
+.journal__heading {
+  margin-bottom: var(--journal-index-heading-gap);
+}
+
+.journal__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--journal-grid-gap-y) var(--journal-grid-gap-x);
+}
+
+.journal__empty {
+  max-width: var(--journal-article-measure);
+  padding-block: var(--journal-empty-pad);
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-fluid-md);
+  line-height: var(--line-height-body);
+}
+
+@include media-max("tablet-lg") {
+  .journal__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@include media-max("phone-lg") {
+  .journal__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

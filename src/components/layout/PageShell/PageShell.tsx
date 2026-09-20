@@ -7,7 +7,15 @@ import styles from "./PageShell.module.scss";
 
 type PageShellProps = {
   children?: React.ReactNode;
-  variant: "home" | "work" | "project" | "about" | "service" | "contact";
+  variant:
+    | "home"
+    | "work"
+    | "project"
+    | "about"
+    | "service"
+    | "contact"
+    | "journal"
+    | "journalPost";
 };
 
 const activeHrefByVariant: Record<PageShellProps["variant"], string> = {
@@ -17,6 +25,10 @@ const activeHrefByVariant: Record<PageShellProps["variant"], string> = {
   about: "/about",
   service: "/service",
   contact: "/contact",
+  journal: "/journal",
+  // A post sits inside the journal the way a project sits inside the work
+  // section, so the Journal nav item stays current on every post.
+  journalPost: "/journal",
 };
 
 export async function PageShell({ children, variant }: PageShellProps) {
