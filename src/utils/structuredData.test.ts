@@ -207,6 +207,25 @@ describe("buildBusinessSchema", () => {
   });
 });
 
+describe("buildBusinessSchema knowsAbout", () => {
+  it("describes the sessions the studio sells, not wedding-day coverage", () => {
+    const { knowsAbout } = buildBusinessSchema(settings) as {
+      knowsAbout: string[];
+    };
+
+    expect(knowsAbout).toEqual(
+      expect.arrayContaining([
+        "Portrait photography",
+        "Engagement photography",
+        "Family photography",
+        "Graduation photography",
+      ]),
+    );
+    // "Pre-wedding" is the engagement session; plain "Wedding" is the day.
+    expect(knowsAbout).not.toContain("Wedding photography");
+  });
+});
+
 describe("buildBusinessSchema local details", () => {
   const local = (extra: Partial<SiteSettings>) =>
     ({ ...settings, ...extra }) as unknown as SiteSettings;

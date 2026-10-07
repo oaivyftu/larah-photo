@@ -106,10 +106,16 @@ export function buildBusinessSchema(settings: SiteSettings): JsonLdGraph {
     priceRange: settings.priceRange,
     areaServed: settings.location,
     sameAs: [settings.instagramUrl, settings.googleBusinessUrl].filter(Boolean),
+    // Mirrors the session packages the studio sells. Wedding-day coverage is
+    // not one of them — engagement (pre-wedding) sessions are — so claiming it
+    // here would send couples looking for a wedding photographer to a studio
+    // that turns them away.
     knowsAbout: [
       "Portrait photography",
-      "Wedding photography",
-      "Editorial photography",
+      "Engagement photography",
+      "Pre-wedding photography",
+      "Family photography",
+      "Graduation photography",
     ],
   });
 }

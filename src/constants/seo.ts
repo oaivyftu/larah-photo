@@ -48,8 +48,8 @@ export const gaMeasurementId =
 
 export const siteDescription =
   "Larah Photo is a London, Ontario photography studio shooting portrait, " +
-  "wedding and editorial work. Browse selected projects, session packages " +
-  "and enquire about a booking.";
+  "engagement, family and graduation sessions. Browse selected projects, " +
+  "session packages and enquire about a booking.";
 
 /**
  * Absolute URL for a site-relative path. The sitemap and JSON-LD both need
