@@ -16,7 +16,9 @@ import type { ServicePackage } from "@/types/service";
 import type {
   AboutPageContent,
   ContactPageContent,
+  GeoCoordinates,
   HomePageContent,
+  OpeningHoursRange,
   PostalAddress,
   ServicePageContent,
   SiteSettings,
@@ -51,6 +53,10 @@ type SanitySiteSettings = {
   location?: string;
   priceCurrency?: string;
   postalAddress?: PostalAddress;
+  businessImage?: { asset?: { url?: string } } | null;
+  geo?: Partial<GeoCoordinates> | null;
+  openingHours?: OpeningHoursRange[] | null;
+  priceRange?: string;
   footerStatement?: string;
   navigationItems?: NavigationItem[];
 };
@@ -228,6 +234,15 @@ function requireDocument<T>(value: T | null, label: string): T {
   return value;
 }
 
+/** Both halves or nothing: a lone latitude is a half-typed form, not a place. */
+function toGeoCoordinates(
+  geo: Partial<GeoCoordinates> | null | undefined,
+): GeoCoordinates | undefined {
+  return typeof geo?.latitude === "number" && typeof geo?.longitude === "number"
+    ? { latitude: geo.latitude, longitude: geo.longitude }
+    : undefined;
+}
+
 export async function getSiteSettings(): Promise<SiteSettings> {
   const settings = requireDocument(
     await fetchSanity<SanitySiteSettings | null>(
@@ -266,6 +281,12 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     // the bare "$" the price UI renders.
     priceCurrency: settings.priceCurrency?.trim() || "CAD",
     postalAddress: settings.postalAddress,
+    // GROQ returns `null` for an unset field, which the builders would have to
+    // tell apart from `undefined` — normalised here, once, instead.
+    businessImageUrl: settings.businessImage?.asset?.url ?? undefined,
+    geo: toGeoCoordinates(settings.geo),
+    openingHours: settings.openingHours ?? undefined,
+    priceRange: settings.priceRange?.trim() || undefined,
     footerStatement: requireString(
       settings.footerStatement,
       "siteSettings.footerStatement",

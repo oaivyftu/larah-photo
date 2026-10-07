@@ -27,6 +27,10 @@ export const siteSettingsQuery = `*[_type == "siteSettings"][0]{
     postalCode,
     country
   },
+  businessImage{asset->{url}},
+  geo{latitude, longitude},
+  openingHours[]{days, opens, closes},
+  priceRange,
   footerStatement,
   navigationItems[]{
     label,

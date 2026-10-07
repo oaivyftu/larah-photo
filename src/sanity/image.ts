@@ -38,6 +38,30 @@ export function toOpenGraphImage(image: Pick<ProjectImage, "src" | "alt">) {
   };
 }
 
+/**
+ * Google asks for a business photo in 1:1, 4:3 and 16:9 and picks whichever
+ * its result card needs. Sanity's CDN crops on request, so one upload yields
+ * all three instead of the editor preparing them by hand.
+ */
+const BUSINESS_IMAGE_CROPS = [
+  { width: 1200, height: 1200 },
+  { width: 1200, height: 900 },
+  { width: 1200, height: 675 },
+] as const;
+
+export function toBusinessImageUrls(src: string): string[] {
+  return BUSINESS_IMAGE_CROPS.map(({ width, height }) => {
+    const url = new URL(src);
+
+    url.searchParams.set("w", String(width));
+    url.searchParams.set("h", String(height));
+    url.searchParams.set("fit", "crop");
+    url.searchParams.set("auto", "format");
+
+    return url.toString();
+  });
+}
+
 export function resolveSanityImage(
   image: SanityImageValue | null | undefined,
   field: string,

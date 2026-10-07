@@ -101,6 +101,57 @@ describe("success path", () => {
     expect(settings.googleBusinessUrl).toBeUndefined();
   });
 
+  it("maps the local-business fields the CMS supplies onto settings", async () => {
+    // Same regression as googleBusinessUrl above: a field that is in the
+    // schema, the type and the query but not in this return object reaches the
+    // structured data as undefined, however carefully an editor filled it in.
+    fetchMock.mockResolvedValue({
+      ...siteSettingsDoc,
+      businessImage: { asset: { url: "https://cdn.sanity.io/i/studio.jpg" } },
+      geo: { latitude: 42.98, longitude: -81.29 },
+      openingHours: [{ days: ["Monday"], opens: "09:30", closes: "17:00" }],
+      priceRange: "  $300-$450 ",
+    });
+    const { getSiteSettings } = await loadFetchers();
+
+    await expect(getSiteSettings()).resolves.toMatchObject({
+      businessImageUrl: "https://cdn.sanity.io/i/studio.jpg",
+      geo: { latitude: 42.98, longitude: -81.29 },
+      openingHours: [{ days: ["Monday"], opens: "09:30", closes: "17:00" }],
+      priceRange: "$300-$450",
+    });
+  });
+
+  it("leaves the local-business fields undefined when the CMS has none", async () => {
+    // GROQ answers `null` for an unset field; the rest of the app should only
+    // ever have to think about `undefined`.
+    fetchMock.mockResolvedValue({
+      ...siteSettingsDoc,
+      businessImage: null,
+      geo: null,
+      openingHours: null,
+      priceRange: null,
+    });
+    const { getSiteSettings } = await loadFetchers();
+
+    const settings = await getSiteSettings();
+
+    expect(settings.businessImageUrl).toBeUndefined();
+    expect(settings.geo).toBeUndefined();
+    expect(settings.openingHours).toBeUndefined();
+    expect(settings.priceRange).toBeUndefined();
+  });
+
+  it("drops a half-filled coordinate pair", async () => {
+    fetchMock.mockResolvedValue({
+      ...siteSettingsDoc,
+      geo: { latitude: 42.98, longitude: null },
+    });
+    const { getSiteSettings } = await loadFetchers();
+
+    expect((await getSiteSettings()).geo).toBeUndefined();
+  });
+
   it("returns null for an unknown slug instead of throwing", async () => {
     fetchMock.mockResolvedValue(null);
     const { getWorkProjectBySlug } = await loadFetchers();

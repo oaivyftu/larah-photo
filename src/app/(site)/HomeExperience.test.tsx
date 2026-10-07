@@ -160,17 +160,33 @@ describe("HomeExperience", () => {
     await waitFor(() =>
       expect(document.querySelectorAll("[data-work-card]")).toHaveLength(1),
     );
-    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
-      "12 Projects",
-    );
+    expect(
+      screen.getByRole("heading", { level: 2, name: /Projects?/ }),
+    ).toHaveTextContent("12 Projects");
   });
 
   it("says Project, singular, for a portfolio of one", () => {
     renderHome({ projectCount: 1 });
 
-    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
-      "1 Project",
-    );
+    expect(
+      screen.getByRole("heading", { level: 2, name: /Projects?/ }),
+    ).toHaveTextContent("1 Project");
+  });
+
+  it("makes the services eyebrow a level-2 heading that names its section", () => {
+    // It was a bare paragraph, which left the home page with no heading to
+    // carry the section's keywords and put the service cards' h3s directly
+    // under the "Projects" h2.
+    renderHome();
+
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: "Session packages",
+    });
+
+    expect(
+      screen.getByRole("region", { name: "Session packages" }),
+    ).toContainElement(heading);
   });
 
   it("labels the selected-work section by the CMS eyebrow", () => {

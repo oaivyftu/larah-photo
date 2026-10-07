@@ -452,9 +452,9 @@ export function HomeExperience({
         aria-labelledby="services-title"
       >
         <div className={styles["services__header"]} data-service-reveal>
-          <p className={styles["services__eyebrow"]} id="services-title">
+          <h2 className={styles["services__eyebrow"]} id="services-title">
             {content.servicesEyebrow}
-          </p>
+          </h2>
           <span className={styles["section-marker"]} aria-hidden="true" />
         </div>
         <div className={styles["services__track"]} data-service-track>
