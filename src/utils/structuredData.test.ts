@@ -207,6 +207,137 @@ describe("buildBusinessSchema", () => {
   });
 });
 
+describe("buildBusinessSchema knowsAbout", () => {
+  it("describes the sessions the studio sells, not wedding-day coverage", () => {
+    const { knowsAbout } = buildBusinessSchema(settings) as {
+      knowsAbout: string[];
+    };
+
+    expect(knowsAbout).toEqual(
+      expect.arrayContaining([
+        "Portrait photography",
+        "Engagement photography",
+        "Family photography",
+        "Graduation photography",
+      ]),
+    );
+    // "Pre-wedding" is the engagement session; plain "Wedding" is the day.
+    expect(knowsAbout).not.toContain("Wedding photography");
+  });
+});
+
+describe("buildBusinessSchema local details", () => {
+  const local = (extra: Partial<SiteSettings>) =>
+    ({ ...settings, ...extra }) as unknown as SiteSettings;
+
+  it("always carries the logo, pointing at the manifest's icon", () => {
+    expect(buildBusinessSchema(settings)).toMatchObject({
+      logo: absoluteUrl("/icon-512.png"),
+    });
+  });
+
+  it("omits image, geo, hours and price range until the CMS has them", () => {
+    const schema = buildBusinessSchema(settings);
+
+    for (const key of [
+      "image",
+      "geo",
+      "openingHoursSpecification",
+      "priceRange",
+    ]) {
+      expect(schema).not.toHaveProperty(key);
+    }
+  });
+
+  it("offers the business photo in three aspect ratios", () => {
+    const schema = buildBusinessSchema(
+      local({ businessImageUrl: "https://cdn.sanity.io/i/studio.jpg" }),
+    );
+
+    expect(schema.image).toHaveLength(3);
+    expect(
+      (schema.image as string[]).map((url) =>
+        new URL(url).searchParams.get("h"),
+      ),
+    ).toEqual(["1200", "900", "675"]);
+  });
+
+  it("emits coordinates as GeoCoordinates", () => {
+    expect(
+      buildBusinessSchema(
+        local({ geo: { latitude: 42.9858431, longitude: -81.2947264 } }),
+      ),
+    ).toMatchObject({
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: 42.9858431,
+        longitude: -81.2947264,
+      },
+    });
+  });
+
+  it("keeps a coordinate of zero instead of treating it as missing", () => {
+    expect(
+      buildBusinessSchema(local({ geo: { latitude: 0, longitude: 0 } })),
+    ).toHaveProperty("geo.latitude", 0);
+  });
+
+  it("omits geo when only one half is present", () => {
+    const half = local({
+      geo: { latitude: 42.98 } as unknown as SiteSettings["geo"],
+    });
+
+    expect(buildBusinessSchema(half)).not.toHaveProperty("geo");
+  });
+
+  it("emits one OpeningHoursSpecification per row", () => {
+    expect(
+      buildBusinessSchema(
+        local({
+          openingHours: [
+            { days: ["Monday", "Tuesday"], opens: "09:30", closes: "17:00" },
+            { days: ["Saturday"], opens: "10:00", closes: "14:00" },
+          ],
+        }),
+      ),
+    ).toMatchObject({
+      openingHoursSpecification: [
+        {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: ["Monday", "Tuesday"],
+          opens: "09:30",
+          closes: "17:00",
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: ["Saturday"],
+          opens: "10:00",
+          closes: "14:00",
+        },
+      ],
+    });
+  });
+
+  it("drops rows missing days or a time, and the block when none survive", () => {
+    const partial = local({
+      openingHours: [
+        { days: [], opens: "09:00", closes: "17:00" },
+        { days: ["Friday"], opens: "09:00", closes: "" },
+      ],
+    });
+
+    expect(buildBusinessSchema(partial)).not.toHaveProperty(
+      "openingHoursSpecification",
+    );
+  });
+
+  it("passes the price range through as written", () => {
+    expect(
+      buildBusinessSchema(local({ priceRange: "$300-$450" })),
+    ).toMatchObject({ priceRange: "$300-$450" });
+  });
+});
+
 describe("buildWebSiteSchema", () => {
   it("names the business as publisher by reference, not by copy", () => {
     // The business graph is declared once in PageShell; every other graph

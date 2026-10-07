@@ -25,8 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "Work",
     description:
       `Selected photography projects by Larah Photo in ${settings.location} ` +
-      `— ${projects.length} galleries spanning portrait, wedding and ` +
-      "editorial commissions.",
+      `— ${projects.length} galleries spanning portrait, engagement, family ` +
+      "and graduation sessions.",
     path: "/work",
     images: leadProject
       ? [toOpenGraphImage({ src: leadProject.image, alt: leadProject.alt })]

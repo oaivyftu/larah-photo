@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { resolveSanityImage, toOpenGraphImage } from "./image";
+import {
+  resolveSanityImage,
+  toBusinessImageUrls,
+  toOpenGraphImage,
+} from "./image";
 import type { SanityImageValue } from "./image";
 
 const complete: SanityImageValue = {
@@ -127,5 +131,32 @@ describe("toOpenGraphImage", () => {
     });
 
     expect(new URL(og.url).searchParams.get("q")).toBe("80");
+  });
+});
+
+describe("toBusinessImageUrls", () => {
+  it("returns the 1:1, 4:3 and 16:9 crops Google asks for", () => {
+    const urls = toBusinessImageUrls("https://cdn.sanity.io/i/a.jpg");
+
+    expect(
+      urls.map((url) => {
+        const params = new URL(url).searchParams;
+        return [params.get("w"), params.get("h"), params.get("fit")];
+      }),
+    ).toEqual([
+      ["1200", "1200", "crop"],
+      ["1200", "900", "crop"],
+      ["1200", "675", "crop"],
+    ]);
+  });
+
+  it("replaces existing sizing params rather than appending duplicates", () => {
+    const [square] = toBusinessImageUrls(
+      "https://cdn.sanity.io/i/a.jpg?w=100&h=100",
+    );
+    const params = new URL(square).searchParams;
+
+    expect(params.getAll("w")).toEqual(["1200"]);
+    expect(params.getAll("h")).toEqual(["1200"]);
   });
 });

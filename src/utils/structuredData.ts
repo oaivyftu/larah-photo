@@ -1,8 +1,14 @@
 import { absoluteUrl, siteDescription, siteName } from "@/constants/seo";
+import { toBusinessImageUrls } from "@/sanity/image";
 import type { JournalPost, JournalPostSummary } from "@/types/journal";
 import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
-import type { PostalAddress, SiteSettings } from "@/types/site";
+import type {
+  GeoCoordinates,
+  OpeningHoursRange,
+  PostalAddress,
+  SiteSettings,
+} from "@/types/site";
 
 /**
  * Stable `@id`s let the separate JSON-LD blocks on a page reference one
@@ -42,6 +48,35 @@ function buildPostalAddress(address: PostalAddress | undefined) {
   return Object.keys(postalAddress).length > 1 ? postalAddress : undefined;
 }
 
+function buildGeo(geo: GeoCoordinates | undefined) {
+  // `typeof` rather than truthiness: 0 is a valid coordinate.
+  return typeof geo?.latitude === "number" && typeof geo?.longitude === "number"
+    ? {
+        "@type": "GeoCoordinates",
+        latitude: geo.latitude,
+        longitude: geo.longitude,
+      }
+    : undefined;
+}
+
+/**
+ * One specification per row the editor entered. Rows that are missing days or
+ * either time are dropped rather than emitted half-formed — an opening-hours
+ * block with no closing time asserts a schedule nobody wrote.
+ */
+function buildOpeningHours(hours: OpeningHoursRange[] | undefined) {
+  const specifications = (hours ?? [])
+    .filter((range) => range.days?.length && range.opens && range.closes)
+    .map((range) => ({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: range.days,
+      opens: range.opens,
+      closes: range.closes,
+    }));
+
+  return specifications.length ? specifications : undefined;
+}
+
 /**
  * The studio itself. `ProfessionalService` is the schema.org branch a
  * photography business belongs to and inherits everything `LocalBusiness`
@@ -57,15 +92,30 @@ export function buildBusinessSchema(settings: SiteSettings): JsonLdGraph {
     alternateName: settings.name === siteName ? undefined : siteName,
     description: siteDescription,
     url: absoluteUrl("/"),
+    // The same 512px mark the web manifest ships, so there is one logo to
+    // keep current rather than a second copy that drifts.
+    logo: absoluteUrl("/icon-512.png"),
+    image: settings.businessImageUrl
+      ? toBusinessImageUrls(settings.businessImageUrl)
+      : undefined,
     email: settings.email,
     telephone: settings.phone,
     address: buildPostalAddress(settings.postalAddress),
+    geo: buildGeo(settings.geo),
+    openingHoursSpecification: buildOpeningHours(settings.openingHours),
+    priceRange: settings.priceRange,
     areaServed: settings.location,
     sameAs: [settings.instagramUrl, settings.googleBusinessUrl].filter(Boolean),
+    // Mirrors the session packages the studio sells. Wedding-day coverage is
+    // not one of them — engagement (pre-wedding) sessions are — so claiming it
+    // here would send couples looking for a wedding photographer to a studio
+    // that turns them away.
     knowsAbout: [
       "Portrait photography",
-      "Wedding photography",
-      "Editorial photography",
+      "Engagement photography",
+      "Pre-wedding photography",
+      "Family photography",
+      "Graduation photography",
     ],
   });
 }

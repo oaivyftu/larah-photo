@@ -11,6 +11,21 @@ export type PostalAddress = {
   country?: string;
 };
 
+/** Structured-data only. Both halves or neither: a lone latitude pins nothing. */
+export type GeoCoordinates = {
+  latitude: number;
+  longitude: number;
+};
+
+/** One row of opening hours: the days it applies to and a same-day window. */
+export type OpeningHoursRange = {
+  days: string[];
+  /** 24-hour "HH:MM". */
+  opens: string;
+  /** 24-hour "HH:MM", later the same day than `opens`. */
+  closes: string;
+};
+
 export type SiteSettings = {
   name: string;
   instagramUrl: string;
@@ -22,6 +37,12 @@ export type SiteSettings = {
   /** ISO 4217 code for the package prices. Structured data only. */
   priceCurrency: string;
   postalAddress?: PostalAddress;
+  /** Structured data only: a photograph of the studio for local rich results. */
+  businessImageUrl?: string;
+  geo?: GeoCoordinates;
+  openingHours?: OpeningHoursRange[];
+  /** Structured data only, e.g. "$300-$450". */
+  priceRange?: string;
   footerStatement: string;
   navigationItems: NavigationItem[];
 };
