@@ -1,4 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
+import type { ReactElement } from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { LandingPageLink } from "@/types/landing";
 import type { Project } from "@/types/project";
 
 // AGENTS.md has said since feature 009 that async Server Components under
@@ -14,6 +16,7 @@ import type { Project } from "@/types/project";
 
 const getWorkProjectBySlug = vi.fn<(slug: string) => Promise<Project | null>>();
 const getWorkProjectSlugs = vi.fn<() => Promise<string[]>>();
+const getLandingPageLinks = vi.fn<() => Promise<LandingPageLink[]>>();
 const notFound = vi.fn(() => {
   // The real one throws to unwind the render, and code after the call is
   // unreachable. A mock that returns would let the page carry on with a null
@@ -24,11 +27,21 @@ const notFound = vi.fn(() => {
 vi.mock("@/sanity/fetchers", () => ({
   getWorkProjectBySlug: (slug: string) => getWorkProjectBySlug(slug),
   getWorkProjectSlugs: () => getWorkProjectSlugs(),
+  getLandingPageLinks: () => getLandingPageLinks(),
 }));
 
 vi.mock("next/navigation", () => ({ notFound: () => notFound() }));
 
 const page = await import("./page");
+const { WorkDetailGallery } =
+  await import("@/components/work/WorkDetailGallery/WorkDetailGallery");
+
+beforeEach(() => {
+  getWorkProjectBySlug.mockReset();
+  getLandingPageLinks.mockReset();
+  getLandingPageLinks.mockResolvedValue([]);
+  notFound.mockClear();
+});
 
 const project: Project = {
   id: "project-1",
@@ -79,6 +92,96 @@ describe("work detail page", () => {
 
     expect(element).toBeTruthy();
     expect(getWorkProjectBySlug).toHaveBeenCalledWith("harbour-light");
+  });
+});
+
+/** The gallery element inside the shell, whatever else the page renders. */
+function galleryProps(element: ReactElement): Record<string, unknown> {
+  const found: Record<string, unknown>[] = [];
+
+  function walk(node: unknown) {
+    if (Array.isArray(node)) {
+      node.forEach(walk);
+    } else if (node && typeof node === "object" && "props" in node) {
+      const child = node as ReactElement<{ children?: unknown }>;
+
+      if (child.type === WorkDetailGallery) {
+        found.push(child.props as Record<string, unknown>);
+      }
+      walk(child.props.children);
+    }
+  }
+
+  walk(element);
+
+  if (found.length !== 1) {
+    throw new Error(`expected one WorkDetailGallery, found ${found.length}`);
+  }
+
+  return found[0]!;
+}
+
+function link(category: string): LandingPageLink {
+  return {
+    slug: "wedding-photographer-london-ontario",
+    href: "/wedding-photographer-london-ontario",
+    heading: "Wedding Photographer in London, Ontario",
+    packageId: "wedding",
+    category,
+  };
+}
+
+describe("work detail page: the matching landing page", () => {
+  it("links a project whose category matches a live page", async () => {
+    getWorkProjectBySlug.mockResolvedValue(project);
+    getLandingPageLinks.mockResolvedValue([link("Wedding")]);
+
+    const props = galleryProps(await page.default(params("harbour-light")));
+
+    expect(props["landingLink"]).toEqual({
+      href: "/wedding-photographer-london-ontario",
+      heading: "Wedding Photographer in London, Ontario",
+    });
+  });
+
+  it("matches ignoring case and spacing", async () => {
+    getWorkProjectBySlug.mockResolvedValue({
+      ...project,
+      category: "graduation",
+    });
+    getLandingPageLinks.mockResolvedValue([link("Graduation ")]);
+
+    const props = galleryProps(await page.default(params("harbour-light")));
+
+    expect(props["landingLink"]).toBeTruthy();
+  });
+
+  it("passes none, and does not error, when no page matches", async () => {
+    getWorkProjectBySlug.mockResolvedValue(project);
+    getLandingPageLinks.mockResolvedValue([link("portrait")]);
+
+    const props = galleryProps(await page.default(params("harbour-light")));
+
+    expect(props["landingLink"]).toBeUndefined();
+  });
+
+  it("changes nothing when no landing page is live", async () => {
+    getWorkProjectBySlug.mockResolvedValue(project);
+    getLandingPageLinks.mockResolvedValue([]);
+
+    const props = galleryProps(await page.default(params("harbour-light")));
+
+    expect(props["landingLink"]).toBeUndefined();
+    expect(props["project"]).toBe(project);
+  });
+
+  it("still 404s an unknown project, without reading the landing pages", async () => {
+    getWorkProjectBySlug.mockResolvedValue(null);
+
+    await expect(page.default(params("nope"))).rejects.toThrow(
+      "NEXT_NOT_FOUND",
+    );
+    expect(getLandingPageLinks).not.toHaveBeenCalled();
   });
 });
 

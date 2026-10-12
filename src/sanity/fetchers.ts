@@ -1,8 +1,14 @@
 import type { PortableTextBlock } from "next-sanity";
 import { cache } from "react";
 import { isJournalCategory } from "@/constants/journalCategories";
+import {
+  HEADING_PLACEHOLDERS,
+  LANDING_CONFIRM_MARKER,
+} from "@/constants/landingPage";
 import { isIsoDate, todayInStudioTimeZone } from "@/utils/journalDate";
 import { parseEmbedUrl } from "@/utils/journalEmbed";
+import { composeLandingHeading } from "@/utils/landingHeading";
+import { isLandingSlug } from "@/utils/landingSlug";
 import { normalizeWorkCategory } from "@/utils/formatWorkCategory";
 import type {
   JournalBodyBlock,
@@ -10,6 +16,14 @@ import type {
   JournalPost,
   JournalPostSummary,
 } from "@/types/journal";
+import type {
+  LandingFaq,
+  LandingPage,
+  LandingPageLink,
+  LandingPageSettings,
+  LandingPageSummary,
+  LandingSection,
+} from "@/types/landing";
 import type { NavigationItem } from "@/types/navigation";
 import type { Project, ProjectImage, WorkPlacement } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
@@ -33,6 +47,10 @@ import {
   journalPostBySlugQuery,
   journalPostSlugsQuery,
   journalPostsQuery,
+  landingPageBySlugQuery,
+  landingPageSlugsQuery,
+  landingPagesQuery,
+  landingSettingsQuery,
   projectBySlugQuery,
   projectSlugsQuery,
   projectsQuery,
@@ -141,6 +159,34 @@ type SanityJournalPost = {
   body?: SanityJournalBodyMember[];
   seoTitle?: string;
   seoDescription?: string;
+};
+
+type SanityLandingPage = {
+  _updatedAt?: string;
+  slug?: { current?: string } | string;
+  serviceName?: string;
+  alternateName?: string;
+  category?: string;
+  packageId?: string;
+  packageImage?: SanityImageValue | null;
+  introduction?: string[];
+  sections?: { heading?: string; body?: string[] }[];
+  faqs?: { question?: string; answer?: string }[];
+  seoTitle?: string;
+  seoDescription?: string;
+  /** `null` when the reference dangles or points at an unpublished package. */
+  package?: SanityService | null;
+};
+
+type SanityLandingSettings = {
+  headingPattern?: string;
+  projectsHeading?: string;
+  packageHeading?: string;
+  packageBookLabel?: string;
+  faqHeading?: string;
+  ctaHeading?: string;
+  ctaBody?: string;
+  ctaContactLabel?: string;
 };
 
 /** Shared by the fetchers and the `/api/revalidate` webhook that busts them. */
@@ -386,38 +432,38 @@ export async function getServices(): Promise<ServicePackage[]> {
     "service packages",
   );
 
-  return services.map((service, index) => {
-    const id = requireString(
-      service.id ?? service._id,
-      `servicePackage[${index}].id`,
-    );
-    const image = resolveSanityImage(
-      service.image,
-      `servicePackage[${index}].image`,
-    );
+  return services.map((service, index) =>
+    mapSanityService(service, `servicePackage[${index}]`),
+  );
+}
 
-    return {
-      id,
-      index: requireString(service.index, `servicePackage[${index}].index`),
-      title: requireString(service.title, `servicePackage[${index}].title`),
-      description: requireString(
-        service.description,
-        `servicePackage[${index}].description`,
-      ),
-      features: requireStringArray(
-        service.features,
-        `servicePackage[${index}].features`,
-      ),
-      price: requireValue(service.price, `servicePackage[${index}].price`),
-      image: image.src,
-      imageBlurDataURL: image.blurDataURL,
-      imageAlt: image.alt,
-      ctaHref: requireString(
-        service.ctaHref,
-        `servicePackage[${index}].ctaHref`,
-      ),
-    };
-  });
+/**
+ * The one mapper for a service package, so the services page and a landing
+ * page's package block cannot disagree about what a valid package is.
+ * `fieldPrefix` only shapes validation messages.
+ */
+function mapSanityService(
+  service: SanityService,
+  fieldPrefix: string,
+): ServicePackage {
+  const id = requireString(service.id ?? service._id, `${fieldPrefix}.id`);
+  const image = resolveSanityImage(service.image, `${fieldPrefix}.image`);
+
+  return {
+    id,
+    index: requireString(service.index, `${fieldPrefix}.index`),
+    title: requireString(service.title, `${fieldPrefix}.title`),
+    description: requireString(
+      service.description,
+      `${fieldPrefix}.description`,
+    ),
+    features: requireStringArray(service.features, `${fieldPrefix}.features`),
+    price: requireValue(service.price, `${fieldPrefix}.price`),
+    image: image.src,
+    imageBlurDataURL: image.blurDataURL,
+    imageAlt: image.alt,
+    ctaHref: requireString(service.ctaHref, `${fieldPrefix}.ctaHref`),
+  };
 }
 
 export async function getWorkProjects(): Promise<Project[]> {
@@ -728,4 +774,263 @@ function mapJournalBodyMember(
       // span here would duplicate the renderer's job for no extra safety.
       return member as unknown as PortableTextBlock;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Service landing pages (spec 014)
+
+/**
+ * A placeholder only the studio can fill must never reach a visitor. The
+ * Studio refuses to switch a page on while one remains; this is the same rule
+ * on the way out, for a page that arrived by import with the switch already on
+ * (research.md §10).
+ */
+function rejectConfirmMarker(value: string, field: string) {
+  if (value.includes(LANDING_CONFIRM_MARKER)) {
+    throw new Error(
+      `Sanity field "${field}" still contains a ${LANDING_CONFIRM_MARKER}: … placeholder. Replace it with the real detail.`,
+    );
+  }
+
+  return value;
+}
+
+function requireLandingText(value: string | null | undefined, field: string) {
+  return rejectConfirmMarker(requireString(value, field), field);
+}
+
+function requireLandingParagraphs(
+  value: string[] | null | undefined,
+  field: string,
+) {
+  return requireStringArray(value, field).map((paragraph) =>
+    rejectConfirmMarker(paragraph, field),
+  );
+}
+
+function mapLandingSummary(
+  page: SanityLandingPage,
+  fieldPrefix: string,
+): LandingPageSummary {
+  const slug = requireString(getSlug(page.slug), `${fieldPrefix}.slug`);
+
+  if (!isLandingSlug(slug)) {
+    throw new Error(
+      `Sanity field "${fieldPrefix}.slug" must be lower-case letters, digits and hyphens, received "${slug}".`,
+    );
+  }
+
+  const alternateName = optionalString(page.alternateName);
+
+  return {
+    slug,
+    serviceName: requireLandingText(
+      page.serviceName,
+      `${fieldPrefix}.serviceName`,
+    ),
+    alternateName: alternateName
+      ? rejectConfirmMarker(alternateName, `${fieldPrefix}.alternateName`)
+      : undefined,
+    category: requireLandingText(page.category, `${fieldPrefix}.category`),
+    packageId: requireString(page.packageId, `${fieldPrefix}.packageId`),
+    packageImage: resolveSanityImage(
+      page.packageImage,
+      `${fieldPrefix}.packageImage`,
+    ),
+    updatedAt: requireString(page._updatedAt, `${fieldPrefix}._updatedAt`),
+  };
+}
+
+/**
+ * Structural guards only: at least one section and one question, every field
+ * non-blank. The word minimums are the Studio's and the launch-content test's
+ * to enforce, not the site's — a page at 390 words is short, not missing, and
+ * a runtime floor would take live pages down when the floor is raised later
+ * (research.md §4b).
+ */
+function mapLandingPage(
+  page: SanityLandingPage,
+  fieldPrefix: string,
+): LandingPage {
+  const sections = requireValue(page.sections, `${fieldPrefix}.sections`);
+  const faqs = requireValue(page.faqs, `${fieldPrefix}.faqs`);
+
+  if (!sections.length) {
+    throw new Error(
+      `Sanity field "${fieldPrefix}.sections" must contain at least one section.`,
+    );
+  }
+
+  if (!faqs.length) {
+    throw new Error(
+      `Sanity field "${fieldPrefix}.faqs" must contain at least one question.`,
+    );
+  }
+
+  if (!page.package) {
+    throw new Error(
+      `Sanity document "${fieldPrefix}.package" is required — the service package it points to is missing or unpublished.`,
+    );
+  }
+
+  return {
+    ...mapLandingSummary(page, fieldPrefix),
+    introduction: requireLandingParagraphs(
+      page.introduction,
+      `${fieldPrefix}.introduction`,
+    ),
+    sections: sections.map((section, index): LandingSection => ({
+      heading: requireLandingText(
+        section.heading,
+        `${fieldPrefix}.sections[${index}].heading`,
+      ),
+      paragraphs: requireLandingParagraphs(
+        section.body,
+        `${fieldPrefix}.sections[${index}].body`,
+      ),
+    })),
+    faqs: faqs.map((faq, index): LandingFaq => ({
+      question: requireLandingText(
+        faq.question,
+        `${fieldPrefix}.faqs[${index}].question`,
+      ),
+      answer: requireLandingText(
+        faq.answer,
+        `${fieldPrefix}.faqs[${index}].answer`,
+      ),
+    })),
+    seoTitle: requireLandingText(page.seoTitle, `${fieldPrefix}.seoTitle`),
+    seoDescription: requireLandingText(
+      page.seoDescription,
+      `${fieldPrefix}.seoDescription`,
+    ),
+    package: mapSanityService(page.package, `${fieldPrefix}.package`),
+  };
+}
+
+/** Live pages only: the filter is in the query (research.md §2). */
+export async function getLandingPages(): Promise<LandingPageSummary[]> {
+  const pages = await fetchSanity<SanityLandingPage[]>(
+    landingPagesQuery,
+    "service landing pages",
+  );
+
+  return pages.map((page, index) =>
+    mapLandingSummary(page, `serviceLandingPage[${index}]`),
+  );
+}
+
+/**
+ * `null` for an unknown slug **and** for a held-back, draft-only or deleted
+ * page — the query cannot tell them apart, and the page should not either.
+ * Looked up per slug rather than checked against a shared list: under
+ * stale-while-revalidate a shared list is stale on the first visit after a
+ * publish, which would answer "no" for a page created seconds ago (research.md
+ * §1).
+ */
+export async function getLandingPageBySlug(
+  slug: string,
+): Promise<LandingPage | null> {
+  const page = await fetchSanity<SanityLandingPage | null>(
+    landingPageBySlugQuery,
+    `the "${slug}" service landing page`,
+    { slug },
+  );
+
+  return page ? mapLandingPage(page, `serviceLandingPage("${slug}")`) : null;
+}
+
+export async function getLandingPageSlugs(): Promise<string[]> {
+  const slugs = await fetchSanity<(string | null)[]>(
+    landingPageSlugsQuery,
+    "service landing page slugs",
+  );
+
+  return slugs.filter((slug): slug is string => Boolean(slug?.trim()));
+}
+
+export async function getLandingPageSettings(): Promise<LandingPageSettings> {
+  const settings = requireDocument(
+    await fetchSanity<SanityLandingSettings | null>(
+      landingSettingsQuery,
+      "the service landing page settings",
+    ),
+    "serviceLandingSettings",
+  );
+  const headingPattern = requireString(
+    settings.headingPattern,
+    "serviceLandingSettings.headingPattern",
+  );
+
+  for (const placeholder of Object.values(HEADING_PLACEHOLDERS)) {
+    if (!headingPattern.includes(placeholder)) {
+      throw new Error(
+        `Sanity field "serviceLandingSettings.headingPattern" must contain ${placeholder}.`,
+      );
+    }
+  }
+
+  return {
+    headingPattern,
+    projectsHeading: requireString(
+      settings.projectsHeading,
+      "serviceLandingSettings.projectsHeading",
+    ),
+    packageHeading: requireString(
+      settings.packageHeading,
+      "serviceLandingSettings.packageHeading",
+    ),
+    packageBookLabel: requireString(
+      settings.packageBookLabel,
+      "serviceLandingSettings.packageBookLabel",
+    ),
+    faqHeading: requireString(
+      settings.faqHeading,
+      "serviceLandingSettings.faqHeading",
+    ),
+    cta: {
+      heading: requireString(
+        settings.ctaHeading,
+        "serviceLandingSettings.ctaHeading",
+      ),
+      body: requireString(settings.ctaBody, "serviceLandingSettings.ctaBody"),
+      contactLabel: requireString(
+        settings.ctaContactLabel,
+        "serviceLandingSettings.ctaContactLabel",
+      ),
+    },
+  };
+}
+
+/**
+ * Ready-made link text for the services page and the project pages, which
+ * never compose a heading themselves. With no live page it returns before
+ * reading any settings, so the build — which calls this from the services page
+ * and every project page — does not depend on the settings document until a
+ * page is actually live.
+ */
+export async function getLandingPageLinks(): Promise<LandingPageLink[]> {
+  const pages = await getLandingPages();
+
+  if (!pages.length) {
+    return [];
+  }
+
+  const [siteSettings, settings] = await Promise.all([
+    getSiteSettings(),
+    getLandingPageSettings(),
+  ]);
+
+  return pages.map((page) => ({
+    slug: page.slug,
+    href: `/${page.slug}`,
+    heading: composeLandingHeading({
+      pattern: settings.headingPattern,
+      serviceName: page.serviceName,
+      alternateName: page.alternateName,
+      city: siteSettings.location,
+    }),
+    packageId: page.packageId,
+    category: page.category,
+  }));
 }

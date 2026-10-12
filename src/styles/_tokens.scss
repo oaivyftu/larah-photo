@@ -155,8 +155,15 @@
   --journal-h2-size: clamp(1.5rem, 2.2vw, 2.25rem);
   --journal-h3-size: clamp(1.25rem, 1.6vw, 1.625rem);
   --journal-quote-size: clamp(1.5rem, 2.4vw, 2.5rem);
-  --journal-cta-heading-size: clamp(1.75rem, 3vw, 3rem);
   --journal-card-title-size: clamp(1.25rem, 1.6vw, 1.75rem);
+
+  /* Call to action (shared by the journal and the service landing pages).
+     Moved out of the --journal-* family when the component became shared
+     (spec 014): the body pair deliberately repeats the journal body's values
+     rather than reading them, so retuning the journal's reading type does not
+     silently retune every call to action. */
+  --cta-heading-size: clamp(1.75rem, 3vw, 3rem);
+  --cta-body-size: clamp(1.0625rem, 1.25vw, 1.25rem);
 
   --line-height-tight: 1;
   --line-height-heading: 1.05;
@@ -216,6 +223,7 @@
   --journal-body-leading: 1.6;
   --journal-h2-leading: 1.12;
   --journal-card-title-leading: 1.15;
+  --cta-body-leading: 1.6;
 
   /* Easing -- named for the motion each describes, never for its control
      points. Five curves that together were already a deliberate vocabulary;
@@ -463,8 +471,10 @@
   /* Maps read better closer to square than video does. */
   --journal-embed-ratio-video: 16 / 9;
   --journal-embed-ratio-map: 4 / 3;
-  --journal-cta-pad: clamp(2.5rem, 5vw, 4.5rem);
-  --journal-cta-gap: clamp(1rem, 1.6vw, 1.5rem);
+
+  /* Call to action (see the type sizes above). */
+  --cta-pad: clamp(2.5rem, 5vw, 4.5rem);
+  --cta-gap: clamp(1rem, 1.6vw, 1.5rem);
 
   /* Journal index (spec 013). */
   --journal-index-pad-top: clamp(1.5rem, 3vw, 3rem);
@@ -475,4 +485,39 @@
   --journal-card-gap: clamp(0.6rem, 1vw, 0.9rem);
   --journal-card-image-ratio: 3 / 2;
   --journal-empty-pad: clamp(3rem, 6vw, 6rem);
+
+  /* Service landing page (spec 014). A service page explains, shows proof,
+     prices and answers: reading type closer to the journal's than to the
+     portfolio's display copy, laid out on the same frame. Each size is paired
+     with its leading by name. The call to action reads the shared --cta-*
+     family above and is spaced by --landing-stack-gap like every other block,
+     so it has no tokens of its own. */
+  --landing-header-pad-top: clamp(2rem, 4.03vw, 3.625rem);
+  --landing-header-pad-bottom: clamp(2rem, 4vw, 3.5rem);
+  --landing-measure: 46rem;
+  --landing-stack-gap: clamp(3.5rem, 7vw, 6.5rem);
+  --landing-pad-bottom: clamp(4.5rem, 8vw, 8rem);
+  --landing-intro-size: clamp(1.25rem, 1.9vw, 1.75rem);
+  --landing-intro-leading: 1.45;
+  --landing-intro-gap: clamp(1rem, 1.6vw, 1.5rem);
+  --landing-section-gap: clamp(2.5rem, 5vw, 4.5rem);
+  --landing-section-columns-gap: clamp(1.5rem, 4vw, 4rem);
+  --landing-section-heading-size: clamp(1.5rem, 2.2vw, 2.25rem);
+  --landing-section-heading-leading: 1.12;
+  --landing-body-size: clamp(1rem, 1.25vw, 1.1875rem);
+  --landing-body-leading: 1.6;
+  --landing-body-gap: clamp(0.9rem, 1.3vw, 1.25rem);
+  --landing-block-heading-size: clamp(1.5rem, 2.2vw, 2.25rem);
+  --landing-block-heading-leading: 1.12;
+  --landing-block-heading-gap: clamp(1.25rem, 2.2vw, 2rem);
+  --landing-projects-gap-x: clamp(1rem, 2vw, 2rem);
+  --landing-projects-gap-y: clamp(1.75rem, 3vw, 3rem);
+  --landing-package-gap: clamp(1.5rem, 4vw, 4rem);
+  --landing-package-copy-gap: clamp(1rem, 1.6vw, 1.5rem);
+  --landing-package-title-size: clamp(1.25rem, 1.7vw, 1.625rem);
+  --landing-package-title-leading: 1.15;
+  --landing-faq-gap: clamp(1.25rem, 2vw, 1.75rem);
+  --landing-faq-question-size: clamp(1.125rem, 1.5vw, 1.375rem);
+  --landing-faq-question-leading: 1.25;
+  --landing-faq-item-gap: clamp(0.5rem, 0.9vw, 0.75rem);
 }

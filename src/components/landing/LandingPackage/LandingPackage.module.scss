@@ -1,0 +1,54 @@
+@use "@/styles/mixins" as *;
+
+.landing-package {
+  display: grid;
+  gap: var(--landing-block-heading-gap);
+}
+
+.landing-package__heading {
+  font-size: var(--landing-block-heading-size);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--landing-block-heading-leading);
+}
+
+.landing-package__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: var(--landing-package-gap);
+  align-items: start;
+}
+
+.landing-package__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.52 / 1;
+  overflow: hidden;
+}
+
+.landing-package__media img {
+  object-fit: contain;
+}
+
+.landing-package__copy {
+  display: grid;
+  gap: var(--landing-package-copy-gap);
+  justify-items: start;
+}
+
+.landing-package__title {
+  font-size: var(--landing-package-title-size);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--landing-package-title-leading);
+}
+
+.landing-package__copy p {
+  font-size: var(--landing-body-size);
+  line-height: var(--landing-body-leading);
+}
+
+@include media-max("tablet-lg") {
+  .landing-package__content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

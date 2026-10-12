@@ -128,6 +128,29 @@ describe("PageShell", () => {
     },
   );
 
+  it("marks Services as current on a landing page, leaving the nav's items alone", async () => {
+    // A landing page sits in the services section the way a project sits in
+    // work (spec 014 research.md §12). Which item is highlighted changes; what
+    // the navigation contains does not (FR-030).
+    const items = [
+      ...settings.navigationItems,
+      { label: "Services", href: "/service" },
+    ];
+    getSiteSettings.mockResolvedValue({ ...settings, navigationItems: items });
+
+    await renderShell("landing");
+
+    expect(document.querySelector("[aria-current='page']")).toHaveAttribute(
+      "href",
+      "/service",
+    );
+    expect(
+      [...document.querySelectorAll("header nav a")].map((link) =>
+        link.getAttribute("href"),
+      ),
+    ).toEqual(expect.arrayContaining(items.map((item) => item.href)));
+  });
+
   it("hides the header brand on the home page only", async () => {
     const { container: home } = await renderShell("home");
     const homeBrand = home.querySelector("header a")?.className;

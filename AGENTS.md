@@ -35,6 +35,7 @@ are about to change and read it:
 | Typography and motion tokens     | `specs/011-typography-motion-tokens/` |
 | Browser end-to-end tests         | `specs/012-browser-e2e-tests/`        |
 | Journal (listing, posts)         | `specs/013-journal-section/`          |
+| Service landing pages            | `specs/014-service-landing-pages/`    |
 
 `specs/001`–`008` are **retrospective**: they describe what already shipped.
 They have no `plan.md` or `tasks.md` and should not get one — see

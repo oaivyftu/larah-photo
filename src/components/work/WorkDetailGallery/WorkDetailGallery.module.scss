@@ -70,6 +70,18 @@
   line-height: var(--work-detail-title-leading);
 }
 
+/* A quiet text link under the title, not a button: it is the way on to the
+   service page for this kind of work, and the title stays the loudest thing
+   in the column. */
+.work-detail__landing {
+  width: fit-content;
+  margin-top: var(--space-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-control);
+  text-decoration: underline;
+}
+
 .work-detail__description {
   align-self: end;
   max-width: 38rem;

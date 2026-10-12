@@ -5,6 +5,8 @@ import { journalPage } from "./journalPage";
 import { journalPost } from "./journalPost";
 import { servicePackage } from "./servicePackage";
 import { servicePage } from "./servicePage";
+import { serviceLandingPage } from "./serviceLandingPage";
+import { serviceLandingSettings } from "./serviceLandingSettings";
 import { siteSettings } from "./siteSettings";
 import { workPage } from "./workPage";
 import { workProject } from "./workProject";
@@ -17,7 +19,9 @@ export const schemaTypes = [
   servicePage,
   workPage,
   journalPage,
+  serviceLandingSettings,
   servicePackage,
   workProject,
   journalPost,
+  serviceLandingPage,
 ];

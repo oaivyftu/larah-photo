@@ -60,7 +60,7 @@ After an editor publishes a change in the Studio, that change becomes visible on
 
 ### Functional Requirements
 
-- **FR-001**: The site MUST provide an embedded content editing interface, reachable at a dedicated route, covering every content type the public site renders (site settings, home/about/service/contact/work/journal page content, work projects, service packages, journal posts).
+- **FR-001**: The site MUST provide an embedded content editing interface, reachable at a dedicated route, covering every content type the public site renders (site settings, home/about/service/contact/work/journal page content, work projects, service packages, journal posts, service landing pages and their shared settings).
 - **FR-002**: The editing interface MUST render with its own visual design, isolated from the public site's global styling.
 - **FR-003**: The editing interface's route MUST be excluded from search engine indexing and following.
 - **FR-004**: The system MUST expose a notification endpoint that, given a valid signed request identifying a changed content type, invalidates the site's cached content so subsequent requests reflect the change.
@@ -70,7 +70,7 @@ After an editor publishes a change in the Studio, that change becomes visible on
 
 ### Key Entities
 
-- **Content Document**: Any CMS-managed record the public site depends on (site settings, page content documents, work projects, service packages, journal posts), each with a content type used to route change notifications. The notification endpoint invalidates one site-wide cache tag for any content type, so types added later (such as spec 013's journal) are covered without a change to it.
+- **Content Document**: Any CMS-managed record the public site depends on (site settings, page content documents, work projects, service packages, journal posts, service landing pages and their settings), each with a content type used to route change notifications. The notification endpoint invalidates one site-wide cache tag for any content type, so types added later (such as spec 013's journal and spec 014's service landing pages) are covered without a change to it.
 - **Cache Invalidation Notification**: A signed request identifying which content type changed, used to trigger a targeted cache refresh.
 
 ## Success Criteria _(mandatory)_
@@ -88,3 +88,4 @@ After an editor publishes a change in the Studio, that change becomes visible on
 - This specification documents the current, already-implemented CMS integration as a baseline, rather than proposing new functionality.
 - "Editor" refers to anyone with valid credentials to the CMS project; authentication/authorization within the editing interface itself is provided by the CMS platform and is out of scope for this specification.
 - The one-hour automatic refresh interval is the current, intentional fallback cadence rather than an incidental value.
+- Content imported with `sanity dataset import` (spec 014's launch pages) **bypasses Studio validation**: the Studio's word minimums, uniqueness checks and publishing gate never run on it. What covers that gap is `src/utils/landingLaunchContent.test.ts`, which runs the same pure quality rule over the launch files in `npm test`, and the site's own fetcher guards, which refuse to render a page holding a `[[CONFIRM` placeholder. A future bulk import would need its own check.

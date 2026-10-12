@@ -246,3 +246,36 @@ export async function firstJournalPostHref(page: Page) {
 
   return cards.first().getByRole("link").getAttribute("href");
 }
+
+/**
+ * Every live service landing page's href, read from the services page.
+ *
+ * Landing pages are discovered the way journal posts are: by asking the site,
+ * never by naming a slug. `[data-landing-link]` is the only handle that finds a
+ * page without knowing what it is called (spec 014 contracts/test-surface.md).
+ * An empty list is a valid content state -- an editor may not have switched a
+ * page on yet -- so callers skip on it rather than fail.
+ */
+export async function landingPageHrefs(page: Page) {
+  await page.goto("/service");
+
+  return (
+    await page
+      .locator("[data-landing-link]")
+      .evaluateAll((links) =>
+        links.map((link) => link.getAttribute("href") ?? ""),
+      )
+  ).filter(Boolean);
+}
+
+/** The first live landing page's href, or `null` when none is live. */
+export async function firstLandingPageHref(page: Page) {
+  return (await landingPageHrefs(page))[0] ?? null;
+}
+
+/** Whether a landing page shows at least one project card. */
+export async function landingPageShowsProjects(page: Page, href: string) {
+  await page.goto(href);
+
+  return (await page.locator("[data-work-card]").count()) > 0;
+}

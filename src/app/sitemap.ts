@@ -1,7 +1,11 @@
 import type { MetadataRoute } from "next";
 
 import { absoluteUrl } from "@/constants/seo";
-import { getJournalPosts, getWorkProjects } from "@/sanity/fetchers";
+import {
+  getJournalPosts,
+  getLandingPages,
+  getWorkProjects,
+} from "@/sanity/fetchers";
 
 /**
  * `changeFrequency` and `priority` are hints Google has said it ignores, so
@@ -17,11 +21,20 @@ import { getJournalPosts, getWorkProjects } from "@/sanity/fetchers";
  * An edited article's freshness is worth telling a crawler about; a project
  * gallery's is not (spec 013 research.md §6). Only live posts are listed: the
  * schedule is enforced by the query, and nothing here adds to it.
+ *
+ * Service landing pages are the same: their own `lastModified` and their
+ * package photograph, and only live ones, because "live" is decided in the
+ * query (spec 014 research.md §2). There is deliberately no `try` / `catch`
+ * here: a malformed live page raises, exactly as a malformed project does.
+ * Skipping it would leave a page that still fails on its own address and that
+ * the services page links to — a half-silent failure, worse than a loud one
+ * (research.md §7).
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [projects, journalPosts] = await Promise.all([
+  const [projects, journalPosts, landingPages] = await Promise.all([
     getWorkProjects(),
     getJournalPosts(),
+    getLandingPages(),
   ]);
   const lastModified = new Date();
 
@@ -49,5 +62,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     images: [post.coverImage.src, ...post.bodyImages.map((image) => image.src)],
   }));
 
-  return [...staticRoutes, ...projectRoutes, ...journalRoutes];
+  const landingRoutes = landingPages.map((page) => ({
+    url: absoluteUrl(`/${page.slug}`),
+    lastModified: new Date(page.updatedAt),
+    images: [page.packageImage.src],
+  }));
+
+  return [
+    ...staticRoutes,
+    ...projectRoutes,
+    ...journalRoutes,
+    ...landingRoutes,
+  ];
 }

@@ -1,0 +1,100 @@
+{
+  "_id": "serviceLandingPage.portrait",
+  "_type": "serviceLandingPage",
+  "published": false,
+  "approvedAgainstBrief": false,
+  "package": {
+    "_type": "reference",
+    "_ref": "431b6be0-cad7-4c85-9292-f590ff246bf7"
+  },
+  "serviceName": "Portrait",
+  "category": "Portrait",
+  "slug": {
+    "_type": "slug",
+    "current": "portrait-photographer-london-ontario"
+  },
+  "introduction": [
+    "A portrait session is time spent on one person: your face, your posture, the way you actually laugh, photographed in good light and without a rush. The sessions here are personal ones, individual or lifestyle, for anyone who wants photographs of themselves that look like them rather than like a template.",
+    "This page explains the kinds of session, how to prepare, where in London it can happen and how to book a portrait photographer."
+  ],
+  "sections": [
+    {
+      "_type": "landingSection",
+      "_key": "section-1",
+      "heading": "Individual and lifestyle sessions",
+      "body": [
+        "Portrait is a broad word, so it helps to name what you want. An individual session keeps the attention on you, with a simple setting and room to try a few different expressions. A lifestyle session places you somewhere familiar, doing something you do, so the photographs carry some of your life as well as your face. Either can serve a creative project, a milestone, a profile photograph or simply the wish to own a good picture of yourself. [[CONFIRM: any other kinds of portrait session the studio offers, such as professional or personal-brand, creative, couples or maternity; keep only those that are real]]."
+      ]
+    },
+    {
+      "_type": "landingSection",
+      "_key": "section-2",
+      "heading": "How the portraits look",
+      "body": [
+        "The projects on this page are the most honest description of how this studio's portraits look, so spend a minute with them before you book. Notice the light, how close the camera sits, how posed or candid the people seem, and whether the colours run warm or cool, then decide whether that is the mood you want. In the studio's own words: [[CONFIRM: a short description of the studio's portrait style, covering the light, the mood and how directed or candid a session is]]. A style that matches your taste will give you a better session than one you have to steer."
+      ]
+    },
+    {
+      "_type": "landingSection",
+      "_key": "section-3",
+      "heading": "Preparing for your session",
+      "body": [
+        "Preparation is mostly about removing small worries. Choose two outfits at most and try them on beforehand, so you know where they pull or crease. Solid colours and simple textures photograph well, while visible logos and strict patterns usually distract. Wash and style your hair the day before rather than the morning of, and bring any makeup you want to touch up. If you feel awkward in front of a camera, say so at the start, because nearly everyone does."
+      ]
+    },
+    {
+      "_type": "landingSection",
+      "_key": "section-4",
+      "heading": "Where in London it can happen",
+      "body": [
+        "Portraits work indoors and out, and London has both. Daylight beside a window can be as flattering as a park at sunset, and in an Ontario winter an indoor setting may be the kinder choice. Outdoors, the river paths and older streets give texture and room to move. The studio shoots portraits at [[CONFIRM: where portraits are shot: a studio space, your home or workplace, or outdoors, and which of these candidates apply: the Museum London area, Victoria Park, Western University's campus, the Covent Garden Market and downtown core, Gibbons Park, the Thames Valley Parkway, Springbank Park, Wortley Village; also any travel fee outside London]]."
+      ]
+    }
+  ],
+  "faqs": [
+    {
+      "_type": "landingFaq",
+      "_key": "question-1",
+      "question": "What kinds of portrait can I book?",
+      "answer": "The package above is for personal portraits, either an individual session or a lifestyle one. If you are after something more specific, such as a profile photograph, a creative concept or a portrait with a partner, describe it when you get in touch. Whether it is offered is [[CONFIRM: which additional kinds of portrait session the studio offers]]."
+    },
+    {
+      "_type": "landingFaq",
+      "_key": "question-2",
+      "question": "I hate being photographed. Will I look stiff?",
+      "answer": "Almost everyone feels that way at the start, and stiffness usually fades once you are moving, talking or doing something with your hands. Choose a setting you like, wear something you feel good in and say what you dislike about photographs of yourself. That information is more useful than any advice about posing."
+    },
+    {
+      "_type": "landingFaq",
+      "_key": "question-3",
+      "question": "How many photographs will I receive, and when?",
+      "answer": "The package block states how many edited photographs and untouched originals a session includes, so the amount is clear before you book. Delivery is a separate question: [[CONFIRM: the delivery time and form, such as an online gallery or download, and whether prints are offered]]."
+    },
+    {
+      "_type": "landingFaq",
+      "_key": "question-4",
+      "question": "Can I use my portraits for work or social media?",
+      "answer": "Many people book a portrait session for a profile photograph, a website or a social account, so it is worth asking before you book. [[CONFIRM: usage rights for personal use, for professional use such as a website or a networking profile, and for commercial use]]. If your use is unusual, describe it when you write."
+    },
+    {
+      "_type": "landingFaq",
+      "_key": "question-5",
+      "question": "Can I change outfits during the session?",
+      "answer": "[[CONFIRM: the outfit-change allowance and how many changes fit in a session]]. Whatever the limit, bring fewer outfits than you think you need and choose them so each looks different from the last: a change of colour or neckline does more than a change of accessories."
+    },
+    {
+      "_type": "landingFaq",
+      "_key": "question-6",
+      "question": "What if the weather is bad?",
+      "answer": "For an outdoor portrait session, cold, rain or deep snow can be a reason to move indoors or pick another day. [[CONFIRM: the studio's rain, cold and rescheduling policy, and whether an indoor option is available]]. Check the forecast the evening before, and get in touch early if you are unsure."
+    },
+    {
+      "_type": "landingFaq",
+      "_key": "question-7",
+      "question": "How do I book a portrait session?",
+      "answer": "Use the contact link below to say what kind of portrait you have in mind, what it is for and when you would like it. The package block shows the starting price and its inclusions. Terms such as [[CONFIRM: deposit and cancellation terms]] are explained at booking."
+    }
+  ],
+  "seoTitle": "Portrait Photographer in London, Ontario",
+  "seoDescription": "Individual and lifestyle portrait sessions in London, Ontario: what to expect, how to prepare, what to wear and how to book yours."
+}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { absoluteUrl } from "@/constants/seo";
 import type { JournalPost } from "@/types/journal";
+import type { LandingPage } from "@/types/landing";
 import type { Project } from "@/types/project";
 import type { SiteSettings } from "@/types/site";
 import {
@@ -11,7 +12,10 @@ import {
   buildContactPageSchema,
   buildJournalCollectionSchema,
   buildJournalPostSchema,
+  buildLandingFaqSchema,
+  buildLandingServiceSchema,
   buildProjectSchema,
+  buildStartingPriceOffer,
   buildServiceListSchema,
   buildWebSiteSchema,
   buildWorkCollectionSchema,
@@ -269,6 +273,21 @@ describe("buildServiceListSchema", () => {
   it("produces an empty list rather than throwing when nothing is published", () => {
     expect(buildServiceListSchema([], "CAD")["itemListElement"]).toEqual([]);
   });
+
+  it("states the offer exactly as it did before the helper was shared", () => {
+    // Pins the literal so extracting `buildStartingPriceOffer` (spec 014)
+    // provably changes nothing on the services page.
+    const [first] = buildServiceListSchema(services, "CAD")[
+      "itemListElement"
+    ] as { item: { offers: unknown } }[];
+
+    expect(first?.item.offers).toEqual({
+      "@type": "AggregateOffer",
+      lowPrice: 900,
+      priceCurrency: "CAD",
+      availability: "https://schema.org/InStock",
+    });
+  });
 });
 
 describe("buildAboutPageSchema", () => {
@@ -444,5 +463,155 @@ describe("buildJournalCollectionSchema", () => {
       numberOfItems: 0,
       itemListElement: [],
     });
+  });
+});
+
+const landingPage: LandingPage = {
+  slug: "engagement-photographer-london-ontario",
+  serviceName: "Engagement",
+  alternateName: "Pre-wedding",
+  category: "Engagement",
+  packageId: "engagement",
+  packageImage: {
+    src: "https://cdn.sanity.io/images/p/d/package.jpg",
+    alt: "A couple by the river",
+    width: 1600,
+    height: 1067,
+  },
+  updatedAt: "2026-10-01T12:00:00Z",
+  introduction: ["First paragraph.", "Second paragraph."],
+  sections: [{ heading: "The session", paragraphs: ["What happens."] }],
+  faqs: [
+    { question: "How long is a session?", answer: "About ninety minutes." },
+    { question: "Where do we shoot?", answer: "Wherever feels like you." },
+  ],
+  seoTitle: "Engagement photographer",
+  seoDescription: "Engagement photography.",
+  package: {
+    id: "engagement",
+    index: "02",
+    title: "Engagement Session",
+    description: "A session.",
+    features: ["Coverage"],
+    price: 450,
+    image: "https://cdn.sanity.io/images/p/d/package.jpg",
+    imageAlt: "A couple by the river",
+    ctaHref: "/contact",
+  },
+};
+
+const landingUrl = absoluteUrl("/engagement-photographer-london-ontario");
+
+describe("buildStartingPriceOffer", () => {
+  it("quotes a starting price as an AggregateOffer", () => {
+    expect(buildStartingPriceOffer(450, "CAD")).toEqual({
+      "@type": "AggregateOffer",
+      lowPrice: 450,
+      priceCurrency: "CAD",
+      availability: "https://schema.org/InStock",
+    });
+  });
+});
+
+describe("buildLandingServiceSchema", () => {
+  const schema = buildLandingServiceSchema(
+    landingPage,
+    "London, Ontario",
+    "CAD",
+  );
+
+  it("is a Service with its own @id", () => {
+    expect(schema).toMatchObject({
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "@id": `${landingUrl}#service`,
+      url: landingUrl,
+    });
+  });
+
+  it("names the service by the editor's service name", () => {
+    expect(schema).toMatchObject({
+      name: "Engagement",
+      serviceType: "Engagement",
+    });
+  });
+
+  it("declares the alternate name when the editor set one", () => {
+    expect(schema["alternateName"]).toBe("Pre-wedding");
+  });
+
+  it("describes it with the visible introduction", () => {
+    expect(schema["description"]).toBe("First paragraph. Second paragraph.");
+  });
+
+  it("uses the package image and the studio's location", () => {
+    expect(schema).toMatchObject({
+      image: "https://cdn.sanity.io/images/p/d/package.jpg",
+      areaServed: "London, Ontario",
+    });
+  });
+
+  it("refers to the business by @id rather than restating it", () => {
+    expect(schema["provider"]).toEqual({ "@id": businessId });
+  });
+
+  it("states the price the way the services page does", () => {
+    expect(schema["offers"]).toEqual(buildStartingPriceOffer(450, "CAD"));
+  });
+
+  it("holds no undefined or empty value", () => {
+    for (const value of Object.values(schema)) {
+      expect(value).not.toBeUndefined();
+      expect(value).not.toBe("");
+    }
+  });
+
+  it.each([undefined, "", "   "])(
+    "leaves alternateName out entirely when it is %j",
+    (alternateName) => {
+      const bare = buildLandingServiceSchema(
+        { ...landingPage, alternateName },
+        "London, Ontario",
+        "CAD",
+      );
+
+      expect("alternateName" in bare).toBe(false);
+    },
+  );
+});
+
+describe("buildLandingFaqSchema", () => {
+  const schema = buildLandingFaqSchema(landingPage);
+
+  it("is a FAQPage with its own @id", () => {
+    expect(schema).toMatchObject({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "@id": `${landingUrl}#faq`,
+      url: landingUrl,
+    });
+  });
+
+  it("has one Question per FAQ, in the editor's order", () => {
+    const questions = schema["mainEntity"] as {
+      "@type": string;
+      name: string;
+    }[];
+
+    expect(questions.map((question) => question.name)).toEqual([
+      "How long is a session?",
+      "Where do we shoot?",
+    ]);
+    expect(questions.every((q) => q["@type"] === "Question")).toBe(true);
+  });
+
+  it("carries each answer byte-for-byte as the page shows it", () => {
+    const questions = schema["mainEntity"] as {
+      acceptedAnswer: { "@type": string; text: string };
+    }[];
+
+    expect(questions.map((question) => question.acceptedAnswer)).toEqual(
+      landingPage.faqs.map((faq) => ({ "@type": "Answer", text: faq.answer })),
+    );
   });
 });

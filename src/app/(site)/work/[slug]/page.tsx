@@ -4,8 +4,13 @@ import { PageShell } from "@/components/layout/PageShell/PageShell";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WorkDetailGallery } from "@/components/work/WorkDetailGallery/WorkDetailGallery";
 import { pageMetadata } from "@/constants/seo";
-import { getWorkProjectBySlug, getWorkProjectSlugs } from "@/sanity/fetchers";
+import {
+  getLandingPageLinks,
+  getWorkProjectBySlug,
+  getWorkProjectSlugs,
+} from "@/sanity/fetchers";
 import { toOpenGraphImage } from "@/sanity/image";
+import { categoriesMatch } from "@/utils/formatWorkCategory";
 import {
   buildBreadcrumbSchema,
   buildProjectSchema,
@@ -53,6 +58,14 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
     notFound();
   }
 
+  // After the 404 check, so an unknown project never pays for the read. The
+  // link is derived from the category, so a project never needs editing to be
+  // linked, and a project with no live page simply gets none (spec 014
+  // research.md §6).
+  const landingLink = (await getLandingPageLinks()).find((link) =>
+    categoriesMatch(link.category, project.category),
+  );
+
   return (
     <PageShell variant="project">
       <JsonLd data={buildProjectSchema(project)} />
@@ -63,7 +76,15 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
           { name: project.title, path: `/work/${project.slug}` },
         ])}
       />
-      <WorkDetailGallery project={project} />
+      <WorkDetailGallery
+        landingLink={
+          landingLink && {
+            href: landingLink.href,
+            heading: landingLink.heading,
+          }
+        }
+        project={project}
+      />
     </PageShell>
   );
 }

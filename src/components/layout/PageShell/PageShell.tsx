@@ -15,7 +15,8 @@ type PageShellProps = {
     | "service"
     | "contact"
     | "journal"
-    | "journalPost";
+    | "journalPost"
+    | "landing";
 };
 
 const activeHrefByVariant: Record<PageShellProps["variant"], string> = {
@@ -29,6 +30,10 @@ const activeHrefByVariant: Record<PageShellProps["variant"], string> = {
   // A post sits inside the journal the way a project sits inside the work
   // section, so the Journal nav item stays current on every post.
   journalPost: "/journal",
+  // A service landing page sits inside the services section the way a project
+  // sits inside work, so Services stays current. Which item is highlighted
+  // changes; the navigation's items do not (spec 014 FR-030).
+  landing: "/service",
 };
 
 export async function PageShell({ children, variant }: PageShellProps) {

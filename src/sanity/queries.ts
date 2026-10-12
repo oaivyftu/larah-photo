@@ -65,7 +65,12 @@ export const servicePageQuery = `*[_type == "servicePage"][0]{
   titleWords
 }`;
 
-export const servicesQuery = `*[_type == "servicePackage"] | order(index asc, title asc){
+/**
+ * One projection of a service package, shared by the services page and the
+ * landing page's `package->{…}` join, so a price or image rule changed here
+ * changes on both and the two pages cannot disagree (spec 014 research.md §5).
+ */
+export const servicePackageFields = `
   _id,
   id,
   index,
@@ -75,7 +80,9 @@ export const servicesQuery = `*[_type == "servicePackage"] | order(index asc, ti
   price,
   image{${imageFields}},
   ctaHref
-}`;
+`;
+
+export const servicesQuery = `*[_type == "servicePackage"] | order(index asc, title asc){${servicePackageFields}}`;
 
 const projectFields = `
   _id,
@@ -159,3 +166,50 @@ export const journalPostBySlugQuery = `*[${liveJournalPostFilter} && slug.curren
 }`;
 
 export const journalPostSlugsQuery = `*[${liveJournalPostFilter}].slug.current`;
+
+export const landingSettingsQuery = `*[_type == "serviceLandingSettings"][0]{
+  headingPattern,
+  projectsHeading,
+  packageHeading,
+  packageBookLabel,
+  faqHeading,
+  ctaHeading,
+  ctaBody,
+  ctaContactLabel
+}`;
+
+/**
+ * Every public landing-page read is built from this filter, so none can omit
+ * the switch — the same reason `liveJournalPostFilter` exists (spec 014
+ * research.md §2). Together with the client's `published` perspective, which a
+ * Studio draft never matches, it is the whole of "live": published in the
+ * Studio AND switched on. `approvedAgainstBrief` is deliberately not here: it
+ * gates the switch in the Studio, and a second runtime gate would make "why is
+ * this page not showing?" a two-variable question.
+ */
+export const liveLandingPageFilter = `_type == "serviceLandingPage" && published == true && defined(slug.current)`;
+
+const landingPageSummaryFields = `
+  _updatedAt,
+  slug,
+  serviceName,
+  alternateName,
+  category,
+  "packageId": coalesce(package->id, package->_id),
+  "packageImage": package->image{${imageFields}}
+`;
+
+/** Summaries for the sitemap, the inbound links and the static params. */
+export const landingPagesQuery = `*[${liveLandingPageFilter}] | order(serviceName asc){${landingPageSummaryFields}}`;
+
+export const landingPageBySlugQuery = `*[${liveLandingPageFilter} && slug.current == $slug][0]{
+  ${landingPageSummaryFields},
+  introduction,
+  sections[]{heading, body},
+  faqs[]{question, answer},
+  seoTitle,
+  seoDescription,
+  "package": package->{${servicePackageFields}}
+}`;
+
+export const landingPageSlugsQuery = `*[${liveLandingPageFilter}].slug.current`;

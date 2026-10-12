@@ -1,0 +1,12 @@
+{
+  "_id": "serviceLandingSettings",
+  "_type": "serviceLandingSettings",
+  "headingPattern": "{service} Photographer in {city}",
+  "projectsHeading": "Recent work",
+  "packageHeading": "What's included",
+  "packageBookLabel": "Book now",
+  "faqHeading": "Frequently asked questions",
+  "ctaHeading": "Ready to talk it through?",
+  "ctaBody": "Send a message with the date you have in mind and a few lines about what you are hoping for, and we can take it from there.",
+  "ctaContactLabel": "Get in touch"
+}

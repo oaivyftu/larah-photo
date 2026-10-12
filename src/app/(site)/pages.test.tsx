@@ -22,6 +22,7 @@ const fetchers = {
   getWorkProjectBySlug: vi.fn(),
   getWorkProjectSlugs: vi.fn(),
   getFeaturedWorkProjects: vi.fn(),
+  getLandingPageLinks: vi.fn(),
 };
 
 vi.mock("@/sanity/fetchers", () => ({
@@ -114,6 +115,7 @@ function resetAll(
   fetchers.getWorkProjects.mockReset().mockResolvedValue([]);
   fetchers.getWorkProjectSlugs.mockReset().mockResolvedValue([]);
   fetchers.getFeaturedWorkProjects.mockReset().mockResolvedValue([]);
+  fetchers.getLandingPageLinks.mockReset().mockResolvedValue([]);
   notFound.mockClear();
 
   for (const [name, value] of Object.entries(overrides)) {

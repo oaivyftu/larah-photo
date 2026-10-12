@@ -3,6 +3,7 @@ import { PageShell } from "@/components/layout/PageShell/PageShell";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { pageMetadata } from "@/constants/seo";
 import {
+  getLandingPageLinks,
   getServicePage,
   getServices,
   getSiteSettings,
@@ -48,11 +49,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ServicePage() {
-  const [content, services, settings] = await Promise.all([
+  const [content, services, settings, landingPageLinks] = await Promise.all([
     getServicePage(),
     getServices(),
     getSiteSettings(),
+    getLandingPageLinks(),
   ]);
+  // Keyed by package id, the key `getServices` already uses, so a package with
+  // no live landing page simply has no entry and renders as it always did.
+  const landingLinks = Object.fromEntries(
+    landingPageLinks.map((link) => [
+      link.packageId,
+      { href: link.href, label: link.heading },
+    ]),
+  );
 
   return (
     <PageShell variant="service">
@@ -63,7 +73,11 @@ export default async function ServicePage() {
           { name: "Services", path: "/service" },
         ])}
       />
-      <ServiceExperience content={content} services={services} />
+      <ServiceExperience
+        content={content}
+        landingLinks={landingLinks}
+        services={services}
+      />
     </PageShell>
   );
 }

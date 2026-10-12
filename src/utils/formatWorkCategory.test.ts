@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  categoriesMatch,
   formatWorkCategory,
   normalizeWorkCategory,
 } from "./formatWorkCategory";
@@ -37,5 +38,30 @@ describe("formatWorkCategory", () => {
 
   it("title-cases every word of a three-word category", () => {
     expect(formatWorkCategory("black and white")).toBe("Black And White");
+  });
+});
+
+describe("categoriesMatch", () => {
+  it.each([
+    ["Portrait", "portrait"],
+    ["Portrait ", "portrait"],
+    ["graduation", "Graduation"],
+    ["Family  Sessions", "family-sessions"],
+  ])("matches %j and %j", (a, b) => {
+    expect(categoriesMatch(a, b)).toBe(true);
+  });
+
+  it.each([
+    ["Portrait", "Portraits"],
+    ["", "portrait"],
+  ])("does not match %j and %j", (a, b) => {
+    expect(categoriesMatch(a, b)).toBe(false);
+  });
+
+  it("is idempotent on already-normalised input", () => {
+    const normalised = normalizeWorkCategory("Family  Sessions");
+
+    expect(categoriesMatch(normalised, normalised)).toBe(true);
+    expect(categoriesMatch(normalised, "Family Sessions")).toBe(true);
   });
 });

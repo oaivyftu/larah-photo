@@ -928,3 +928,442 @@ describe("the journal schedule is applied to every journal read", () => {
     },
   );
 });
+
+// ---------------------------------------------------------------------------
+// Service landing pages (spec 014). The guards below are the Principle I side
+// of FR-031: a page that cannot be rendered correctly raises, naming the
+// document and the field, and never degrades into a half-built object.
+
+const landingQueries = await import("./queries");
+
+const landingSlug = "engagement-photographer-london-ontario";
+
+function landingDoc(overrides: Record<string, unknown> = {}) {
+  return {
+    _updatedAt: "2026-10-01T12:00:00Z",
+    slug: { current: landingSlug },
+    serviceName: "Engagement",
+    alternateName: "Pre-wedding",
+    category: "Engagement",
+    packageId: "service-1",
+    packageImage: image,
+    introduction: ["The first paragraph.", "The second paragraph."],
+    sections: [
+      { heading: "The session", body: ["What happens.", "Where it happens."] },
+    ],
+    faqs: [{ question: "How long?", answer: "About ninety minutes." }],
+    seoTitle: "Engagement photographer",
+    seoDescription: "Engagement photography in London.",
+    package: serviceDoc,
+    ...overrides,
+  };
+}
+
+const landingSettingsDoc = {
+  headingPattern: "{service} Photographer in {city}",
+  projectsHeading: "Recent sessions",
+  packageHeading: "The session",
+  packageBookLabel: "Book this session",
+  faqHeading: "Questions",
+  ctaHeading: "Let us talk",
+  ctaBody: "Tell me about your plans.",
+  ctaContactLabel: "Get in touch",
+};
+
+describe("getLandingPageBySlug", () => {
+  it("returns null for an unknown, held-back or deleted slug", async () => {
+    // The live filter is in the query, so a held-back page comes back from
+    // Sanity exactly as an unknown one does: as nothing.
+    fetchMock.mockResolvedValue(null);
+    const { getLandingPageBySlug } = await loadFetchers();
+
+    await expect(getLandingPageBySlug("nothing-here")).resolves.toBeNull();
+  });
+
+  it("maps a complete page", async () => {
+    fetchMock.mockResolvedValue(landingDoc());
+    const { getLandingPageBySlug, getServices } = await loadFetchers();
+
+    const page = await getLandingPageBySlug(landingSlug);
+
+    expect(page).toMatchObject({
+      slug: landingSlug,
+      serviceName: "Engagement",
+      alternateName: "Pre-wedding",
+      category: "Engagement",
+      packageId: "service-1",
+      packageImage: { alt: "A photograph", width: 800 },
+      updatedAt: "2026-10-01T12:00:00Z",
+      introduction: ["The first paragraph.", "The second paragraph."],
+      sections: [
+        {
+          heading: "The session",
+          paragraphs: ["What happens.", "Where it happens."],
+        },
+      ],
+      faqs: [{ question: "How long?", answer: "About ninety minutes." }],
+      seoTitle: "Engagement photographer",
+      seoDescription: "Engagement photography in London.",
+    });
+
+    // The package is not a second copy of the services page's data (FR-016).
+    fetchMock.mockResolvedValue([serviceDoc]);
+    const [servicesPackage] = await getServices();
+
+    expect(page?.package).toEqual(servicesPackage);
+  });
+
+  it("asks Sanity for this slug, through the shared live filter", async () => {
+    fetchMock.mockResolvedValue(null);
+    const { getLandingPageBySlug } = await loadFetchers();
+
+    await getLandingPageBySlug(landingSlug);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      landingQueries.landingPageBySlugQuery,
+      { slug: landingSlug },
+      expect.anything(),
+    );
+    expect(landingQueries.landingPageBySlugQuery).toContain(
+      landingQueries.liveLandingPageFilter,
+    );
+  });
+
+  it("treats a blank alternate name as unset", async () => {
+    fetchMock.mockResolvedValue(landingDoc({ alternateName: "   " }));
+    const { getLandingPageBySlug } = await loadFetchers();
+
+    const page = await getLandingPageBySlug(landingSlug);
+
+    expect(page?.alternateName).toBeUndefined();
+  });
+
+  it.each(["serviceName", "category", "seoTitle", "seoDescription"])(
+    "raises, naming the field, when %s is missing or blank",
+    async (field) => {
+      const { getLandingPageBySlug } = await loadFetchers();
+
+      for (const value of [undefined, "  "]) {
+        fetchMock.mockResolvedValue(landingDoc({ [field]: value }));
+
+        await expect(getLandingPageBySlug(landingSlug)).rejects.toThrow(
+          `serviceLandingPage("${landingSlug}").${field}`,
+        );
+      }
+    },
+  );
+
+  it("raises on a malformed slug", async () => {
+    fetchMock.mockResolvedValue(
+      landingDoc({ slug: { current: "Not A Slug" } }),
+    );
+    const { getLandingPageBySlug } = await loadFetchers();
+
+    await expect(getLandingPageBySlug("not-a-slug")).rejects.toThrow(
+      'serviceLandingPage("not-a-slug").slug',
+    );
+  });
+
+  it("raises on a blank introduction paragraph", async () => {
+    fetchMock.mockResolvedValue(landingDoc({ introduction: ["Fine.", " "] }));
+    const { getLandingPageBySlug } = await loadFetchers();
+
+    await expect(getLandingPageBySlug(landingSlug)).rejects.toThrow(
+      `serviceLandingPage("${landingSlug}").introduction`,
+    );
+  });
+
+  it("raises when there are no sections", async () => {
+    fetchMock.mockResolvedValue(landingDoc({ sections: [] }));
+    const { getLandingPageBySlug } = await loadFetchers();
+
+    await expect(getLandingPageBySlug(landingSlug)).rejects.toThrow(
+      `serviceLandingPage("${landingSlug}").sections`,
+    );
+  });
+
+  it.each([
+    ["heading", { heading: " ", body: ["Text."] }],
+    ["body", { heading: "Heading", body: ["Text.", ""] }],
+  ])("raises on a section with a blank %s", async (field, section) => {
+    fetchMock.mockResolvedValue(landingDoc({ sections: [section] }));
+    const { getLandingPageBySlug } = await loadFetchers();
+
+    await expect(getLandingPageBySlug(landingSlug)).rejects.toThrow(
+      `sections[0].${field}`,
+    );
+  });
+
+  it("raises when there are no questions", async () => {
+    fetchMock.mockResolvedValue(landingDoc({ faqs: [] }));
+    const { getLandingPageBySlug } = await loadFetchers();
+
+    await expect(getLandingPageBySlug(landingSlug)).rejects.toThrow(
+      `serviceLandingPage("${landingSlug}").faqs`,
+    );
+  });
+
+  it.each([
+    ["question", { question: " ", answer: "An answer." }],
+    ["answer", { question: "A question?", answer: "" }],
+  ])("raises on a %s that is blank", async (field, faq) => {
+    fetchMock.mockResolvedValue(landingDoc({ faqs: [faq] }));
+    const { getLandingPageBySlug } = await loadFetchers();
+
+    await expect(getLandingPageBySlug(landingSlug)).rejects.toThrow(
+      `faqs[0].${field}`,
+    );
+  });
+
+  it("raises, saying why, when the package is missing or unpublished", async () => {
+    fetchMock.mockResolvedValue(landingDoc({ package: null }));
+    const { getLandingPageBySlug } = await loadFetchers();
+
+    await expect(getLandingPageBySlug(landingSlug)).rejects.toThrow(
+      `Sanity document "serviceLandingPage("${landingSlug}").package" is required — the service package it points to is missing or unpublished.`,
+    );
+  });
+
+  it.each(["price", "image"])(
+    "raises when the package has no %s",
+    async (field) => {
+      fetchMock.mockResolvedValue(
+        landingDoc({ package: { ...serviceDoc, [field]: undefined } }),
+      );
+      const { getLandingPageBySlug } = await loadFetchers();
+
+      await expect(getLandingPageBySlug(landingSlug)).rejects.toThrow(
+        `serviceLandingPage("${landingSlug}").package.${field}`,
+      );
+    },
+  );
+
+  it.each([
+    ["serviceName", { serviceName: "Engagement [[CONFIRM: name]]" }],
+    ["alternateName", { alternateName: "[[CONFIRM: other name]]" }],
+    ["category", { category: "[[CONFIRM: category]]" }],
+    ["introduction", { introduction: ["Ready in [[CONFIRM: time]]."] }],
+    [
+      "section heading",
+      { sections: [{ heading: "[[CONFIRM: heading]]", body: ["Text."] }] },
+    ],
+    [
+      "section body",
+      { sections: [{ heading: "H", body: ["Cost [[CONFIRM: price]]."] }] },
+    ],
+    [
+      "question",
+      { faqs: [{ question: "[[CONFIRM: ask]]", answer: "An answer." }] },
+    ],
+    [
+      "answer",
+      { faqs: [{ question: "Q?", answer: "In [[CONFIRM: days]] days." }] },
+    ],
+    ["seoTitle", { seoTitle: "[[CONFIRM: title]]" }],
+    ["seoDescription", { seoDescription: "Text [[CONFIRM: more]]" }],
+  ])(
+    "refuses to render a placeholder left in the %s",
+    async (_name, override) => {
+      fetchMock.mockResolvedValue(landingDoc(override));
+      const { getLandingPageBySlug } = await loadFetchers();
+
+      await expect(getLandingPageBySlug(landingSlug)).rejects.toThrow(
+        "[[CONFIRM",
+      );
+    },
+  );
+});
+
+describe("getLandingPages", () => {
+  it("maps the summaries the sitemap and the links read", async () => {
+    fetchMock.mockResolvedValue([landingDoc()]);
+    const { getLandingPages } = await loadFetchers();
+
+    await expect(getLandingPages()).resolves.toEqual([
+      {
+        slug: landingSlug,
+        serviceName: "Engagement",
+        alternateName: "Pre-wedding",
+        category: "Engagement",
+        packageId: "service-1",
+        packageImage: {
+          src: image.asset.url,
+          alt: "A photograph",
+          width: 800,
+          height: 600,
+          blurDataURL: "data:x",
+        },
+        updatedAt: "2026-10-01T12:00:00Z",
+      },
+    ]);
+  });
+
+  it("builds its query from the shared live filter", async () => {
+    fetchMock.mockResolvedValue([]);
+    const { getLandingPages } = await loadFetchers();
+
+    await getLandingPages();
+
+    expect(landingQueries.landingPagesQuery).toContain(
+      landingQueries.liveLandingPageFilter,
+    );
+    expect(landingQueries.liveLandingPageFilter).toContain("published == true");
+  });
+
+  it("returns an empty list rather than raising when nothing is live", async () => {
+    fetchMock.mockResolvedValue([]);
+    const { getLandingPages } = await loadFetchers();
+
+    await expect(getLandingPages()).resolves.toEqual([]);
+  });
+
+  it("raises without a last-modified time", async () => {
+    fetchMock.mockResolvedValue([landingDoc({ _updatedAt: undefined })]);
+    const { getLandingPages } = await loadFetchers();
+
+    await expect(getLandingPages()).rejects.toThrow(
+      "serviceLandingPage[0]._updatedAt",
+    );
+  });
+
+  it("raises when the package image is missing", async () => {
+    fetchMock.mockResolvedValue([landingDoc({ packageImage: null })]);
+    const { getLandingPages } = await loadFetchers();
+
+    await expect(getLandingPages()).rejects.toThrow(
+      "serviceLandingPage[0].packageImage",
+    );
+  });
+});
+
+describe("getLandingPageSlugs", () => {
+  it("returns the live slugs, dropping blanks", async () => {
+    fetchMock.mockResolvedValue([landingSlug, null, " "]);
+    const { getLandingPageSlugs } = await loadFetchers();
+
+    await expect(getLandingPageSlugs()).resolves.toEqual([landingSlug]);
+    expect(landingQueries.landingPageSlugsQuery).toContain(
+      landingQueries.liveLandingPageFilter,
+    );
+  });
+});
+
+describe("getLandingPageSettings", () => {
+  it("maps the settings document", async () => {
+    fetchMock.mockResolvedValue(landingSettingsDoc);
+    const { getLandingPageSettings } = await loadFetchers();
+
+    await expect(getLandingPageSettings()).resolves.toEqual({
+      headingPattern: "{service} Photographer in {city}",
+      projectsHeading: "Recent sessions",
+      packageHeading: "The session",
+      packageBookLabel: "Book this session",
+      faqHeading: "Questions",
+      cta: {
+        heading: "Let us talk",
+        body: "Tell me about your plans.",
+        contactLabel: "Get in touch",
+      },
+    });
+  });
+
+  it("raises when the document does not exist", async () => {
+    fetchMock.mockResolvedValue(null);
+    const { getLandingPageSettings } = await loadFetchers();
+
+    await expect(getLandingPageSettings()).rejects.toThrow(
+      'Sanity document "serviceLandingSettings" is required.',
+    );
+  });
+
+  it.each(Object.keys(landingSettingsDoc))(
+    "raises, naming the field, when %s is blank",
+    async (field) => {
+      fetchMock.mockResolvedValue({ ...landingSettingsDoc, [field]: "  " });
+      const { getLandingPageSettings } = await loadFetchers();
+
+      await expect(getLandingPageSettings()).rejects.toThrow(
+        `serviceLandingSettings.${field}`,
+      );
+    },
+  );
+
+  it.each(["{service}", "{city}"])(
+    "raises when the heading pattern lacks %s",
+    async (placeholder) => {
+      fetchMock.mockResolvedValue({
+        ...landingSettingsDoc,
+        headingPattern: landingSettingsDoc.headingPattern.replace(
+          placeholder,
+          "",
+        ),
+      });
+      const { getLandingPageSettings } = await loadFetchers();
+
+      await expect(getLandingPageSettings()).rejects.toThrow(placeholder);
+    },
+  );
+});
+
+describe("getLandingPageLinks", () => {
+  function answerEachQuery(pages: unknown[]) {
+    fetchMock.mockImplementation(async (query: string) => {
+      if (query === landingQueries.landingPagesQuery) return pages;
+      if (query === landingQueries.siteSettingsQuery) return siteSettingsDoc;
+      if (query === landingQueries.landingSettingsQuery) {
+        return landingSettingsDoc;
+      }
+
+      throw new Error(`unexpected query: ${query.slice(0, 40)}`);
+    });
+  }
+
+  it("composes the link text from the pattern and the studio's location", async () => {
+    answerEachQuery([landingDoc()]);
+    const { getLandingPageLinks } = await loadFetchers();
+
+    await expect(getLandingPageLinks()).resolves.toEqual([
+      {
+        slug: landingSlug,
+        href: `/${landingSlug}`,
+        heading: "Engagement & Pre-wedding Photographer in Ontario",
+        packageId: "service-1",
+        category: "Engagement",
+      },
+    ]);
+  });
+
+  it("returns an empty list without reading the settings when nothing is live", async () => {
+    // Otherwise `npm run build` would need the settings document before any
+    // page exists, and the push hook would fail until someone published it.
+    answerEachQuery([]);
+    const { getLandingPageLinks } = await loadFetchers();
+
+    await expect(getLandingPageLinks()).resolves.toEqual([]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).not.toHaveBeenCalledWith(
+      landingQueries.landingSettingsQuery,
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it("links by package id and nothing else", async () => {
+    answerEachQuery([
+      landingDoc(),
+      landingDoc({
+        slug: { current: "portrait-photographer-london-ontario" },
+        packageId: "service-2",
+        category: "Portrait",
+      }),
+    ]);
+    const { getLandingPageLinks } = await loadFetchers();
+
+    const links = await getLandingPageLinks();
+
+    expect(links.map((link) => link.packageId)).toEqual([
+      "service-1",
+      "service-2",
+    ]);
+  });
+});

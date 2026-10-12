@@ -60,15 +60,15 @@
   line-height: var(--service-row-title-leading);
 }
 
-.service-row__summary p,
-.service-row__details li {
+.service-row__summary p {
   font-size: var(--service-row-copy-size);
   font-weight: var(--font-weight-medium);
   letter-spacing: 0;
   line-height: var(--line-height-control);
 }
 
-.service-row__summary p {
+.service-row__summary p,
+.service-row__landing {
   max-width: 22rem;
 }
 
@@ -76,6 +76,16 @@
   align-self: end;
   justify-self: start;
   margin-top: auto;
+}
+
+/* The link to a package's landing page sits under "Book now", at the start of
+   the summary column like it. Its text is the page's own heading, which is long
+   and must wrap inside the column rather than run under the photograph the way
+   a button label would. */
+.service-row__landing {
+  justify-self: start;
+  text-align: left;
+  white-space: normal;
 }
 
 .service-row__media {
@@ -87,34 +97,6 @@
 
 .service-row__media img {
   object-fit: contain;
-}
-
-.service-row__details {
-  display: grid;
-  gap: var(--space-xl);
-}
-
-.service-row__details ul {
-  display: grid;
-  gap: var(--service-detail-list-gap);
-  list-style: none;
-}
-
-.service-row__details span {
-  display: block;
-  margin-bottom: var(--service-detail-label-offset);
-  font-size: var(--service-detail-label-size);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0;
-  line-height: var(--line-height-tight);
-}
-
-.service-row__details strong {
-  display: block;
-  font-size: var(--service-detail-figure-size);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: 0;
-  line-height: var(--line-height-tight);
 }
 
 @include media-max("desktop") {

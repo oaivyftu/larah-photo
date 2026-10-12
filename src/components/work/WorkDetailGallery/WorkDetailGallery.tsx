@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import Link from "next/link";
 import type Isotope from "isotope-layout";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { Button } from "@/components/ui/Button/Button";
@@ -19,6 +20,12 @@ const COLUMN_SIZER_SELECTOR = `.${styles["work-detail__sizer"]}`;
 const GUTTER_SIZER_SELECTOR = `.${styles["work-detail__gutter-sizer"]}`;
 
 type WorkDetailGalleryProps = {
+  /**
+   * The live landing page for this project's category, if any. Offered on the
+   * standalone page only: the overlay's sticky bar owns its onward controls
+   * (spec 014 FR-028).
+   */
+  landingLink?: { href: string; heading: string };
   presentation?: "modal" | "page";
   project: Project;
 };
@@ -67,6 +74,7 @@ function GalleryItem({
 }
 
 export function WorkDetailGallery({
+  landingLink,
   presentation = "page",
   project,
 }: WorkDetailGalleryProps) {
@@ -171,6 +179,15 @@ export function WorkDetailGallery({
           <TitleTag className={styles["work-detail__title"]} id={titleId}>
             {project.title}
           </TitleTag>
+          {presentation === "page" && landingLink ? (
+            <Link
+              className={styles["work-detail__landing"]}
+              data-landing-link
+              href={landingLink.href}
+            >
+              {landingLink.heading}
+            </Link>
+          ) : null}
         </div>
 
         <p className={styles["work-detail__description"]}>

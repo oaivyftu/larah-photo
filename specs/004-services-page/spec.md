@@ -52,6 +52,7 @@ A visitor navigates to the services page to see what photography sessions are of
 - **FR-006**: When required services page content is missing or fails validation, the system MUST surface an error instead of rendering fallback or placeholder content.
 - **FR-007**: Service packages MUST render in the order configured in the CMS.
 - **FR-008**: Only service package images visible in the initial viewport MUST be prioritized for immediate loading; images for packages further down the page MUST defer until the visitor scrolls near them.
+- **FR-009**: A package whose service landing page is live MUST link to it, in the package's summary column after "Book now". The link text is that page's own heading, never a generic "learn more". A package with no live landing page MUST render exactly as it did before this requirement (spec 014 FR-027).
 
 ### Key Entities
 
@@ -74,4 +75,5 @@ A visitor navigates to the services page to see what photography sessions are of
 - This specification documents the services page's current, already-implemented behavior as a baseline, rather than proposing new functionality.
 - Sanity CMS remains the sole source of this page's content, consistent with the project's content-source-of-truth principle.
 - Pricing is displayed in a single site-wide currency; multi-currency display is out of scope.
+- A package's features list and its "STARTING FROM" price are rendered by one shared component, `ServicePackageDetails`, which the service landing pages (spec 014) also use, so the two pages show the same details by construction. The services page's markup and appearance are unchanged by that extraction.
 - Visitors' reduced-motion preference is read from OS/browser-level settings, not from an in-app toggle.

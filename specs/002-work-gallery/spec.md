@@ -94,6 +94,7 @@ While viewing a project's full gallery (either in the overlay or on its standalo
 - **FR-012**: Every gallery image in a project MUST have required alt text at the content level; the system MUST NOT allow a gallery image to be published without it.
 - **FR-013**: Each project detail view MUST display the project's year, location, category, and total image count alongside its title and description.
 - **FR-014**: Gallery card images MUST NOT all load immediately; only cards visible in the initial viewport MUST be prioritized for immediate loading, with the remainder and every project detail/gallery image deferred until the visitor scrolls or navigates near them.
+- **FR-015**: A project's standalone page MUST link to the live service landing page for the project's category, when there is one (spec 014 FR-028). The link text is that page's own heading, the category match ignores case and spacing, and a project whose category has no live page shows no link and no error. The overlay preview is not required to carry the link. The client-side category filter on the work index is unchanged.
 
 ### Key Entities
 
@@ -116,6 +117,6 @@ While viewing a project's full gallery (either in the overlay or on its standalo
 
 - This specification documents the work gallery's current, already-implemented behavior as a baseline, rather than proposing new functionality.
 - "Overlay preview" corresponds to the in-app modal experience reachable via an intercepting route; "standalone page" corresponds to the same content rendered as a full page for direct/shared links — both present identical project content.
-- Category values are free-form CMS text; the system does not enforce a fixed category taxonomy beyond what projects actually use.
+- Category values are free-form CMS text; the system does not enforce a fixed category taxonomy beyond what projects actually use. A service landing page (spec 014) names a category in the same free-form way and is matched to projects with the shared category matcher, `categoriesMatch`, so the work filter, the project page's landing link and the Studio's advisory cannot disagree about case or spacing.
 - Sanity CMS remains the sole source of project content, consistent with the project's content-source-of-truth principle.
 - The featured-project ordering and homepage span fields exist to support the home page's grid and are not directly user-facing on the work index itself.

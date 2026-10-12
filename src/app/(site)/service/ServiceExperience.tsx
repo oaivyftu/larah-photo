@@ -4,6 +4,7 @@ import { usePageIntro } from "@/utils/usePageIntro";
 import { Button } from "@/components/ui/Button/Button";
 import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
+import { ServicePackageDetails } from "@/components/service/ServicePackageDetails/ServicePackageDetails";
 import type { ServicePackage } from "@/types/service";
 import type { ServicePageContent } from "@/types/site";
 import styles from "./service.module.scss";
@@ -11,11 +12,18 @@ import styles from "./service.module.scss";
 type ServiceExperienceProps = {
   content: ServicePageContent;
   services: ServicePackage[];
+  /**
+   * A live landing page for a package, keyed by the package's id. `label` is
+   * the page's own heading, never a generic "learn more". A package with no
+   * entry renders exactly as it always did (spec 014 FR-027).
+   */
+  landingLinks?: Record<string, { href: string; label: string }>;
 };
 
 export function ServiceExperience({
   content,
   services,
+  landingLinks = {},
 }: ServiceExperienceProps) {
   const rootRef = usePageIntro<HTMLDivElement>((intro) => {
     intro.from(
@@ -67,6 +75,18 @@ export function ServiceExperience({
               >
                 Book now
               </Button>
+              {landingLinks[service.id] ? (
+                <Button
+                  className={styles["service-row__landing"]}
+                  data-landing-link
+                  href={landingLinks[service.id]!.href}
+                  size="small"
+                  variant="secondary"
+                  withIcon
+                >
+                  {landingLinks[service.id]!.label}
+                </Button>
+              ) : null}
             </div>
 
             <div className={styles["service-row__media"]}>
@@ -79,17 +99,11 @@ export function ServiceExperience({
               />
             </div>
 
-            <div className={styles["service-row__details"]}>
-              <ul>
-                {service.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              <div>
-                <span>STARTING FROM</span>
-                <strong>${service.price}</strong>
-              </div>
-            </div>
+            <ServicePackageDetails
+              className={styles["service-row__details"]}
+              features={service.features}
+              price={service.price}
+            />
           </article>
         ))}
       </section>

@@ -1,0 +1,36 @@
+/* The contents of a package's details block. Where the block sits (a grid
+   cell on the services page, a column on a landing page) is the caller's. */
+.package-details {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.package-details ul {
+  display: grid;
+  gap: var(--service-detail-list-gap);
+  list-style: none;
+}
+
+.package-details li {
+  font-size: var(--service-row-copy-size);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0;
+  line-height: var(--line-height-control);
+}
+
+.package-details span {
+  display: block;
+  margin-bottom: var(--service-detail-label-offset);
+  font-size: var(--service-detail-label-size);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0;
+  line-height: var(--line-height-tight);
+}
+
+.package-details strong {
+  display: block;
+  font-size: var(--service-detail-figure-size);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: 0;
+  line-height: var(--line-height-tight);
+}

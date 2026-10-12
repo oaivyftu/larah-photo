@@ -218,6 +218,72 @@ describe("ServiceExperience", () => {
     ).toBeInTheDocument();
   });
 
+  describe("links to landing pages", () => {
+    const landingLinks = {
+      portrait: {
+        href: "/portrait-photographer-london-ontario",
+        label: "Portrait Photographer in London, Ontario",
+      },
+    };
+
+    it("links a package that has a live landing page, with the page's own heading", () => {
+      const { container } = render(
+        <ServiceExperience
+          content={content}
+          landingLinks={landingLinks}
+          services={services}
+        />,
+      );
+
+      const link = container.querySelector("a[data-landing-link]");
+
+      expect(link).toHaveAttribute(
+        "href",
+        "/portrait-photographer-london-ontario",
+      );
+      expect(link).toHaveTextContent(
+        "Portrait Photographer in London, Ontario",
+      );
+      expect(container.querySelectorAll("[data-landing-link]")).toHaveLength(1);
+    });
+
+    it("renders a package with no landing page exactly as it does today", () => {
+      const without = render(
+        <ServiceExperience content={content} services={services} />,
+      );
+      const rowWithout =
+        without.container.querySelectorAll("[data-service-row]")[1]!.outerHTML;
+      cleanup();
+
+      const withLinks = render(
+        <ServiceExperience
+          content={content}
+          landingLinks={landingLinks}
+          services={services}
+        />,
+      );
+      const rowWith =
+        withLinks.container.querySelectorAll("[data-service-row]")[1]!
+          .outerHTML;
+
+      expect(rowWith).toBe(rowWithout);
+    });
+
+    it("never uses a generic link text", () => {
+      const { container } = render(
+        <ServiceExperience
+          content={content}
+          landingLinks={landingLinks}
+          services={services}
+        />,
+      );
+
+      expect(
+        container.querySelector("[data-landing-link]")?.textContent,
+      ).not.toMatch(/learn more|read more|click here/i);
+    });
+  });
+
   it("renders the page with no packages published rather than failing", () => {
     render(<ServiceExperience content={content} services={[]} />);
 

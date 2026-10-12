@@ -193,6 +193,48 @@ describe("as an intercepted modal", () => {
   });
 });
 
+describe("the landing page link", () => {
+  const landingLink = {
+    href: "/family-photographer-london-ontario",
+    heading: "Family Photographer in London, Ontario",
+  };
+
+  it("is offered on the standalone page, as a link with the page's heading", () => {
+    const { container } = render(
+      <WorkDetailGallery
+        landingLink={landingLink}
+        presentation="page"
+        project={project}
+      />,
+    );
+
+    const link = container.querySelector("a[data-landing-link]");
+
+    expect(link).toHaveAttribute("href", "/family-photographer-london-ontario");
+    expect(link).toHaveTextContent("Family Photographer in London, Ontario");
+  });
+
+  it("is not carried by the modal, whose sticky bar owns the onward controls", () => {
+    const { container } = render(
+      <WorkDetailGallery
+        landingLink={landingLink}
+        presentation="modal"
+        project={project}
+      />,
+    );
+
+    expect(container.querySelector("[data-landing-link]")).toBeNull();
+  });
+
+  it("adds nothing when there is no matching page", () => {
+    const { container } = render(
+      <WorkDetailGallery presentation="page" project={project} />,
+    );
+
+    expect(container.querySelector("[data-landing-link]")).toBeNull();
+  });
+});
+
 describe("opening the lightbox", () => {
   it("stays closed until an image is chosen", () => {
     render(<WorkDetailGallery project={project} />);

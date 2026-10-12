@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { JournalPostSummary } from "@/types/journal";
+import type { LandingPageSummary } from "@/types/landing";
 import type { Project } from "@/types/project";
 
 // robots.ts, sitemap.ts and manifest.ts are the three files nobody looks at
@@ -11,11 +12,32 @@ import type { Project } from "@/types/project";
 
 const getWorkProjects = vi.fn<() => Promise<Project[]>>();
 const getJournalPosts = vi.fn<() => Promise<JournalPostSummary[]>>();
+const getLandingPages = vi.fn<() => Promise<LandingPageSummary[]>>();
 
 vi.mock("@/sanity/fetchers", () => ({
   getWorkProjects: () => getWorkProjects(),
   getJournalPosts: () => getJournalPosts(),
+  getLandingPages: () => getLandingPages(),
 }));
+
+function landingPage(
+  slug: string,
+  updatedAt = "2026-10-01T12:00:00.000Z",
+): LandingPageSummary {
+  return {
+    slug,
+    serviceName: slug,
+    category: slug,
+    packageId: slug,
+    packageImage: {
+      src: `https://cdn.sanity.io/${slug}-package.jpg`,
+      alt: slug,
+      width: 1,
+      height: 1,
+    },
+    updatedAt,
+  };
+}
 
 function journalPost(
   slug: string,
@@ -69,6 +91,8 @@ beforeEach(() => {
   getWorkProjects.mockReset();
   getJournalPosts.mockReset();
   getJournalPosts.mockResolvedValue([]);
+  getLandingPages.mockReset();
+  getLandingPages.mockResolvedValue([]);
   process.env["NEXT_PUBLIC_SITE_URL"] = "https://larah.photo";
 });
 
@@ -238,6 +262,95 @@ describe("sitemap: journal posts", () => {
     const urls = (await sitemap()).map((entry) => entry.url);
 
     expect(urls.some((url) => url.includes("/journal/"))).toBe(false);
+  });
+});
+
+describe("sitemap: service landing pages", () => {
+  beforeEach(() => {
+    getWorkProjects.mockResolvedValue([]);
+  });
+
+  it("lists every live page at its own root address", async () => {
+    getLandingPages.mockResolvedValue([
+      landingPage("portrait-photographer-london-ontario"),
+      landingPage("family-photographer-london-ontario"),
+    ]);
+    const { default: sitemap } = await import("./sitemap");
+
+    const urls = (await sitemap()).map((entry) => entry.url);
+
+    expect(urls).toContain(
+      "https://larah.photo/portrait-photographer-london-ontario",
+    );
+    expect(urls).toContain(
+      "https://larah.photo/family-photographer-london-ontario",
+    );
+  });
+
+  it("carries the package photograph as an image entry", async () => {
+    getLandingPages.mockResolvedValue([landingPage("portrait")]);
+    const { default: sitemap } = await import("./sitemap");
+
+    const entry = (await sitemap()).find((item) =>
+      item.url.endsWith("/portrait"),
+    );
+
+    expect(entry?.images).toEqual([
+      "https://cdn.sanity.io/portrait-package.jpg",
+    ]);
+  });
+
+  it("dates each page by its own last edit, not by the build", async () => {
+    getLandingPages.mockResolvedValue([
+      landingPage("portrait", "2026-10-03T09:30:00.000Z"),
+    ]);
+    const { default: sitemap } = await import("./sitemap");
+
+    const entry = (await sitemap()).find((item) =>
+      item.url.endsWith("/portrait"),
+    );
+
+    expect(entry?.lastModified).toEqual(new Date("2026-10-03T09:30:00.000Z"));
+  });
+
+  it("does not list a page the query withheld, so held back means absent", async () => {
+    // Switched-off pages never leave the query, so the sitemap cannot list
+    // them; it adds nothing of its own on top.
+    getLandingPages.mockResolvedValue([landingPage("live")]);
+    const { default: sitemap } = await import("./sitemap");
+
+    const urls = (await sitemap()).map((entry) => entry.url);
+
+    expect(urls).not.toContain("https://larah.photo/held-back");
+  });
+
+  it("leaves the other groups exactly as they were", async () => {
+    getWorkProjects.mockResolvedValue([project("harbour-light")]);
+    getJournalPosts.mockResolvedValue([journalPost("springbank-guide")]);
+    getLandingPages.mockResolvedValue([]);
+    const { default: sitemap } = await import("./sitemap");
+
+    expect((await sitemap()).map((entry) => entry.url)).toEqual([
+      "https://larah.photo/",
+      "https://larah.photo/work",
+      "https://larah.photo/service",
+      "https://larah.photo/about",
+      "https://larah.photo/contact",
+      "https://larah.photo/journal",
+      "https://larah.photo/work/harbour-light",
+      "https://larah.photo/journal/springbank-guide",
+    ]);
+  });
+
+  it("lets a malformed page fail the sitemap rather than being skipped", async () => {
+    // A half-silent failure is worse than a loud one: the page would still
+    // 500 on its own URL, and the services page links to it (research §7).
+    getLandingPages.mockRejectedValue(
+      new Error("Sanity field serviceLandingPage[0]._updatedAt is required."),
+    );
+    const { default: sitemap } = await import("./sitemap");
+
+    await expect(sitemap()).rejects.toThrow("serviceLandingPage[0]");
   });
 });
 

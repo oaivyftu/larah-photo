@@ -1,0 +1,35 @@
+.landing {
+  overflow: clip;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.landing__header,
+.landing__body {
+  width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
+  margin: 0 auto;
+}
+
+.landing__header {
+  padding: var(--landing-header-pad-top) 0 var(--landing-header-pad-bottom);
+}
+
+/* Every block is spaced by the same gap, so the page's rhythm is one decision
+   rather than a margin on each component. */
+.landing__body {
+  display: grid;
+  gap: var(--landing-stack-gap);
+  padding-bottom: var(--landing-pad-bottom);
+}
+
+.landing__intro {
+  display: grid;
+  gap: var(--landing-intro-gap);
+  max-width: var(--landing-measure);
+}
+
+.landing__intro p {
+  font-size: var(--landing-intro-size);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--landing-intro-leading);
+}

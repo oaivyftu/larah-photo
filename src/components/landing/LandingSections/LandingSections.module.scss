@@ -1,0 +1,38 @@
+@use "@/styles/mixins" as *;
+
+.landing-sections {
+  display: grid;
+  gap: var(--landing-section-gap);
+}
+
+.landing-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
+  gap: var(--landing-section-columns-gap);
+  align-items: start;
+}
+
+.landing-section__heading {
+  font-size: var(--landing-section-heading-size);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--landing-section-heading-leading);
+}
+
+.landing-section__body {
+  display: grid;
+  gap: var(--landing-body-gap);
+  max-width: var(--landing-measure);
+}
+
+.landing-section__body p {
+  font-size: var(--landing-body-size);
+  line-height: var(--landing-body-leading);
+}
+
+@include media-max("tablet-lg") {
+  .landing-section {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--landing-body-gap);
+  }
+}

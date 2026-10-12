@@ -1,5 +1,6 @@
 import { absoluteUrl, siteDescription, siteName } from "@/constants/seo";
 import type { JournalPost, JournalPostSummary } from "@/types/journal";
+import type { LandingPage } from "@/types/landing";
 import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
 import type { PostalAddress, SiteSettings } from "@/types/site";
@@ -84,6 +85,21 @@ export function buildWebSiteSchema(): JsonLdGraph {
 }
 
 /**
+ * "Starting at", stated one way for the services page and for every landing
+ * page. `AggregateOffer.lowPrice` rather than `Offer.price`, because the CMS
+ * field is a starting price and the UI says "From $x" — quoting it as the
+ * price would be a claim the studio does not make.
+ */
+export function buildStartingPriceOffer(price: number, priceCurrency: string) {
+  return {
+    "@type": "AggregateOffer",
+    lowPrice: price,
+    priceCurrency,
+    availability: "https://schema.org/InStock",
+  };
+}
+
+/**
  * One `Service` per package, wrapped in the `ItemList` that describes the page
  * as a whole. `AggregateOffer.lowPrice` rather than `Offer.price`, because the
  * CMS field is a starting price and the UI says "From $x" — quoting it as the
@@ -108,13 +124,61 @@ export function buildServiceListSchema(
         url: absoluteUrl("/service"),
         image: service.image,
         provider: { "@id": businessId },
-        offers: {
-          "@type": "AggregateOffer",
-          lowPrice: service.price,
-          priceCurrency,
-          availability: "https://schema.org/InStock",
-        },
+        offers: buildStartingPriceOffer(service.price, priceCurrency),
       }),
+    })),
+  };
+}
+
+/**
+ * One service landing page as a `Service`. Every value is what the page
+ * displays (spec 014 FR-025): the description is the visible introduction, the
+ * name and the alternate name are the same fields the heading is built from, so
+ * the page cannot show one name and declare another. The business is referenced
+ * by `@id`, never restated (FR-022).
+ */
+export function buildLandingServiceSchema(
+  page: LandingPage,
+  location: string,
+  priceCurrency: string,
+): JsonLdGraph {
+  const url = absoluteUrl(`/${page.slug}`);
+
+  return compact({
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${url}#service`,
+    name: page.serviceName,
+    // Compacted away when unset, and a whitespace-only value counts as unset.
+    alternateName: page.alternateName?.trim() || undefined,
+    serviceType: page.serviceName,
+    description: page.introduction.join(" "),
+    url,
+    image: page.package.image,
+    areaServed: location,
+    provider: { "@id": businessId },
+    offers: buildStartingPriceOffer(page.package.price, priceCurrency),
+  });
+}
+
+/**
+ * The page's questions as a `FAQPage`. The answers are the plain-text strings
+ * the page renders, byte for byte — plain text is why that holds by
+ * construction (spec 014 research.md §9). Valid markup that mirrors the page;
+ * a search engine may or may not decorate the result with it.
+ */
+export function buildLandingFaqSchema(page: LandingPage): JsonLdGraph {
+  const url = absoluteUrl(`/${page.slug}`);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${url}#faq`,
+    url,
+    mainEntity: page.faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
     })),
   };
 }
