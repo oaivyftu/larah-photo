@@ -25,8 +25,8 @@ import {
 // context: a `getClient` whose `fetch` is a stub, and a `document`. Sanity's
 // own validation runtime is not exercised, as for journalPost.
 
-const DRAFT = "drafts.serviceLandingPage.engagement";
-const PUBLISHED = "serviceLandingPage.engagement";
+const DRAFT = "drafts.serviceLandingPage-engagement";
+const PUBLISHED = "serviceLandingPage-engagement";
 
 function words(count: number, prefix = "w") {
   return Array.from({ length: count }, (_, i) => `${prefix}${i}`).join(" ");

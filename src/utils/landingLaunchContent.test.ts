@@ -65,6 +65,7 @@ describe("the launch content files", () => {
 
   it("holds the shared settings, with a heading pattern holding both placeholders", () => {
     expect(settings._id).toBe("serviceLandingSettings");
+    expect(settings._id).not.toContain(".");
     expect(settings.headingPattern).toContain("{service}");
     expect(settings.headingPattern).toContain("{city}");
   });
@@ -73,7 +74,14 @@ describe("the launch content files", () => {
 describe.each(pages)("$file", ({ service, doc }) => {
   it("is a landing page document with a deterministic id", () => {
     expect(doc._type).toBe("serviceLandingPage");
-    expect(doc._id).toBe(`serviceLandingPage.${service}`);
+    expect(doc._id).toBe(`serviceLandingPage-${service}`);
+  });
+
+  it("has an id with no dot, so the site can read it without a token", () => {
+    // Sanity treats a dotted id as a private path, like `drafts.<id>`. The site
+    // reads with no token, so a page with such an id would be saved, published
+    // and never seen.
+    expect(doc._id).not.toContain(".");
   });
 
   it("meets every quality minimum the Studio would have enforced", () => {

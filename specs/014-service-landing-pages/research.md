@@ -425,8 +425,11 @@ hand would be four pages of 800-1,200 words typed or pasted in. Instead:
 - The content is written as **one readable JSON file per document** in
   `content/service-landing-pages/` (`portrait.json`, `engagement.json`,
   `family.json`, `graduation.json`, `settings.json`), with deterministic ids
-  (`serviceLandingPage.portrait`, `.engagement`, `.family`, `.graduation`, and
-  `serviceLandingSettings`). One file per document, with paragraphs as separate
+  (`serviceLandingPage-portrait`, `-engagement`, `-family`, `-graduation`, and
+  `serviceLandingSettings`). **No id may contain a dot**: Sanity treats a dotted id
+  as a private path (the way `drafts.<id>` is), readable only with a token, and
+  this site reads without one, so a dotted page would never be visible even once
+  published. One file per document, with paragraphs as separate
   array entries, because the owner has to _read_ about a thousand words of
   prose per page in a pull request, and a one-document-per-line NDJSON file
   would put each page on a single unreadable line. `content/` is a new top-level

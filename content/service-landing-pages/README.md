@@ -7,10 +7,10 @@ After that the Studio is the source of truth, and nothing here is edited.
 | File              | Sanity document                 | State on import               |
 | ----------------- | ------------------------------- | ----------------------------- |
 | `settings.json`   | `serviceLandingSettings`        | the wording every page shares |
-| `portrait.json`   | `serviceLandingPage.portrait`   | held back, not approved       |
-| `engagement.json` | `serviceLandingPage.engagement` | held back, not approved       |
-| `family.json`     | `serviceLandingPage.family`     | held back, not approved       |
-| `graduation.json` | `serviceLandingPage.graduation` | held back, not approved       |
+| `portrait.json`   | `serviceLandingPage-portrait`   | held back, not approved       |
+| `engagement.json` | `serviceLandingPage-engagement` | held back, not approved       |
+| `family.json`     | `serviceLandingPage-family`     | held back, not approved       |
+| `graduation.json` | `serviceLandingPage-graduation` | held back, not approved       |
 
 `settings.json` is published first (task T024): without it a live page raises a
 content error, and so does the services page and every project page once any
