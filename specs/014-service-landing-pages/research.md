@@ -168,11 +168,11 @@ every question and answer. Package text is excluded (FR-042).
 **(b) Is the same rule asserted outside the Studio?** Yes, in two places, and
 deliberately no third.
 
-1. A Vitest suite runs `assessLandingPageQuality` over the **launch content
-   files** (§10). Launch content reaches the dataset by import, which skips
-   Studio validation entirely, so this is the only check that stands between a
-   thin imported page and the live site. It runs in `npm test`, which runs on
-   every push.
+1. A Vitest suite ran `assessLandingPageQuality` over the **launch content
+   files** (§10) before they were imported. An import skips Studio validation
+   entirely, so that was the only check between a thin imported page and the live
+   site. The files and the suite were removed once the pages were imported (they
+   are in git history); a future bulk import would need its own.
 2. The Studio validators call the same function.
 
 **Rejected: enforcing the word minimums at read time in the fetcher.** A page at
@@ -422,24 +422,20 @@ brings Isotope and the work page's filter classes). `WorkCard` already links to
 **How the four pages get into the dataset (F1).** Authoring them in the Studio by
 hand would be four pages of 800-1,200 words typed or pasted in. Instead:
 
-- The content is written as **one readable JSON file per document** in
-  `content/service-landing-pages/` (`portrait.json`, `engagement.json`,
-  `family.json`, `graduation.json`, `settings.json`), with deterministic ids
+- The content was written as **one readable JSON file per document** in a
+  top-level `content/service-landing-pages/` folder (removed after the import; it
+  is in git history), with deterministic ids
   (`serviceLandingPage-portrait`, `-engagement`, `-family`, `-graduation`, and
   `serviceLandingSettings`). **No id may contain a dot**: Sanity treats a dotted id
   as a private path (the way `drafts.<id>` is), readable only with a token, and
   this site reads without one, so a dotted page would never be visible even once
   published. One file per document, with paragraphs as separate
-  array entries, because the owner has to _read_ about a thousand words of
-  prose per page in a pull request, and a one-document-per-line NDJSON file
-  would put each page on a single unreadable line. `content/` is a new top-level
-  folder with a short README, because `specs/` holds documentation, `src/` holds
-  code, and this is neither.
+  array entries, because a one-document-per-line NDJSON file would put each page
+  on a single unreadable line in review.
 - Imported with the Sanity CLI that is already a dependency. The importer reads
   one JSON document per line, so a one-line `node -e` command joins the files
   into that stream and pipes it to `npx sanity dataset import - production
---missing` (the exact command is in quickstart §9e, with the fallback if the
-  installed CLI will not read standard input). **`--missing` skips ids that
+--missing` (the CLI reads standard input with `-`). **`--missing` skips ids that
   already exist**, so re-running it can never overwrite the owner's edits; it
   only creates what is absent. It needs a write-capable login (`sanity login`)
   that the owner or the developer holds; nothing in the repo stores a token.
@@ -589,7 +585,7 @@ The plan's tests, by boundary. Which files cover which requirement is in
 | Integration | The landing page, awaited as a Server Component (`work/[slug]/page.test.tsx` pattern): renders every section in order, 2 projects, 0 projects, 404 on bad shape (no fetch), 404 on unknown, content error    | `@/sanity/fetchers`, `next/navigation` (`notFound` throws, so a returning mock cannot hide a bug), `PageShell` | The page's contract with each is narrow; a real `PageShell` is async and cannot nest in Testing Library                                                  |
 | Integration | Services page and project page: link present only for a live page; `ServiceExperience` unchanged for a package without one                                                                                   | fetchers                                                                                                       | Same                                                                                                                                                     |
 | Integration | `seo-routes.test.ts` extensions: live pages in the sitemap with image and `lastModified`, switched-off absent, malformed raises                                                                              | fetchers                                                                                                       | Existing pattern                                                                                                                                         |
-| Integration | The launch content files pass `assessLandingPageQuality`, contain no `[[CONFIRM` in a document that has `published: true`, and have `published: false` and `approvedAgainstBrief: false`                     | none (reads the file)                                                                                          | The only check on imported content (§4b)                                                                                                                 |
+| Integration | (Removed after import) The launch content files passed `assessLandingPageQuality` and had `published: false` and `approvedAgainstBrief: false`                                                               | none (reads the file)                                                                                          | The only check on imported content (§4b)                                                                                                                 |
 | Browser     | Playwright `e2e/landing.spec.ts` under `underBothMotionPreferences`: services → landing; landing → contact; project → landing → back to the project; unknown root path is a real 404; static routes unharmed | none                                                                                                           | Real navigation, the page transition and the HTTP status (F6) are what jsdom cannot show. Browser-only behaviour is not faked in a unit test (AGENTS.md) |
 
 Studio validators are **not** unit-tested through Sanity (the Studio is not

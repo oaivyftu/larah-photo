@@ -3,7 +3,7 @@
 **Feature**: 014-service-landing-pages | **Date**: 2026-10-07
 
 A run-through that proves the feature works end to end: the gates, the Studio's
-refusals, a page going live and going dark, and the launch content. It validates
+refusals, a page going live and going dark, and the launch pages. It validates
 behaviour; the rules are in [contracts/](./contracts/) and the shapes in
 [data-model.md](./data-model.md).
 
@@ -16,12 +16,10 @@ behaviour; the rules are in [contracts/](./contracts/) and the shapes in
   server between edits.
 - The **Service landing settings** document published (steps 3 onward need it
   the moment a page goes live; so do the services page and every project page).
-  Import `content/service-landing-pages/settings.json` alone, as in step 9e but
-  with only that file, or enter its eight fields in the Studio and Publish.
-  Without it a live page raises a content error and, once any page is live,
-  `/service` and every project page do too.
-- A Sanity login that can **write** to the dataset (`npx sanity login`), for the
-  import in step 9 only. Nothing in the repository stores a token.
+  It is already in the production dataset; in another dataset, enter its eight
+  fields in the Studio and Publish. Without it a live page raises a content error
+  and, once any page is live, `/service` and every project page do too.
+- Nothing here needs a write login: pages are made and edited in the Studio.
 - At least one **service package** and one **work project** already published, as
   they are today.
 - For steps 3–8, a throwaway page is fine: pick a slug you will delete.
@@ -174,58 +172,32 @@ and the sitemap drops it.
   `404` and the new one `200`, with no redirect.
 - Delete the page: everything above disappears.
 
-## 9. The launch content (FR-040, FR-041, SC-012, SC-013)
+## 9. The launch pages (FR-040, FR-041, SC-012, SC-013)
 
-**9a. Read the real package ids and categories.**
+The four launch pages (Portrait, Engagement, Family, Graduation) were imported
+once, switched off and unapproved, as `serviceLandingPage-portrait`,
+`-engagement`, `-family` and `-graduation`, each pointing at its service package.
+The import files were removed afterwards and remain in git history; the Studio is
+the source from here.
 
-```bash
-npx sanity documents query '*[_type == "servicePackage"]{_id, id, title}'
-npx sanity documents query '*[_type == "workProject"].category'
-```
+**Ids must not contain a dot.** Sanity treats a dotted id (`a.b`, like
+`drafts.<id>`) as private, readable only with a token. The site reads without
+one, so a page with such an id would be saved, published and never seen.
 
-The owner confirms which package is Portrait, Engagement, Family and Graduation,
-and that the four category strings match their projects.
+**9a. Check they are held back.** Open the Studio. **Expected:** four pages, all
+**Held back**, each with the `[[CONFIRM: …]]` markers still in its text. Visit
+each URL: all `404`. None is in the sitemap, on `/service` or on a project page.
 
-**9b. Write the pages.** The implementer writes one readable JSON file per
-page in `content/service-landing-pages/` (`portrait.json`, `engagement.json`,
-`family.json`, `graduation.json`; `settings.json` already exists from the
-prerequisite), with those `_ref`s,
-`published: false`, `approvedAgainstBrief: false`, and every unknown studio fact
-as `[[CONFIRM: …]]`.
-
-**9c. Test them.**
-
-```bash
-npm test -- landingLaunchContent
-```
-
-**Expected:** each page meets `LANDING_QUALITY`, none has `published: true`, and
-the Engagement page uses both names in all six places (SC-004).
-
-**9d. Run the distinctness check** (research §10) over the four pages and the
-services page's copy, and paste its result into the pull request. **Expected:**
-zero exact repeats, zero shared eight-word runs, four distinct titles and four
-distinct descriptions.
-
-**9e. Import** (idempotent; never overwrites an existing id). This joins the
-files into the one-document-per-line stream the importer reads. The settings
-document is already published, and `--missing` skips it:
-
-```bash
-node -e 'for (const f of process.argv.slice(1)) console.log(JSON.stringify(require(require("path").resolve(f))))' content/service-landing-pages/*.json | npx sanity dataset import - production --missing
-```
-
-(If `dataset import -` does not accept standard input in the installed CLI,
-write the stream to a temporary `.ndjson` file and pass that path instead; the
-files themselves are not changed.)
-
-**9f. Check.** Open the Studio. **Expected:** four pages, all **Held back**. Visit
-each URL: all `404`.
-
-**9g. Go live, as the owner would.** For one page, replace each `[[CONFIRM]]` in
-the Studio, read the page against its brief, tick approval, switch on, publish.
+**9b. Go live, as the owner would.** For one page, replace each `[[CONFIRM]]` in
+the Studio, read the page against its brief
+([contracts/briefs/](./contracts/briefs/)), tick approval, switch on, publish.
 **Expected:** live as in step 5. Try the same with a marker left in:
 **Expected:** refused.
+
+**9c. Check the page reads like this studio.** Places named are only ones the
+studio really shoots, and nothing contradicts the package's price or inclusions.
+Family and Graduation have only 2 projects each, so they may stay off until the
+owner has enough to say.
 
 ## 10. Thin categories and no projects
 
@@ -237,11 +209,12 @@ the Studio, read the page against its brief, tick approval, switch on, publish.
 
 ## Troubleshooting
 
-| Symptom                                                             | Likely cause                                                                                        |
-| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| A page you published is `404`                                       | **Published** is off, the document is still a draft, or approval is unticked and the switch refused |
-| The page throws instead of rendering                                | A required field is blank, the package is unpublished or has no price, or a `[[CONFIRM` remains     |
-| The sitemap errors                                                  | A live page is malformed (research §7). Fix the page; the sitemap is not skipping it on purpose     |
-| `/service` or a project page errors after a landing page was edited | The link summaries (research §6) found a malformed live page; same fix                              |
-| The heading says the wrong service                                  | `serviceName` or `headingPattern`; the package title is not used (research §8)                      |
-| A change is not visible                                             | The webhook missed it; the hourly fallback applies (spec 007)                                       |
+| Symptom                                                             | Likely cause                                                                                                          |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| A page you published is `404`                                       | **Published** is off, the document is still a draft, or approval is unticked and the switch refused                   |
+| The page throws instead of rendering                                | A required field is blank, the package is unpublished or has no price, or a `[[CONFIRM` remains                       |
+| The sitemap errors                                                  | A live page is malformed (research §7). Fix the page; the sitemap is not skipping it on purpose                       |
+| `/service` or a project page errors after a landing page was edited | The link summaries (research §6) found a malformed live page; same fix                                                |
+| The heading says the wrong service                                  | `serviceName` or `headingPattern`; the package title is not used (research §8)                                        |
+| A page is published and switched on but still `404` for visitors    | Its `_id` contains a dot, so anonymous reads cannot see it. Ids must be dot-free, e.g. `serviceLandingPage-<service>` |
+| A change is not visible                                             | The webhook missed it; the hourly fallback applies (spec 007)                                                         |

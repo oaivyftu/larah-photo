@@ -109,7 +109,7 @@ Every story reads through these.
 - [x] T021 [P] Create `src/sanity/schemaTypes/serviceLandingSettings.ts`: the eight required fields in data-model.md, `ctaBody` as `text`, preview title "Service landing settings", following `journalPage.ts`. Relative imports only. Makes T011 pass.
 - [x] T022 Register `serviceLandingPage` and `serviceLandingSettings` in `src/sanity/schemaTypes/index.ts`: the settings next to the other page documents, the page next to `servicePackage` / `workProject`. Depends on T020, T021.
 - [x] T023 [P] Create `content/service-landing-pages/settings.json` — the shared `serviceLandingSettings` document, written **now, not with the launch content**, because every page that goes live needs it: the throwaway pages in T048, T060 and T068, and, once any page is live, the services page and every project page too (see "Before you start"). `_id` and `_type` `serviceLandingSettings`; `headingPattern` `{service} Photographer in {city}`; and Claude-written `projectsHeading`, `packageHeading`, `packageBookLabel`, `faqHeading`, `ctaHeading`, `ctaBody`, `ctaContactLabel`. It states **no studio facts**, so it carries no `[[CONFIRM` markers; the owner may reword any of it later in the Studio. Depends on T021.
-- [ ] T024 **[Content — owner or developer with a write login]** Publish the settings document: import just that file with `node -e 'console.log(JSON.stringify(require(require("path").resolve("content/service-landing-pages/settings.json"))))' | npx sanity dataset import - production --missing` (quickstart §9e explains the standard-input fallback), or, with no write login to hand, open `/studio`, enter the eight fields from the file by hand and **Publish**. Confirm the document is published and no field is empty. This is the journal's "publish the settings first" lesson (spec 013's T014): without it nothing that puts a page live can be checked, and from the moment any page is live every `npm run build` needs it. Not blocking T025–T047. Depends on T022, T023.
+- [x] T024 **[Content — owner or developer with a write login]** Publish the settings document: import just that file with `node -e 'console.log(JSON.stringify(require(require("path").resolve("content/service-landing-pages/settings.json"))))' | npx sanity dataset import - production --missing` (quickstart §9e explains the standard-input fallback), or, with no write login to hand, open `/studio`, enter the eight fields from the file by hand and **Publish**. Confirm the document is published and no field is empty. This is the journal's "publish the settings first" lesson (spec 013's T014): without it nothing that puts a page live can be checked, and from the moment any page is live every `npm run build` needs it. Not blocking T025–T047. Depends on T022, T023.
 - [x] T025 Extract the `AggregateOffer` literal from `buildServiceListSchema` in `src/utils/structuredData.ts` into an exported `buildStartingPriceOffer(price, priceCurrency)` and use it in the list builder. T012's `toEqual` pins that the list's output is unchanged. Depends on T012.
 - [x] T026 Add `"landing"` to the `PageShell` variant union in `src/components/layout/PageShell/PageShell.tsx`, mapped to `"/service"` in `activeHrefByVariant` with the comment that a landing page sits in the services section the way a project sits in work (research.md §12). Add `.page-shell__main--landing` to the shared variant selector list in `PageShell.module.scss`. Extend `src/components/layout/PageShell/PageShell.test.tsx`: with a nav item `{ href: "/service" }`, `variant="landing"` marks it `aria-current="page"`, and the nav's items are unchanged.
 
@@ -244,7 +244,7 @@ activation, a category with two projects shows two, and `/no-such-slug` is a rea
 
 **Needs the live dataset** for T069–T070 and T078 onward. Steps before them can be written and tested without it. The settings document is **not** part of this phase: it was written and published in T023–T024, so `--missing` makes the import in T078 skip it.
 
-- [ ] T069 **[Content — owner]** Confirm which published service package is Portrait, Engagement, Family and Graduation, and that the category string each page will use matches its projects (quickstart §9a). Blocks T070.
+- [x] T069 **[Content — owner]** Confirm which published service package is Portrait, Engagement, Family and Graduation, and that the category string each page will use matches its projects (quickstart §9a). Blocks T070.
 - [x] T070 Read the package `_id`s and the project categories from the dataset (`npx sanity documents query …`, quickstart §9a) and note them for T071–T074. If the tool or the dataset is unavailable, **stop here** and say so; do not invent ids.
 - [x] T071 [P] Create `content/service-landing-pages/engagement.json` from `contracts/briefs/engagement.md`: `_id` `serviceLandingPage-engagement`, `published: false`, `approvedAgainstBrief: false`, `package` `_ref` from T070, `serviceName` `Engagement`, `alternateName` `Pre-wedding`, `category` from T070, `slug` `engagement-photographer-london-ontario`. Use both names naturally in the **introduction, at least one question and answer, `seoTitle` and `seoDescription`** (SC-004). Each text field meets `LANDING_QUALITY`; unknown studio facts are `[[CONFIRM: …]]` exactly as the brief lists them; nothing contradicts the package. Paragraphs are separate array entries so the file reads as prose in review.
 - [x] T072 [P] Create `content/service-landing-pages/portrait.json` from `contracts/briefs/portrait.md`, same rules. `serviceName` `Portrait`, slug `portrait-photographer-london-ontario`, no `alternateName`.
@@ -253,7 +253,7 @@ activation, a category with two projects shows two, and `/no-such-slug` is a rea
 - [x] T075 [P] Create `content/service-landing-pages/README.md`: what the folder is (launch content for spec 014, imported once), the five files (`settings.json` was already published in T024), the exact import command from quickstart §9e and its fallback, that `--missing` makes it safe to re-run, that nothing here is edited after import (the Studio is the source from then on), and that a `[[CONFIRM` is a gap the owner must fill.
 - [x] T076 Write `src/utils/landingLaunchContent.test.ts` (reads the files with `node:fs`; it is the only check on imported content, research.md §4b): every `serviceLandingPage.*.json` passes `assessLandingPageQuality` with an empty result; none has `published: true`; each has `approvedAgainstBrief: false`; each `_id` matches `serviceLandingPage-<service>` and contains **no dot**; the four slugs satisfy `isLandingSlug`, are unique, and none is reserved; `settings.json`'s pattern holds both placeholders; **the Engagement page uses both "engagement" and "pre-wedding" (case-insensitive) in all six places** — the heading composed from `settings.json`'s pattern, the introduction, at least one question-and-answer, `seoTitle`, `seoDescription`, and `alternateName` (which is what feeds the structured data) — SC-004; no landing document lacks a `package._ref`. Depends on T023 (the settings file it reads) and T071–T074, and on T056 for `assessLandingPageQuality`.
 - [x] T077 Run the distinctness check (research.md §10) over the four pages **and** the services page's package copy (descriptions and features read from the dataset): exact repeated sentences, shared eight-word runs, pairwise FAQ answers, the four titles and descriptions, services-page overlap. Fix the copy until every count is zero or each exception is justified. Use a throwaway script in the scratchpad directory; **do not commit it**. Keep the counts for T091. Depends on T071–T074.
-- [ ] T078 **[Content — owner or developer with a write login]** Import: `sanity login` if needed, then the command in quickstart §9e. Confirm four **Held back** pages appear in the Studio (the settings document is already there from T024) and that all four URLs return `404` (quickstart §9f). Depends on T069, T075, T076.
+- [x] T078 **[Content — owner or developer with a write login]** Import: `sanity login` if needed, then the command in quickstart §9e. Confirm four **Held back** pages appear in the Studio (the settings document is already there from T024) and that all four URLs return `404` (quickstart §9f). Depends on T069, T075, T076.
 - [ ] T079 **[Content — owner]** For each page she is ready to launch: replace every `[[CONFIRM]]` with the real detail or delete the sentence, read the page against its brief, tick **Approved against the brief**, switch **Published** on, publish (quickstart §9g). Family and Graduation may stay held back until she has more to say; the switch exists for exactly that. Not blocking the pull request.
 
 ---
@@ -372,21 +372,34 @@ Task: "T043 LandingProjects"  Task: "T044 LandingPackage"  Task: "T045 LandingCt
 
 ---
 
-## Implementation status (2026-10-11)
+## Implementation status (2026-10-12)
 
-Everything an implementing agent can do is done. What remains is the owner's, or
-needs a login this checkout does not have, and is left unchecked on purpose.
+Everything an implementing agent can do is done, including the production import.
+
+**Done outside the code**
+
+- **T024, T069, T078** — on 2026-10-12, with the owner's approval, `settings.json`
+  and the four pages were imported into the production dataset with
+  `sanity dataset import --missing`: `serviceLandingSettings` and
+  `serviceLandingPage-portrait`, `-engagement`, `-family`, `-graduation`, each
+  `published: false` and `approvedAgainstBrief: false`, pointing at Portrait
+  Session, Engagement, Family Session and Graduation Session. A first import used
+  dotted ids (`serviceLandingPage.engagement`), which Sanity treats as private, so
+  the site could never have read them; those eight documents (four published,
+  four drafts) were deleted and re-imported with dot-free ids. After the import
+  the four URLs answer `404` and none is in the sitemap, on `/service` or on a
+  project page.
+- The import files (`content/service-landing-pages/`) and the test that read them
+  (`src/utils/landingLaunchContent.test.ts`) were then deleted: the site reads
+  Sanity, never the folder, and the Studio is the source from here. T023 and
+  T071–T076 describe them as they were; they are in git history (`1057909`,
+  `a32e0f1`). A future bulk import needs its own check, since an import skips
+  Studio validation.
 
 **Left open**
 
-- **T024** — publish `settings.json`. **Do this before anyone switches a page on.**
-  Once any page is live, `/service` and every project page read the settings
-  document, and the build fails without it. With no live page the build does not
-  read it (T019).
-- **T069, T078, T079** — the owner confirms the package mapping, imports, replaces
-  every `[[CONFIRM]]`, ticks approval and switches pages on. T070 was done from the
-  public dataset: Portrait Session → Portrait, Engagement → Engagement, Family
-  Session → Family, Graduation Session → Graduation; the owner still confirms it.
+- **T079** — the owner replaces every `[[CONFIRM]]`, ticks approval, switches
+  **Published** on and publishes each page she is ready to launch.
 - **T060** — the Studio walk (quickstart §3, §4) needs an interactive Studio
   session. The schema loads through the Sanity CLI with no errors or warnings
   (`npx sanity schema validate`), and every rule is a pure function with its own
@@ -395,7 +408,7 @@ needs a login this checkout does not have, and is left unchecked on purpose.
   publishing) needs a deployed webhook; the stale-404 risk in research.md §1 is
   still unobserved. §6's keyboard and screen-reader walk was not done.
 
-**How T048, T053 and T068 were verified without writing to the dataset**
+**How T048, T053 and T068 were verified without a live page**
 
 A throwaway fetch interceptor (not committed) served the launch pages as live
 documents to a local server while every other query went to the real dataset.
@@ -407,10 +420,3 @@ a never-prerendered slug rendering on its first request. The browser journeys
 L1–L5 passed against that server under both motion preferences. The exported
 queries were also evaluated with `groq-js` over the real packages and images plus
 the launch files, and each was accepted by the real API.
-
-**Removed after import (2026-10-12).** `content/service-landing-pages/` and
-`src/utils/landingLaunchContent.test.ts` were deleted once the five documents
-were imported: the site reads Sanity, never the folder, and the Studio is the
-source from then on. T023, T071–T076 and quickstart §9 describe them as they
-were; the files are in git history (`1057909`, `a32e0f1`). A future bulk import
-needs its own check, since an import skips Studio validation.

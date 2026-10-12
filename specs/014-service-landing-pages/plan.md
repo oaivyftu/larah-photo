@@ -26,9 +26,9 @@ they are where the risk is:
    than a shared slug list, because under `revalidateTag(…, "max")` a shared list
    is stale on the first visit after a publish.
 2. **Quality enforced as data, not as hope** (research §4): word minimums as pure
-   functions behind Studio validators, one constants module, and a check of the
-   launch content in `npm test` — because launch content arrives by import, which
-   skips the Studio entirely.
+   functions behind Studio validators, one constants module, and a one-time test of
+   the launch files before they were imported — because an import skips the
+   Studio entirely.
 3. **Honesty enforced mechanically** (research §10): AI-written copy marks every
    unknown studio fact `[[CONFIRM: …]]`; the Studio refuses to switch a page on
    while one remains or without the owner's approval, and the site refuses to
@@ -128,8 +128,8 @@ Where each requirement is satisfied, and the test that proves it.
 | FR-030 — nothing else changes                                            | No edit to nav items, work filter or home copy                                                | Existing suites stay green; `PageShell` test pins nav items                                                                                   |
 | FR-031 — content errors                                                  | `mapLandingPage`, `getLandingPageSettings`, package join                                      | `fetchers.test.ts`, one case per required field, missing/unpublished/priceless package, `[[CONFIRM`                                           |
 | FR-032 to FR-036 — alt text, reduced motion, image loading, a11y, tokens | `LarahImage`, `usePageIntro`, tokens, jsx-a11y                                                | Lint; `audit:design-system`; e2e under `reduce`; page test                                                                                    |
-| FR-039, FR-040 — minimums, accuracy                                      | `assessLandingPageQuality`, Studio validators, `[[CONFIRM` rule                               | `landingPageQuality.test.ts` (exact, one under, whitespace-only, lone punctuation); launch-content suite                                      |
-| FR-041 — brief and approval                                              | `contracts/briefs/`, `approvedAgainstBrief`, `published` validator                            | Quickstart §3 and §9; launch-content suite (`approvedAgainstBrief: false`)                                                                    |
+| FR-039, FR-040 — minimums, accuracy                                      | `assessLandingPageQuality`, Studio validators, `[[CONFIRM` rule                               | `landingPageQuality.test.ts` (exact, one under, whitespace-only, lone punctuation)                                                            |
+| FR-041 — brief and approval                                              | `contracts/briefs/`, `approvedAgainstBrief`, `published` validator                            | Quickstart §3 and §9 (the imported pages are held back and unapproved)                                                                        |
 | FR-037 — coverage list                                                   | This table                                                                                    | Every row above                                                                                                                               |
 
 ## Project Structure
@@ -211,11 +211,8 @@ e2e/
 ├── journeys/landing.ts
 └── support/content.ts                    # + firstLandingPageHref
 
-content/service-landing-pages/
-├── README.md                             # what this is; the import command; not edited after import
-├── settings.json                         # the shared settings document
-├── portrait.json  engagement.json
-└── family.json    graduation.json        # one document each; published:false, approved:false
+(no content/ folder: the launch pages were written as JSON, imported once and the
+files removed; they are in git history. Ids are dot-free, e.g. serviceLandingPage-engagement.)
 
 specs/ (retrospective edits, same change)
 002-work-gallery · 004-services-page · 006-site-navigation-shell ·
@@ -245,11 +242,11 @@ copy is production content that is neither documentation (`specs/`) nor code
 The plan took a position on each of these. They are cheap to reverse now and
 costly after the pages are indexed. In order of how much each matters:
 
-1. **Thin content is refused by the Studio and the launch test, not by the site at
-   run time** (research §4b). A page at 390 words is short, not missing data; a
-   runtime floor would take live pages down when the floor is raised later. The
-   cost: content that bypasses the Studio is only caught by the launch-content
-   test, so a future bulk import would need its own check.
+1. **Thin content is refused by the Studio, not by the site at run time**
+   (research §4b). A page at 390 words is short, not missing data; a runtime floor
+   would take live pages down when the floor is raised later. The cost: content
+   that bypasses the Studio is not checked at all once it is in, so a future bulk
+   import would need its own check (the launch pages had a one-time one).
 2. **`serviceName` and `headingPattern` are new fields** (FR-043, research §8). The
    heading is built from them, not from the package title, because the package
    title is written for the services page and could not be seen from here. The
