@@ -137,8 +137,7 @@ export function checkTotal(content: LandingPageContent): QualityFinding | null {
 
 /**
  * Everything a page is short of, against the numbers in `LANDING_QUALITY`.
- * Pure, so the Studio validators and the launch-content test run exactly the
- * same rule (spec 014 research.md §4b). These minimums measure length, not
+ * Pure, so the Studio validators and every test run exactly the same rule (spec 014 research.md §4b). These minimums measure length, not
  * quality: a page can clear every one and still be poor.
  */
 export function assessLandingPageQuality(

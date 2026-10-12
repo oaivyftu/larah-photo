@@ -843,7 +843,7 @@ function mapLandingSummary(
 
 /**
  * Structural guards only: at least one section and one question, every field
- * non-blank. The word minimums are the Studio's and the launch-content test's
+ * non-blank. The word minimums are the Studio's
  * to enforce, not the site's — a page at 390 words is short, not missing, and
  * a runtime floor would take live pages down when the floor is raised later
  * (research.md §4b).

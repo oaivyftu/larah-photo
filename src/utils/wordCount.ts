@@ -1,6 +1,6 @@
 /**
  * The one rule for "how many words is this", read by the Studio validators,
- * `assessLandingPageQuality`, the launch-content test and the quickstart, so
+ * `assessLandingPageQuality` and the quickstart, so
  * they cannot disagree about whether a page is long enough (spec 014
  * research.md §4a).
  *

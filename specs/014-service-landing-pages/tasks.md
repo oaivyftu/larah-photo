@@ -407,3 +407,10 @@ a never-prerendered slug rendering on its first request. The browser journeys
 L1–L5 passed against that server under both motion preferences. The exported
 queries were also evaluated with `groq-js` over the real packages and images plus
 the launch files, and each was accepted by the real API.
+
+**Removed after import (2026-10-12).** `content/service-landing-pages/` and
+`src/utils/landingLaunchContent.test.ts` were deleted once the five documents
+were imported: the site reads Sanity, never the folder, and the Studio is the
+source from then on. T023, T071–T076 and quickstart §9 describe them as they
+were; the files are in git history (`1057909`, `a32e0f1`). A future bulk import
+needs its own check, since an import skips Studio validation.
