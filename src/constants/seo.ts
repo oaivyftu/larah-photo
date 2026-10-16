@@ -73,7 +73,7 @@ export function homeDescription({
 
   return (
     `Honest, natural portrait, couple, family and graduation photos in ` +
-    `${location}. ${sessions} — see the work and book your date.`
+    `${location}. ${sessions} — see the work and book your date!`
   );
 }
 
