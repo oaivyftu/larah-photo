@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/PageShell/PageShell";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { pageMetadata, siteDescription } from "@/constants/seo";
+import { homeDescription, pageMetadata } from "@/constants/seo";
 import {
   getFeaturedWorkProjects,
   getHomePage,
@@ -14,10 +14,14 @@ import { buildWebSiteSchema } from "@/utils/structuredData";
 import { HomeExperience } from "./HomeExperience";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const [homePage, settings] = await Promise.all([
+  const [homePage, settings, services] = await Promise.all([
     getHomePage(),
     getSiteSettings(),
+    getServices(),
   ]);
+  const startingPrice = services.length
+    ? Math.min(...services.map((service) => service.price))
+    : undefined;
 
   return pageMetadata({
     // The one title not run through the `%s | Larah Photo` template — the
@@ -26,7 +30,10 @@ export async function generateMetadata(): Promise<Metadata> {
     // matches against; the tagline stays where a reader sees it, in the hero.
     title: `${settings.name} — Photographer in ${settings.location}`,
     absoluteTitle: true,
-    description: siteDescription,
+    description: homeDescription({
+      location: settings.location,
+      startingPrice,
+    }),
     path: "/",
     images: [toOpenGraphImage(homePage.heroImage)],
   });

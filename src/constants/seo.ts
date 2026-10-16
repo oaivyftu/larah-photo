@@ -52,6 +52,32 @@ export const siteDescription =
   "session packages and enquire about a booking.";
 
 /**
+ * The home page snippet is the one most searches land on, so it is written to
+ * earn the click — what you get, the entry price, what to do next — rather
+ * than to describe the site. `siteDescription` stays the neutral version for
+ * the manifest and JSON-LD, where a sales line would read oddly.
+ *
+ * The price comes from the published packages; with none, the sentence simply
+ * drops it instead of shipping "from $Infinity".
+ */
+export function homeDescription({
+  location,
+  startingPrice,
+}: {
+  location: string;
+  startingPrice?: number;
+}) {
+  const sessions = startingPrice
+    ? `Sessions from $${startingPrice}`
+    : "Sessions available now";
+
+  return (
+    `Honest, natural portrait, couple, family and graduation photos in ` +
+    `${location}. ${sessions} — see the work and book your date!`
+  );
+}
+
+/**
  * Absolute URL for a site-relative path. The sitemap and JSON-LD both need
  * one: unlike the Metadata API, neither resolves relative URLs against
  * `metadataBase`.
