@@ -192,3 +192,40 @@ describe("pageMetadata", () => {
     expect(metadata.twitter).toMatchObject({ card: "summary_large_image" });
   });
 });
+
+describe("homeDescription", () => {
+  async function build(input: { location: string; startingPrice?: number }) {
+    const { homeDescription } = await loadSeo({
+      NEXT_PUBLIC_SITE_URL: "https://larah.photo",
+    });
+
+    return homeDescription(input);
+  }
+
+  it("leads with the benefit, names the entry price and ends on an action", async () => {
+    const description = await build({
+      location: "London, Ontario",
+      startingPrice: 300,
+    });
+
+    expect(description).toContain("London, Ontario");
+    expect(description).toContain("from $300");
+    expect(description).toMatch(/book your date\.$/);
+  });
+
+  it("drops the price instead of printing a nonsense one when no packages exist", async () => {
+    const description = await build({ location: "London, Ontario" });
+
+    expect(description).not.toContain("$");
+    expect(description).not.toContain("Infinity");
+  });
+
+  it("stays inside what a search result shows before truncating", async () => {
+    const description = await build({
+      location: "London, Ontario",
+      startingPrice: 300,
+    });
+
+    expect(description.length).toBeLessThanOrEqual(160);
+  });
+});
