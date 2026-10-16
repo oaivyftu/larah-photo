@@ -210,7 +210,7 @@ describe("homeDescription", () => {
 
     expect(description).toContain("London, Ontario");
     expect(description).toContain("from $300");
-    expect(description).toMatch(/book your date\.$/);
+    expect(description).toMatch(/book your date\!$/);
   });
 
   it("drops the price instead of printing a nonsense one when no packages exist", async () => {
