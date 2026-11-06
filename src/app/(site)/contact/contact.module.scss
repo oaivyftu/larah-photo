@@ -34,7 +34,7 @@
 
 .contact__detail-label {
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-regular);
   letter-spacing: var(--tracking-label);
   line-height: var(--line-height-control);
   text-transform: uppercase;
@@ -59,7 +59,7 @@
   max-width: 100%;
   overflow-wrap: anywhere;
   font-size: var(--contact-detail-size);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
   letter-spacing: var(--contact-detail-tracking);
   line-height: var(--contact-detail-leading);
 }
@@ -85,13 +85,37 @@
   }
 }
 
+/* Phone: a hairline under the title, then three stacked groups -- a 14px
+   label over an 18px value, 8px apart -- 32px from one another. */
 @include media-max("phone") {
-  .contact__detail {
-    grid-template-columns: 1fr;
-    gap: var(--space-sm);
+  .contact__layout {
+    gap: var(--contact-layout-gap-phone);
+    padding: var(--space-2xs) 0 var(--space-block-gap);
   }
 
   .contact__details {
-    margin-top: var(--space-xl);
+    gap: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .contact__detail {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+    margin: 0;
+  }
+
+  .contact__detail-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0;
+    line-height: var(--line-height-compact);
+  }
+
+  .contact__detail-value {
+    font-size: var(--contact-detail-size-phone);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--tracking-body);
+    line-height: var(--line-height-body);
   }
 }

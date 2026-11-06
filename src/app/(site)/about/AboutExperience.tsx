@@ -32,12 +32,13 @@ export function AboutExperience({ content }: AboutExperienceProps) {
   return (
     <div className={styles["about"]} ref={rootRef}>
       <section className={styles["about__intro"]} aria-labelledby="about-title">
+        <PageHeading
+          className={styles["about__title"]}
+          id="about-title"
+          words={content.titleWords}
+        />
+
         <div className={styles["about__copy"]} data-about-copy>
-          <PageHeading
-            className={styles["about__title"]}
-            id="about-title"
-            words={content.titleWords}
-          />
           {content.story.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
@@ -61,7 +62,7 @@ export function AboutExperience({ content }: AboutExperienceProps) {
               blurDataURL={content.portraitOne.blurDataURL}
               width={content.portraitOne.width}
               height={content.portraitOne.height}
-              sizes="(max-width: 900px) calc(100vw - 48px), 42vw"
+              sizes="(max-width: 900px) calc(100vw - 40px), 38vw"
             />
           </div>
         </figure>
