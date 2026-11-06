@@ -1,7 +1,6 @@
 "use client";
 
 import { usePageIntro } from "@/utils/usePageIntro";
-import { Button } from "@/components/ui/Button/Button";
 import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import type { ServicePackage } from "@/types/service";
@@ -54,19 +53,21 @@ export function ServiceExperience({
               {service.index}
             </span>
 
-            <div className={styles["service-row__summary"]}>
-              <h2>{service.title}</h2>
-              <p>{service.description}</p>
-              <Button
-                className={styles["service-row__cta"]}
-                data-transition-label="Contact"
-                href={service.ctaHref}
-                size="small"
-                variant="primary"
-                withIcon
-              >
-                Book now
-              </Button>
+            <h2 className={styles["service-row__title"]}>{service.title}</h2>
+
+            <p className={styles["service-row__description"]}>
+              {service.description}
+            </p>
+
+            <ul className={styles["service-row__features"]}>
+              {service.features.map((feature) => (
+                <li key={feature}>{feature}</li>
+              ))}
+            </ul>
+
+            <div className={styles["service-row__price"]}>
+              <span>STARTING FROM</span>
+              <strong>${service.price}</strong>
             </div>
 
             <div className={styles["service-row__media"]}>
@@ -75,20 +76,8 @@ export function ServiceExperience({
                 alt={service.imageAlt}
                 blurDataURL={service.imageBlurDataURL}
                 fill
-                sizes="(max-width: 900px) calc(100vw - 48px), 31vw"
+                sizes="(max-width: 900px) calc(100vw - 40px), 29vw"
               />
-            </div>
-
-            <div className={styles["service-row__details"]}>
-              <ul>
-                {service.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              <div>
-                <span>STARTING FROM</span>
-                <strong>${service.price}</strong>
-              </div>
             </div>
           </article>
         ))}

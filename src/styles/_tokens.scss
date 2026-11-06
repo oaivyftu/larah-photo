@@ -132,11 +132,16 @@
   --home-services-desc-size: clamp(1rem, 1.04vw, 1.125rem);
   --home-services-desc-size-phone: 1.125rem;
   --home-services-desc-leading: var(--line-height-body);
-  --service-index-size: clamp(2.3rem, 3.15vw, 4rem);
-  --service-row-title-size: clamp(2.15rem, 3.1vw, 4.1rem);
-  --service-row-copy-size: clamp(1rem, 1.22vw, 1.28rem);
-  --service-detail-label-size: clamp(0.82rem, 0.95vw, 0.96rem);
-  --service-detail-figure-size: clamp(2.2rem, 2.95vw, 3.4rem);
+  /* Services: Figma's 1728 canvas -- index 40, title 56, description 28,
+     features 20, label 20, price 40. Each floors at its phone size. */
+  --service-index-size: clamp(1.5rem, 2.31vw, 2.5rem);
+  --service-row-title-size: clamp(2rem, 3.24vw, 3.5rem);
+  --service-row-copy-size: clamp(1.125rem, 1.62vw, 1.75rem);
+  --service-feature-size: clamp(1rem, 1.16vw, 1.25rem);
+  --service-feature-size-phone: 1rem;
+  --service-detail-label-size: clamp(1rem, 1.16vw, 1.25rem);
+  --service-detail-label-size-phone: 1.125rem;
+  --service-detail-figure-size: clamp(1.5rem, 2.31vw, 2.5rem);
 
   --footer-statement-size: clamp(1.45rem, 2vw, 2rem);
   --footer-statement-size-phone: clamp(1.35rem, 7vw, 2rem);
@@ -230,7 +235,8 @@
   --about-caption-leading: 0.95;
   --contact-detail-leading: 1.08;
   --home-manifesto-leading: 0.76;
-  --service-row-title-leading: 0.96;
+  --service-row-title-leading: 1.1;
+  --service-index-leading: 0.85;
   --footer-statement-leading: 1.14;
   --page-heading-leading: 1.22;
   --work-detail-title-leading: 0.92;
@@ -389,15 +395,23 @@
   --home-manifesto-pad-y: 4.5rem;
 
   /* Service */
-  --service-header-pad-top: clamp(2rem, 4.03vw, 3.625rem);
-  --service-header-pad-bottom: clamp(1.5rem, 2.22vw, 2rem);
-  --service-list-gap: clamp(4.8rem, 6vw, 7rem);
-  --service-list-pad-bottom: clamp(7rem, 9.5vw, 11rem);
-  --service-list-pad-bottom-tablet: 5rem;
-  --service-row-stack-gap: clamp(2.4rem, 5vw, 6rem);
-  --service-summary-gap: clamp(1.2rem, 1.7vw, 2rem);
-  --service-detail-list-gap: 0.58rem;
-  --service-detail-label-offset: 1.1rem;
+  --service-header-pad-top: clamp(1.5rem, 2.31vw, 2.5rem);
+  --service-header-pad-bottom: clamp(1.5rem, 2.31vw, 2.5rem);
+  --service-list-gap: clamp(1.5rem, 2.31vw, 2.5rem);
+  --service-row-pad-bottom: clamp(1.5rem, 2.31vw, 2.5rem);
+  --service-list-pad-bottom: clamp(1.5rem, 2.31vw, 2.5rem);
+  --service-row-column-gap: var(--space-xl);
+  --service-index-track: 3.25rem;
+  --service-feature-gap: var(--space-xs);
+  --service-features-offset: var(--space-lg);
+  --service-price-gap: var(--space-sm);
+  --service-header-pad-top-phone: var(--space-2xs);
+  --service-header-pad-bottom-phone: var(--space-md);
+  --service-list-pad-bottom-phone: var(--space-block-gap);
+  --service-row-pad-phone: var(--space-block-gap);
+  --service-row-gap-phone: var(--space-lg);
+  --service-title-offset-phone: 0.125rem;
+  --service-media-max-phone: 36rem;
 
   /* Work index */
   --work-hero-pad-top: clamp(1rem, 1.94vw, 1.75rem);

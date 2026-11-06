@@ -18,18 +18,17 @@
 
 ### User Story 1 - Review service packages and book (Priority: P1)
 
-A visitor navigates to the services page to see what photography sessions are offered, reviews each package's description, included features, and starting price, and follows a "Book now" link to inquire about the one they want.
+A visitor navigates to the services page to see what photography sessions are offered, reviews each package's description, included features, and starting price. _(Revised to the Figma "Final" frames: the rows no longer carry a "Book now" link; a visitor reaches the contact page from the header and footer.)_
 
 **Why this priority**: This page exists to convert visitor interest into a booking inquiry; without a clear, complete list of bookable packages the page has no purpose.
 
-**Independent Test**: Load the services page and confirm each configured service package renders with its title, description, image, feature list, starting price, and a working "Book now" link, then confirm following that link reaches the booking destination.
+**Independent Test**: Load the services page and confirm each configured service package renders with its title, description, image, feature list and starting price.
 
 **Acceptance Scenarios**:
 
-1. **Given** a visitor opens the services page, **When** the page finishes loading, **Then** the page title and every configured service package appear, each showing an index/order marker, title, description, image, list of included features, starting price, and a "Book now" link.
-2. **Given** a visitor selects a package's "Book now" link, **When** they activate it, **Then** they are taken to that package's configured booking destination.
-3. **Given** a visitor's browser has no motion restrictions, **When** the page loads, **Then** the title and each service package animate into place in a staggered sequence rather than appearing all at once.
-4. **Given** a visitor has requested reduced motion, **When** the page loads, **Then** the same title and all service packages are fully visible immediately, without any entrance animation.
+1. **Given** a visitor opens the services page, **When** the page finishes loading, **Then** the page title and every configured service package appear, each showing an index/order marker, title, description, image, list of included features and starting price, laid out as three columns on wide screens and as a single ruled column on a phone.
+2. **Given** a visitor's browser has no motion restrictions, **When** the page loads, **Then** the title and each service package animate into place in a staggered sequence rather than appearing all at once.
+3. **Given** a visitor has requested reduced motion, **When** the page loads, **Then** the same title and all service packages are fully visible immediately, without any entrance animation.
 
 ---
 
@@ -37,7 +36,7 @@ A visitor navigates to the services page to see what photography sessions are of
 
 - What happens when the services page has zero configured service packages? The page MUST still render its title without error, showing no package rows rather than broken layout.
 - What happens when a service package is missing its price? The page MUST NOT display a broken or malformed price value.
-- What happens when a service package doesn't specify a booking link? The system MUST fall back to the site's general contact destination.
+- The package's booking link (`ctaHref`) stays in the CMS schema and the fetcher's validation but the page no longer renders it.
 - What happens when required content (page title, or a package's title/image) is missing or invalid in the CMS? The page MUST surface an error rather than silently rendering blank space or placeholder content.
 
 ## Requirements _(mandatory)_
@@ -46,7 +45,7 @@ A visitor navigates to the services page to see what photography sessions are of
 
 - **FR-001**: Services page MUST render its title and the full list of configured service packages entirely from CMS-managed content, with no hardcoded production copy, pricing, or imagery in the page itself.
 - **FR-002**: Each service package MUST display its display index/order marker, title, description, image, an ordered list of included features, and a starting price.
-- **FR-003**: Each service package MUST include a "Book now" link that navigates to that package's configured booking destination, defaulting to the site's general contact page when none is configured.
+- **FR-003**: _(Superseded — the services page carries no per-package "Book now" link; see the revision note in User Story 1. The booking field remains in the CMS but is not rendered.)_
 - **FR-004**: On viewports with no reduced-motion preference, the page title and each service package row MUST animate into view in a staggered sequence on load.
 - **FR-005**: When a visitor has a reduced-motion preference set, no entrance animation MUST run; the title and every service package MUST still be fully visible and readable.
 - **FR-006**: When required services page content is missing or fails validation, the system MUST surface an error instead of rendering fallback or placeholder content.
@@ -62,8 +61,8 @@ A visitor navigates to the services page to see what photography sessions are of
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% of configured service packages appear on the services page with complete details (title, description, image, features, price, booking link).
-- **SC-002**: A visitor can go from the services page to the booking destination for any package in a single click.
+- **SC-001**: 100% of configured service packages appear on the services page with complete details (title, description, image, features, price).
+- **SC-002**: _(Superseded together with FR-003.)_
 - **SC-003**: Visitors with a reduced-motion preference can read the full services page with zero load-triggered motion.
 - **SC-004**: An editor who adds, removes, reorders, or updates a service package in the CMS sees the change reflected on the live services page without any code change.
 - **SC-005**: Services page content that is missing or invalid in the CMS never results in a visitor seeing a broken, blank, or placeholder page — it results in a visible error state instead.

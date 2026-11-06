@@ -12,8 +12,8 @@
   margin: 0 auto;
 }
 
-/* Figma: the title sits 58px under the header with 32px of air before the first
-   service row — the same rhythm the work page's hero already uses. */
+/* Figma: the title sits 40px under the header, with 40px before the first
+   row and 80px (40 + the last row's own 40) after the last. */
 .service__header {
   padding: var(--service-header-pad-top) 0 var(--service-header-pad-bottom);
 }
@@ -24,134 +24,176 @@
   padding-bottom: var(--service-list-pad-bottom);
 }
 
-/* The four intrinsic minimums plus three gaps need ~1230px of viewport, so the
-   pricing column used to spill past the right edge between the old 1100px
-   breakpoint and ~1230px. `minmax(0, …)` keeps the row inside the frame at any
-   width and the three-column fallback now starts where the minimums give out. */
+/* One row is three columns on the 1440 frame -- 527 (index, title, price),
+   429 (description, features) and 420 (a 3:2 photo) -- 32px apart. The index
+   gets its own narrow track so the title lines up at x=84 as it does in
+   Figma. The price sits on the bottom edge of the first column, level with
+   the photo's bottom; the features follow the description directly. */
 .service-row {
   display: grid;
-  grid-template-columns: 5.5rem minmax(0, 0.88fr) minmax(0, 1.2fr) minmax(
-      0,
-      0.78fr
-    );
-  gap: var(--service-row-stack-gap);
+  grid-template-areas:
+    "index title description media"
+    "index .     features    media"
+    "index price .           media";
+  grid-template-columns:
+    var(--service-index-track)
+    minmax(0, 443fr)
+    minmax(0, 429fr)
+    minmax(0, 420fr);
+  grid-template-rows: auto 1fr auto;
+  column-gap: var(--service-row-column-gap);
   align-items: start;
+  padding-bottom: var(--service-row-pad-bottom);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.service-row:last-child {
+  border-bottom: 0;
 }
 
 .service-row__index {
+  grid-area: index;
   font-size: var(--service-index-size);
   font-weight: var(--font-weight-medium);
-  letter-spacing: 0;
-  line-height: var(--line-height-tight);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--service-index-leading);
 }
 
-.service-row__summary {
-  display: grid;
-  min-height: clamp(17rem, 20vw, 24rem);
-  align-content: start;
-  gap: var(--service-summary-gap);
-}
-
-.service-row__summary h2 {
-  max-width: 18rem;
+.service-row__title {
+  grid-area: title;
+  font-family: var(--font-serif);
   font-size: var(--service-row-title-size);
   font-weight: var(--font-weight-regular);
-  letter-spacing: 0;
+  letter-spacing: var(--tracking-display);
   line-height: var(--service-row-title-leading);
+  text-transform: uppercase;
 }
 
-.service-row__summary p,
-.service-row__details li {
+.service-row__description {
+  grid-area: description;
   font-size: var(--service-row-copy-size);
   font-weight: var(--font-weight-medium);
   letter-spacing: 0;
   line-height: var(--line-height-control);
 }
 
-.service-row__summary p {
-  max-width: 22rem;
+.service-row__features {
+  display: grid;
+  grid-area: features;
+  gap: var(--service-feature-gap);
+  margin-top: var(--service-features-offset);
+  list-style: none;
+  font-size: var(--service-feature-size);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0;
+  line-height: var(--line-height-control);
 }
 
-.service-row__cta {
+.service-row__price {
+  display: grid;
+  grid-area: price;
   align-self: end;
-  justify-self: start;
-  margin-top: auto;
+  gap: var(--service-price-gap);
+}
+
+.service-row__price span {
+  font-size: var(--service-detail-label-size);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0;
+  line-height: var(--line-height-control);
+}
+
+.service-row__price strong {
+  font-size: var(--service-detail-figure-size);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0;
+  line-height: var(--line-height-control);
 }
 
 .service-row__media {
   position: relative;
+  grid-area: media;
   width: 100%;
-  aspect-ratio: 1.52 / 1;
+  aspect-ratio: 3 / 2;
   overflow: hidden;
 }
 
 .service-row__media img {
-  object-fit: contain;
+  object-fit: cover;
 }
 
-.service-row__details {
-  display: grid;
-  gap: var(--space-xl);
-}
-
-.service-row__details ul {
-  display: grid;
-  gap: var(--service-detail-list-gap);
-  list-style: none;
-}
-
-.service-row__details span {
-  display: block;
-  margin-bottom: var(--service-detail-label-offset);
-  font-size: var(--service-detail-label-size);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0;
-  line-height: var(--line-height-tight);
-}
-
-.service-row__details strong {
-  display: block;
-  font-size: var(--service-detail-figure-size);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: 0;
-  line-height: var(--line-height-tight);
-}
-
-@include media-max("desktop") {
-  .service-row {
-    grid-template-columns: var(--home-manifesto-pad-y) minmax(0, 1fr) minmax(
-        0,
-        1.1fr
-      );
-  }
-
-  .service-row__details {
-    grid-column: 2 / -1;
-    min-height: auto;
-  }
-}
-
-@include media-max("tablet") {
+/* Phone (and tablet): a single column, in the order Figma stacks it -- index,
+   title, description, photo, features, price -- with 20px above and below each
+   ruled row. */
+@include media-max("tablet-lg") {
   .service__header {
-    padding: var(--space-xl) 0 var(--space-lg);
+    padding: var(--service-header-pad-top-phone) 0
+      var(--service-header-pad-bottom-phone);
   }
 
   .service__list {
-    gap: var(--space-3xl);
-    padding-bottom: var(--service-list-pad-bottom-tablet);
+    gap: 0;
+    padding-bottom: var(--service-list-pad-bottom-phone);
   }
 
   .service-row {
-    grid-template-columns: 1fr;
-    gap: var(--space-row-gap);
+    grid-template-areas:
+      "index"
+      "title"
+      "description"
+      "media"
+      "features"
+      "price";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    padding-block: var(--service-row-pad-phone);
   }
 
-  .service-row__summary,
-  .service-row__details {
-    min-height: auto;
+  .service-row__index {
+    letter-spacing: 0;
+    line-height: var(--line-height-loose);
   }
 
-  .service-row__details {
-    grid-column: auto;
+  .service-row__title {
+    margin-top: var(--service-title-offset-phone);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0;
+    line-height: var(--line-height-body);
+  }
+
+  .service-row__description {
+    margin-top: var(--service-row-gap-phone);
+    letter-spacing: var(--tracking-body);
+    line-height: var(--line-height-body);
+  }
+
+  .service-row__media {
+    max-width: var(--service-media-max-phone);
+    margin-top: var(--space-sm);
+  }
+
+  .service-row__features {
+    gap: var(--space-2xs);
+    margin-top: var(--space-sm);
+    font-size: var(--service-feature-size-phone);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-loose);
+  }
+
+  .service-row__price {
+    align-self: start;
+    gap: var(--space-2xs);
+    margin-top: var(--service-row-gap-phone);
+  }
+
+  .service-row__price span {
+    font-size: var(--service-detail-label-size-phone);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--tracking-body);
+    line-height: var(--line-height-body);
+  }
+
+  .service-row__price strong {
+    line-height: var(--line-height-loose);
   }
 }
