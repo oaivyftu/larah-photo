@@ -55,15 +55,21 @@ export function ServiceExperience({
 
             <h2 className={styles["service-row__title"]}>{service.title}</h2>
 
-            <p className={styles["service-row__description"]}>
-              {service.description}
-            </p>
+            {/* One block so the features follow the description directly, as
+                they do in Figma, whatever height the title runs to. On a
+                phone the wrapper dissolves and its children join the row's
+                own grid. */}
+            <div className={styles["service-row__body"]}>
+              <p className={styles["service-row__description"]}>
+                {service.description}
+              </p>
 
-            <ul className={styles["service-row__features"]}>
-              {service.features.map((feature) => (
-                <li key={feature}>{feature}</li>
-              ))}
-            </ul>
+              <ul className={styles["service-row__features"]}>
+                {service.features.map((feature) => (
+                  <li key={feature}>{feature}</li>
+                ))}
+              </ul>
+            </div>
 
             <div className={styles["service-row__price"]}>
               <span>STARTING FROM</span>
