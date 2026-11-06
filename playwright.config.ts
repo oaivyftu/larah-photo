@@ -91,7 +91,7 @@ export default defineConfig({
     // sensitive to hydration timing, and Strict Mode's double render in dev is
     // exactly the difference that produces a suite passing on one and failing
     // on the other (research.md §8).
-    command: `npm run build && npm run start -- --port ${port}`,
+    command: `pnpm run build && pnpm run start --port ${port}`,
     url: baseURL,
     reuseExistingServer: !process.env.E2E_FRESH_BUILD,
     // A production build from cold is well past Playwright's 60s default.

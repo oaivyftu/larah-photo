@@ -159,12 +159,12 @@ function declarations(css) {
   return out.sort();
 }
 
-run("npm run build");
+run("pnpm run build");
 const after = declarations(builtCss());
 
 run("git stash --include-untracked");
 try {
-  run("npm run build");
+  run("pnpm run build");
   var before = declarations(builtCss());
 } finally {
   run("git stash pop");

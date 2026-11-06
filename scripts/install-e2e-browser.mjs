@@ -1,8 +1,8 @@
 // Fetches the one browser the end-to-end suite drives, as a `postinstall` step.
 //
 // Why a script rather than `"postinstall": "playwright install chromium"`:
-// `npm install --omit=dev` and `npm ci --omit=dev` still run root lifecycle
-// scripts, but do not install dev-only packages -- so the bare command exits
+// `pnpm install --prod` still runs root lifecycle
+// scripts, but does not install dev-only packages -- so the bare command exits
 // with "playwright: not found" and takes the whole production install down with
 // it. A deploy that installs production dependencies must not fail because a
 // test tool is missing; that is precisely when it is *supposed* to be missing.
@@ -33,10 +33,14 @@ try {
   skip("@playwright/test is not installed (a production install, most likely)");
 }
 
-const result = spawnSync("npx", ["playwright", "install", "chromium"], {
-  stdio: "inherit",
-  shell: process.platform === "win32",
-});
+const result = spawnSync(
+  "pnpm",
+  ["exec", "playwright", "install", "chromium"],
+  {
+    stdio: "inherit",
+    shell: process.platform === "win32",
+  },
+);
 
 // A genuine download failure still fails, deliberately. The guard above is for
 // "the tool is absent by design", not for "the tool is here and broke".
