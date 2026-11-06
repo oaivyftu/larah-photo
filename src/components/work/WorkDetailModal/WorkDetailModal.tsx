@@ -172,6 +172,16 @@ export function WorkDetailModal({ children, project }: WorkDetailModalProps) {
       <div className={styles["work-modal__dialog"]}>
         <div className={styles["work-modal__document"]}>
           <header className={styles["work-modal__bar"]}>
+            {/* Shown on phones only (see the stylesheet), where it stands in
+                for the project name: closing the preview is "back to all
+                work", the route this modal was opened over. */}
+            <button
+              className={styles["work-modal__back"]}
+              onClick={closeModal}
+              type="button"
+            >
+              All work
+            </button>
             <div className={styles["work-modal__identity"]}>
               <strong id={titleId}>{project.title}</strong>
               <span aria-hidden="true">/</span>

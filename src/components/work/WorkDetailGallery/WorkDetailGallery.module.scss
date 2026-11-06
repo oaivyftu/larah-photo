@@ -11,24 +11,23 @@
 }
 
 .work-detail--modal .work-detail__header {
-  padding-top: var(--work-detail-header-pad);
-}
-
-.work-detail__header {
   display: grid;
   grid-template-columns:
-    minmax(15rem, 1.2fr)
-    minmax(16rem, 0.9fr)
-    minmax(18rem, 0.8fr);
-  gap: var(--work-detail-header-gap-y) var(--work-detail-header-gap-x);
+    minmax(0, 467fr)
+    var(--work-detail-title-gap)
+    minmax(0, 486fr)
+    var(--work-detail-block-gap)
+    minmax(0, 345fr);
+  row-gap: var(--work-detail-header-gap-y);
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
   padding: var(--work-detail-header-pad-top) 0 var(--work-detail-header-pad);
-  border-bottom: 1px solid var(--color-line-soft);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .work-detail__heading {
   display: grid;
+  grid-column: 1;
   align-content: start;
 }
 
@@ -53,58 +52,58 @@
 }
 
 .work-detail__eyebrow {
-  margin-bottom: var(--space-label-gap);
+  margin-bottom: var(--work-detail-eyebrow-gap);
   color: var(--color-muted-text);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
+  font-size: var(--work-detail-copy-size);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-loose);
 }
 
 .work-detail__title {
-  max-width: 12ch;
-  font-family: var(--font-serif);
   font-size: var(--work-detail-title-size);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: var(--work-detail-title-tracking);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: 0;
   line-height: var(--work-detail-title-leading);
 }
 
 .work-detail__description {
-  align-self: end;
-  max-width: 38rem;
+  grid-column: 3;
   font-size: var(--work-detail-copy-size);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-body);
   line-height: var(--work-detail-copy-leading);
 }
 
+// Two columns of two, 20px apart, each under a hairline.
 .work-detail__meta {
   display: grid;
+  grid-column: 5;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-self: end;
-  gap: var(--space-lg) var(--space-xl);
+  align-self: start;
+  gap: var(--work-detail-meta-gap);
   margin: 0;
 }
 
 .work-detail__meta div {
   display: grid;
-  gap: var(--space-pair-gap);
-  padding-top: var(--space-label-gap);
-  border-top: 1px solid var(--color-line-soft);
+  gap: var(--space-2xs);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .work-detail__meta dt {
   color: var(--color-muted-text);
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
+  font-size: var(--work-detail-meta-size);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-loose);
 }
 
 .work-detail__meta dd {
   margin: 0;
-  font-size: var(--font-size-sm);
+  font-size: var(--work-detail-meta-size);
   font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-compact);
+  letter-spacing: var(--tracking-detail-value);
+  line-height: var(--line-height-control);
 }
 
 .work-detail__gallery {
@@ -192,7 +191,14 @@
 
 @include media-max(1080px) {
   .work-detail__header {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-columns:
+      minmax(0, 467fr)
+      var(--work-detail-title-gap)
+      minmax(0, 486fr);
+  }
+
+  .work-detail__description {
+    grid-column: 3;
   }
 
   .work-detail__meta {
@@ -213,23 +219,42 @@
   }
 }
 
+// Phone: title block, description and meta stacked 16px apart, 14px copy and
+// a 16px bold title.
 @include media-max(680px) {
   .work-detail__header {
-    grid-template-columns: 1fr;
-    gap: var(--space-xl);
-    padding: var(--space-section-narrow-lg) 0 var(--space-section-narrow);
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--work-detail-header-gap-phone);
+    padding: var(--work-detail-header-pad-phone) 0;
+  }
+
+  .work-detail--modal .work-detail__header {
+    padding-top: var(--work-detail-header-pad-phone);
+  }
+
+  .work-detail__heading,
+  .work-detail__description,
+  .work-detail__meta {
+    grid-column: 1;
+  }
+
+  .work-detail__eyebrow {
+    font-weight: var(--font-weight-medium);
   }
 
   .work-detail__title {
     font-size: var(--work-detail-title-size-phone);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--tracking-body);
   }
 
   .work-detail__description {
-    align-self: start;
+    font-weight: var(--font-weight-regular);
+    letter-spacing: 0;
   }
 
-  .work-detail__meta {
-    grid-column: auto;
+  .work-detail__gallery {
+    padding-bottom: var(--work-detail-header-pad-phone);
   }
 }
 

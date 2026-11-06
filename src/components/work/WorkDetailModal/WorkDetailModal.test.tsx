@@ -171,6 +171,16 @@ describe("closing", () => {
     expect(back).toHaveBeenCalledOnce();
   });
 
+  it('closes on the phone layout\'s "All work" control, the same way', () => {
+    // Hidden above 680px by the stylesheet, but it is the same dismissal.
+    renderModal();
+
+    fireEvent.click(screen.getByRole("button", { name: "All work" }));
+    act(() => void vi.advanceTimersByTime(CLOSE_DURATION));
+
+    expect(back).toHaveBeenCalledOnce();
+  });
+
   it("closes when the backdrop itself is pressed", () => {
     renderModal();
 

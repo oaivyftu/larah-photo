@@ -8,7 +8,7 @@
   color: var(--color-ink);
 }
 
-/* Figma sits the title 28px under the header with the filters riding the same
+/* Figma sits the title 40px under the header with the filters riding the same
    row, pinned right. They share one flex line rather than being pulled together
    with a negative margin, so the row holds however the title wraps. */
 .work-page__hero {
@@ -64,11 +64,12 @@
 
 @include media-max("phone") {
   .work-page__hero {
-    padding-top: var(--space-md);
+    padding-top: var(--work-hero-pad-top-phone);
+    padding-bottom: var(--work-hero-pad-bottom-phone);
   }
 
   .work-page__toolbar {
-    margin-top: var(--space-md);
+    margin-top: var(--work-toolbar-offset-tablet);
   }
 
   .work-page__grid {

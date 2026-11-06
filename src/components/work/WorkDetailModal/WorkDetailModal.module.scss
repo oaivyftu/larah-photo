@@ -21,7 +21,7 @@
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  border-radius: 0.9rem 0.9rem 0 0;
+  border-radius: var(--work-modal-radius) var(--work-modal-radius) 0 0;
   background: var(--color-paper);
   box-shadow: 0 -1.2rem 4rem var(--overlay-modal-document);
   overscroll-behavior: contain;
@@ -42,6 +42,10 @@
   border-bottom: 1px solid var(--color-line-soft);
   background: color-mix(in srgb, var(--color-paper) 92%, transparent);
   backdrop-filter: blur(16px);
+}
+
+.work-modal__back {
+  display: none;
 }
 
 .work-modal__identity {
@@ -83,7 +87,9 @@
 
 .work-modal__close {
   position: fixed;
-  right: clamp(1rem, 2vw, 2rem);
+  /* Level with the content frame's right edge, as Figma sets it (about 139px
+     in on the 1728 canvas). */
+  right: max(var(--page-gutter), calc((100vw - var(--frame-max)) / 2));
   bottom: clamp(1rem, 2vw, 2rem);
   z-index: 8;
   display: grid;
@@ -159,19 +165,43 @@
   transform: translateY(1rem);
 }
 
+// Phone: Figma's sheet opens on a "← All work" / Share row instead of the
+// project's name, so the identity and hint step aside and the back control
+// (which closes the preview) takes the left edge.
 @include media-max(680px) {
   .work-modal {
-    padding-top: var(--space-xs);
-  }
-
-  .work-modal__document {
-    border-radius: 0.65rem 0.65rem 0 0;
+    padding-top: var(--work-modal-pad-top-phone);
   }
 
   .work-modal__bar {
     min-height: 3.75rem;
   }
 
+  .work-modal__back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 0;
+    border: 0;
+    color: var(--color-ink);
+    background: transparent;
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-compact);
+  }
+
+  .work-modal__back::before {
+    content: "←";
+    font-weight: var(--font-weight-regular);
+  }
+
+  .work-modal__back:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 0.25rem;
+  }
+
+  .work-modal__identity,
   .work-modal__hint {
     display: none;
   }

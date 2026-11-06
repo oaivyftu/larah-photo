@@ -149,9 +149,12 @@
 
   --page-heading-size: clamp(1.5rem, 2.22vw, 2rem);
 
-  --work-detail-title-size: clamp(2.7rem, 5.6vw, 6.3rem);
-  --work-detail-title-size-phone: clamp(2.8rem, 15vw, 4.8rem);
-  --work-detail-copy-size: clamp(1rem, 1.25vw, 1.3rem);
+  /* Figma's detail title is Montserrat ExtraBold, 32px on desktop and 16px on
+     a phone -- not the display serif the page used to set at ~100px. */
+  --work-detail-title-size: clamp(1.5rem, 1.85vw, 2rem);
+  --work-detail-title-size-phone: var(--font-size-base);
+  --work-detail-copy-size: clamp(0.875rem, 1.04vw, 1.125rem);
+  --work-detail-meta-size: var(--font-size-base);
 
   /* Work card text. The gallery card and the home-page card are two designs:
      the home grid is a large collage, so its type runs at 32/24 where the
@@ -165,7 +168,8 @@
   --home-card-meta-size: clamp(0.875rem, 1.39vw, 1.5rem);
   --home-card-meta-leading: var(--line-height-loose);
 
-  --work-filters-size: clamp(0.62rem, 0.54vw, 0.72rem);
+  /* 16px on the 1728 canvas, 12px on a phone (set at the tablet breakpoint). */
+  --work-filters-size: clamp(0.875rem, 0.93vw, 1rem);
 
   --gallery-title-size: clamp(1.55rem, 2.05vw, 2.25rem);
   --gallery-copy-size: clamp(0.9rem, 1.05vw, 1.15rem);
@@ -205,6 +209,8 @@
   --tracking-display: -0.02em;
   /* Figma's body copy on phones and in the service lists: +0.5%. */
   --tracking-body: 0.005em;
+  /* The value text in the work-detail meta grid. */
+  --tracking-detail-value: 0.01em;
   /* Named for the control rather than the width: its two call sites are the
      cursor readout and the gallery float label, which are one control at two
      sizes -- the pairing --font-size-glass-label already recognises. */
@@ -213,7 +219,6 @@
   --not-found-code-tracking: 0.18em;
   --skip-link-tracking: 0.04em;
   --contact-detail-tracking: -0.025em;
-  --work-detail-title-tracking: -0.045em;
   --gallery-float-close-tracking: 0.09em;
 
   /* Font weight */
@@ -239,8 +244,8 @@
   --service-index-leading: 0.85;
   --footer-statement-leading: 1.14;
   --page-heading-leading: 1.22;
-  --work-detail-title-leading: 0.92;
-  --work-detail-copy-leading: 1.55;
+  --work-detail-title-leading: var(--line-height-body);
+  --work-detail-copy-leading: var(--line-height-body);
   --gallery-detail-label-leading: 1.1;
   --gallery-float-sub-leading: 1.15;
   --journal-title-leading: 1.02;
@@ -414,12 +419,21 @@
   --service-media-max-phone: 36rem;
 
   /* Work index */
-  --work-hero-pad-top: clamp(1rem, 1.94vw, 1.75rem);
-  --work-hero-pad-bottom: clamp(1.55rem, 2.1vw, 2.2rem);
+  /* Figma: title 40px under the header, 20px of air before the grid. On a phone
+     the title sits 4px under it with 16px below and the filters 12px under
+     the title. */
+  --work-hero-pad-top: clamp(1.5rem, 2.31vw, 2.5rem);
+  --work-hero-pad-bottom: clamp(0.75rem, 1.16vw, 1.25rem);
+  --work-hero-pad-top-phone: var(--space-2xs);
+  --work-hero-pad-bottom-phone: var(--space-md);
   --work-grid-pad-bottom: clamp(4rem, 8vw, 7rem);
-  --work-toolbar-offset-tablet: clamp(1.7rem, 2.5vw, 2.4rem);
-  --work-grid-gap-x: clamp(0.35rem, 0.9vw, 0.9rem);
-  --work-grid-gap-y: clamp(2rem, 3.4vw, 3.75rem);
+  --work-toolbar-offset-tablet: var(--space-sm);
+  /* 345px columns, 20px between them and 40px between rows; a phone pair is
+     12px / 20px. */
+  --work-grid-gap-x: clamp(0.75rem, 1.16vw, 1.25rem);
+  --work-grid-gap-y: clamp(1.5rem, 2.31vw, 2.5rem);
+  --work-grid-gap-x-phone: var(--space-sm);
+  --work-grid-gap-y-phone: var(--space-block-gap);
   /* Card text rhythm: image to title, then title to meta. */
   --work-card-image-gap: var(--space-sm);
   --home-card-image-gap: var(--space-block-gap);
@@ -450,26 +464,37 @@
   --glass-pointer-pad-x: 15px;
 
   /* Work detail */
-  --work-detail-header-pad: clamp(3rem, 6vw, 6rem);
-  --work-detail-header-pad-top: clamp(4rem, 8vw, 8.5rem);
-  --work-detail-header-gap-y: clamp(2rem, 4vw, 4rem);
-  --work-detail-header-gap-x: clamp(2rem, 5vw, 6rem);
+  /* 80px above and below the header and the gallery on the 1728 canvas. The
+     header is title (467) + 20 + description (486) + 122 + a 345px meta grid
+     (Figma 1161:7947). */
+  --work-detail-header-pad: clamp(2.5rem, 4.63vw, 5rem);
+  --work-detail-header-pad-top: clamp(2.5rem, 4.63vw, 5rem);
+  --work-detail-header-gap-y: var(--space-block-gap);
+  --work-detail-title-gap: clamp(1rem, 1.16vw, 1.25rem);
+  --work-detail-block-gap: clamp(2rem, 7.06vw, 7.625rem);
+  --work-detail-eyebrow-gap: var(--space-sm);
+  --work-detail-header-pad-phone: var(--space-block-gap);
+  --work-detail-header-gap-phone: var(--space-md);
   --work-detail-actions-gap: clamp(1.25rem, 2.5vw, 2rem);
-  --work-detail-gallery-pad-top: clamp(1.25rem, 2vw, 2rem);
-  --work-detail-gallery-pad-bottom: clamp(5rem, 10vw, 10rem);
+  --work-detail-gallery-pad-top: clamp(2.5rem, 4.63vw, 5rem);
+  --work-detail-gallery-pad-bottom: clamp(2.5rem, 4.63vw, 5rem);
   /* Holds the same value as --work-grid-gap-x by coincidence, not by
      decision: that one is the masonry gutter, this is the gap inside a meta
      pair. Two tokens so that tuning one does not silently move the other. */
-  --work-detail-meta-gap: clamp(0.35rem, 0.9vw, 0.9rem);
+  --work-detail-meta-gap: clamp(0.75rem, 1.16vw, 1.25rem);
 
   /* Work modal */
-  --work-modal-pad-top: clamp(0.9rem, 2vw, 1.8rem);
+  /* The sheet hangs 89px under the top edge on desktop and 25px on a phone,
+     with 32px / 20px corners. */
+  --work-modal-pad-top: clamp(0.5rem, 5.15vw, 5.5625rem);
+  --work-modal-pad-top-phone: 1.5625rem;
+  --work-modal-radius: clamp(1.25rem, 1.85vw, 2rem);
   --work-modal-bar-gap: clamp(1rem, 3vw, 2rem);
   --work-modal-identity-gap: 0.7rem;
   --work-modal-actions-gap: clamp(0.75rem, 1.6vw, 1.5rem);
 
   /* Work filters */
-  --work-filters-gap: 0.45rem;
+  --work-filters-gap: var(--space-xs);
   --work-filters-button-pad-y: 0.3rem;
   --work-filters-button-pad-x: 0.05rem;
 
