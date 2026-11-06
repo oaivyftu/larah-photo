@@ -57,12 +57,12 @@ After the manifesto, a visitor reaches a summary of the photographer's body of w
 
 **Why this priority**: This section converts interest into action (viewing more work or booking a service), but a visitor who only wants a first impression may never need it, so it's the lowest-priority of the three primary journeys while still being essential to the page's business purpose.
 
-**Independent Test**: Scroll to the work and services sections and confirm the project count, featured project grid, "view all work" link, and each service card (icon, title, description, features, price, booking link) render correctly, independent of the hero or manifesto sections.
+**Independent Test**: Scroll to the work and services sections and confirm the project count, featured project grid, "view all work" link, and each service item (number, title, description) and the "view all services" link render correctly, independent of the hero or manifesto sections.
 
 **Acceptance Scenarios**:
 
 1. **Given** the site has a set of work projects, **When** a visitor reaches the work section, **Then** they see the total number of projects, a grid of up to 7 featured projects, and a link to view all work.
-2. **Given** the site has configured service packages, **When** a visitor reaches the services section, **Then** each service displays its icon, title, description, up to 5 listed features, starting price, and a "Book now" link to inquire.
+2. **Given** the site has configured service packages, **When** a visitor reaches the services section, **Then** each service displays its running number, title and description, and one "View all services" link below the list takes them to the services page, where features, price and booking live.
 3. **Given** a visitor scrolls the services section into view with no motion restrictions, **When** the section first becomes visible, **Then** its header and each service card fade and slide into place once, and remain visible on any further scrolling.
 4. **Given** a visitor has requested reduced motion, **When** they reach the services section, **Then** the header and all service cards are visible immediately with no reveal animation.
 
@@ -74,7 +74,6 @@ After the manifesto, a visitor reaches a summary of the photographer's body of w
 - What happens when the manifesto words configured in the CMS number more or fewer than three? The system MUST treat this as invalid content and surface an error rather than rendering a partial or malformed manifesto.
 - What happens when there are fewer than 7 featured projects? The work grid MUST show only the projects that exist, and the project count MUST reflect the true total.
 - What happens when there is exactly 1 total project versus more than 1? The count label MUST read correctly in both the singular and plural case.
-- What happens when a service does not match one of the known service categories (portrait, couple, wedding, family, graduation)? The card MUST still render using a generic fallback icon rather than failing to display.
 - What happens if a visitor changes their OS-level motion preference mid-session, or resizes the browser across the desktop/tablet/phone thresholds? Each section's animation behavior MUST correspond to the visitor's current preference and current viewport width.
 - What happens when a visitor scrolls the services section into view, then away, then back? The reveal animation MUST NOT replay once it has already played.
 - What happens when there are zero featured projects or zero configured service packages? Each section's heading/eyebrow MUST still render; this is a valid empty content state (an empty grid or empty card list), not treated as missing/invalid required content.
@@ -92,12 +91,12 @@ After the manifesto, a visitor reaches a summary of the photographer's body of w
 - **FR-007**: On tablet- and phone-width viewports with no reduced-motion preference, the manifesto section MUST reveal its words and images once when first scrolled into view, and continue a smaller-amplitude scroll-linked drift without pinning the section.
 - **FR-008**: When a visitor has a reduced-motion preference set, no hero, manifesto, or services entrance/scroll animation MUST run; the corresponding content MUST still be fully visible and readable.
 - **FR-009**: Work section MUST display the total count of projects (using correct singular/plural wording) and a grid of the featured projects (capped at 7), plus a link to the full work listing.
-- **FR-010**: Services section MUST display each configured service package's icon, title, description, up to 5 listed features, starting price, and a booking link.
+- **FR-010**: Services section MUST display each configured service package as a numbered item ("01", "02", …) with its title and description, laid out as a three-column list on wide screens and as ruled rows on a phone, followed by one link to the full services page. Features, price and the booking link belong to the services page (spec 004). _(Revised to match the Figma "Final" frames, which show no icon, features, price or booking link here.)_
 - **FR-011**: On viewports with no reduced-motion preference, the services section header and each service card MUST fade and slide into view the first time the section scrolls into the visitor's viewport, and MUST NOT re-trigger on subsequent scrolling.
 - **FR-011a**: The services section's eyebrow MUST be a level-2 heading that labels the section, so the services cards' level-3 titles sit directly beneath a heading of their own rather than beneath the work section's "Projects" heading, and the page carries a second heading in which the CMS copy can name the studio's service and city.
 - **FR-012**: When required home page content is missing or fails validation (e.g., missing tagline, images, or an incorrect number of manifesto words), the system MUST surface an error instead of rendering fallback or placeholder content.
-- **FR-013**: Each service card whose identifier does not match a known service category MUST still render using a generic fallback icon.
-- **FR-014**: Decorative or visually-duplicated content (e.g., the manifesto's on-screen word repeats, service-card category icons) MUST be hidden from assistive technology, and every CMS-sourced image on the page MUST have meaningful alt text.
+- **FR-013**: _(Removed — the home services list no longer shows per-service icons, so there is no fallback icon to specify.)_
+- **FR-014**: Decorative or visually-duplicated content (e.g., the manifesto's on-screen word repeats and the services list's running numbers) MUST be hidden from assistive technology, and every CMS-sourced image on the page MUST have meaningful alt text.
 - **FR-015**: The hero logo, portrait image, and feature image MUST be prioritized for immediate loading (not deferred like below-the-fold imagery), so the hero is visible without a perceptible loading delay on initial page load.
 
 ### Key Entities

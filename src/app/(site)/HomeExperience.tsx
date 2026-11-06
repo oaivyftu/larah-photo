@@ -8,8 +8,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
 import { Button } from "@/components/ui/Button/Button";
-import { Icon } from "@/components/ui/Icon/Icon";
-import { icons } from "@/constants/icons";
 import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
 import type { HomePageContent } from "@/types/site";
@@ -27,14 +25,6 @@ type HomeExperienceProps = {
   projects: Project[];
   services: ServicePackage[];
   siteName: string;
-};
-
-const serviceIcons: Record<string, typeof icons.portrait> = {
-  "portrait-session": icons.portrait,
-  "couple-and-engagement": icons.userGroup,
-  "wedding-session": icons.ring,
-  "family-session": icons.family,
-  "graduation-session": icons.graduation,
 };
 
 export function HomeExperience({
@@ -373,7 +363,7 @@ export function HomeExperience({
             <Button
               href={content.heroCtaHref}
               size="medium"
-              variant="secondary"
+              variant="primary"
               withIcon
             >
               {content.heroCtaLabel}
@@ -458,41 +448,32 @@ export function HomeExperience({
           <span className={styles["section-marker"]} aria-hidden="true" />
         </div>
         <div className={styles["services__track"]} data-service-track>
-          {services.map((service) => (
+          {services.map((service, index) => (
             <article
-              className={styles["service-card"]}
+              className={styles["service-item"]}
               data-service-reveal
               key={service.id}
             >
-              <Icon
-                className={styles["service-card__icon"]}
-                decorative
-                icon={serviceIcons[service.id] ?? icons.circle}
-              />
-              <h3>{service.title}</h3>
-              <p className={styles["service-card__desc"]}>
+              <p className={styles["service-item__index"]} aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </p>
+              <h3 className={styles["service-item__title"]}>{service.title}</h3>
+              <p className={styles["service-item__desc"]}>
                 {service.description}
               </p>
-              <ul>
-                {service.features.slice(0, 5).map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              <p className={styles["service-card__price"]}>
-                From ${service.price}
-              </p>
-              <Button
-                className={styles["service-card__cta"]}
-                data-transition-label="Contact"
-                href={service.ctaHref}
-                size="small"
-                variant="primary"
-                withIcon
-              >
-                Book now
-              </Button>
             </article>
           ))}
+        </div>
+        <div className={styles["services__footer"]} data-service-reveal>
+          <Button
+            data-transition-label="Service"
+            href="/service"
+            size="large"
+            variant="secondary"
+            withIcon
+          >
+            View all services
+          </Button>
         </div>
       </section>
     </div>

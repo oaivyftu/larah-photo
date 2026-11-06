@@ -312,3 +312,20 @@
     display: none;
   }
 }
+
+// Figma's phone home page stacks the work in one 350px column rather than the
+// staggered pair the work index keeps.
+@include media-max("phone-lg") {
+  .work-layout--homepage {
+    --work-columns: 1;
+    --work-gap-y: var(--home-grid-gap-y-phone);
+  }
+
+  .work-layout--homepage .work-layout__skeleton {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .work-layout--homepage .work-layout__skeleton-column:nth-child(2) {
+    display: none;
+  }
+}

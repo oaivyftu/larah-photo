@@ -6,7 +6,7 @@
 
 .work-card__link {
   display: grid;
-  gap: var(--space-2xs);
+  gap: 0;
   width: 100%;
   border: 0;
   padding: 0;
@@ -21,8 +21,12 @@
   position: relative;
   display: block;
   width: 100%;
-  margin-bottom: var(--space-2xs);
+  margin-bottom: var(--work-card-image-gap);
   overflow: hidden;
+}
+
+.work-card--homepage .work-card__media {
+  margin-bottom: var(--home-card-image-gap);
 }
 
 @include hover-fine {
@@ -49,13 +53,55 @@
 }
 
 .work-card__title {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-control);
+  font-size: var(--work-card-title-size);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--work-card-title-leading);
 }
 
 .work-card__meta {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-control);
+  margin-top: var(--work-card-meta-gap);
+  font-size: var(--work-card-meta-size);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--work-card-meta-leading);
+}
+
+.work-card--homepage .work-card__title {
+  font-size: var(--home-card-title-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--home-card-title-leading);
+}
+
+.work-card--homepage .work-card__meta {
+  font-size: var(--home-card-meta-size);
+  line-height: var(--home-card-meta-leading);
+}
+
+/* Phone: the gallery card is a caption (title only, 12/16) and the home card
+   steps down to 16 Bold over a 14/18 Medium line. */
+@include media-max("phone-lg") {
+  .work-card__title {
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-compact);
+  }
+
+  .work-card__meta {
+    display: none;
+  }
+
+  .work-card--homepage .work-card__media {
+    margin-bottom: var(--space-sm);
+  }
+
+  .work-card--homepage .work-card__title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .work-card--homepage .work-card__meta {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-control);
+  }
 }
