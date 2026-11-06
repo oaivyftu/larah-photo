@@ -4,14 +4,11 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 First, run the development server:
 
+This project uses [pnpm](https://pnpm.io). Install dependencies, then start the server:
+
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -34,7 +31,7 @@ Managed content:
 Create or connect a Sanity project:
 
 ```bash
-npx sanity@latest init
+pnpm dlx sanity@latest init
 ```
 
 Use `/studio` as the Studio route when prompted. Then copy `.env.example` to
@@ -49,7 +46,7 @@ NEXT_PUBLIC_SANITY_API_VERSION=2026-07-01
 Run the site and open the Studio:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 - Website: [http://localhost:3000](http://localhost:3000)
@@ -65,17 +62,17 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 ## Quality gates
 
-`npm install` also installs the Git hooks — there is no separate setup step.
+`pnpm install` also installs the Git hooks — there is no separate setup step.
 
-| Command                | What it does                                          |
-| ---------------------- | ----------------------------------------------------- |
-| `npm test`             | Vitest unit + integration tests, one pass             |
-| `npm run test:watch`   | the same suite, watching                              |
-| `npm run test:e2e`     | Playwright browser journeys — see below, runs on push |
-| `npm run typecheck`    | `tsc --noEmit` against `tsconfig.typecheck.json`      |
-| `npm run lint`         | ESLint, including the full `jsx-a11y` recommended set |
-| `npm run format`       | rewrites the tree with Prettier                       |
-| `npm run format:check` | reports formatting without rewriting                  |
+| Command                 | What it does                                          |
+| ----------------------- | ----------------------------------------------------- |
+| `pnpm test`             | Vitest unit + integration tests, one pass             |
+| `pnpm run test:watch`   | the same suite, watching                              |
+| `pnpm run test:e2e`     | Playwright browser journeys — see below, runs on push |
+| `pnpm run typecheck`    | `tsc --noEmit` against `tsconfig.typecheck.json`      |
+| `pnpm run lint`         | ESLint, including the full `jsx-a11y` recommended set |
+| `pnpm run format`       | rewrites the tree with Prettier                       |
+| `pnpm run format:check` | reports formatting without rewriting                  |
 
 **On `git commit`** — Prettier and ESLint `--fix` run over the staged files, then
 the project type-checks and the design-system audit runs. Formatting is applied
@@ -83,7 +80,7 @@ for you and re-staged into the commit rather than bounced back, so a commit neve
 fails just because of layout. Lint warnings _do_ fail: the gate runs with
 `--max-warnings=0`.
 
-**On `git push`** — the same checks again over the whole project, plus `npm test`
+**On `git push`** — the same checks again over the whole project, plus `pnpm test`
 and the Playwright browser suite. Both run here and only here: they're the
 slowest checks of the set, and once per push is enough to keep a failing test
 or a broken journey off a shared branch. There's no separate `next build` step
@@ -100,7 +97,7 @@ Each step prints its own name, so a failure tells you which one to fix.
 ## Browser end-to-end tests
 
 ```bash
-npm run test:e2e
+pnpm run test:e2e
 ```
 
 Nine visitor journeys through a real browser, each run under both motion
@@ -124,10 +121,10 @@ why, with the reasoning for keeping it out of `pre-commit`, is
 Both hooks type-check and lint `e2e/` regardless, so a spec file that does not
 compile cannot be committed even though only `pre-push` executes it.
 
-`npm install` fetches Chromium once, roughly 150 MB. Skip it with
-`PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install` if you will not run the suite.
-A production install (`npm ci --omit=dev`) skips it on its own — the step checks
-whether Playwright is actually installed before reaching for it, because npm runs
+`pnpm install` fetches Chromium once, roughly 150 MB. Skip it with
+`PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install` if you will not run the suite.
+A production install (`pnpm install --prod --frozen-lockfile`) skips it on its own — the step checks
+whether Playwright is actually installed before reaching for it, because pnpm runs
 lifecycle scripts even when it has not installed the dev dependency they need.
 The journeys need content, so `.env.local` must be filled in — without it the
 suite refuses to start and names the missing variable.
@@ -135,7 +132,7 @@ suite refuses to start and names the missing variable.
 Two flags worth knowing:
 
 ```bash
-E2E_FRESH_BUILD=1 npm run test:e2e
+E2E_FRESH_BUILD=1 pnpm run test:e2e
 ```
 
 forces a production build instead of reusing whatever is on port 3000. Use it
@@ -143,7 +140,7 @@ whenever the run has to reflect a change you just made — a reused server serve
 the old code and the suite will happily pass.
 
 ```bash
-PORT=3100 npm run test:e2e
+PORT=3100 pnpm run test:e2e
 ```
 
 moves the site off 3000, which matters if you have a dev server up for another
