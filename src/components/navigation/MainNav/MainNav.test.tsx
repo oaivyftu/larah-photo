@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { MainNav } from "./MainNav";
 
@@ -81,5 +81,48 @@ describe("MainNav", () => {
     expect(
       screen.getByRole("navigation", { name: "Primary" }),
     ).toBeInTheDocument();
+  });
+
+  describe("phone menu", () => {
+    it("starts closed, with a toggle that says so", () => {
+      render(<MainNav items={items} />);
+      const toggle = screen.getByRole("button", { name: "Open menu" });
+
+      expect(toggle).toHaveAttribute("aria-expanded", "false");
+      expect(document.querySelector("[data-open]")).toBeNull();
+    });
+
+    it("opens and closes from the toggle, wiring aria-controls to the list", () => {
+      render(<MainNav items={items} />);
+
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+      const toggle = screen.getByRole("button", { name: "Close menu" });
+      const list = document.querySelector("[data-open]");
+
+      expect(toggle).toHaveAttribute("aria-expanded", "true");
+      expect(list).not.toBeNull();
+      expect(toggle.getAttribute("aria-controls")).toBe(list?.id);
+
+      fireEvent.click(toggle);
+      expect(document.querySelector("[data-open]")).toBeNull();
+    });
+
+    it("closes on Escape", () => {
+      render(<MainNav items={items} />);
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+
+      fireEvent.keyDown(window, { key: "Escape" });
+
+      expect(document.querySelector("[data-open]")).toBeNull();
+    });
+
+    it("closes when a link is followed", () => {
+      render(<MainNav items={items} />);
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+
+      fireEvent.click(screen.getByRole("link", { name: "About" }));
+
+      expect(document.querySelector("[data-open]")).toBeNull();
+    });
   });
 });

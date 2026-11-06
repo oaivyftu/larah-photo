@@ -13,6 +13,10 @@
   --color-accent-text: #df3134;
   --color-line: #111111;
   --color-line-soft: #d8d8d8;
+  /* The warm hairline Figma draws under service rows, work-detail meta and the
+     contact details ("Border/Subtle"). A different decision from --color-line-soft,
+     which is neutral grey: this one is tinted to sit on the warm paper. */
+  --color-border-subtle: #d8d1c9;
   --color-divider: #505050;
   --divider-hairline: 0.5px;
 
@@ -79,7 +83,7 @@
 
   /* Typography */
   --font-sans: var(--font-montserrat), Arial, Helvetica, sans-serif;
-  --font-serif: Georgia, "Times New Roman", serif;
+  --font-serif: var(--font-bodoni-moda), Georgia, "Times New Roman", serif;
 
   --font-size-2xs: 0.625rem;
   --font-size-xs: 0.75rem;
@@ -268,12 +272,15 @@
   --gallery-thumb-duration: 240ms;
 
   /* Layout */
-  --page-gutter-min: 1.5rem;
+  /* 20px: every Figma mobile frame pads its sides by 20. */
+  --page-gutter-min: 1.25rem;
   --page-gutter-max: 2.5rem;
   --page-gutter: clamp(var(--page-gutter-min), 2.777vw, var(--page-gutter-max));
   --container-max: 85rem;
   --frame-max: 90rem;
   --header-height: 5.25rem;
+  /* 75px: Figma's mobile header is 16px padding around a 43px row. */
+  --header-height-phone: 4.6875rem;
 
   /* Spacing */
   --space-2xs: 0.25rem;
@@ -377,6 +384,10 @@
   --nav-list-gap: clamp(1.5rem, 8.33vw, 7.5rem);
   --nav-link-pad: 0.375rem;
   --nav-link-pad-phone: 0.72rem;
+  /* The hamburger: a 24px-wide, 43px-tall hit area around a 24x14 glyph. */
+  --nav-toggle-width: 1.5rem;
+  --nav-toggle-height: 2.6875rem;
+  --nav-toggle-icon-height: 0.875rem;
   --page-heading-gap: 0.28em;
   --page-heading-underline-gap: 0.08em;
   --input-label-gap: 0.125rem;

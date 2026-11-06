@@ -4,6 +4,30 @@
   flex: 0 0 auto;
 }
 
+/* Phone only; see the last block. */
+.main-nav__toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--nav-toggle-width);
+  height: var(--nav-toggle-height);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.main-nav__toggle:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: var(--space-2xs);
+}
+
+.main-nav__toggle-icon {
+  width: 100%;
+  height: var(--nav-toggle-icon-height);
+}
+
 .main-nav__list {
   display: flex;
   align-items: center;
@@ -89,25 +113,57 @@
 }
 
 @include media-max("phone") {
-  /* Auto columns rather than `repeat(4, …)`: the items come from Sanity, so a
-     fifth entry would otherwise drop onto a stranded second row. */
+  .main-nav {
+    width: auto;
+    order: 0;
+  }
+
+  .main-nav__toggle {
+    display: flex;
+  }
+
+  /* The links drop into a full-width panel hung off the header's bottom edge
+     (the header is the positioned ancestor). Closed, the list is out of the
+     layout and the a11y tree, so the toggle's `aria-expanded` is the truth. */
   .main-nav__list {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
     gap: 0;
-    border-top: 1px solid var(--color-line-soft);
+    padding: var(--space-xs) var(--page-gutter) var(--space-md);
     border-bottom: 1px solid var(--color-line-soft);
+    background: var(--color-paper);
+  }
+
+  .main-nav__list[data-open] {
+    display: flex;
+  }
+
+  .main-nav__item {
+    width: 100%;
+    text-align: left;
   }
 
   .main-nav__link {
     display: block;
-    padding: var(--nav-link-pad-phone) var(--space-pair-gap);
-    font-size: var(--font-size-sm);
-    text-align: center;
+    padding: var(--nav-link-pad-phone) 0;
+    font-size: var(--font-size-md);
   }
 
+  .main-nav__link::after {
+    left: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .main-nav__link:hover::after,
+  .main-nav__link:focus-visible::after,
   .main-nav__link--active::after {
-    bottom: 0.4rem;
+    transform: scaleX(1);
   }
 }

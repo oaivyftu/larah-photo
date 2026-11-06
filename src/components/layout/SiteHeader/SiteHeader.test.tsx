@@ -5,7 +5,6 @@ import { SiteHeader } from "./SiteHeader";
 afterEach(cleanup);
 
 const props = {
-  instagramUrl: "https://instagram.com/larah",
   navigationItems: [
     { label: "Work", href: "/work" },
     { label: "About", href: "/about" },
@@ -67,14 +66,13 @@ describe("SiteHeader", () => {
     );
   });
 
-  it("opens the Instagram call to action safely in a new tab", () => {
+  it("has no Instagram call to action -- the footer and contact page carry it", () => {
+    // Figma's header is the logo and the primary navigation only.
     render(<SiteHeader {...props} />);
-    const cta = screen.getByRole("link", { name: /Message on Instagram/ });
 
-    expect(cta).toHaveAttribute("href", props.instagramUrl);
-    expect(cta).toHaveAttribute("target", "_blank");
-    // Without noopener the opened page gets a handle on this window.
-    expect(cta).toHaveAttribute("rel", "noopener noreferrer");
+    expect(
+      screen.queryByRole("link", { name: /Instagram/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("renders the nav even with no navigation items", () => {
