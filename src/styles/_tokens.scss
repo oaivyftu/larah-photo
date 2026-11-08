@@ -494,7 +494,6 @@
   --work-detail-eyebrow-gap: var(--space-sm);
   --work-detail-header-pad-phone: var(--space-block-gap);
   --work-detail-header-gap-phone: var(--space-md);
-  --work-detail-actions-gap: clamp(1.25rem, 2.5vw, 2rem);
   --work-detail-gallery-pad-top: clamp(2.5rem, 4.63vw, 5rem);
   --work-detail-gallery-pad-bottom: clamp(2.5rem, 4.63vw, 5rem);
   /* Holds the same value as --work-grid-gap-x by coincidence, not by
@@ -511,9 +510,6 @@
   /* On a phone the close control is a square tab in the sheet's top-right
      corner, as tall as the bar beside it. */
   --work-modal-close-size-phone: 3.5rem;
-  --work-modal-bar-gap: clamp(1rem, 3vw, 2rem);
-  --work-modal-identity-gap: 0.7rem;
-  --work-modal-actions-gap: clamp(0.75rem, 1.6vw, 1.5rem);
 
   /* Work filters */
   --work-filters-gap: var(--space-xs);

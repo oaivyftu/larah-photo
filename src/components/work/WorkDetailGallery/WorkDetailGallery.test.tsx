@@ -156,16 +156,17 @@ describe("as a standalone page", () => {
     ).toBeInTheDocument();
   });
 
-  it("offers a way back to the index and a share control", () => {
+  it("carries no back link or share control above the title", () => {
+    // The header opens straight on the project: the site navigation is the
+    // way back to the index.
     render(<WorkDetailGallery presentation="page" project={project} />);
 
-    expect(screen.getByRole("link", { name: "All work" })).toHaveAttribute(
-      "href",
-      "/work",
-    );
     expect(
-      screen.getByRole("button", { name: /Copy link to Harbour Light/ }),
-    ).toBeInTheDocument();
+      screen.queryByRole("link", { name: "All work" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Copy link/ }),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -177,19 +178,6 @@ describe("as an intercepted modal", () => {
       screen.getByRole("heading", { level: 2, name: "Harbour Light" }),
     ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { level: 1 })).not.toBeInTheDocument();
-  });
-
-  it("drops the back link and share row, which the sticky bar already carries", () => {
-    // Duplicating them would give a screen reader two identical controls and
-    // leave the second unreachable once the header scrolls away.
-    render(<WorkDetailGallery presentation="modal" project={project} />);
-
-    expect(
-      screen.queryByRole("link", { name: "All work" }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: /Copy link/ }),
-    ).not.toBeInTheDocument();
   });
 });
 
@@ -209,8 +197,8 @@ describe("opening the lightbox", () => {
   });
 
   it("opens on the image that was clicked, not on the first", async () => {
-    // Selected by label rather than by index: the page presentation also
-    // renders a ShareButton, so positional lookup would drift.
+    // Selected by label rather than by index, so the lookup does not depend
+    // on what else the header renders.
     render(<WorkDetailGallery project={project} />);
 
     fireEvent.click(

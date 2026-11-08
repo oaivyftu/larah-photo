@@ -3,9 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type Isotope from "isotope-layout";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
-import { Button } from "@/components/ui/Button/Button";
 import { usePointerLabel } from "@/components/ui/GlassPointer/usePointerLabel";
-import { ShareButton } from "@/components/ui/ShareButton/ShareButton";
 import {
   getProjectGalleryImages,
   WorkProjectGallery,
@@ -146,24 +144,6 @@ export function WorkDetailGallery({
       aria-labelledby={titleId}
     >
       <header className={styles["work-detail__header"]}>
-        {/* Spans the whole header rather than sitting in the title column, so
-            the share control lands on the far right edge of the page. As a
-            modal this row is dropped: the share control lives in the sticky
-            bar above, which stays reachable once the header scrolls away. */}
-        {presentation === "page" ? (
-          <div className={styles["work-detail__actions"]}>
-            <Button
-              className={styles["work-detail__back"]}
-              href="/work"
-              size="small"
-              variant="secondary"
-            >
-              All work
-            </Button>
-            <ShareButton path={`/work/${project.slug}`} title={project.title} />
-          </div>
-        ) : null}
-
         <div className={styles["work-detail__heading"]}>
           <p className={styles["work-detail__eyebrow"]}>
             {formatWorkCategory(project.category)}

@@ -31,26 +31,6 @@
   align-content: start;
 }
 
-// Its own row across the full header width: "All work" keeps the left edge,
-// the share control keeps the right one.
-.work-detail__actions {
-  display: flex;
-  grid-column: 1 / -1;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md) var(--work-detail-actions-gap);
-}
-
-.work-detail__back {
-  width: fit-content;
-}
-
-.work-detail__back::before {
-  margin-right: var(--space-control-pad-sm);
-  content: "←";
-}
-
 .work-detail__eyebrow {
   margin-bottom: var(--work-detail-eyebrow-gap);
   color: var(--color-muted-text);
@@ -228,8 +208,10 @@
     padding: var(--work-detail-header-pad-phone) 0;
   }
 
+  /* The modal has no top bar on a phone, only the close tab in the corner;
+     start the content below it so a long title never runs underneath. */
   .work-detail--modal .work-detail__header {
-    padding-top: var(--work-detail-header-pad-phone);
+    padding-top: var(--work-modal-close-size-phone);
   }
 
   .work-detail__heading,

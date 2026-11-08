@@ -27,64 +27,6 @@
   overscroll-behavior: contain;
 }
 
-.work-modal__bar {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  // The title truncates to fit, so without a gap it would run right up to the
-  // share control and read as one word.
-  gap: var(--work-modal-bar-gap);
-  min-height: var(--home-manifesto-pad-y);
-  padding: 0 var(--page-gutter);
-  border-bottom: 1px solid var(--color-line-soft);
-  background: color-mix(in srgb, var(--color-paper) 92%, transparent);
-  backdrop-filter: blur(16px);
-}
-
-.work-modal__back {
-  display: none;
-}
-
-.work-modal__identity {
-  display: flex;
-  align-items: center;
-  gap: var(--work-modal-identity-gap);
-  min-width: 0;
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-tight);
-}
-
-.work-modal__identity strong {
-  overflow: hidden;
-  font-weight: var(--font-weight-bold);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.work-modal__identity span {
-  color: var(--color-muted-text);
-  font-weight: var(--font-weight-semibold);
-}
-
-.work-modal__actions {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: var(--work-modal-actions-gap);
-  padding: var(--space-control-gap) 0;
-}
-
-.work-modal__hint {
-  color: var(--color-muted-text);
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-label);
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-}
-
 .work-modal__close {
   position: fixed;
   /* A floating control pinned to the screen corner, the same distance from
@@ -179,42 +121,6 @@
   /* The sheet is a plain rectangle on a phone: no rounded corners. */
   .work-modal__document {
     border-radius: 0;
-  }
-
-  /* The bar is exactly as tall as the close tab and keeps clear of it, so the
-     share control stops short of the corner instead of sliding under it. */
-  .work-modal__bar {
-    min-height: var(--work-modal-close-size-phone);
-    padding-right: calc(var(--work-modal-close-size-phone) + var(--space-sm));
-  }
-
-  .work-modal__back {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-xs);
-    padding: 0;
-    border: 0;
-    color: var(--color-ink);
-    background: transparent;
-    cursor: pointer;
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    line-height: var(--line-height-compact);
-  }
-
-  .work-modal__back::before {
-    content: "←";
-    font-weight: var(--font-weight-regular);
-  }
-
-  .work-modal__back:focus-visible {
-    outline: 2px solid var(--color-ink);
-    outline-offset: 0.25rem;
-  }
-
-  .work-modal__identity,
-  .work-modal__hint {
-    display: none;
   }
 
   /* Close: a black square flush in the top-right corner of the sheet (the

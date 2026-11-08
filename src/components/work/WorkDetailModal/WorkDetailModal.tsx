@@ -3,7 +3,6 @@
 import {
   useCallback,
   useEffect,
-  useId,
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
@@ -11,9 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { ShareButton } from "@/components/ui/ShareButton/ShareButton";
 import type { Project } from "@/types/project";
-import { formatWorkCategory } from "@/utils/formatWorkCategory";
 import styles from "./WorkDetailModal.module.scss";
 
 const CLOSE_DURATION = 360;
@@ -33,7 +30,6 @@ type WorkDetailModalProps = {
 
 export function WorkDetailModal({ children, project }: WorkDetailModalProps) {
   const router = useRouter();
-  const titleId = useId();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [isClosing, setIsClosing] = useState(false);
@@ -156,7 +152,7 @@ export function WorkDetailModal({ children, project }: WorkDetailModalProps) {
     // Tab trap. Removing them is what would break accessibility.
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
-      aria-labelledby={titleId}
+      aria-label={project.title}
       // The lightbox stacks its own `aria-modal` dialog on top. Two nested
       // modal dialogs leave assistive tech guessing which one confines the
       // user, so this one stands down while the lightbox is open.
@@ -170,38 +166,7 @@ export function WorkDetailModal({ children, project }: WorkDetailModalProps) {
       role="dialog"
     >
       <div className={styles["work-modal__dialog"]}>
-        <div className={styles["work-modal__document"]}>
-          <header className={styles["work-modal__bar"]}>
-            {/* Shown on phones only (see the stylesheet), where it stands in
-                for the project name: closing the preview is "back to all
-                work", the route this modal was opened over. */}
-            <button
-              className={styles["work-modal__back"]}
-              onClick={closeModal}
-              type="button"
-            >
-              All work
-            </button>
-            <div className={styles["work-modal__identity"]}>
-              <strong id={titleId}>{project.title}</strong>
-              <span aria-hidden="true">/</span>
-              <span>{formatWorkCategory(project.category)}</span>
-            </div>
-            <div className={styles["work-modal__actions"]}>
-              <span className={styles["work-modal__hint"]}>
-                Project preview
-              </span>
-              {/* The modal is an intercepted route: the address bar already
-                  reads /work/<slug>, so this shares the same permalink the
-                  standalone page would. */}
-              <ShareButton
-                path={`/work/${project.slug}`}
-                title={project.title}
-              />
-            </div>
-          </header>
-          {children}
-        </div>
+        <div className={styles["work-modal__document"]}>{children}</div>
       </div>
 
       <button

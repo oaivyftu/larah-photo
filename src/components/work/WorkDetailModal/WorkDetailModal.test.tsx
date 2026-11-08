@@ -84,10 +84,14 @@ describe("WorkDetailModal", () => {
     expect(dialog).toHaveAttribute("aria-modal", "true");
   });
 
-  it("shows the project's category in a readable form", () => {
+  it("has no top bar of its own -- no breadcrumb, preview label or share control", () => {
     renderModal();
 
-    expect(screen.getByText("Fine Art")).toBeInTheDocument();
+    expect(screen.queryByText("Project preview")).not.toBeInTheDocument();
+    expect(screen.queryByText("Fine Art")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Copy link/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("moves focus to the close button on open", () => {
@@ -171,16 +175,6 @@ describe("closing", () => {
     expect(back).toHaveBeenCalledOnce();
   });
 
-  it('closes on the phone layout\'s "All work" control, the same way', () => {
-    // Hidden above 680px by the stylesheet, but it is the same dismissal.
-    renderModal();
-
-    fireEvent.click(screen.getByRole("button", { name: "All work" }));
-    act(() => void vi.advanceTimersByTime(CLOSE_DURATION));
-
-    expect(back).toHaveBeenCalledOnce();
-  });
-
   it("closes when the backdrop itself is pressed", () => {
     renderModal();
 
@@ -193,7 +187,7 @@ describe("closing", () => {
   it("stays open when the press lands on the content", () => {
     renderModal();
 
-    fireEvent.pointerDown(screen.getByText("Project preview"));
+    fireEvent.pointerDown(screen.getByText("One"));
     act(() => void vi.advanceTimersByTime(CLOSE_DURATION));
 
     expect(back).not.toHaveBeenCalled();
@@ -234,8 +228,8 @@ describe("closing", () => {
 
 /**
  * The same selector the component traps on, so the test does not assume the
- * order. It is not the reading order: ShareButton sits in the header above the
- * children, and the close button is last because it is a sibling of the sheet.
+ * order. It is not the reading order: the close button is last because it is a
+ * sibling of the sheet, after the content.
  */
 function focusables(dialog: HTMLElement) {
   return Array.from(
