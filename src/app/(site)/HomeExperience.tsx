@@ -19,6 +19,17 @@ import {
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
+// How long the manifesto stays pinned while its words and photographs drift,
+// as a share of its own height (one screen). The movement is slight -- the
+// words shift by at most 16% and the photographs by under 20% -- so a long hold
+// is mostly scrolling that seems to do nothing. A screen's worth is about one
+// beat of motion; much beyond one and a half reads as the page being stuck.
+const MANIFESTO_PIN_DISTANCE = "+=100%";
+// Seconds the motion lags the scroll, to smooth a notched mouse wheel. Around
+// half a second hides the steps and still tracks the hand; a full second made
+// the animation feel as if it were still finishing after the finger stopped.
+const MANIFESTO_SCRUB = 0.5;
+
 type HomeExperienceProps = {
   content: HomePageContent;
   projectCount: number;
@@ -74,9 +85,9 @@ export function HomeExperience({
               scrollTrigger: {
                 trigger: "[data-manifesto]",
                 start: "top top",
-                end: "+=160%",
+                end: MANIFESTO_PIN_DISTANCE,
                 pin: true,
-                scrub: 1,
+                scrub: MANIFESTO_SCRUB,
               },
             })
             .to(
