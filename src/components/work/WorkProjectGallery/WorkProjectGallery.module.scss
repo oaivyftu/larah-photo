@@ -10,7 +10,17 @@
   z-index: 100;
   inset: 0;
   display: grid;
-  background: color-mix(in srgb, var(--color-ink) 38%, transparent);
+  /* The dim fades out as a swipe down pushes the viewer away
+     (`--gallery-drag-progress` runs 0 to 1; see useSwipeDownToDismiss). */
+  background: color-mix(
+    in srgb,
+    var(--color-ink) calc(38% * (1 - var(--gallery-drag-progress, 0))),
+    transparent
+  );
+  /* The viewer owns every gesture on its surface -- the carousel viewport
+     already claims it below, this covers the margins and the controls so a
+     downward swipe that starts there is not taken for a browser pan. */
+  touch-action: none;
   /* The lightbox sits inside the work detail panel, which is itself a scroll
      container. Without this, a swipe that runs out of carousel hands the
      scroll to that panel behind the photograph. */
@@ -34,6 +44,45 @@
 
 .work-project-gallery--modal .work-project-gallery__panel {
   min-height: 100%;
+}
+
+/* Swipe down to dismiss. The hook sets `data-swipe` and two custom properties
+   on the section and nothing else; every pixel of the movement is here.
+
+   The transform exists only while a gesture is under way. At rest it would
+   make the panel the containing block of the fixed float nav inside it; the
+   panel is viewport-sized so nothing would move, but there is no reason to
+   take that on for every visitor who never swipes. */
+.work-project-gallery--modal[data-swipe] .work-project-gallery__panel {
+  transform: translate3d(0, var(--gallery-drag-y, 0), 0);
+  will-change: transform;
+}
+
+/* Following the finger: no easing, or the viewer would trail behind it. */
+.work-project-gallery--modal[data-swipe="dragging"],
+.work-project-gallery--modal[data-swipe="dragging"]
+  .work-project-gallery__panel {
+  transition: none;
+}
+
+/* Let go past the threshold: accelerate away, the dim going with it. */
+.work-project-gallery--modal[data-swipe="dismissing"] {
+  transition: background-color var(--duration-slow) var(--ease-exit);
+}
+
+.work-project-gallery--modal[data-swipe="dismissing"]
+  .work-project-gallery__panel {
+  transition: transform var(--duration-slow) var(--ease-exit);
+}
+
+/* Let go short of it: settle back where it was. */
+.work-project-gallery--modal[data-swipe="returning"] {
+  transition: background-color var(--duration-slow) var(--ease-settle);
+}
+
+.work-project-gallery--modal[data-swipe="returning"]
+  .work-project-gallery__panel {
+  transition: transform var(--duration-slow) var(--ease-settle);
 }
 
 /* The panel takes focus programmatically when the lightbox opens so the dialog
@@ -670,6 +719,8 @@
 }
 
 @include reduced-motion {
+  .work-project-gallery--modal[data-swipe],
+  .work-project-gallery--modal[data-swipe] .work-project-gallery__panel,
   .work-project-gallery__float-nav,
   .work-project-gallery__float-close,
   .work-project-gallery__float-close-label,

@@ -6,7 +6,7 @@ import {
   openProjectWithSeveralPhotographs,
   readPosition,
 } from "../support/content";
-import { swipeHorizontally } from "../support/gestures";
+import { swipeHorizontally, swipeVertically } from "../support/gestures";
 import {
   carousel,
   expectCarouselReady,
@@ -221,6 +221,56 @@ export async function dismissFullScreenInsidePreview(page: Page) {
     "the project preview should still be open behind it",
   ).toBeVisible();
   expect(page.url(), "Escape should not have navigated anywhere").toBe(
+    projectUrl,
+  );
+}
+
+/**
+ * J11 -- swipe down on the full-screen photograph to dismiss it, on a touch
+ * device (US1 AS6).
+ *
+ * Opened inside the project preview, the nested case, for the same reason as
+ * J3: the swipe must close the photograph and nothing else. A swipe that took
+ * the preview down with it, or navigated, would land the visitor back on the
+ * work index instead of the project they were looking at.
+ *
+ * What this proves: a long downward swipe closes the viewer, and a short one
+ * that comes to rest before the finger lifts does not -- so the gesture is
+ * neither missing nor too eager. What it does not prove, as with J10, is how
+ * it feels under a real thumb on a real browser's own scrolling and rubber
+ * band: that is a device check.
+ */
+export async function swipeDownToDismissFullScreen(page: Page) {
+  const preview = await openPreviewOfProjectWithPhotograph(page);
+  const projectUrl = page.url();
+
+  await openPhotographFullScreen(preview);
+  await expectCarouselReady(page);
+  await expect(lightbox(page), "the lightbox should be open").toBeVisible();
+
+  // Short, and still before it lifts: a drag, not a dismissal.
+  await swipeVertically(page, carousel(page), {
+    distance: 50,
+    restBeforeLift: 250,
+  });
+
+  await expect(
+    lightbox(page),
+    "a short drag that rested before lifting should leave the photograph open",
+  ).toBeVisible();
+
+  // Long and carried through: the viewer is pushed away.
+  await swipeVertically(page, carousel(page), { distance: 400 });
+
+  await expect(
+    lightbox(page),
+    "a long swipe down should close the full-screen photograph",
+  ).toBeHidden();
+  await expect(
+    projectPreview(page),
+    "the project preview should still be open behind it",
+  ).toBeVisible();
+  expect(page.url(), "the swipe should not have navigated anywhere").toBe(
     projectUrl,
   );
 }

@@ -52,7 +52,7 @@ the carousel, not accepting from the component.
 | `aria-live="polite"` text `"Image {n} of {N}"`           | Inside the float nav                                | J1, J2, J10    |
 | `role="button"` name `"Next image"` / `"Previous image"` | Float-nav controls                                  | J1             |
 | `role="button"` name `"Close gallery"`                   | Float-nav close, modal only                         | J3             |
-| `role="dialog"` + `aria-modal`                           | Work detail preview and the lightbox                | J3, J7         |
+| `role="dialog"` + `aria-modal`                           | Work detail preview and the lightbox                | J3, J7, J11    |
 | `data-work-modal`                                        | The project preview dialog                          | J3, J7         |
 | `data-page-heading`                                      | `PageHeading`                                       | J8             |
 | `data-active`                                            | The glass pointer pill                              | J9             |
@@ -90,7 +90,7 @@ The handles above locate elements; these are the assertions made on them.
 | The swipe advanced          | `"Image {n} of {N}"` reads the next photograph, and exactly one `figure.is-selected` exists | J10         |
 | The controls are visible    | Computed `opacity` of `[data-gallery-controls]` is `"1"`                                    | J4          |
 | The controls have receded   | Computed `opacity` of `[data-gallery-controls]` is `"0"`                                    | J4          |
-| The preview is still open   | `[role="dialog"]` is attached, and the URL is still the project's                           | J3          |
+| The preview is still open   | `[role="dialog"]` is attached, and the URL is still the project's                           | J3, J11     |
 | The navigation completed    | `document.documentElement.dataset.pageTransition === "ready"`                               | J5          |
 | Focus moved to the content  | `document.activeElement.id === "main-content"` after a navigation                           | J6          |
 | Tab continues from there    | The next focused element is inside `#main-content` or follows it in document order          | J6          |

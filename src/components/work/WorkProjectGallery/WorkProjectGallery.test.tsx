@@ -109,6 +109,9 @@ type MediaListener = (event: MediaQueryListEvent) => void;
 
 const slideMediaListeners = new Set<MediaListener>();
 let isSlideMedia = false;
+// `prefers-reduced-motion` is a third question the stub has to answer apart
+// from the other two, or it would read as a slide-mode flag and flip with it.
+let isReducedMotion = false;
 let realMatchMedia: typeof window.matchMedia;
 
 function isSlideQuery(query: string) {
@@ -147,6 +150,7 @@ beforeEach(() => {
   constructions = [];
   slideMediaListeners.clear();
   isSlideMedia = false;
+  isReducedMotion = false;
   select.mockClear();
   previous.mockClear();
   next.mockClear();
@@ -156,9 +160,14 @@ beforeEach(() => {
   realMatchMedia = window.matchMedia;
   window.matchMedia = ((query: string) => {
     const slideQuery = isSlideQuery(query);
+    const reducedMotionQuery = query.includes("prefers-reduced-motion");
 
     return {
       get matches() {
+        if (reducedMotionQuery) {
+          return isReducedMotion;
+        }
+
         return slideQuery ? isSlideMedia : !isSlideMedia;
       },
       media: query,
@@ -354,6 +363,428 @@ describe("as a modal", () => {
     );
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
+  });
+});
+
+/**
+ * A touch event with a list of fingers on it.
+ *
+ * Built by hand for the same reason as `pointerMove` above: jsdom has no
+ * `Touch`, and Testing Library's `fireEvent.touchMove(el, { touches })` does not
+ * carry the list through. The component reads `touches.length` and
+ * `touches.item(0)`, so the stand-in has both.
+ */
+function touchEvent(type: string, fingers: Array<[x: number, y: number]>) {
+  const event = new window.Event(type, { bubbles: true, cancelable: true });
+  const points = fingers.map(([clientX, clientY]) => ({ clientX, clientY }));
+  const touches = Object.assign(points, {
+    item: (index: number) => points[index] ?? null,
+  });
+
+  Object.defineProperty(event, "touches", { value: touches });
+
+  return event;
+}
+
+describe("swiping down to dismiss", () => {
+  // `performance.now` is what the component times a flick with, and Date-based
+  // fake timers would not move it here, so the clock is the test's own.
+  let now = 0;
+
+  beforeEach(() => {
+    now = 0;
+    vi.spyOn(performance, "now").mockImplementation(() => now);
+    // A touch device: the viewer is the sliding carousel, and the section is
+    // what listens.
+    isSlideMedia = true;
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  async function open(props: { isModal?: boolean; onClose?: () => void } = {}) {
+    const onClose = props.onClose ?? vi.fn();
+    const { container } = render(
+      <WorkProjectGallery
+        initialIndex={0}
+        isModal={props.isModal ?? true}
+        onClose={onClose}
+        project={project(3)}
+      />,
+    );
+    const section = container.querySelector("section") as HTMLElement;
+
+    // Let the dynamic Flickity import settle before touching anything.
+    await vi.waitFor(() => expect(constructions.length).toBeGreaterThan(0));
+
+    const panel = section.firstElementChild as HTMLElement;
+
+    return { onClose, panel, section };
+  }
+
+  const start = (el: Element, x: number, y: number) =>
+    fireEvent(el, touchEvent("touchstart", [[x, y]]));
+  const move = (el: Element, x: number, y: number, ms = 16) => {
+    now += ms;
+    fireEvent(el, touchEvent("touchmove", [[x, y]]));
+  };
+  const end = (el: Element) => fireEvent(el, touchEvent("touchend", []));
+  const transitionEnd = (panel: Element) =>
+    fireEvent(
+      panel,
+      Object.assign(new window.Event("transitionend", { bubbles: true }), {
+        propertyName: "transform",
+      }),
+    );
+  const dragY = (el: HTMLElement) =>
+    el.style.getPropertyValue("--gallery-drag-y");
+
+  it("follows the finger down, then leaves once let go past the threshold", async () => {
+    const { onClose, panel, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 115); // locks as a downward swipe
+    move(section, 100, 300, 120);
+
+    expect(section).toHaveAttribute("data-swipe", "dragging");
+    expect(dragY(section)).toBe("185px");
+
+    end(section);
+
+    // Sliding away, not yet gone: it closes when the slide has finished.
+    expect(section).toHaveAttribute("data-swipe", "dismissing");
+    expect(dragY(section)).toBe(`${window.innerHeight}px`);
+    expect(onClose).not.toHaveBeenCalled();
+
+    transitionEnd(panel);
+
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("closes once even if the fallback timer and the transition both fire", async () => {
+    const { onClose, panel, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 300, 120);
+    end(section);
+    transitionEnd(panel);
+    vi.advanceTimersByTime(1000);
+
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("closes on the fallback timer when the transition never ends", async () => {
+    const { onClose, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 300, 120);
+    end(section);
+    expect(onClose).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(700);
+
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("ignores a transition that is not the panel's own transform", async () => {
+    // The float nav and the carousel transition transforms too, and those
+    // bubble up to the section.
+    const { onClose, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 300, 120);
+    end(section);
+    transitionEnd(section.querySelector("button") as Element);
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("springs back when let go short of the threshold", async () => {
+    const { onClose, panel, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 160, 200); // 45px further, slowly
+    end(section);
+
+    expect(section).toHaveAttribute("data-swipe", "returning");
+    expect(dragY(section)).toBe("0px");
+
+    transitionEnd(panel);
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(section).not.toHaveAttribute("data-swipe");
+    expect(dragY(section)).toBe("");
+  });
+
+  it("ignores a new touch while it is already on its way out", async () => {
+    const { onClose, panel, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 300, 120);
+    end(section);
+
+    // A finger lands on the sliding viewer and drags: it must not take over.
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 160, 120);
+
+    expect(section).toHaveAttribute("data-swipe", "dismissing");
+    expect(dragY(section)).toBe(`${window.innerHeight}px`);
+
+    transitionEnd(panel);
+
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("takes a new swipe that lands while it is still springing back", async () => {
+    const { onClose, panel, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 160, 200);
+    end(section);
+    expect(section).toHaveAttribute("data-swipe", "returning");
+
+    // Straight away, before the spring has settled: the next gesture.
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 300, 120);
+    expect(section).toHaveAttribute("data-swipe", "dragging");
+
+    end(section);
+    transitionEnd(panel);
+
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("treats a short, fast flick as a dismissal", async () => {
+    const { onClose, panel, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 120);
+    move(section, 100, 160, 10); // 40px in 10ms
+    end(section);
+    transitionEnd(panel);
+
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("does not count a flick the finger rested after before lifting", async () => {
+    // Fast, and far enough -- but it stopped, held for a beat and then lifted,
+    // which is a drag, not a flick.
+    const { onClose, panel, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 120);
+    move(section, 100, 160, 10);
+    now += 200;
+    end(section);
+
+    expect(section).toHaveAttribute("data-swipe", "returning");
+
+    transitionEnd(panel);
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("does not count a twitch as a flick", async () => {
+    const { onClose, panel, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 112);
+    move(section, 100, 118, 4); // fast, but 6px
+    end(section);
+    transitionEnd(panel);
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("keeps a downward swipe from Flickity, which listens on the window", async () => {
+    const { section } = await open();
+    const onWindowMove = vi.fn();
+    window.addEventListener("touchmove", onWindowMove);
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 200);
+
+    window.removeEventListener("touchmove", onWindowMove);
+    expect(onWindowMove).not.toHaveBeenCalled();
+  });
+
+  it("cancels the browser's own handling of the swipe", async () => {
+    const { section } = await open();
+    const event = touchEvent("touchmove", [[100, 200]]);
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    fireEvent(section, event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it("leaves a horizontal swipe to the carousel", async () => {
+    const { onClose, section } = await open();
+    const onWindowMove = vi.fn();
+    window.addEventListener("touchmove", onWindowMove);
+
+    start(section, 100, 100);
+    move(section, 140, 105);
+    move(section, 200, 400); // later drifting down must not flip the mode
+    end(section);
+
+    window.removeEventListener("touchmove", onWindowMove);
+    expect(onWindowMove).toHaveBeenCalled();
+    expect(section).not.toHaveAttribute("data-swipe");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("leaves a swipe that leans more sideways than down to the carousel", async () => {
+    const { onClose, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 160, 130);
+    move(section, 200, 400);
+    end(section);
+
+    expect(section).not.toHaveAttribute("data-swipe");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("ignores a swipe upward", async () => {
+    const { onClose, section } = await open();
+
+    start(section, 100, 400);
+    move(section, 100, 300);
+    move(section, 100, 100, 200);
+    end(section);
+
+    expect(section).not.toHaveAttribute("data-swipe");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("ignores a gesture that starts with two fingers", async () => {
+    const { onClose, section } = await open();
+
+    fireEvent(
+      section,
+      touchEvent("touchstart", [
+        [100, 100],
+        [200, 100],
+      ]),
+    );
+    move(section, 100, 115);
+    move(section, 100, 400, 120);
+    end(section);
+
+    expect(section).not.toHaveAttribute("data-swipe");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("lets go of the viewer when a second finger lands mid-drag", async () => {
+    const { onClose, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 300, 120);
+    now += 16;
+    fireEvent(
+      section,
+      touchEvent("touchmove", [
+        [100, 320],
+        [200, 320],
+      ]),
+    );
+
+    expect(section).toHaveAttribute("data-swipe", "returning");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("springs back when the browser takes the touch away", async () => {
+    const { onClose, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 300, 120);
+    fireEvent(section, touchEvent("touchcancel", []));
+
+    expect(section).toHaveAttribute("data-swipe", "returning");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("closes without sliding for someone who asked for less motion", async () => {
+    isReducedMotion = true;
+    const { onClose, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 300, 120);
+    end(section);
+
+    // No transition to wait for.
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("settles without easing under reduced motion when let go short", async () => {
+    isReducedMotion = true;
+    const { onClose, section } = await open();
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 160, 200);
+    end(section);
+
+    expect(section).not.toHaveAttribute("data-swipe");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("does nothing on the page presentation, which has nothing to dismiss", async () => {
+    const { container } = render(
+      <WorkProjectGallery initialIndex={0} project={project(3)} />,
+    );
+    const section = container.querySelector("section") as HTMLElement;
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 300, 120);
+
+    expect(section).not.toHaveAttribute("data-swipe");
+  });
+
+  it("does nothing when there is no close handler to call", async () => {
+    const { container } = render(
+      <WorkProjectGallery initialIndex={0} isModal project={project(3)} />,
+    );
+    const section = container.querySelector("section") as HTMLElement;
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 300, 120);
+
+    expect(section).not.toHaveAttribute("data-swipe");
+  });
+
+  it("puts everything back when it unmounts mid-drag", async () => {
+    const { section } = await open();
+    const { unmount } = { unmount: () => cleanup() };
+
+    start(section, 100, 100);
+    move(section, 100, 115);
+    move(section, 100, 300, 120);
+    expect(section).toHaveAttribute("data-swipe", "dragging");
+
+    unmount();
+
+    expect(section).not.toHaveAttribute("data-swipe");
+    expect(dragY(section)).toBe("");
   });
 });
 
