@@ -505,8 +505,8 @@
   /* Work modal */
   /* The sheet hangs 89px under the top edge on desktop and 25px on a phone,
      with 32px / 20px corners. */
-  --work-modal-pad-top: clamp(0.5rem, 5.15vw, 5.5625rem);
-  --work-modal-pad-top-phone: 1.5625rem;
+  --work-modal-pad-top: 1.875rem;
+  --work-modal-pad-top-phone: 0;
   --work-modal-radius: clamp(1.25rem, 1.85vw, 2rem);
   --work-modal-bar-gap: clamp(1rem, 3vw, 2rem);
   --work-modal-identity-gap: 0.7rem;

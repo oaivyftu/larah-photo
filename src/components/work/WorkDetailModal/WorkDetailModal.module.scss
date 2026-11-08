@@ -87,9 +87,12 @@
 
 .work-modal__close {
   position: fixed;
-  /* Level with the content frame's right edge, as Figma sets it (about 139px
-     in on the 1728 canvas). */
-  right: max(var(--page-gutter), calc((100vw - var(--frame-max)) / 2));
+  /* A floating control pinned to the screen corner, the same distance from
+     both edges. Figma draws it 139px in from the right of the 1728 frame, but
+     that is a still of a scrolled modal and says nothing about whether the
+     button is fixed, so it is not read as a rule: aligning to the content
+     frame floated it over the gallery's last column on wide screens. */
+  right: clamp(1rem, 2vw, 2rem);
   bottom: clamp(1rem, 2vw, 2rem);
   z-index: 8;
   display: grid;
