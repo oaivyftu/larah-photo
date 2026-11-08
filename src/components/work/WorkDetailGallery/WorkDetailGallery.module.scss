@@ -10,7 +10,7 @@
   min-height: calc(100svh - clamp(5.4rem, 7vw, 6.3rem));
 }
 
-.work-detail--modal .work-detail__header {
+.work-detail__header {
   display: grid;
   grid-template-columns:
     minmax(0, 467fr)
