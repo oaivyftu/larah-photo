@@ -176,8 +176,16 @@
     padding-top: var(--work-modal-pad-top-phone);
   }
 
+  /* The sheet is a plain rectangle on a phone: no rounded corners. */
+  .work-modal__document {
+    border-radius: 0;
+  }
+
+  /* The bar is exactly as tall as the close tab and keeps clear of it, so the
+     share control stops short of the corner instead of sliding under it. */
   .work-modal__bar {
-    min-height: 3.75rem;
+    min-height: var(--work-modal-close-size-phone);
+    padding-right: calc(var(--work-modal-close-size-phone) + var(--space-sm));
   }
 
   .work-modal__back {
@@ -209,9 +217,20 @@
     display: none;
   }
 
+  /* Close: a black square flush in the top-right corner of the sheet (the
+     sheet is full width and starts at the top inset), still fixed so it stays
+     put while the content scrolls. */
   .work-modal__close {
-    width: 3.5rem;
-    border-radius: 50%;
+    top: var(--work-modal-pad-top-phone);
+    right: 0;
+    bottom: auto;
+    width: var(--work-modal-close-size-phone);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .work-modal__close:hover {
+    transform: none;
   }
 }
 
