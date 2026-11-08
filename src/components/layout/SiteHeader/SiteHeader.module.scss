@@ -78,6 +78,14 @@
   visibility: hidden;
 }
 
+/* The hero mark is only a stand-in while the header is the page's top row.
+   Once the header floats over the page it is the only logo in reach, so it
+   shows the same brand as every other route (the ordinary header logo, not the
+   hero's oversized one). The extra specificity beats the phone block below. */
+.site-header[data-floating] .site-header__brand--hidden {
+  visibility: visible;
+}
+
 @include media-max("laptop-sm") {
   .site-header {
     min-height: auto;
