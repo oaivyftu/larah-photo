@@ -74,8 +74,11 @@
   gap: var(--service-features-offset);
 }
 
+/* Description and features are flow children of `.service-row__body`, which is
+   its own grid. They name no `grid-area` here: a name that matches nothing in
+   that grid collapses every item onto line 1 and they overprint each other.
+   The phone block below dissolves the wrapper and places them by area. */
 .service-row__description {
-  grid-area: description;
   font-size: var(--service-row-copy-size);
   font-weight: var(--font-weight-medium);
   letter-spacing: 0;
@@ -84,7 +87,6 @@
 
 .service-row__features {
   display: grid;
-  grid-area: features;
   gap: var(--service-feature-gap);
   list-style: none;
   font-size: var(--service-feature-size);
@@ -170,6 +172,7 @@
   }
 
   .service-row__description {
+    grid-area: description;
     margin-top: var(--service-row-gap-phone);
     letter-spacing: var(--tracking-body);
     line-height: var(--line-height-body);
@@ -181,6 +184,7 @@
   }
 
   .service-row__features {
+    grid-area: features;
     gap: var(--space-2xs);
     margin-top: var(--space-sm);
     font-size: var(--service-feature-size-phone);
