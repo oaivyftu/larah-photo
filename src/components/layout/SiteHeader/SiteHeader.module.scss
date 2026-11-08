@@ -71,10 +71,20 @@
    the links in a panel under it. The home hero carries its own logo mark, so
    the brand goes back to hidden there. */
 @include media-max("phone") {
+  /* Above the page's own positioned layers (the work grid's z-index 2) so the
+     open menu and its veil cover them, and below the pointer label (1000),
+     the project modal (1200) and the page-transition curtain (2000). */
   .site-header {
+    z-index: 100;
     min-height: var(--header-height-phone);
     flex-wrap: nowrap;
     padding-block: var(--space-md);
+  }
+
+  /* The menu sheet slides in behind the header row; keep the logo above it. */
+  .site-header__brand {
+    position: relative;
+    z-index: 2;
   }
 
   .site-header__brand--hidden {

@@ -60,6 +60,9 @@
   --overlay-glass-edge-soft: rgba(0, 0, 0, 0.075);
   --overlay-glass-inner-top: rgba(0, 0, 0, 0.08);
 
+  /* The phone menu's veil over the page behind it: lighter than the modal's,
+     because the menu is a drop-down and not a takeover. */
+  --overlay-nav-backdrop: rgb(18 18 18 / 48%);
   --overlay-modal-backdrop: rgb(18 18 18 / 68%);
   /* The same backdrop at zero alpha: the from/to stop of the modal's fade.
      Written as a transparent black rather than `transparent` so the
@@ -463,6 +466,17 @@
   --nav-toggle-width: 1.5rem;
   --nav-toggle-height: 2.6875rem;
   --nav-toggle-icon-height: 0.875rem;
+  /* The three bars are 2px tall, 6px apart centre to centre, so the outer two
+     travel 6px to meet the middle one when the glyph turns into a cross. */
+  --nav-toggle-bar-height: 0.125rem;
+  --nav-toggle-bar-shift: 0.375rem;
+  --nav-toggle-blur: 0.25rem;
+  /* The phone menu: the sheet eases down 12px as it fades in, each link then
+     rises 8px behind the one above it. */
+  --nav-menu-shift: 0.75rem;
+  --nav-item-shift: 0.5rem;
+  --nav-item-delay: 90ms;
+  --nav-item-stagger: 45ms;
   --page-heading-gap: 0.28em;
   --page-heading-underline-gap: 0.08em;
   --input-label-gap: 0.125rem;

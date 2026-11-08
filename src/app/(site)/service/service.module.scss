@@ -125,7 +125,7 @@
 }
 
 .service-row__media img {
-  object-fit: cover;
+  object-fit: contain;
 }
 
 /* Phone (and tablet): a single column, in the order Figma stacks it -- index,

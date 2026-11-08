@@ -6,6 +6,8 @@
 
 /* Phone only; see the last block. */
 .main-nav__toggle {
+  position: relative;
+  z-index: 2;
   display: none;
   align-items: center;
   justify-content: center;
@@ -16,6 +18,7 @@
   background: none;
   color: var(--color-ink);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .main-nav__toggle:focus-visible {
@@ -23,9 +26,62 @@
   outline-offset: var(--space-2xs);
 }
 
+/* Three bars that meet in the middle and cross: the outer two slide to the
+   centre line and turn +/-45deg while the middle one thins to nothing. The
+   whole glyph also gives a little under the finger. */
 .main-nav__toggle-icon {
+  position: relative;
+  display: block;
   width: 100%;
   height: var(--nav-toggle-icon-height);
+  transition: transform var(--duration-base) var(--ease-settle);
+}
+
+.main-nav__toggle:active .main-nav__toggle-icon {
+  transform: scale(0.88);
+}
+
+.main-nav__toggle-bar {
+  position: absolute;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: var(--nav-toggle-bar-height);
+  background: currentColor;
+  transition:
+    transform var(--duration-slow) var(--ease-settle),
+    opacity var(--duration-fast) ease;
+}
+
+.main-nav__toggle-bar--top {
+  top: 0;
+}
+
+.main-nav__toggle-bar--middle {
+  top: 50%;
+  margin-top: calc(var(--nav-toggle-bar-height) / -2);
+}
+
+.main-nav__toggle-bar--bottom {
+  bottom: 0;
+}
+
+.main-nav__toggle[aria-expanded="true"] .main-nav__toggle-bar--top {
+  transform: translateY(var(--nav-toggle-bar-shift)) rotate(45deg);
+}
+
+.main-nav__toggle[aria-expanded="true"] .main-nav__toggle-bar--middle {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.main-nav__toggle[aria-expanded="true"] .main-nav__toggle-bar--bottom {
+  transform: translateY(calc(var(--nav-toggle-bar-shift) * -1)) rotate(-45deg);
+}
+
+/* Phone only; see the last block. */
+.main-nav__backdrop {
+  display: none;
 }
 
 .main-nav__list {
@@ -84,7 +140,12 @@
 
 @include reduced-motion {
   .main-nav__link,
-  .main-nav__link::after {
+  .main-nav__link::after,
+  .main-nav__list,
+  .main-nav__item,
+  .main-nav__backdrop,
+  .main-nav__toggle-icon,
+  .main-nav__toggle-bar {
     transition: none;
   }
 }
@@ -112,6 +173,14 @@
   }
 }
 
+// Phone: the links become a white sheet that eases down from the top edge over
+// a veil that dims (and slightly blurs) the whole screen. The sheet is as tall
+// as its links plus the header row it sits behind, so logo and toggle stay
+// readable on top of it (they carry z-index 2, the sheet 1, the veil 0).
+//
+// Closed, the sheet and veil are `visibility: hidden`, not `display: none`, so
+// they can fade out; the visibility switch is delayed by the fade so it lands
+// after it. Hidden also keeps the links out of the tab order and a11y tree.
 @include media-max("phone") {
   .main-nav {
     width: auto;
@@ -122,31 +191,88 @@
     display: flex;
   }
 
-  /* The links drop into a full-width panel hung off the header's bottom edge
-     (the header is the positioned ancestor). Closed, the list is out of the
-     layout and the a11y tree, so the toggle's `aria-expanded` is the truth. */
   .main-nav__list {
     position: absolute;
     z-index: 1;
-    top: 100%;
+    top: 0;
     right: 0;
     left: 0;
-    display: none;
+    display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 0;
-    padding: var(--space-xs) var(--page-gutter) var(--space-md);
+    padding: calc(var(--header-height-phone) + var(--space-xs))
+      var(--page-gutter) var(--space-lg);
     border-bottom: 1px solid var(--color-line-soft);
     background: var(--color-paper);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(calc(var(--nav-menu-shift) * -1));
+    visibility: hidden;
+    transition:
+      opacity var(--duration-slow) ease,
+      transform var(--duration-slow) var(--ease-settle),
+      visibility 0s linear var(--duration-slow);
   }
 
   .main-nav__list[data-open] {
-    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    visibility: visible;
+    transition:
+      opacity var(--duration-slow) ease,
+      transform var(--duration-slow) var(--ease-settle),
+      visibility 0s linear 0s;
   }
 
   .main-nav__item {
     width: 100%;
     text-align: left;
+    opacity: 0;
+    transform: translateY(var(--nav-item-shift));
+    transition:
+      opacity var(--duration-fast) ease,
+      transform var(--duration-base) var(--ease-settle);
+  }
+
+  /* Opening staggers the links; closing lets them go together with the sheet. */
+  .main-nav__list[data-open] .main-nav__item {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--duration-slow) ease
+        calc(
+          var(--nav-item-delay) + var(--nav-item-index, 0) *
+            var(--nav-item-stagger)
+        ),
+      transform var(--duration-slow) var(--ease-settle)
+        calc(
+          var(--nav-item-delay) + var(--nav-item-index, 0) *
+            var(--nav-item-stagger)
+        );
+  }
+
+  .main-nav__backdrop {
+    position: fixed;
+    z-index: 0;
+    inset: 0;
+    display: block;
+    background: var(--overlay-nav-backdrop);
+    opacity: 0;
+    visibility: hidden;
+    backdrop-filter: blur(var(--nav-toggle-blur));
+    transition:
+      opacity var(--duration-slow) ease,
+      visibility 0s linear var(--duration-slow);
+  }
+
+  .main-nav__list[data-open] ~ .main-nav__backdrop {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity var(--duration-slow) ease,
+      visibility 0s linear 0s;
   }
 
   .main-nav__link {
