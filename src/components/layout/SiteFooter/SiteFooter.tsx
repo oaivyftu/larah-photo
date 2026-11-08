@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { Icon } from "@/components/ui/Icon/Icon";
-import { icons } from "@/constants/icons";
 import type { SiteSettings } from "@/types/site";
 import styles from "./SiteFooter.module.scss";
 
@@ -42,14 +40,6 @@ export function SiteFooter({ settings }: SiteFooterProps) {
           Instagram
         </a>
         <Link href="/work">Work</Link>
-        <a className={styles["site-footer__back-to-top"]} href="#top">
-          <span>BACK TO TOP</span>
-          <Icon
-            className={styles["site-footer__back-to-top-icon"]}
-            decorative
-            icon={icons.arrowUp}
-          />
-        </a>
       </div>
     </footer>
   );

@@ -459,6 +459,18 @@
   --footer-bar-pad-top: 1.35rem;
   --footer-bar-pad-bottom: 1.45rem;
   --footer-bar-gap-phone: 0.9rem;
+
+  /* Floating square action buttons pinned to a bottom corner of the screen:
+     the work modal's close (right) and the scroll-to-top button (left). One
+     decision, so the two stay the same size. */
+  --floating-action-size: clamp(3.5rem, 5vw, 4.25rem);
+  --floating-action-inset: clamp(1rem, 2vw, 2rem);
+  --floating-action-radius: 0.65rem;
+
+  /* Scroll-to-top only. */
+  --scroll-top-icon-height: 1.25rem;
+  --scroll-top-shift: var(--space-xs);
+
   --nav-list-gap: clamp(1.5rem, 8.33vw, 7.5rem);
   --nav-link-pad: 0.375rem;
   --nav-link-pad-phone: 0.72rem;

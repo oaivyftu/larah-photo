@@ -34,16 +34,16 @@
      that is a still of a scrolled modal and says nothing about whether the
      button is fixed, so it is not read as a rule: aligning to the content
      frame floated it over the gallery's last column on wide screens. */
-  right: clamp(1rem, 2vw, 2rem);
-  bottom: clamp(1rem, 2vw, 2rem);
+  right: var(--floating-action-inset);
+  bottom: var(--floating-action-inset);
   z-index: 8;
   display: grid;
-  width: clamp(3.5rem, 5vw, 4.25rem);
+  width: var(--floating-action-size);
   aspect-ratio: 1;
   place-items: center;
   padding: 0;
   border: 0;
-  border-radius: 0.65rem;
+  border-radius: var(--floating-action-radius);
   color: var(--color-paper);
   background: var(--color-ink);
   box-shadow: 0 0.8rem 2.5rem var(--overlay-modal-close);

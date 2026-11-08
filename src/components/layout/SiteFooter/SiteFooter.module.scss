@@ -56,11 +56,6 @@
   text-transform: uppercase;
 }
 
-.site-footer__bar a:last-child {
-  justify-self: end;
-  grid-column-start: 5;
-}
-
 /* Footer links render at 12–18px tall on their own; the bar and the contact
    columns both have room to spare, so the links take the 24px minimum target
    height directly rather than via an overlay (WCAG 2.5.8). */
@@ -77,35 +72,16 @@
   outline-offset: 0.25rem;
 }
 
-.site-footer__back-to-top {
-  display: inline-flex;
-  gap: var(--space-xs);
-  align-items: center;
-}
-
-.site-footer__back-to-top-icon {
-  width: 0.78em;
-  height: 0.78em;
-  flex: 0 0 auto;
-}
-
 @include media-max("tablet-lg") {
   .site-footer__inner {
     grid-template-columns: 1fr;
   }
 
-  /* The bar reflows to a wrapping row rather than a single grid column: the
-     last link is pinned to column 5, which a 1fr track would strand in an
-     implicit column instead of stacking. */
+  /* The bar reflows to a wrapping row rather than a fixed-track grid. */
   .site-footer__bar {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-sm) var(--space-xl);
-  }
-
-  .site-footer__bar a:last-child {
-    grid-column-start: auto;
-    justify-self: start;
   }
 }
 

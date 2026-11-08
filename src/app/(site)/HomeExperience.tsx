@@ -383,7 +383,11 @@ export function HomeExperience({
         </div>
       </section>
 
-      <section className={styles["manifesto"]} data-manifesto>
+      <section
+        className={styles["manifesto"]}
+        data-manifesto
+        data-scroll-to-top-after
+      >
         <div className={styles["manifesto__words"]} aria-hidden="true">
           <span data-manifesto-word="light">{content.manifestoWords[0]}</span>
           <span data-manifesto-word="memory">{content.manifestoWords[1]}</span>
