@@ -357,13 +357,24 @@
   white-space: nowrap;
 }
 
-.work-project-gallery__float-close:hover
-  .work-project-gallery__float-close-label,
+/* The label unfurls for a keyboard user (focus-visible) and for a mouse
+   (hover). Hover is fenced to real pointers: on a touch screen a tap leaves
+   `:hover` stuck on the button, so the pill would swell open and stay that way
+   behind the photograph instead of just closing. */
 .work-project-gallery__float-close:focus-visible
   .work-project-gallery__float-close-label {
   grid-template-columns: 1fr;
   margin-right: var(--space-control-gap);
   opacity: 1;
+}
+
+@include hover-fine {
+  .work-project-gallery__float-close:hover
+    .work-project-gallery__float-close-label {
+    grid-template-columns: 1fr;
+    margin-right: var(--space-control-gap);
+    opacity: 1;
+  }
 }
 
 .work-project-gallery__float-container {
@@ -497,9 +508,15 @@
   stroke-linejoin: round;
 }
 
-.work-project-gallery__float-close:hover,
 .work-project-gallery__float-button:hover {
   background-color: var(--overlay-glass-hover);
+}
+
+/* As with the label: no stuck highlight on the close pill after a tap. */
+@include hover-fine {
+  .work-project-gallery__float-close:hover {
+    background-color: var(--overlay-glass-hover);
+  }
 }
 
 .work-project-gallery__float-close:focus-visible,
