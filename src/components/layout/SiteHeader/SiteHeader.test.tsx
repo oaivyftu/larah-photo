@@ -1,5 +1,11 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { SiteHeader } from "./SiteHeader";
 
 afterEach(cleanup);
@@ -81,5 +87,33 @@ describe("SiteHeader", () => {
     expect(
       screen.getByRole("navigation", { name: "Primary" }),
     ).toBeInTheDocument();
+  });
+
+  it("takes the header out of the flow once the page scrolls past it, and keeps its space", () => {
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(84);
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+      callback(0);
+      return 1;
+    });
+    const { container } = render(<SiteHeader {...props} />);
+    const slot = container.firstElementChild as HTMLElement;
+
+    expect(screen.getByRole("banner")).not.toHaveAttribute("data-floating");
+    expect(slot.style.minHeight).toBe("");
+
+    act(() => {
+      Object.defineProperty(window, "scrollY", {
+        configurable: true,
+        value: 400,
+      });
+      fireEvent.scroll(window);
+    });
+
+    expect(screen.getByRole("banner")).toHaveAttribute("data-floating", "true");
+    expect(slot.style.minHeight).toBe("84px");
+
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 });
