@@ -1,5 +1,23 @@
 <!--
-Sync Impact Report (2.3.1)
+Sync Impact Report (2.3.2)
+- Version change: 2.3.1 → 2.3.2 (PATCH: one factual correction to Principle V;
+  no principle added, removed, or redefined — the same class of correction as
+  v2.2.2)
+- Modified principles:
+  - V. Critical User Flows Require Test Coverage. The parenthetical explaining
+    why inquiry-form submission is not a critical flow is removed. It described
+    `InquiryForm` as present in the codebase but unrendered and posting to a
+    non-existent `/api/contact` route; neither the component nor that route
+    exists any more, so the note described a state that is gone. The list of
+    critical flows (work gallery navigation, Sanity content error handling) is
+    unchanged. If a contact form is built again it falls under this principle
+    the moment it is wired up, as it always would have.
+- Modified sections: none
+- Added/removed sections: none
+- Downstream: none — `specs/005-contact-page/spec.md` is not touched by this
+  change.
+
+Prior report (2.3.1)
 - Version change: 2.3.0 → 2.3.1 (PATCH: the Development Workflow paragraph
   now describes what `.husky/pre-push` actually runs; no principle added,
   removed, or redefined — the same class of correction as v2.2.1)
@@ -249,11 +267,7 @@ shared constants once; this principle prevents the drift from creeping back in.
 
 Before a critical flow ships or is materially changed, it MUST have automated
 coverage. The critical flows that exist today are **work gallery navigation**
-and **Sanity content error handling**. (Inquiry-form submission is deliberately
-not on this list: `InquiryForm` exists in the codebase but is not rendered on
-the contact page and posts to an `/api/contact` route that does not exist — see
-`specs/005-contact-page/spec.md` Assumptions. It becomes a critical flow, and
-falls under this principle, the moment it is actually wired up.)
+and **Sanity content error handling**.
 
 **Vitest is the selected framework** — unit tests for isolated logic, and tests
 that replace the Sanity client at the module boundary rather than over the
@@ -424,4 +438,4 @@ Versioning policy:
 - MINOR: New principle/section added or materially expanded guidance.
 - PATCH: Clarifications, wording, typo fixes, non-semantic refinements.
 
-**Version**: 2.3.1 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-31
+**Version**: 2.3.2 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-11-08
