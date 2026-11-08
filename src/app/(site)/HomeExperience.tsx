@@ -87,6 +87,11 @@ export function HomeExperience({
                 start: "top top",
                 end: MANIFESTO_PIN_DISTANCE,
                 pin: true,
+                // Pin a touch early. ScrollTrigger switches the section to
+                // position: fixed from JS, a frame behind the browser's own
+                // scrolling, so on a fast flick the dark section has already
+                // slid up by the time it pins and the page shows through below.
+                anticipatePin: 1,
                 scrub: MANIFESTO_SCRUB,
               },
             })

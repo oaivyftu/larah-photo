@@ -158,6 +158,13 @@
   color: var(--home-paper-soft);
 }
 
+/* GSAP wraps the pinned manifesto in a `.pin-spacer`. Painting it the section's
+   own colour means any frame where the pin engages late shows dark, not the
+   white page, below the section. */
+.home :global(.pin-spacer) {
+  background: var(--home-ink);
+}
+
 .manifesto__words {
   position: absolute;
   inset: 0;
