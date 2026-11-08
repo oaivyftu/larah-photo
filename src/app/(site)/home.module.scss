@@ -92,8 +92,8 @@
 .hero__feature {
   display: flex;
   flex-direction: column;
+  width: 100%;
   gap: var(--home-hero-feature-gap);
-  justify-self: end;
 }
 
 /* Wraps the media alone, keeping the photo its own positioning context
