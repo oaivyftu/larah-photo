@@ -4,6 +4,7 @@ import {
   controlsRecedeWhenPointerIdles,
   dismissFullScreenInsidePreview,
   moveWithArrowKeys,
+  swipeDownToDismissFullScreen,
   swipeToNextPhotograph,
 } from "./journeys/gallery";
 import { underBothMotionPreferences } from "./support/variants";
@@ -34,5 +35,7 @@ test.describe("on a touch device", () => {
 
   underBothMotionPreferences("gallery", {
     "a visitor swipes to the next photograph": swipeToNextPhotograph,
+    "a visitor swipes down to dismiss the full-screen photograph":
+      swipeDownToDismissFullScreen,
   });
 });

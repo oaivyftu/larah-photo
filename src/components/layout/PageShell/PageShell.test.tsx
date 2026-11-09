@@ -67,11 +67,19 @@ describe("PageShell", () => {
     expect(screen.getByRole("main")).toHaveAttribute("tabindex", "-1");
   });
 
-  it("makes the top of the page focusable for the footer's back-to-top", async () => {
+  it("makes the top of the page focusable for the scroll-to-top button", async () => {
     await renderShell();
 
     const top = document.querySelector("#top");
     expect(top).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("renders the floating scroll-to-top button on every route", async () => {
+    await renderShell();
+
+    expect(
+      screen.getByRole("button", { name: "Back to top", hidden: true }),
+    ).toBeInTheDocument();
   });
 
   it("declares the studio identity once, for the page graphs to reference", async () => {

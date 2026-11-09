@@ -38,7 +38,9 @@
   justify-content: center;
   border: 0;
   background: transparent;
-  color: var(--color-ink);
+  /* Figma greys the inactive filters. The text-safe grey, because the design's
+     #8e8e93 is 3.26:1 on paper, under the 4.5:1 body text needs. */
+  color: var(--color-muted-text);
   cursor: pointer;
   font-size: inherit;
   line-height: inherit;
@@ -71,11 +73,13 @@
 }
 
 .work-filters__button:not(.work-filters__button--active):hover {
-  opacity: 0.62;
+  color: var(--color-ink);
 }
 
 .work-filters__button--active {
+  color: var(--color-ink);
   font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-body);
 }
 
 @include reduced-motion {
@@ -88,5 +92,10 @@
   .work-filters {
     justify-content: flex-start;
     font-size: var(--font-size-xs);
+  }
+
+  /* Figma's phone filters are Medium until one is chosen. */
+  .work-filters__button:not(.work-filters__button--active) {
+    font-weight: var(--font-weight-medium);
   }
 }

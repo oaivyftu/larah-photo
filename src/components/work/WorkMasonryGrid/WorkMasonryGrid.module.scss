@@ -296,10 +296,16 @@
 }
 
 // Phones keep the staggered grid rather than stacking — the cards just shrink.
+// The work index tightens to Figma's 12px / 20px pair gaps.
 @include media-max(767px) {
   .work-layout--work,
   .work-layout--homepage {
     --work-columns: 2;
+  }
+
+  .work-layout--work {
+    --work-gap-x: var(--work-grid-gap-x-phone);
+    --work-gap-y: var(--work-grid-gap-y-phone);
   }
 
   .work-layout--work .work-layout__skeleton,
@@ -309,6 +315,23 @@
 
   .work-layout--work .work-layout__skeleton-column:nth-child(3),
   .work-layout--homepage .work-layout__skeleton-column:nth-child(3) {
+    display: none;
+  }
+}
+
+// Figma's phone home page stacks the work in one 350px column rather than the
+// staggered pair the work index keeps.
+@include media-max("phone-lg") {
+  .work-layout--homepage {
+    --work-columns: 1;
+    --work-gap-y: var(--home-grid-gap-y-phone);
+  }
+
+  .work-layout--homepage .work-layout__skeleton {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .work-layout--homepage .work-layout__skeleton-column:nth-child(2) {
     display: none;
   }
 }

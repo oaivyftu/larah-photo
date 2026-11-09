@@ -202,12 +202,20 @@ describe("ServiceExperience", () => {
     expect(screen.getAllByText("Coverage")).toHaveLength(services.length);
   });
 
-  it("points each package at its call to action", () => {
+  it("has no booking button -- the design's rows are information only", () => {
+    // Figma's services rows carry index, title, price, description, features
+    // and a photo; the contact route is reached from the header and footer.
     render(<ServiceExperience content={content} services={services} />);
 
-    for (const link of screen.getAllByRole("link")) {
-      expect(link).toHaveAttribute("href", "/contact");
-    }
+    expect(screen.queryByText(/Book now/)).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
+  });
+
+  it("shows each package's starting price", () => {
+    render(<ServiceExperience content={content} services={services} />);
+
+    expect(screen.getAllByText("STARTING FROM")).toHaveLength(services.length);
+    expect(screen.getByText("$2500")).toBeInTheDocument();
   });
 
   it("shows each package's photograph with its own alt text", () => {

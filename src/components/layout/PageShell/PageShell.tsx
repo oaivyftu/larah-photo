@@ -1,3 +1,4 @@
+import { ScrollToTopButton } from "@/components/layout/ScrollToTopButton/ScrollToTopButton";
 import { SiteFooter } from "@/components/layout/SiteFooter/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader/SiteHeader";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -35,9 +36,9 @@ export async function PageShell({ children, variant }: PageShellProps) {
   const settings = await getSiteSettings();
 
   return (
-    // `tabIndex={-1}`: the footer's "back to top" link targets this element,
-    // and without it the browser scrolls but leaves focus stranded at the
-    // bottom of the page.
+    // `tabIndex={-1}`: the floating scroll-to-top button moves focus to this
+    // element, and without it focus would stay stranded at the bottom of the
+    // page after the scroll.
     <div
       className={styles["page-shell"]}
       data-page-shell
@@ -56,7 +57,6 @@ export async function PageShell({ children, variant }: PageShellProps) {
         /* The home hero carries the full-size logo mark, so the nav drops its
            own brand there rather than showing it twice. */
         hideBrand={variant === "home"}
-        instagramUrl={settings.instagramUrl}
         navigationItems={settings.navigationItems}
         siteName={settings.name}
       />
@@ -75,6 +75,7 @@ export async function PageShell({ children, variant }: PageShellProps) {
         {children}
       </main>
       <SiteFooter settings={settings} />
+      <ScrollToTopButton />
     </div>
   );
 }

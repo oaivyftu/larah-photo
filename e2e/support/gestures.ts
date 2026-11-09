@@ -72,3 +72,56 @@ export async function swipeHorizontally(
 
   await client.detach();
 }
+
+/**
+ * Drag a finger down across `target` and lift it.
+ *
+ * `restBeforeLift` holds the finger still for that many milliseconds before it
+ * lifts. The gesture under test reads the speed of the last few moments before
+ * release -- a quick flick dismisses even when it is short -- and CDP delivers
+ * the moves a millisecond or two apart, which is faster than any hand. A drag
+ * meant to *not* count as a flick has to stop first, as a real one does.
+ */
+export async function swipeVertically(
+  page: Page,
+  target: Locator,
+  {
+    distance,
+    horizontalDrift = 0,
+    restBeforeLift = 0,
+  }: { distance: number; horizontalDrift?: number; restBeforeLift?: number },
+) {
+  const start = await centreOf(target);
+  const client = await page.context().newCDPSession(page);
+  const steps = 10;
+
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{ x: start.x, y: start.y }],
+  });
+
+  for (let step = 1; step <= steps; step += 1) {
+    const progress = step / steps;
+
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [
+        {
+          x: start.x + horizontalDrift * progress,
+          y: start.y + distance * progress,
+        },
+      ],
+    });
+  }
+
+  if (restBeforeLift > 0) {
+    await page.waitForTimeout(restBeforeLift);
+  }
+
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchEnd",
+    touchPoints: [],
+  });
+
+  await client.detach();
+}

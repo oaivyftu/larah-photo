@@ -225,48 +225,37 @@ describe("HomeExperience", () => {
     expect(screen.getByText("Wedding")).toBeInTheDocument();
   });
 
-  it("falls back to a generic icon for a package it has no mark for", () => {
-    // Service ids come from Sanity, so a new package must not render a hole.
-    const { container } = renderHome({
-      services: [service("brand-new-session", "Something new")],
+  it("numbers the packages in order, as the design's list does", () => {
+    renderHome({
+      services: [
+        service("portrait-session", "Portrait"),
+        service("wedding-session", "Wedding"),
+      ],
     });
 
-    expect(screen.getByText("Something new")).toBeInTheDocument();
-    expect(container.querySelectorAll("svg").length).toBeGreaterThan(0);
+    const numbers = Array.from(
+      document.querySelectorAll("article p[aria-hidden='true']"),
+    ).map((node) => node.textContent);
+
+    expect(numbers).toEqual(["01", "02"]);
   });
 
-  it("gives each real package its own mark, not the fallback", () => {
-    // The test above cannot catch a mapping gone stale: the fallback is an
-    // svg too, so it passes whether or not a package found its own icon. That
-    // is how Engagement rendered a plain circle -- its Sanity id is
-    // `couple-and-engagement`, and the map still said `couple-session`.
-    //
-    // These ids are the ones the dataset actually holds. If an editor renames
-    // one, this is where that stops being silent -- though the lasting fix is
-    // an icon field on the package, which removes the id coupling.
-    const packages = [
-      ["portrait-session", "Portrait Session", "user"],
-      ["couple-and-engagement", "Engagement", "user-group"],
-      ["family-session", "Family Session", "people-roof"],
-      ["graduation-session", "Graduation Session", "graduation"],
-    ] as const;
+  it("shows only index, title and description -- no price, features or booking button", () => {
+    // Figma's home services list is those three lines and one link to the
+    // services page; the detail lives there.
+    renderHome({ services: [service("portrait-session", "Portrait")] });
 
-    renderHome({
-      services: packages.map(([id, title]) => service(id, title)),
-    });
+    expect(screen.queryByText(/Book now/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^From \$/)).not.toBeInTheDocument();
+    expect(screen.queryByText("One")).not.toBeInTheDocument();
+  });
 
-    for (const [, title, expectedIcon] of packages) {
-      // The card's own icon is its first svg; the button's arrow comes later.
-      const icon = screen
-        .getByRole("heading", { name: title })
-        .closest("article")
-        ?.querySelector("svg");
+  it("links on to the full services page", () => {
+    renderHome();
 
-      expect(icon, `${title} should render an icon`).toHaveAttribute(
-        "data-icon",
-        expectedIcon,
-      );
-    }
+    expect(
+      screen.getByRole("link", { name: /View all services/ }),
+    ).toHaveAttribute("href", "/service");
   });
 
   it("renders with no services rather than failing", () => {

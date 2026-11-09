@@ -1,12 +1,53 @@
 @use "@/styles/mixins" as *;
 
+/* Holds the header's place in the flow. Normally it is just the header's
+   box; once the header goes fixed (below) the component gives it the header's
+   height so the page does not jump up into the gap. */
+.site-header-slot {
+  position: relative;
+}
+
+/* Above the page's own positioned layers (the work grid's z-index 2) so the
+   open phone menu and its veil, and a revealed floating header, cover them;
+   below the pointer label (1000), the project modal (1200) and the
+   page-transition curtain (2000). */
+/* Figma insets the desktop header to the 1440 content frame (logo at x=144,
+   nav ending at x=1584 on the 1728 canvas), so on a wide screen the sides pad
+   out to the frame edge and on a narrow one fall back to the page gutter. */
 .site-header {
+  position: relative;
+  z-index: 100;
+  background: var(--color-paper);
   display: flex;
   min-height: var(--header-height);
   align-items: center;
   justify-content: space-between;
   gap: var(--space-fluid-header);
-  padding: var(--space-block-gap) var(--page-gutter);
+  padding: var(--space-block-gap)
+    max(var(--page-gutter), calc((100% - var(--frame-max)) / 2));
+}
+
+/* Scrolled past the header: it leaves the flow and parks just above the
+   viewport, and slides down when the reader scrolls back up. `top` rather than
+   a transform, because a transformed ancestor would turn the phone menu's
+   `position: fixed` veil into one the size of the header. */
+.site-header[data-floating] {
+  position: fixed;
+  top: calc(var(--site-header-height) * -1);
+  right: 0;
+  left: 0;
+  transition: top var(--duration-slow) var(--ease-settle);
+}
+
+.site-header[data-floating][data-revealed] {
+  top: 0;
+  box-shadow: 0 1px 0 var(--color-line-soft);
+}
+
+@include reduced-motion {
+  .site-header[data-floating] {
+    transition: none;
+  }
 }
 
 .site-header__brand {
@@ -37,14 +78,12 @@
   visibility: hidden;
 }
 
-.site-header__cta {
-  flex: 0 0 auto;
-}
-
-@include media-max("laptop-lg") {
-  .site-header__cta {
-    font-size: var(--font-size-sm);
-  }
+/* The hero mark is only a stand-in while the header is the page's top row.
+   Once the header floats over the page it is the only logo in reach, so it
+   shows the same brand as every other route (the ordinary header logo, not the
+   hero's oversized one). The extra specificity beats the phone block below. */
+.site-header[data-floating] .site-header__brand--hidden {
+  visibility: visible;
 }
 
 @include media-max("laptop-sm") {
@@ -58,14 +97,9 @@
   .site-header__brand--hidden {
     visibility: visible;
   }
-
-  .site-header__cta {
-    padding: var(--space-xs) var(--space-control-pad);
-    font-size: var(--font-size-xs);
-  }
 }
 
-@include media-max(720px) {
+@include media-max("tablet-sm") {
   .site-header {
     gap: var(--space-label-gap);
     padding-bottom: var(--space-sm);
@@ -74,5 +108,26 @@
   .site-header__brand {
     width: 4.75rem;
     height: 1.6rem;
+  }
+}
+
+/* Phone: Figma's header is one 75px row -- logo left, hamburger right -- with
+   the links in a panel under it. The home hero carries its own logo mark, so
+   the brand goes back to hidden there. */
+@include media-max("phone") {
+  .site-header {
+    min-height: var(--header-height-phone);
+    flex-wrap: nowrap;
+    padding-block: var(--space-md);
+  }
+
+  /* The menu sheet slides in behind the header row; keep the logo above it. */
+  .site-header__brand {
+    position: relative;
+    z-index: 2;
+  }
+
+  .site-header__brand--hidden {
+    visibility: hidden;
   }
 }

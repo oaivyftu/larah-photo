@@ -1,0 +1,82 @@
+@use "@/styles/mixins" as *;
+
+/* Above the page's own layers (the work grid's z-index 2), below the header and
+   the project gallery (100), the pointer label (1000), the project modal (1200)
+   and the page-transition curtain (2000), so full-screen views cover it. Same
+   size, radius, shadow and distance from the bottom as the work modal's close
+   button. Horizontally it straddles the content frame's right edge, half over the
+   content and half in the gap beside it (the frame edge is the one every page
+   and the header use). On a screen too narrow to have a gap, it keeps the
+   close button's inset from the screen edge rather than leaving the screen. */
+.scroll-to-top {
+  position: fixed;
+  bottom: var(--floating-action-inset);
+  right: max(
+    var(--floating-action-inset),
+    calc(
+      max(var(--page-gutter), calc((100% - var(--frame-max)) / 2)) - var(
+          --floating-action-size
+        ) /
+        2
+    )
+  );
+  z-index: 50;
+  display: flex;
+  width: var(--floating-action-size);
+  aspect-ratio: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--floating-action-radius);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  box-shadow: 0 0.8rem 2.5rem var(--overlay-modal-close);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(var(--scroll-top-shift));
+  visibility: hidden;
+  /* `visibility` flips at the end of the fade out and the start of the fade in,
+     so the button is never focusable while invisible. */
+  transition:
+    opacity var(--duration-base) var(--ease-settle),
+    transform var(--duration-base) var(--ease-settle),
+    visibility 0s linear var(--duration-base);
+}
+
+.scroll-to-top[data-visible] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.scroll-to-top:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 0.25rem;
+}
+
+@include hover-fine {
+  .scroll-to-top:hover {
+    background: var(--color-ink-soft);
+  }
+}
+
+.scroll-to-top__icon {
+  width: auto;
+  height: var(--scroll-top-icon-height);
+}
+
+@include reduced-motion {
+  .scroll-to-top {
+    transition: none;
+  }
+}
+
+@include forced-colors {
+  .scroll-to-top {
+    border: 1px solid ButtonText;
+  }
+}

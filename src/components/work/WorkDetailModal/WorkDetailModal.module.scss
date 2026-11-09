@@ -21,78 +21,29 @@
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  border-radius: 0.9rem 0.9rem 0 0;
+  border-radius: var(--work-modal-radius) var(--work-modal-radius) 0 0;
   background: var(--color-paper);
   box-shadow: 0 -1.2rem 4rem var(--overlay-modal-document);
   overscroll-behavior: contain;
 }
 
-.work-modal__bar {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  // The title truncates to fit, so without a gap it would run right up to the
-  // share control and read as one word.
-  gap: var(--work-modal-bar-gap);
-  min-height: var(--home-manifesto-pad-y);
-  padding: 0 var(--page-gutter);
-  border-bottom: 1px solid var(--color-line-soft);
-  background: color-mix(in srgb, var(--color-paper) 92%, transparent);
-  backdrop-filter: blur(16px);
-}
-
-.work-modal__identity {
-  display: flex;
-  align-items: center;
-  gap: var(--work-modal-identity-gap);
-  min-width: 0;
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-tight);
-}
-
-.work-modal__identity strong {
-  overflow: hidden;
-  font-weight: var(--font-weight-bold);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.work-modal__identity span {
-  color: var(--color-muted-text);
-  font-weight: var(--font-weight-semibold);
-}
-
-.work-modal__actions {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: var(--work-modal-actions-gap);
-  padding: var(--space-control-gap) 0;
-}
-
-.work-modal__hint {
-  color: var(--color-muted-text);
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-label);
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-}
-
 .work-modal__close {
   position: fixed;
-  right: clamp(1rem, 2vw, 2rem);
-  bottom: clamp(1rem, 2vw, 2rem);
+  /* A floating control pinned to the screen corner, the same distance from
+     both edges. Figma draws it 139px in from the right of the 1728 frame, but
+     that is a still of a scrolled modal and says nothing about whether the
+     button is fixed, so it is not read as a rule: aligning to the content
+     frame floated it over the gallery's last column on wide screens. */
+  right: var(--floating-action-inset);
+  bottom: var(--floating-action-inset);
   z-index: 8;
   display: grid;
-  width: clamp(3.5rem, 5vw, 4.25rem);
+  width: var(--floating-action-size);
   aspect-ratio: 1;
   place-items: center;
   padding: 0;
   border: 0;
-  border-radius: 0.65rem;
+  border-radius: var(--floating-action-radius);
   color: var(--color-paper);
   background: var(--color-ink);
   box-shadow: 0 0.8rem 2.5rem var(--overlay-modal-close);
@@ -159,26 +110,33 @@
   transform: translateY(1rem);
 }
 
+// Phone: Figma's sheet opens on a "← All work" / Share row instead of the
+// project's name, so the identity and hint step aside and the back control
+// (which closes the preview) takes the left edge.
 @include media-max(680px) {
   .work-modal {
-    padding-top: var(--space-xs);
+    padding-top: var(--work-modal-pad-top-phone);
   }
 
+  /* The sheet is a plain rectangle on a phone: no rounded corners. */
   .work-modal__document {
-    border-radius: 0.65rem 0.65rem 0 0;
+    border-radius: 0;
   }
 
-  .work-modal__bar {
-    min-height: 3.75rem;
-  }
-
-  .work-modal__hint {
-    display: none;
-  }
-
+  /* Close: a black square flush in the top-right corner of the sheet (the
+     sheet is full width and starts at the top inset), still fixed so it stays
+     put while the content scrolls. */
   .work-modal__close {
-    width: 3.5rem;
-    border-radius: 50%;
+    top: var(--work-modal-pad-top-phone);
+    right: 0;
+    bottom: auto;
+    width: var(--work-modal-close-size-phone);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .work-modal__close:hover {
+    transform: none;
   }
 }
 

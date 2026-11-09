@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 // never reaches Sanity Studio, whose own theme leaves those selectors alone.
 import "./globals.scss";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { Montserrat } from "next/font/google";
+import { Bodoni_Moda, Montserrat } from "next/font/google";
 import { PageTransition } from "@/components/layout/PageTransition/PageTransition";
 import { GlassPointer } from "@/components/ui/GlassPointer/GlassPointer";
 import {
@@ -21,6 +21,14 @@ import {
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
+});
+
+// The Figma serif is Bodoni 72 Oldstyle, an Apple system face that cannot be
+// shipped to the web. Bodoni Moda is the closest open face; it is a variable
+// font, so every weight the design asks for (400-700) comes from one file.
+const bodoniModa = Bodoni_Moda({
+  subsets: ["latin"],
+  variable: "--font-bodoni-moda",
 });
 
 export const metadata: Metadata = {
@@ -74,7 +82,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={montserrat.variable}
+      className={`${montserrat.variable} ${bodoniModa.variable}`}
       data-scroll-behavior="smooth"
     >
       <body>

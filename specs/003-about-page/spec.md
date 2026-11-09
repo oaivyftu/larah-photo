@@ -39,6 +39,7 @@ A visitor navigates to the about page to learn who Larah Photo is, and sees a he
 - **FR-001**: About page MUST render its title, portrait image, and story paragraphs entirely from CMS-managed content, with no hardcoded production copy or imagery in the page itself.
 - **FR-002**: About page MUST display the story as an ordered sequence of one or more paragraphs, exactly as configured in the CMS.
 - **FR-003**: About page MUST display a portrait image with accessible alt text sourced from the CMS.
+- **FR-003a**: The title MUST span the full width above the story and the portrait. On wide screens the story and a portrait of fixed 655:1060 proportions sit side by side beneath it; on a phone the order is title, portrait, story. _(Added to match the Figma "Final" frames.)_
 - **FR-004**: On viewports with no reduced-motion preference, the page title, story paragraphs, and portrait MUST animate into view in a staggered sequence on load.
 - **FR-005**: When a visitor has a reduced-motion preference set, no entrance animation MUST run; the title, story, and portrait MUST still be fully visible and readable.
 - **FR-006**: When required about page content is missing or fails validation, the system MUST surface an error instead of rendering fallback or placeholder content.

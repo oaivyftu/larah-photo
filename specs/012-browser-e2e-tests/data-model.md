@@ -51,8 +51,10 @@ of this suite.
 | J7  | Dismiss the project preview                                        | work index → preview | Back on the work index, not one level past it                      | US2 AS3          |
 | J8  | Open a page and let it arrive                                      | any page             | Page content reaches its finished state                            | US3 AS1, AS3     |
 | J9  | Hover a labelled target                                            | work index           | The pointer label becomes active                                   | US3 AS2          |
+| J10 | Swipe to the next photograph (touch device)                        | project detail       | The next photograph is selected; the sliding carousel is running   | US1 AS5 → SC-009 |
+| J11 | Swipe down to dismiss a full-screen photograph (touch device)      | work index → preview | A short drag leaves it open; a long swipe closes it, preview stays | US1 AS6          |
 
-Nine journeys. J3 and J7 are separate on purpose: they dismiss different things
+Eleven journeys. J10 and J11 run only on a touch device. J3 and J7 are separate on purpose: they dismiss different things
 from the same screen, and SC-002 exists because the nested one is where it
 fails.
 

@@ -1,11 +1,16 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { SiteHeader } from "./SiteHeader";
 
 afterEach(cleanup);
 
 const props = {
-  instagramUrl: "https://instagram.com/larah",
   navigationItems: [
     { label: "Work", href: "/work" },
     { label: "About", href: "/about" },
@@ -67,14 +72,13 @@ describe("SiteHeader", () => {
     );
   });
 
-  it("opens the Instagram call to action safely in a new tab", () => {
+  it("has no Instagram call to action -- the footer and contact page carry it", () => {
+    // Figma's header is the logo and the primary navigation only.
     render(<SiteHeader {...props} />);
-    const cta = screen.getByRole("link", { name: /Message on Instagram/ });
 
-    expect(cta).toHaveAttribute("href", props.instagramUrl);
-    expect(cta).toHaveAttribute("target", "_blank");
-    // Without noopener the opened page gets a handle on this window.
-    expect(cta).toHaveAttribute("rel", "noopener noreferrer");
+    expect(
+      screen.queryByRole("link", { name: /Instagram/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("renders the nav even with no navigation items", () => {
@@ -83,5 +87,33 @@ describe("SiteHeader", () => {
     expect(
       screen.getByRole("navigation", { name: "Primary" }),
     ).toBeInTheDocument();
+  });
+
+  it("takes the header out of the flow once the page scrolls past it, and keeps its space", () => {
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(84);
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+      callback(0);
+      return 1;
+    });
+    const { container } = render(<SiteHeader {...props} />);
+    const slot = container.firstElementChild as HTMLElement;
+
+    expect(screen.getByRole("banner")).not.toHaveAttribute("data-floating");
+    expect(slot.style.minHeight).toBe("");
+
+    act(() => {
+      Object.defineProperty(window, "scrollY", {
+        configurable: true,
+        value: 400,
+      });
+      fireEvent.scroll(window);
+    });
+
+    expect(screen.getByRole("banner")).toHaveAttribute("data-floating", "true");
+    expect(slot.style.minHeight).toBe("84px");
+
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 });

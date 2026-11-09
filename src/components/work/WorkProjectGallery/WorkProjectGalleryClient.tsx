@@ -15,6 +15,7 @@ import "flickity/css/flickity.css";
 import "flickity-fade/flickity-fade.css";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { usePointerLabel } from "@/components/ui/GlassPointer/usePointerLabel";
+import { useSwipeDownToDismiss } from "./useSwipeDownToDismiss";
 import type { Project, ProjectImage } from "@/types/project";
 import styles from "./WorkProjectGallery.module.scss";
 
@@ -323,6 +324,7 @@ export function WorkProjectGalleryClient({
 }: WorkProjectGalleryClientProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const flickityRef = useRef<Flickity | null>(null);
   const controlsTimerRef = useRef<number | null>(null);
@@ -353,6 +355,13 @@ export function WorkProjectGalleryClient({
       onClose?.();
     }
   }, [isModal, onClose]);
+
+  // A downward swipe pushes the viewer off the bottom and closes it, the same
+  // way the close control does. Only offered when there is something to close.
+  useSwipeDownToDismiss(sectionRef, panelRef, {
+    enabled: isModal && Boolean(onClose),
+    onDismiss: handleClose,
+  });
 
   const clearControlsTimer = useCallback(() => {
     if (controlsTimerRef.current === null) {
@@ -830,6 +839,7 @@ export function WorkProjectGalleryClient({
           : styles["work-project-gallery--page"]
       }`}
       onKeyDown={revealControls}
+      ref={sectionRef}
       // Only a press that both starts and ends on the backdrop dismisses, so
       // the panel no longer needs a `stopPropagation` click handler of its own
       // — one that existed solely to cancel this one.

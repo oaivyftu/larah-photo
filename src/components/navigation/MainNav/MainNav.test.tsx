@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { MainNav } from "./MainNav";
 
@@ -81,5 +81,128 @@ describe("MainNav", () => {
     expect(
       screen.getByRole("navigation", { name: "Primary" }),
     ).toBeInTheDocument();
+  });
+
+  describe("phone menu", () => {
+    it("starts closed, with a toggle that says so", () => {
+      render(<MainNav items={items} />);
+      const toggle = screen.getByRole("button", { name: "Open menu" });
+
+      expect(toggle).toHaveAttribute("aria-expanded", "false");
+      expect(document.querySelector("[data-open]")).toBeNull();
+    });
+
+    it("opens and closes from the toggle, wiring aria-controls to the list", () => {
+      render(<MainNav items={items} />);
+
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+      const toggle = screen.getByRole("button", { name: "Close menu" });
+      const list = document.querySelector("[data-open]");
+
+      expect(toggle).toHaveAttribute("aria-expanded", "true");
+      expect(list).not.toBeNull();
+      expect(toggle.getAttribute("aria-controls")).toBe(list?.id);
+
+      fireEvent.click(toggle);
+      expect(document.querySelector("[data-open]")).toBeNull();
+    });
+
+    it("closes on Escape", () => {
+      render(<MainNav items={items} />);
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+
+      fireEvent.keyDown(window, { key: "Escape" });
+
+      expect(document.querySelector("[data-open]")).toBeNull();
+    });
+
+    it("freezes the page behind it while open and gives it back on close", () => {
+      document.body.style.overflow = "";
+      render(<MainNav items={items} />);
+
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+      expect(document.body.style.overflow).toBe("hidden");
+
+      fireEvent.click(screen.getByRole("button", { name: "Close menu" }));
+      expect(document.body.style.overflow).toBe("");
+    });
+
+    it("gives the scroll lock back when it unmounts while open", () => {
+      document.body.style.overflow = "";
+      const { unmount } = render(<MainNav items={items} />);
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+
+      unmount();
+
+      expect(document.body.style.overflow).toBe("");
+    });
+
+    it("makes the page content inert while open, so Tab cannot reach it", () => {
+      document.body.innerHTML =
+        '<div data-page-shell><main id="main-content"></main><footer></footer></div>';
+      const host = document.createElement("div");
+      document.body.appendChild(host);
+      render(<MainNav items={items} />, { container: host });
+      const main = document.getElementById("main-content");
+      const footer = document.querySelector("footer");
+
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+      expect(main).toHaveAttribute("inert");
+      expect(footer).toHaveAttribute("inert");
+
+      fireEvent.click(screen.getByRole("button", { name: "Close menu" }));
+      expect(main).not.toHaveAttribute("inert");
+      expect(footer).not.toHaveAttribute("inert");
+      document.body.innerHTML = "";
+    });
+
+    it("closes when the veil behind the menu is pressed", () => {
+      const { container } = render(<MainNav items={items} />);
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+
+      const veil = container.querySelector('[aria-hidden="true"]:not(span)');
+      expect(veil).not.toBeNull();
+      fireEvent.click(veil as Element);
+
+      expect(document.querySelector("[data-open]")).toBeNull();
+    });
+
+    it("hides the veil from assistive tech: it is decoration, Escape is the way out", () => {
+      const { container } = render(<MainNav items={items} />);
+
+      expect(
+        container.querySelector('div[aria-hidden="true"]'),
+      ).toBeInTheDocument();
+    });
+
+    it("returns focus to the toggle when Escape closes it", () => {
+      render(<MainNav items={items} />);
+      const toggle = screen.getByRole("button", { name: "Open menu" });
+      fireEvent.click(toggle);
+      screen.getByRole("link", { name: "Work" }).focus();
+
+      fireEvent.keyDown(window, { key: "Escape" });
+
+      expect(screen.getByRole("button", { name: "Open menu" })).toHaveFocus();
+    });
+
+    it("indexes each link so the stylesheet can stagger them in", () => {
+      render(<MainNav items={items} />);
+
+      const indexes = screen
+        .getAllByRole("listitem")
+        .map((item) => item.style.getPropertyValue("--nav-item-index"));
+
+      expect(indexes).toEqual(["0", "1", "2"]);
+    });
+
+    it("closes when a link is followed", () => {
+      render(<MainNav items={items} />);
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+
+      fireEvent.click(screen.getByRole("link", { name: "About" }));
+
+      expect(document.querySelector("[data-open]")).toBeNull();
+    });
   });
 });

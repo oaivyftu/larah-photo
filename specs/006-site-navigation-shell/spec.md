@@ -12,7 +12,7 @@
 
 ### User Story 1 - Move around the site via consistent chrome (Priority: P1)
 
-On every page, a visitor sees the same header (logo, primary navigation, a prominent "message on Instagram" action) and footer (studio statement, business email/phone, location, social link, a link to the work page, and a "back to top" control), and can always tell which section of the site they're currently on.
+On every page, a visitor sees the same header (logo and primary navigation; on phones the navigation collapses into a hamburger menu) and footer (studio statement, business email/phone, location, social link, and a link to the work page), plus a floating "back to top" button that appears once they have scrolled down, and can always tell which section of the site they're currently on.
 
 **Why this priority**: This is the site's primary means of getting from one page to another; without consistent, working chrome the site is not navigable as a whole.
 
@@ -20,9 +20,9 @@ On every page, a visitor sees the same header (logo, primary navigation, a promi
 
 **Acceptance Scenarios**:
 
-1. **Given** a visitor loads any page, **When** the page renders, **Then** a header with the site logo, primary navigation links, and an Instagram call-to-action appears, and a footer with the studio's statement, contact details, location, social link, work link, and "back to top" control appears.
+1. **Given** a visitor loads any page, **When** the page renders, **Then** a header with the site logo and primary navigation links appears, and a footer with the studio's statement, contact details, location, social link, and work link appears.
 2. **Given** a visitor is on a given section of the site, **When** they view the primary navigation, **Then** the link corresponding to their current section is marked as the current page for both sighted and assistive-technology users.
-3. **Given** a visitor selects "back to top" in the footer, **When** they activate it, **Then** the page scrolls to the top and keyboard focus moves there.
+3. **Given** a visitor has scrolled down, **When** they activate the floating "back to top" button, **Then** the page scrolls to the top and keyboard focus moves there.
 4. **Given** a visitor is on the home page, **When** the header renders, **Then** the header's own logo is not shown, since the home page displays its own full-size logo in the hero.
 
 ---
@@ -71,10 +71,12 @@ A keyboard or screen-reader user can skip the header to reach the page's main co
 
 ### Functional Requirements
 
-- **FR-001**: Every page MUST render a header containing the site logo (except on the home page, where it is hidden to avoid duplicating the hero's own logo), the primary navigation, and an Instagram call-to-action, and a footer containing the studio's statement, business email, business phone, location, an Instagram link, a link to the work page, and a "back to top" control.
+- **FR-001**: Every page MUST render a header containing the site logo (except on the home page, where it is hidden to avoid duplicating the hero's own logo), and the primary navigation, and a footer containing the studio's statement, business email, business phone, location, an Instagram link, and a link to the work page.
+- **FR-001a**: On phone widths the header MUST be a single row (logo left, a menu toggle right) and the primary navigation links MUST sit in a panel the toggle opens and closes. The toggle MUST expose its state (`aria-expanded`), the panel MUST close on Escape, when a link is followed, when the dimmed backdrop is pressed, and if the viewport grows past the phone layout. While open, a backdrop MUST dim the whole screen, the page behind MUST NOT scroll (and no page scrollbar shows) and its content MUST be inert, and focus MUST return to the toggle after Escape. The panel and backdrop MUST fade in and out, the links MUST rise in one after another, and the three-bar icon MUST animate into a cross; none of this motion runs under reduced motion. The header carries no Instagram call-to-action; the Instagram link lives in the footer and on the contact page.
+- **FR-001b**: Once the visitor has scrolled further than the header is tall, the header MUST stay out of view while they scroll down and MUST slide in from the top edge as soon as they scroll up, over a solid background with a hairline underneath. Within the header's own height, and at the very top of the page, it MUST behave as an ordinary block at the top of the page, and handing it back to the flow MUST NOT move the content beneath it. Focusing a link in a hidden header MUST bring it into view. The slide does not animate under reduced motion (the header still appears and disappears), and it MUST NOT use a transform, which would shrink the phone menu's full-screen veil to the size of the header.
 - **FR-002**: Primary navigation items, the site name, and the Instagram URL used in the header and footer MUST be sourced entirely from site-wide CMS settings, not hardcoded.
 - **FR-003**: The primary navigation link matching the visitor's current section MUST be marked as the current page both visually and via an accessible "current page" indicator. A page nested inside a section marks that section's link: project pages mark Work, and journal post pages mark Journal (spec 013).
-- **FR-004**: Activating the footer's "back to top" control MUST scroll the page to the top and move keyboard focus there.
+- **FR-004**: Every page MUST offer a floating, icon-only "back to top" button (accessible name "Back to top"), fixed to the bottom of the viewport, straddling the right edge of the content frame. It MUST be hidden until the page has scrolled further than 80% of the viewport's height (on the home page: until the manifesto section, including the distance it is pinned for, has scrolled out of the top of the viewport), MUST stay on screen while the visitor is past that point, and MUST hide again once they scroll back up across it. While hidden it MUST be out of the tab order. Activating it MUST scroll the page to the top and move keyboard focus there. Full-screen overlays (the project gallery, the project modal, the page transition) MUST cover it. The footer carries no "back to top" control.
 - **FR-005**: Clicking an internal link to a different page (in the same tab, without modifier keys, not a download, and not opening a new tab) MUST trigger a covering transition animation before the browser navigates, and MUST reveal the destination page shortly after navigation completes.
 - **FR-006**: Links that open in a new tab, are modified-clicked, point to a download, point to an external origin, only change the current page's hash, or are marked as opening an in-app overlay MUST NOT trigger the full-page transition animation.
 - **FR-007**: The transition system MUST NOT render at all on the CMS Studio route.

@@ -8,8 +8,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { WorkMasonryGrid } from "@/components/work/WorkMasonryGrid/WorkMasonryGrid";
 import { Button } from "@/components/ui/Button/Button";
-import { Icon } from "@/components/ui/Icon/Icon";
-import { icons } from "@/constants/icons";
 import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
 import type { HomePageContent } from "@/types/site";
@@ -21,20 +19,23 @@ import {
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
+// How long the manifesto stays pinned while its words and photographs drift,
+// as a share of its own height (one screen). The movement is slight -- the
+// words shift by at most 16% and the photographs by under 20% -- so a long hold
+// is mostly scrolling that seems to do nothing. A screen's worth is about one
+// beat of motion; much beyond one and a half reads as the page being stuck.
+const MANIFESTO_PIN_DISTANCE = "+=80%";
+// Seconds the motion lags the scroll, to smooth a notched mouse wheel. Around
+// half a second hides the steps and still tracks the hand; a full second made
+// the animation feel as if it were still finishing after the finger stopped.
+const MANIFESTO_SCRUB = 0.5;
+
 type HomeExperienceProps = {
   content: HomePageContent;
   projectCount: number;
   projects: Project[];
   services: ServicePackage[];
   siteName: string;
-};
-
-const serviceIcons: Record<string, typeof icons.portrait> = {
-  "portrait-session": icons.portrait,
-  "couple-and-engagement": icons.userGroup,
-  "wedding-session": icons.ring,
-  "family-session": icons.family,
-  "graduation-session": icons.graduation,
 };
 
 export function HomeExperience({
@@ -84,9 +85,14 @@ export function HomeExperience({
               scrollTrigger: {
                 trigger: "[data-manifesto]",
                 start: "top top",
-                end: "+=160%",
+                end: MANIFESTO_PIN_DISTANCE,
                 pin: true,
-                scrub: 1,
+                // Pin a touch early. ScrollTrigger switches the section to
+                // position: fixed from JS, a frame behind the browser's own
+                // scrolling, so on a fast flick the dark section has already
+                // slid up by the time it pins and the page shows through below.
+                anticipatePin: 1,
+                scrub: MANIFESTO_SCRUB,
               },
             })
             .to(
@@ -373,7 +379,7 @@ export function HomeExperience({
             <Button
               href={content.heroCtaHref}
               size="medium"
-              variant="secondary"
+              variant="primary"
               withIcon
             >
               {content.heroCtaLabel}
@@ -382,7 +388,11 @@ export function HomeExperience({
         </div>
       </section>
 
-      <section className={styles["manifesto"]} data-manifesto>
+      <section
+        className={styles["manifesto"]}
+        data-manifesto
+        data-scroll-to-top-after
+      >
         <div className={styles["manifesto__words"]} aria-hidden="true">
           <span data-manifesto-word="light">{content.manifestoWords[0]}</span>
           <span data-manifesto-word="memory">{content.manifestoWords[1]}</span>
@@ -458,41 +468,32 @@ export function HomeExperience({
           <span className={styles["section-marker"]} aria-hidden="true" />
         </div>
         <div className={styles["services__track"]} data-service-track>
-          {services.map((service) => (
+          {services.map((service, index) => (
             <article
-              className={styles["service-card"]}
+              className={styles["service-item"]}
               data-service-reveal
               key={service.id}
             >
-              <Icon
-                className={styles["service-card__icon"]}
-                decorative
-                icon={serviceIcons[service.id] ?? icons.circle}
-              />
-              <h3>{service.title}</h3>
-              <p className={styles["service-card__desc"]}>
+              <p className={styles["service-item__index"]} aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </p>
+              <h3 className={styles["service-item__title"]}>{service.title}</h3>
+              <p className={styles["service-item__desc"]}>
                 {service.description}
               </p>
-              <ul>
-                {service.features.slice(0, 5).map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              <p className={styles["service-card__price"]}>
-                From ${service.price}
-              </p>
-              <Button
-                className={styles["service-card__cta"]}
-                data-transition-label="Contact"
-                href={service.ctaHref}
-                size="small"
-                variant="primary"
-                withIcon
-              >
-                Book now
-              </Button>
             </article>
           ))}
+        </div>
+        <div className={styles["services__footer"]} data-service-reveal>
+          <Button
+            data-transition-label="Service"
+            href="/service"
+            size="large"
+            variant="secondary"
+            withIcon
+          >
+            View all services
+          </Button>
         </div>
       </section>
     </div>

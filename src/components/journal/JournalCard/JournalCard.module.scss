@@ -10,7 +10,6 @@
 
 .journal-card__media {
   overflow: hidden;
-  background: var(--color-paper-warm);
 }
 
 .journal-card__image {
@@ -18,7 +17,7 @@
   width: 100%;
   height: auto;
   aspect-ratio: var(--journal-card-image-ratio);
-  object-fit: cover;
+  object-fit: contain;
   transition: transform var(--duration-slow) var(--ease-settle);
 }
 

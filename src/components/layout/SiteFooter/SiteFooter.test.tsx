@@ -73,22 +73,10 @@ describe("SiteFooter", () => {
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
   });
 
-  it("points back to top at the shell's focusable anchor", () => {
-    // PageShell carries tabIndex={-1} on #top so focus follows the scroll.
+  it("no longer carries a back-to-top link", () => {
+    // It floats on the page instead: see ScrollToTopButton.
     render(<SiteFooter settings={settings} />);
 
-    expect(screen.getByRole("link", { name: /BACK TO TOP/ })).toHaveAttribute(
-      "href",
-      "#top",
-    );
-  });
-
-  it("hides the back-to-top arrow from assistive tech", () => {
-    const { container } = render(<SiteFooter settings={settings} />);
-
-    expect(container.querySelector("svg")).toHaveAttribute(
-      "aria-hidden",
-      "true",
-    );
+    expect(screen.queryByRole("link", { name: /back to top/i })).toBeNull();
   });
 });

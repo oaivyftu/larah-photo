@@ -7,25 +7,31 @@
 
 .about__intro {
   display: grid;
-  grid-template-columns: minmax(22rem, 0.86fr) minmax(26rem, 0.9fr);
-  gap: var(--about-intro-gap);
+  grid-template-areas:
+    "title title"
+    "copy  media";
+  grid-template-columns: minmax(0, 705fr) minmax(0, 655fr);
+  column-gap: var(--about-intro-gap);
+  row-gap: var(--about-title-gap);
   align-items: start;
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
   padding: var(--about-intro-pad-top) 0 var(--about-intro-pad-bottom);
 }
 
+/* The title spans both columns, so it sits above the copy and the portrait
+   rather than inside the copy column. */
+.about__title {
+  grid-area: title;
+}
+
 .about__copy {
   display: grid;
+  grid-area: copy;
   gap: var(--about-copy-gap);
 }
 
-.about__title {
-  margin-bottom: var(--about-title-gap);
-}
-
 .about__copy p {
-  max-width: 51rem;
   font-size: var(--about-copy-size);
   font-weight: var(--font-weight-regular);
   letter-spacing: 0;
@@ -34,18 +40,23 @@
 
 .about__media {
   position: relative;
+  grid-area: media;
   width: 100%;
-  height: auto;
-  margin-top: var(--about-media-offset);
 }
 
+/* The ratio is the frame's, not the upload's: a CMS image of any shape fills
+   the same 655 x 1060 portrait slot. */
 .about__media-visual {
+  position: relative;
   width: 100%;
+  aspect-ratio: var(--about-media-ratio);
+  overflow: hidden;
 }
 
 .about__media img {
-  object-fit: contain;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .about__media figcaption {
@@ -66,16 +77,18 @@
   display: inline-block;
 }
 
+/* Phone (and tablet): title, then portrait, then copy -- one column, 20px
+   apart. */
 @include media-max("tablet-lg") {
   .about__intro {
-    grid-template-columns: 1fr;
-    gap: var(--space-section-narrow);
+    grid-template-areas:
+      "title"
+      "media"
+      "copy";
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--about-stack-gap-phone);
     padding: var(--about-intro-pad-top-tablet) 0
       var(--about-intro-pad-bottom-tablet);
-  }
-
-  .about__media {
-    order: -1;
   }
 
   .about__media figcaption {
@@ -84,11 +97,14 @@
 }
 
 @include media-max("phone") {
-  .about__intro {
-    padding-top: var(--space-section-narrow);
+  .about__copy {
+    gap: var(--about-copy-gap-phone);
   }
 
   .about__copy p {
     font-size: var(--about-copy-size-phone);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--tracking-body);
+    line-height: var(--line-height-body);
   }
 }

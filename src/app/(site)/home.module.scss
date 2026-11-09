@@ -4,15 +4,14 @@
   --home-paper: var(--color-paper);
   --home-paper-soft: var(--color-paper);
   --home-ink: var(--color-ink);
-  --home-line: var(--color-line-soft);
   color: var(--home-ink);
   background: var(--home-paper);
   overflow: clip;
 }
 
-/* Hero — two 20px-gapped columns across the 1360px content frame. The left
-   column sets the 577px row height (logo 91 + 59 + portrait 427); the right
-   column hangs its 591px block off the right edge and top-aligns inside it. */
+/* Hero — two 20px-gapped columns across the 1440px content frame. The left
+   column sets the 601px row height (logo 91 + 56 + portrait 454); the right
+   column (a 709x418 photo, 16px, the call to action) top-aligns inside it. */
 .hero {
   display: grid;
   grid-template-columns: 670fr 669fr;
@@ -20,7 +19,7 @@
   align-items: start;
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
   margin: 0 auto;
-  padding: var(--space-block-gap) 0 var(--home-hero-pad-bottom);
+  padding: var(--home-hero-pad-top) 0 var(--home-hero-pad-bottom);
 }
 
 .hero__intro {
@@ -92,10 +91,9 @@
 
 .hero__feature {
   display: flex;
-  width: 88.34%;
   flex-direction: column;
-  gap: var(--space-block-gap);
-  justify-self: end;
+  width: 100%;
+  gap: var(--home-hero-feature-gap);
 }
 
 /* Wraps the media alone, keeping the photo its own positioning context
@@ -105,7 +103,7 @@
 }
 
 .hero__feature-media {
-  aspect-ratio: 3 / 2;
+  aspect-ratio: var(--home-hero-feature-ratio);
 }
 
 .hero__cta {
@@ -113,7 +111,7 @@
 }
 
 /* Shared section header used by "Discover more" and "Services" — both are
-   the same Header block in the design (0.5px rule, 100px padding, 20px gap). */
+   the same Header block in the design (1px warm rule, 80px padding). */
 .section-header {
   display: grid;
   justify-items: center;
@@ -132,17 +130,18 @@
   text-transform: uppercase;
 }
 
+/* 20 x 17, the Figma polygon. */
 .section-marker {
   width: 0;
   height: 0;
-  border-top: 0.8125rem solid currentColor;
-  border-right: 0.546875rem solid transparent;
-  border-left: 0.546875rem solid transparent;
+  border-top: 1.0625rem solid currentColor;
+  border-right: 0.625rem solid transparent;
+  border-left: 0.625rem solid transparent;
 }
 
 .discover {
   composes: section-header;
-  border-top: var(--divider-hairline) solid var(--color-divider);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .discover__title {
@@ -157,6 +156,13 @@
   overflow: hidden;
   background: var(--home-ink);
   color: var(--home-paper-soft);
+}
+
+/* GSAP wraps the pinned manifesto in a `.pin-spacer`. Painting it the section's
+   own colour means any frame where the pin engages late shows dark, not the
+   white page, below the section. */
+.home :global(.pin-spacer) {
+  background: var(--home-ink);
 }
 
 .manifesto__words {
@@ -221,14 +227,12 @@
   display: flex;
   justify-content: center;
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--frame-max));
-  margin: var(--home-stack-footer-offset) auto 0;
-  padding-top: var(--home-stack-footer-pad);
-  border-top: 1px solid var(--home-line);
+  margin: 0 auto;
 }
 
 .services {
   overflow: hidden;
-  border-top: var(--divider-hairline) solid var(--color-divider);
+  border-top: 1px solid var(--color-border-subtle);
   background: var(--home-paper);
   color: var(--home-ink);
 }
@@ -248,64 +252,44 @@
   column-gap: var(--home-services-column-gap);
   row-gap: var(--home-services-row-gap);
   margin: 0 auto;
-  padding: 0 0 var(--home-services-pad);
 }
 
-.service-card {
+.services__footer {
+  display: flex;
+  justify-content: center;
+  padding: var(--home-services-footer-gap) 0 var(--home-services-pad);
+}
+
+/* Index, title and description stacked 16px apart. The title is the serif
+   face in Book weight on desktop; the phone list swaps it for Bold. */
+.service-item {
   display: grid;
   min-width: 0;
   align-content: start;
-  gap: var(--space-md);
-  background: transparent;
+  gap: var(--home-services-item-gap);
 }
 
-.service-card__icon {
-  width: auto;
-  height: 1.6875rem;
+.service-item__index {
+  font-size: var(--home-services-index-size);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--home-services-index-leading);
 }
 
-.service-card h3 {
+.service-item__title {
   font-family: var(--font-serif);
-  font-size: var(--font-size-fluid-lg);
+  font-size: var(--home-services-title-size);
   font-weight: var(--font-weight-regular);
-  letter-spacing: 0;
-  line-height: var(--line-height-control);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--home-services-title-leading);
   text-transform: uppercase;
 }
 
-.service-card__desc {
-  margin-bottom: var(--space-md);
-  font-size: var(--font-size-fluid-sm);
+.service-item__desc {
+  font-size: var(--home-services-desc-size);
   font-weight: var(--font-weight-medium);
-  letter-spacing: 0;
-  line-height: var(--line-height-control);
-}
-
-.service-card ul {
-  display: grid;
-  gap: var(--space-xs);
-  border-bottom: 1px solid var(--color-line);
-  padding-bottom: var(--space-lg);
-  list-style: none;
-}
-
-.service-card li {
-  font-size: var(--font-size-fluid-base);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: 0;
-  line-height: var(--line-height-compact);
-}
-
-.service-card__price {
-  margin-top: var(--space-xs);
-  font-size: var(--font-size-fluid-sm);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-control);
-  text-transform: uppercase;
-}
-
-.service-card__cta {
-  justify-self: start;
+  letter-spacing: var(--tracking-body);
+  line-height: var(--home-services-desc-leading);
 }
 
 @include media-max("tablet-lg") {
@@ -316,7 +300,7 @@
   }
 
   .hero__logo {
-    width: min(17.0625rem, 55%);
+    display: none;
   }
 
   /* The intro now spans the full frame, so cap the portrait instead of letting
@@ -344,11 +328,7 @@
   }
 
   .services__track {
-    column-gap: var(--home-services-column-gap-tablet);
-  }
-
-  .service-card {
-    width: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -357,13 +337,26 @@
     overflow: hidden;
   }
 
-  .hero__intro-body {
-    grid-template-columns: minmax(0, 1fr);
-    align-items: start;
+  /* Figma keeps the portrait beside the tagline on a phone (181 + 9 + 160),
+     with the tagline sitting on the portrait's bottom edge. */
+  .hero__intro {
+    gap: var(--home-hero-intro-gap-phone);
   }
 
-  .hero__portrait {
-    width: min(100%, 20rem);
+  .hero__intro-body {
+    grid-template-columns: minmax(0, 181fr) minmax(0, 160fr);
+    gap: var(--home-hero-body-gap-phone);
+  }
+
+  .hero__tagline {
+    font-size: var(--font-size-sm);
+    letter-spacing: 0;
+    line-height: var(--line-height-compact);
+  }
+
+  .hero__feature {
+    width: var(--home-hero-feature-width-phone);
+    gap: var(--space-sm);
   }
 
   .manifesto {
@@ -405,18 +398,41 @@
   }
 
   .services__header {
-    padding-top: var(--space-section-narrow);
+    padding-top: var(--space-block-gap);
     padding-bottom: var(--home-services-header-pad-phone);
   }
 
+  /* One column of ruled rows: 20px above and below each, 24px between the
+     title block and the description. */
   .services__track {
     grid-template-columns: 1fr;
-    gap: var(--space-2xl);
-    padding-bottom: var(--space-3xl);
+    gap: 0;
   }
 
-  .service-card {
-    min-height: 0;
+  .service-item {
+    gap: var(--home-services-row-gap-phone);
+    padding: var(--home-services-row-pad-phone) 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .service-item__index {
+    letter-spacing: 0;
+    line-height: var(--line-height-loose);
+  }
+
+  .service-item__title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0;
+    line-height: var(--line-height-body);
+  }
+
+  .service-item__desc {
+    font-size: var(--home-services-desc-size-phone);
+  }
+
+  .services__footer {
+    padding: var(--space-block-gap) 0 var(--space-2xl);
   }
 }
 
