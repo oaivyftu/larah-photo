@@ -112,8 +112,8 @@
 }
 
 /* Phone: Figma's header is one 75px row -- logo left, hamburger right -- with
-   the links in a panel under it. The home hero carries its own logo mark, so
-   the brand goes back to hidden there. */
+   the links in a panel under it. The home hero drops its own logo mark at this
+   width, so the header brand stays visible on home too. */
 @include media-max("phone") {
   .site-header {
     min-height: var(--header-height-phone);
@@ -125,9 +125,5 @@
   .site-header__brand {
     position: relative;
     z-index: 2;
-  }
-
-  .site-header__brand--hidden {
-    visibility: hidden;
   }
 }
