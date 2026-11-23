@@ -676,10 +676,6 @@ const journalPostDoc = () => ({
 const journalPageDoc = {
   titleWords: ["The", "Journal"],
   emptyStateMessage: "New stories are on their way.",
-  ctaHeading: "Planning something here?",
-  ctaBody: "Tell me about it.",
-  ctaContactLabel: "Get in touch",
-  ctaWorkLabel: "See the work",
 };
 
 describe("getJournalPage", () => {
@@ -690,12 +686,6 @@ describe("getJournalPage", () => {
     await expect(getJournalPage()).resolves.toEqual({
       titleWords: ["The", "Journal"],
       emptyStateMessage: "New stories are on their way.",
-      cta: {
-        heading: "Planning something here?",
-        body: "Tell me about it.",
-        contactLabel: "Get in touch",
-        workLabel: "See the work",
-      },
     });
   });
 
@@ -708,18 +698,15 @@ describe("getJournalPage", () => {
     );
   });
 
-  it.each([
-    "emptyStateMessage",
-    "ctaHeading",
-    "ctaBody",
-    "ctaContactLabel",
-    "ctaWorkLabel",
-  ])("raises, naming the field, when %s is blank", async (field) => {
-    fetchMock.mockResolvedValue({ ...journalPageDoc, [field]: "   " });
-    const { getJournalPage } = await loadFetchers();
+  it.each(["emptyStateMessage"])(
+    "raises, naming the field, when %s is blank",
+    async (field) => {
+      fetchMock.mockResolvedValue({ ...journalPageDoc, [field]: "   " });
+      const { getJournalPage } = await loadFetchers();
 
-    await expect(getJournalPage()).rejects.toThrow(`journalPage.${field}`);
-  });
+      await expect(getJournalPage()).rejects.toThrow(`journalPage.${field}`);
+    },
+  );
 
   it("raises when titleWords is missing", async () => {
     fetchMock.mockResolvedValue({ ...journalPageDoc, titleWords: undefined });

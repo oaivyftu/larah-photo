@@ -57,12 +57,8 @@ query time, so nothing has to write it, and nothing can leave it stale
 | ------------------- | --------------- | -------- | --------------------------------------------------------- | ---------- |
 | `titleWords`        | `array<string>` | yes      | reuses the shared `titleWordsField`; drives `PageHeading` | FR-006     |
 | `emptyStateMessage` | `text`          | yes      | shown when no post is live                                | FR-006/015 |
-| `ctaHeading`        | `string`        | yes      | end-of-post call to action                                | FR-006/011 |
-| `ctaBody`           | `text`          | yes      | supporting line                                           | FR-006/011 |
-| `ctaContactLabel`   | `string`        | yes      | link text to `/contact`                                   | FR-011     |
-| `ctaWorkLabel`      | `string`        | yes      | link text to `/work`                                      | FR-011     |
 
-All six are required: a missing one is a content error, not a silent default
+Both are required: a missing one is a content error, not a silent default
 (Principle I, FR-025). The destinations `/contact` and `/work` are structural
 and stay in code — only the wording is editor-owned.
 
@@ -126,12 +122,6 @@ export type JournalPost = JournalPostSummary & {
 export type JournalPageContent = {
   titleWords: string[];
   emptyStateMessage: string;
-  cta: {
-    heading: string;
-    body: string;
-    contactLabel: string;
-    workLabel: string;
-  };
 };
 ```
 
@@ -154,7 +144,7 @@ fragment so a new query cannot omit it.
 
 | Query                    | Returns                                               | Used by                                   |
 | ------------------------ | ----------------------------------------------------- | ----------------------------------------- |
-| `journalPageQuery`       | the singleton                                         | listing, post CTA                         |
+| `journalPageQuery`       | the singleton                                         | listing                                   |
 | `journalPostsQuery`      | summaries, `order(publishedAt desc, _createdAt desc)` | listing, sitemap, listing structured data |
 | `journalPostBySlugQuery` | one full post, or null                                | post page, `generateMetadata`             |
 | `journalPostSlugsQuery`  | live slugs only                                       | `generateStaticParams`, sitemap           |

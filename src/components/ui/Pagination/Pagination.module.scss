@@ -1,0 +1,75 @@
+@use "@/styles/mixins" as *;
+
+.pagination {
+  padding-top: var(--pagination-pad-top);
+  color: var(--color-ink);
+}
+
+.pagination__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pagination-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pagination__link,
+.pagination__gap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--pagination-item-size);
+  min-height: var(--pagination-item-size);
+  padding: 0 var(--pagination-item-pad);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-label);
+  line-height: var(--line-height-control);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.pagination__link {
+  border: 1px solid var(--color-line-soft);
+  border-radius: 2rem;
+  color: var(--color-ink);
+  text-decoration: none;
+  background: transparent;
+  transition:
+    color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    background-color var(--duration-fast) ease;
+}
+
+.pagination__link--current {
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+  background: var(--color-ink);
+}
+
+.pagination__link:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 0.25rem;
+}
+
+@include hover-fine {
+  a.pagination__link:hover {
+    border-color: var(--color-ink);
+    color: var(--color-paper);
+    background: var(--color-ink);
+  }
+}
+
+@include reduced-motion {
+  .pagination__link {
+    transition: none;
+  }
+}
+
+@include forced-colors {
+  .pagination__link--current {
+    outline: 2px solid;
+  }
+}

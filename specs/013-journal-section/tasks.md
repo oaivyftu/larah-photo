@@ -8,6 +8,8 @@ description: "Task list for the Journal section"
 
 **Prerequisites**: [plan.md](./plan.md), [spec.md](./spec.md), [research.md](./research.md), [data-model.md](./data-model.md), [contracts/](./contracts/), [quickstart.md](./quickstart.md)
 
+**Amendment (end-of-post CTA removed)**: T010, T014, T018, T026, T027 and T052 below describe the end-of-post call to action (`JournalCta`, the four `cta*` settings fields, the `postLeadsToContact` journey). That block has since been removed from the site, the schema, the fetcher and the tests; the entries are kept as history. FR-011 and SC-006 are withdrawn in spec.md.
+
 **Tests**: Included, and not optional here. Constitution Principle V names
 Sanity content-error handling as a critical flow that must have automated
 coverage before it ships, and research.md §8 sets out the three layers (unit,
@@ -217,6 +219,25 @@ every gate the hooks will run.
   - _Done 2026-09-19._ `npm run lint`, `typecheck`, `audit:design-system`, `npm test` (689 tests) and `npm run build` all pass, the build having been blocked until T014 published the Journal page. `.husky/pre-push` re-runs all of them, plus the browser suite (T054), when this branch is pushed.
   - _Status 2026-09-18:_ lint, typecheck, `audit:design-system` and `npm test` (689 tests) all pass. `npm run build` fails at exactly one place, prerendering `/journal`, with `Sanity document "journalPage" is required.` That is Principle I doing its job, and it clears once T014 is done.
 - [ ] T060 Run every scenario in `specs/013-journal-section/quickstart.md` end to end, and put one live post URL through Google's Rich Results Test (SC-003); record the results at the bottom of `specs/013-journal-section/quickstart.md`.
+
+---
+
+## Phase 8: Pagination (amendment 2026-11-22)
+
+**Purpose**: With about seventy live posts a single listing is too long, so
+FR-016 now paginates it at twelve per page (spec Clarifications, 2026-11-22).
+Same rules as before: read `AGENTS.md`, search `src/components/ui/` first, zero
+literals in `*.module.scss`, and read the Next.js docs under
+`node_modules/next/dist/docs/` before writing route code.
+
+- [x] T061 [P] Write `src/utils/journalPagination.test.ts`, then `src/utils/journalPagination.ts`: `pageCount` (never below 1), `paginate` (the slice for a page, empty past the end), `parsePageNumber` (positive integers only; `"02"`, `"1.5"`, `"0"`, `"abc"`, `""` and unsafe integers give `null`) and `journalPagePath` (`/journal` for page 1, `/journal/page/<n>` after). Add `JOURNAL_PAGE_SIZE = 12` in `src/constants/journal.ts`.
+- [x] T062 [P] Write `src/components/ui/Pagination/Pagination.test.tsx`, then the component and its stylesheet: a labelled `<nav>` of real links with previous/next, numbered pages with an ellipsis for long runs, the current page as `aria-current="page"` and not a link, and nothing rendered for one page. Add `--pagination-*` tokens to `src/styles/_tokens.scss`.
+- [x] T063 [P] Extend `src/utils/structuredData.test.ts`, then `buildJournalCollectionSchema`, to take the page number: URL and name for that page, item positions counted across the whole journal.
+- [x] T064 Extend `src/app/(site)/journal/page.test.tsx` and add `src/app/(site)/journal/page/[page]/page.test.tsx`: only twelve cards per page; later pages offer previous and next; page 1 redirects; bad or too-large numbers are not found and not indexable; each page's own canonical, title and JSON-LD.
+- [x] T065 Implement the shared view in `src/app/(site)/journal/journalIndex.tsx`, wire `page.tsx` to it for page 1 and add `page/[page]/page.tsx` for the rest (`generateStaticParams` for pages 2 to the last). Pass the pager to `JournalListClient`.
+- [x] T066 [P] Add the later listing pages to `src/app/sitemap.ts` and update the sitemap suite in `src/app/seo-routes.test.ts`.
+- [x] T067 Add a browser journey to `e2e/journeys/journal.ts` and `e2e/journal.spec.ts`: from the index follow the pager to the next page and back, the page is marked current, the Journal nav item stays current. It skips, not fails, when the dataset has one page.
+- [x] T068 Run every gate: `npm run lint`, `typecheck`, `audit:design-system`, `npm test`, `npm run build`, and `PORT=3100 E2E_FRESH_BUILD=1 npm run test:e2e`. Update the 013 entry in `specs/README.md`.
 
 ---
 

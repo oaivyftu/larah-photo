@@ -9,10 +9,16 @@ browser, and most of it is asserted in `src/app/seo-routes.test.ts`'s style.
 
 ## Routes
 
-| Route             | Renders                                   | Shell variant | Not-found when                          |
-| ----------------- | ----------------------------------------- | ------------- | --------------------------------------- |
-| `/journal`        | listing, newest first, or the empty state | `journal`     | never (an empty journal is valid)       |
-| `/journal/[slug]` | one post                                  | `journalPost` | slug unknown, unpublished, or scheduled |
+| Route               | Renders                                         | Shell variant | Not-found when                                    |
+| ------------------- | ----------------------------------------------- | ------------- | ------------------------------------------------- |
+| `/journal`          | page 1 of the listing, or the empty state       | `journal`     | never (an empty journal is valid)                 |
+| `/journal/page/[n]` | page _n_ of the listing (twelve posts per page) | `journal`     | _n_ not a positive integer, or past the last page |
+| `/journal/[slug]`   | one post                                        | `journalPost` | slug unknown, unpublished, or scheduled           |
+
+`/journal/page/1` redirects permanently to `/journal` (FR-016a). `page` is a
+literal segment of its own, so it never collides with `[slug]` — a one-segment
+path — and `generateStaticParams` for the page route returns pages 2 to the
+current last page.
 
 Both prerender and refresh on the existing hourly ISR under the shared `sanity`
 cache tag. `generateStaticParams` returns live slugs only; `dynamicParams` keeps
@@ -27,6 +33,7 @@ navigation marks the section as current on the listing and on every post
 | Route             | Title                                         | Description                                           | Canonical         | OG image                                   |
 | ----------------- | --------------------------------------------- | ----------------------------------------------------- | ----------------- | ------------------------------------------ |
 | `/journal`        | "Journal"                                     | derived, naming the studio's location                 | `/journal`        | newest post's cover, else the site default |
+| `/journal/page/n` | "Journal — Page n"                            | the same, plus "Page n of N."                         | `/journal/page/n` | cover of the newest post on that page      |
 | `/journal/[slug]` | `seoTitle` if set and non-blank, else `title` | `seoDescription` if set and non-blank, else `excerpt` | `/journal/<slug>` | the post's cover, via `toOpenGraphImage`   |
 
 Blank-after-trim overrides count as unset (spec Edge Cases). A slug that
@@ -38,10 +45,11 @@ no second way to build metadata.
 
 ## Structured data
 
-| Route             | Emits                                                                  |
-| ----------------- | ---------------------------------------------------------------------- |
-| `/journal`        | `CollectionPage` + `ItemList` of live posts; breadcrumb Home › Journal |
-| `/journal/[slug]` | `BlogPosting`; breadcrumb Home › Journal › post title                  |
+| Route             | Emits                                                                                                    |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| `/journal`        | `CollectionPage` + `ItemList` of live posts; breadcrumb Home › Journal                                   |
+| `/journal/page/n` | the same for that page's posts, positions counted across the journal; breadcrumb Home › Journal › Page n |
+| `/journal/[slug]` | `BlogPosting`; breadcrumb Home › Journal › post title                                                    |
 
 `BlogPosting` carries `headline`, `description`, `image`, `datePublished`
 (the authored date), `dateModified` (`_updatedAt`), `author` and `publisher` as
@@ -55,7 +63,8 @@ reuse `compact()`, so no empty property is ever claimed (SC-003).
 
 ## Sitemap
 
-`src/app/sitemap.ts` gains `/journal` plus one entry per live post:
+`src/app/sitemap.ts` gains `/journal`, one entry for each later listing page,
+and one entry per live post:
 
 ```text
 { url: absoluteUrl(`/journal/${slug}`),

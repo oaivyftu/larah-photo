@@ -115,11 +115,6 @@ Add a Journal entry to the primary navigation in site settings.
 and a post page. Until it is added, the section is still reachable by URL and
 sitemap — a valid state (FR-024).
 
-Finally, check the end of the post.
-
-**Expect**: the call-to-action's two links reach `/contact` and `/work` in one
-activation, using the wording from Journal page settings. (FR-011, SC-006)
-
 ---
 
 ## Scenario 6 — The gates

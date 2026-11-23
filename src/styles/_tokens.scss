@@ -191,7 +191,6 @@
   --journal-h2-size: clamp(1.5rem, 2.2vw, 2.25rem);
   --journal-h3-size: clamp(1.25rem, 1.6vw, 1.625rem);
   --journal-quote-size: clamp(1.5rem, 2.4vw, 2.5rem);
-  --journal-cta-heading-size: clamp(1.75rem, 3vw, 3rem);
   --journal-card-title-size: clamp(1.25rem, 1.6vw, 1.75rem);
 
   --line-height-tight: 1;
@@ -585,8 +584,6 @@
   /* Maps read better closer to square than video does. */
   --journal-embed-ratio-video: 16 / 9;
   --journal-embed-ratio-map: 4 / 3;
-  --journal-cta-pad: clamp(2.5rem, 5vw, 4.5rem);
-  --journal-cta-gap: clamp(1rem, 1.6vw, 1.5rem);
 
   /* Journal index (spec 013). */
   --journal-index-pad-top: clamp(1.5rem, 3vw, 3rem);
@@ -597,4 +594,10 @@
   --journal-card-gap: clamp(0.6rem, 1vw, 0.9rem);
   --journal-card-image-ratio: 3 / 2;
   --journal-empty-pad: clamp(3rem, 6vw, 6rem);
+
+  /* Pagination control (spec 013 FR-016b). */
+  --pagination-pad-top: clamp(3rem, 6vw, 5rem);
+  --pagination-gap: clamp(0.4rem, 1vw, 0.75rem);
+  --pagination-item-size: 2.75rem;
+  --pagination-item-pad: var(--space-sm);
 }

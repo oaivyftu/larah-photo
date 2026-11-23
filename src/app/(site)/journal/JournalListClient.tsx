@@ -2,20 +2,30 @@
 
 import { JournalCard } from "@/components/journal/JournalCard/JournalCard";
 import { PageHeading } from "@/components/ui/PageHeading/PageHeading";
+import { Pagination } from "@/components/ui/Pagination/Pagination";
 import type { JournalPageContent, JournalPostSummary } from "@/types/journal";
+import { journalPagePath } from "@/utils/journalPagination";
 import { usePageIntro } from "@/utils/usePageIntro";
 import styles from "./journal.module.scss";
 
 type JournalListClientProps = {
   content: JournalPageContent;
+  /** The posts on this page only; the route has already sliced them. */
   posts: JournalPostSummary[];
+  currentPage: number;
+  totalPages: number;
 };
 
 /** How many cards load eagerly: the first row on a laptop, which is what a
  *  visitor sees without scrolling. The rest are lazy (FR-028). */
 const EAGER_CARDS = 3;
 
-export function JournalListClient({ content, posts }: JournalListClientProps) {
+export function JournalListClient({
+  content,
+  posts,
+  currentPage,
+  totalPages,
+}: JournalListClientProps) {
   const rootRef = usePageIntro<HTMLDivElement>((intro) => {
     intro.from(
       "[data-journal-card], [data-journal-empty]",
@@ -58,6 +68,13 @@ export function JournalListClient({ content, posts }: JournalListClientProps) {
           {content.emptyStateMessage}
         </p>
       )}
+
+      <Pagination
+        currentPage={currentPage}
+        hrefForPage={journalPagePath}
+        label="Journal pages"
+        totalPages={totalPages}
+      />
     </div>
   );
 }

@@ -48,24 +48,6 @@ export async function indexOpensPost(page: Page) {
   ).toBeVisible();
 }
 
-/** From the end of a post, the contact page is one activation away (FR-011, SC-006). */
-export async function postLeadsToContact(page: Page) {
-  const href = await requirePost(page);
-
-  await page.goto(href);
-
-  await page
-    .locator("[data-journal-cta]")
-    .locator('a[href="/contact"]')
-    .click();
-
-  await expect(
-    page,
-    "the call to action should reach the contact page",
-  ).toHaveURL(/\/contact$/);
-  await expectNavigationSettled(page);
-}
-
 /** The Journal nav item is current on the index and on a post (FR-024). */
 export async function journalMarkedCurrent(page: Page) {
   const href = await requirePost(page);
@@ -103,4 +85,72 @@ export async function emptyJournalRenders(page: Page) {
     empty,
     "an empty journal should show the editor's message",
   ).toBeVisible();
+}
+
+/** The listing's pager, found by its landmark name (spec 013 FR-016b). */
+function pager(page: Page) {
+  return page.getByRole("navigation", { name: "Journal pages" });
+}
+
+/**
+ * With more than one page, the pager leads to the next page and back, the page
+ * is marked current, and the Journal nav item stays current (FR-016b, FR-024).
+ * Skipped, not failed, while the journal fits on one page.
+ */
+export async function pagerWalksTheListing(page: Page) {
+  await openJournalIndex(page);
+
+  test.skip(
+    (await pager(page).count()) === 0,
+    "The journal fits on one page, so there is no pager to walk.",
+  );
+
+  await pager(page).getByRole("link", { name: "Next page" }).click();
+
+  await expect(page, "Next should open page 2 of the listing").toHaveURL(
+    /\/journal\/page\/2$/,
+  );
+  await expectNavigationSettled(page);
+  await expect(
+    page.locator("[data-journal-card]").first(),
+    "page 2 should show posts, not still be behind the curtain",
+  ).toBeVisible();
+  await expect(
+    pager(page).locator('[aria-current="page"]'),
+    "the pager should mark page 2 as current",
+  ).toHaveText("2");
+
+  if ((await journalNavLink(page).count()) > 0) {
+    await expect(
+      journalNavLink(page),
+      "the Journal item should stay current on a later page",
+    ).toHaveAttribute("aria-current", "page");
+  }
+
+  await pager(page).getByRole("link", { name: "Previous page" }).click();
+
+  await expect(
+    page,
+    "Previous from page 2 should return to /journal",
+  ).toHaveURL(/\/journal$/);
+  await expectNavigationSettled(page);
+}
+
+/** Page 1 has one address: /journal/page/1 sends the reader to /journal (FR-016a). */
+export async function pageOneHasOneAddress(page: Page) {
+  await page.goto("/journal/page/1");
+
+  await expect(page, "page 1 should live at /journal only").toHaveURL(
+    /\/journal$/,
+  );
+}
+
+/** A page past the end is a real 404, not an empty listing (FR-016a). */
+export async function pageBeyondTheEndIsNotFound(page: Page) {
+  const response = await page.goto("/journal/page/9999");
+
+  expect(
+    response?.status(),
+    "a page that does not exist should answer 404",
+  ).toBe(404);
 }

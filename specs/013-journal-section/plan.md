@@ -61,7 +61,9 @@ layer: new values become `--journal-*` tokens before they are used, and
 `npm run audit:design-system` must exit 0. Scheduling is approximate by
 construction — bounded by the hourly revalidate, which is what SC-002 states.
 
-**Scale/Scope**: a couple of posts a month; single unpaginated listing. Roughly
+**Scale/Scope**: a couple of posts a month at first, then about seventy within
+three months (2026-11-22 amendment), so the listing is paginated at twelve per
+page — see FR-016. Originally a single unpaginated listing. Roughly
 two routes, two schema types, three Portable Text members, four fetchers, two
 structured-data builders, one sitemap change, one `PageShell` variant pair, one
 new token family, and the test files for each.
@@ -122,8 +124,7 @@ src/
 ├── components/journal/               # composes ui/ primitives, adds no duplicates
 │   ├── JournalCard/
 │   ├── JournalBody/                  # PortableText component map
-│   ├── JournalEmbed/
-│   └── JournalCta/
+│   └── JournalEmbed/
 ├── components/layout/PageShell/PageShell.tsx   # + journal, journalPost variants
 ├── constants/journalCategories.ts    # imported by schema AND fetcher
 ├── sanity/

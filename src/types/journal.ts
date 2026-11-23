@@ -50,10 +50,4 @@ export type JournalPost = JournalPostSummary & {
 export type JournalPageContent = {
   titleWords: string[];
   emptyStateMessage: string;
-  cta: {
-    heading: string;
-    body: string;
-    contactLabel: string;
-    workLabel: string;
-  };
 };

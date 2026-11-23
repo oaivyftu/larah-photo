@@ -114,11 +114,7 @@ export const projectSlugsQuery = `*[_type == "workProject" && defined(slug.curre
 
 export const journalPageQuery = `*[_type == "journalPage"][0]{
   titleWords,
-  emptyStateMessage,
-  ctaHeading,
-  ctaBody,
-  ctaContactLabel,
-  ctaWorkLabel
+  emptyStateMessage
 }`;
 
 /**
