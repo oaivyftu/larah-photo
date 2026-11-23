@@ -218,6 +218,30 @@ describe("sitemap: journal posts", () => {
     expect(entry?.lastModified).toEqual(new Date("2026-09-10T12:00:00.000Z"));
   });
 
+  it("lists the listing's later pages once there are more posts than fit on one", async () => {
+    // Twenty-six posts: pages of 12, 12 and 2 (spec 013 FR-016, FR-021).
+    getJournalPosts.mockResolvedValue(
+      Array.from({ length: 26 }, (_, index) => journalPost(`post-${index}`)),
+    );
+    const { default: sitemap } = await import("./sitemap");
+
+    const urls = (await sitemap()).map((entry) => entry.url);
+
+    expect(urls).toContain("https://larah.photo/journal/page/2");
+    expect(urls).toContain("https://larah.photo/journal/page/3");
+    expect(urls).not.toContain("https://larah.photo/journal/page/4");
+    expect(urls).not.toContain("https://larah.photo/journal/page/1");
+  });
+
+  it("lists no later page while everything fits on one", async () => {
+    getJournalPosts.mockResolvedValue([journalPost("springbank-guide")]);
+    const { default: sitemap } = await import("./sitemap");
+
+    const urls = (await sitemap()).map((entry) => entry.url);
+
+    expect(urls.some((url) => url.includes("/journal/page/"))).toBe(false);
+  });
+
   it("lists the journal itself even when no post is live", async () => {
     // An empty journal is a valid state, not a missing page (spec 013 Edge
     // Cases), so its index stays discoverable.

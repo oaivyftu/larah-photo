@@ -17,7 +17,6 @@ attributes second, never a CSS-module class name, never text copy, never
 | `data-journal-card`    | each listing entry                  | "this is one post's card"   |
 | `data-journal-empty`   | the empty-state region              | "no posts are live"         |
 | `data-journal-article` | the post page's article element     | "this is the post body"     |
-| `data-journal-cta`     | the end-of-post call to action      | "this is the onward path"   |
 | `data-journal-embed`   | each embed figure (value: provider) | "this is an embed, from X"  |
 
 No state mirrors: nothing here encodes scheduled-ness, an index, or a count.

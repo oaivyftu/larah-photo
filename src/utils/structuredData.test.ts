@@ -576,4 +576,31 @@ describe("buildJournalCollectionSchema", () => {
       itemListElement: [],
     });
   });
+
+  describe("on a later page", () => {
+    it("is its own page of the collection, at its own address", () => {
+      expect(buildJournalCollectionSchema(posts, { page: 2 })).toMatchObject({
+        "@type": "CollectionPage",
+        url: absoluteUrl("/journal/page/2"),
+        name: expect.stringContaining("page 2"),
+      });
+    });
+
+    it("counts positions across the whole journal, not from 1 again", () => {
+      expect(
+        buildJournalCollectionSchema(posts, { page: 3, pageSize: 12 })[
+          "mainEntity"
+        ],
+      ).toMatchObject({
+        numberOfItems: 2,
+        itemListElement: [{ position: 25 }, { position: 26 }],
+      });
+    });
+
+    it("leaves page 1 exactly as it was", () => {
+      expect(buildJournalCollectionSchema(posts, { page: 1 })).toEqual(
+        buildJournalCollectionSchema(posts),
+      );
+    });
+  });
 });

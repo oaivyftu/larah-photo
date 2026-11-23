@@ -1,5 +1,7 @@
+import { JOURNAL_PAGE_SIZE } from "@/constants/journal";
 import { absoluteUrl, siteDescription, siteName } from "@/constants/seo";
 import { toBusinessImageUrls } from "@/sanity/image";
+import { journalPagePath } from "@/utils/journalPagination";
 import type { JournalPost, JournalPostSummary } from "@/types/journal";
 import type { Project } from "@/types/project";
 import type { ServicePackage } from "@/types/service";
@@ -278,12 +280,21 @@ export function buildProjectSchema(project: Project): JsonLdGraph {
  */
 export function buildJournalCollectionSchema(
   posts: Pick<JournalPostSummary, "slug" | "title">[],
+  { page = 1, pageSize = JOURNAL_PAGE_SIZE } = {},
 ): JsonLdGraph {
+  // `posts` is one page's worth. Positions are counted across the whole
+  // journal, so page 2 starts at 13 rather than claiming to be a second list
+  // that begins again at 1.
+  const offset = (page - 1) * pageSize;
+
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: `Journal by ${siteName}`,
-    url: absoluteUrl("/journal"),
+    name:
+      page > 1
+        ? `Journal by ${siteName} — page ${page}`
+        : `Journal by ${siteName}`,
+    url: absoluteUrl(journalPagePath(page)),
     inLanguage: "en",
     isPartOf: { "@id": websiteId },
     about: { "@id": businessId },
@@ -292,7 +303,7 @@ export function buildJournalCollectionSchema(
       numberOfItems: posts.length,
       itemListElement: posts.map((post, index) => ({
         "@type": "ListItem",
-        position: index + 1,
+        position: offset + index + 1,
         name: post.title,
         url: absoluteUrl(`/journal/${post.slug}`),
       })),

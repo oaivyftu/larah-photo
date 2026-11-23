@@ -73,6 +73,10 @@ These are specified _before_ being built, so they carry the full artifact set:
   webhook fixed: the Studio walkthrough (T038), the quickstart scenarios (T060),
   the browser suite's journal journeys running against a real post (T054), and
   the revalidation webhook, which returns 500 (T037, not journal-specific).
+  Amended 2026-11-22 (Phase 8, T061–T068, all done): the listing is paginated
+  at twelve posts per page — `/journal` is page 1, later pages live at
+  `/journal/page/<n>` — because the journal grew to about seventy posts. This
+  reverses the original "single unpaginated page" decision (FR-016).
 
 ## Targeting a feature
 

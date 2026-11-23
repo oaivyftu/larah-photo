@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { JournalPageContent, JournalPost } from "@/types/journal";
+import type { JournalPost } from "@/types/journal";
 
 // The post route, called and awaited like `work/[slug]/page.test.tsx` does.
 // That file only checks an element comes back; this one renders it, because
@@ -15,7 +15,6 @@ import type { JournalPageContent, JournalPost } from "@/types/journal";
 const getJournalPostBySlug =
   vi.fn<(slug: string) => Promise<JournalPost | null>>();
 const getJournalPostSlugs = vi.fn<() => Promise<string[]>>();
-const getJournalPage = vi.fn<() => Promise<JournalPageContent>>();
 const shellVariant = vi.fn<(variant: string) => void>();
 const notFound = vi.fn(() => {
   throw new Error("NEXT_NOT_FOUND");
@@ -24,7 +23,6 @@ const notFound = vi.fn(() => {
 vi.mock("@/sanity/fetchers", () => ({
   getJournalPostBySlug: (slug: string) => getJournalPostBySlug(slug),
   getJournalPostSlugs: () => getJournalPostSlugs(),
-  getJournalPage: () => getJournalPage(),
 }));
 
 vi.mock("next/navigation", () => ({ notFound: () => notFound() }));
@@ -70,25 +68,12 @@ const post: JournalPost = {
   ],
 };
 
-const journalPage: JournalPageContent = {
-  titleWords: ["The", "Journal"],
-  emptyStateMessage: "New stories are on their way.",
-  cta: {
-    heading: "Planning something here?",
-    body: "Tell me about it.",
-    contactLabel: "Get in touch",
-    workLabel: "See the work",
-  },
-};
-
 function params(slug: string) {
   return { params: Promise.resolve({ slug }) };
 }
 
 beforeEach(() => {
   getJournalPostBySlug.mockReset();
-  getJournalPage.mockReset();
-  getJournalPage.mockResolvedValue(journalPage);
   shellVariant.mockReset();
   notFound.mockClear();
 });
@@ -125,17 +110,6 @@ describe("journal post page", () => {
     expect(notFound).not.toHaveBeenCalled();
   });
 
-  it("raises when the journal settings are missing, as the CTA needs them", async () => {
-    getJournalPostBySlug.mockResolvedValue(post);
-    getJournalPage.mockRejectedValue(
-      new Error('Sanity document "journalPage" is required.'),
-    );
-
-    await expect(page.default(params(post.slug))).rejects.toThrow(
-      "journalPage",
-    );
-  });
-
   it("gives the title the page's only h1, above the body's own headings", async () => {
     await renderPost();
 
@@ -143,10 +117,10 @@ describe("journal post page", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       post.title,
     );
-    // The body's own headings and the call to action's both sit beneath it.
+    // The body's own headings sit beneath it.
     expect(
       screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent),
-    ).toEqual(["Go early", "Planning something here?"]);
+    ).toEqual(["Go early"]);
   });
 
   it("shows the date as a date, the place and the category", async () => {
@@ -163,21 +137,6 @@ describe("journal post page", () => {
     await renderPost();
 
     expect(screen.getByAltText(post.coverImage.alt)).toBeInTheDocument();
-  });
-
-  it("ends with a way on to the contact page and the work, in the editor's words", async () => {
-    const { container } = await renderPost();
-
-    const cta = container.querySelector("[data-journal-cta]");
-    expect(cta).toHaveTextContent("Planning something here?");
-    expect(screen.getByRole("link", { name: /Get in touch/ })).toHaveAttribute(
-      "href",
-      "/contact",
-    );
-    expect(screen.getByRole("link", { name: /See the work/ })).toHaveAttribute(
-      "href",
-      "/work",
-    );
   });
 
   it("asks the shell to mark the journal as the current section", async () => {

@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JournalBody } from "@/components/journal/JournalBody/JournalBody";
-import { JournalCta } from "@/components/journal/JournalCta/JournalCta";
 import { PageShell } from "@/components/layout/PageShell/PageShell";
 import { LarahImage } from "@/components/media/LarahImage/LarahImage";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { pageMetadata } from "@/constants/seo";
-import {
-  getJournalPage,
-  getJournalPostBySlug,
-  getJournalPostSlugs,
-} from "@/sanity/fetchers";
+import { getJournalPostBySlug, getJournalPostSlugs } from "@/sanity/fetchers";
 import { toOpenGraphImage } from "@/sanity/image";
 import { formatJournalDate } from "@/utils/journalDate";
 import {
@@ -74,11 +69,6 @@ export default async function JournalPostPage({
     notFound();
   }
 
-  // After the 404 check, so an unknown slug never pays for the settings read,
-  // and before rendering, so missing settings raise rather than rendering a
-  // post with no way on (FR-025).
-  const journalPage = await getJournalPage();
-
   return (
     <PageShell variant="journalPost">
       <JsonLd data={buildJournalPostSchema(post)} />
@@ -119,7 +109,6 @@ export default async function JournalPostPage({
         </figure>
 
         <JournalBody body={post.body} />
-        <JournalCta cta={journalPage.cta} />
       </JournalPostClient>
     </PageShell>
   );

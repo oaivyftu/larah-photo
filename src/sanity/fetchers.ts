@@ -123,10 +123,6 @@ type SanityProject = {
 type SanityJournalPage = {
   titleWords?: string[];
   emptyStateMessage?: string;
-  ctaHeading?: string;
-  ctaBody?: string;
-  ctaContactLabel?: string;
-  ctaWorkLabel?: string;
 };
 
 type SanityJournalBodyMember =
@@ -571,15 +567,6 @@ export async function getJournalPage(): Promise<JournalPageContent> {
       page.emptyStateMessage,
       "journalPage.emptyStateMessage",
     ),
-    cta: {
-      heading: requireString(page.ctaHeading, "journalPage.ctaHeading"),
-      body: requireString(page.ctaBody, "journalPage.ctaBody"),
-      contactLabel: requireString(
-        page.ctaContactLabel,
-        "journalPage.ctaContactLabel",
-      ),
-      workLabel: requireString(page.ctaWorkLabel, "journalPage.ctaWorkLabel"),
-    },
   };
 }
 

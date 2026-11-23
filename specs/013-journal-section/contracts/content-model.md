@@ -10,15 +10,15 @@ blocks a publish, what merely advises, and what the editor sees.
 
 ## Blocks publishing (validation errors)
 
-| Condition                                            | Message the editor should see                                                | Source  |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------- | ------- |
-| Any required field empty                             | the field's own required message                                             | FR-004  |
-| A slug already used by another post                  | "Slug is already in use" — Sanity's built-in slug check, not duplicated here | FR-001  |
-| An inline image with no alt text                     | "Alt text is required."                                                      | FR-002a |
-| An embed URL outside the allow-list                  | names the three accepted providers                                           | FR-002b |
-| An embed with no description                         | "Describe what this embed shows."                                            | FR-002c |
-| A link annotation with no or non-http(s)/mailto href | "Enter a valid link."                                                        | FR-002  |
-| Journal page settings missing any of its six fields  | the field's own required message                                             | FR-006  |
+| Condition                                              | Message the editor should see                                                | Source  |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------- | ------- |
+| Any required field empty                               | the field's own required message                                             | FR-004  |
+| A slug already used by another post                    | "Slug is already in use" — Sanity's built-in slug check, not duplicated here | FR-001  |
+| An inline image with no alt text                       | "Alt text is required."                                                      | FR-002a |
+| An embed URL outside the allow-list                    | names the three accepted providers                                           | FR-002b |
+| An embed with no description                           | "Describe what this embed shows."                                            | FR-002c |
+| A link annotation with no or non-http(s)/mailto href   | "Enter a valid link."                                                        | FR-002  |
+| Journal page settings missing either of its two fields | the field's own required message                                             | FR-006  |
 
 ## Advises only (warnings)
 

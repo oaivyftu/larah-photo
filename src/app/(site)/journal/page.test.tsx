@@ -61,12 +61,6 @@ const posts = [
 const journalPage: JournalPageContent = {
   titleWords: ["The", "Journal"],
   emptyStateMessage: "New stories are on their way.",
-  cta: {
-    heading: "Planning something here?",
-    body: "Tell me about it.",
-    contactLabel: "Get in touch",
-    workLabel: "See the work",
-  },
 };
 
 beforeEach(() => {
@@ -194,5 +188,66 @@ describe("journal index metadata", () => {
     const metadata = await page.generateMetadata();
 
     expect(metadata.openGraph?.images).toBeUndefined();
+  });
+});
+
+describe("journal index pagination", () => {
+  // 30 posts, newest first: pages of 12, 12 and 6.
+  const many = Array.from({ length: 30 }, (_, index) =>
+    summary(
+      `post-${index + 1}`,
+      `Post ${index + 1}`,
+      `2026-09-${String(30 - index).padStart(2, "0")}`,
+    ),
+  );
+
+  it("shows only the first twelve posts on page 1", async () => {
+    const { container } = await renderIndex(many);
+
+    const cards = container.querySelectorAll("[data-journal-card]");
+
+    expect(cards).toHaveLength(12);
+    expect(cards[0]).toHaveTextContent("Post 1");
+    expect(cards[11]).toHaveTextContent("Post 12");
+  });
+
+  it("offers the next page, and no previous one, on page 1", async () => {
+    await renderIndex(many);
+
+    expect(screen.getByRole("link", { name: "Next page" })).toHaveAttribute(
+      "href",
+      "/journal/page/2",
+    );
+    expect(screen.queryByRole("link", { name: "Previous page" })).toBeNull();
+    expect(screen.getByText("1")).toHaveAttribute("aria-current", "page");
+  });
+
+  it("shows no pager when everything fits on one page", async () => {
+    const { container } = await renderIndex(posts);
+
+    expect(container.querySelector("[data-pagination]")).toBeNull();
+  });
+
+  it("lists only that page's posts in the collection data, with their true positions", async () => {
+    await renderIndex(many);
+
+    const collection = jsonLd("CollectionPage") as {
+      mainEntity: {
+        numberOfItems: number;
+        itemListElement: { position: number }[];
+      };
+    };
+
+    expect(collection.mainEntity.numberOfItems).toBe(12);
+    expect(collection.mainEntity.itemListElement.at(-1)?.position).toBe(12);
+  });
+
+  it("does not describe page 1 as a numbered page", async () => {
+    getJournalPosts.mockResolvedValue(many);
+
+    const metadata = await page.generateMetadata();
+
+    expect(metadata.title).toBe("Journal");
+    expect(metadata.description).not.toContain("Page 1 of");
   });
 });

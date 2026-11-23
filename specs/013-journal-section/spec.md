@@ -18,6 +18,10 @@
 - Q: What should happen when an editor gives a post a published date in the future? → A: Scheduled — the post stays hidden until its date arrives, then appears on its own, within the site's normal refresh window (up to an hour after the date).
 - Q: Besides headings, paragraphs, images and links, what else should an editor be able to put in a post body? → A: Bulleted and numbered lists, optional image captions, pull quotes, bold/italic emphasis, and embeds (map and video), the last from an allowed-provider URL only.
 
+### Session 2026-11-22
+
+- Q: The journal now holds about seventy posts and the brief ruled pagination out of scope. How should the listing handle that? → A: Paginate it: twelve posts per page, newest first. Page 1 stays at `/journal`; later pages live at `/journal/page/<n>`. Navigation is by ordinary links, never "load more" or infinite scroll. This replaces the single unpaginated page (FR-016) and removes pagination from the out-of-scope list.
+
 ## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Read a local article found through search (Priority: P1)
@@ -112,7 +116,7 @@ A visitor already on the site selects "Journal" in the primary navigation and se
 - **FR-003**: The category field MUST offer a fixed list the editor chooses from, containing the five categories the work gallery uses today — Portrait, Wedding, Engagement, Family, Graduation — plus two editorial categories: Location Guide and Behind the Scenes.
 - **FR-004**: The Studio MUST prevent publishing a post with any required field empty, or with an inline image missing alt text, and MUST indicate which field needs attention.
 - **FR-005**: The Studio MUST advise, without blocking, when the excerpt exceeds 200 characters, the search title override exceeds 60 characters, or the search description override exceeds 160 characters.
-- **FR-006**: The CMS Studio MUST provide Journal page settings that hold the listing page's heading, the empty-state message shown when no posts are published, and the end-of-post call-to-action copy. None of this copy may be written into the site's code.
+- **FR-006**: The CMS Studio MUST provide Journal page settings that hold the listing page's heading, and the empty-state message shown when no posts are published. None of this copy may be written into the site's code.
 - **FR-007**: Publishing, editing, unpublishing or deleting a post MUST take effect on the live site through the same content-update mechanism as all existing content — within seconds of a publish notification, and at most one hour later if a notification is missed — with no deploy.
 - **FR-007a**: A post is **live** when it is published in the Studio AND its published date has arrived. A published post dated in the future is **scheduled**: it MUST NOT appear at its own URL, on the listing page, in the sitemap, or in any structured data until its date arrives, and MUST then appear with no further editor action, within the same refresh window as FR-007 (so at most one hour after the date). The published date is a calendar date, and a post becomes live at the start of that day in the studio's own time zone (America/Toronto), not the visitor's.
 - **FR-007b**: The Studio MUST show the editor whether a published post is live or still scheduled, so a future date is never mistaken for a failed publish.
@@ -122,7 +126,7 @@ A visitor already on the site selects "Journal" in the primary navigation and se
 - **FR-008**: The journal listing MUST be available at `/journal`, and each published post at its own canonical URL `/journal/<slug>`, formed from the post's slug.
 - **FR-009**: The post page MUST display the post title as the page's single top-level heading, followed by the cover image, the published date, the location, the category, and the body rendered with its full structure intact.
 - **FR-010**: The published date MUST be shown in a human-readable form and exposed to assistive technology and search engines as a date, and MUST display as the calendar date the editor chose regardless of the visitor's time zone.
-- **FR-011**: Every post page MUST end with a call-to-action offering a single-activation path to the contact page and to the work gallery, using the copy from Journal page settings.
+- **FR-011**: _Withdrawn._ Posts originally ended with a call-to-action to the contact page and the work gallery; it was removed, so a post now ends with its body.
 - **FR-012**: A request for a slug that matches no live post — unknown, unpublished, deleted, or still scheduled — MUST produce a not-found outcome, and that response MUST NOT be offered for indexing.
 
 **Listing page**
@@ -130,21 +134,24 @@ A visitor already on the site selects "Journal" in the primary navigation and se
 - **FR-013**: The journal listing page MUST show every live post exactly once, ordered by published date descending, with a stable tiebreak for posts sharing a date (most recently created first).
 - **FR-014**: Each listing entry MUST show the post's cover image, title, excerpt and published date, and MUST link to the post page.
 - **FR-015**: When no posts are live — none published, or every published post still scheduled — the listing page MUST render its heading and the editor-authored empty-state message.
-- **FR-016**: The listing is a single unpaginated page; it MUST NOT paginate or load more posts on scroll.
+- **FR-016**: The listing MUST be paginated, with twelve live posts per page in the order set by FR-013, so every live post appears on exactly one page. It MUST NOT load more posts on scroll or on a button press: every page is a separate address reached by an ordinary link.
+- **FR-016a**: Page 1 MUST stay at `/journal`; page _n_ (n ≥ 2) MUST be at `/journal/page/<n>`, with `<n>` written without leading zeros. `/journal/page/1` MUST redirect permanently to `/journal`, so no page has two addresses. A page number that is not a positive whole number, or that is beyond the last page, MUST produce a not-found outcome that is not offered for indexing — the same rule FR-012 sets for an unknown post.
+- **FR-016b**: When there is more than one page, every listing page MUST show a pagination control with a link to the previous and next page where they exist, links to the pages themselves (collapsing long runs into an ellipsis), and the current page marked for assistive technology. With one page or none it MUST NOT be shown. These are internal links: they take the branded page transition and focus handling of every other internal navigation (FR-023).
+- **FR-016c**: The number of pages follows the number of live posts, so it grows by itself as scheduled posts reach their date (FR-007a), within the refresh window of FR-007.
 
 **Search metadata, structured data & sitemap**
 
 - **FR-017**: Each post page MUST expose a distinct title, description, canonical URL and social preview. The title MUST be the search title override when set and non-blank, otherwise the post title; the description MUST be the search description override when set and non-blank, otherwise the excerpt; the preview image MUST be the post's cover image.
-- **FR-018**: The listing page MUST expose its own distinct title, description, canonical URL and social preview, derived the same way the other listing page on the site (the work page) derives its own.
+- **FR-018**: The listing page MUST expose its own distinct title, description, canonical URL and social preview, derived the same way the other listing page on the site (the work page) derives its own. Every later page MUST do the same for itself: its title and description say which page of how many it is, its canonical URL is its own address (never page 1's), and its social preview is the cover of the newest post on that page.
 - **FR-019**: Each post page MUST embed structured data describing the post as an article — headline, description, cover image, published date, last-modified date, and the studio as both author and publisher, referencing the studio identity the page shell already declares — together with a breadcrumb trail Home › Journal › post title.
-- **FR-020**: The listing page MUST embed structured data describing the journal as a collection of the live articles, together with a breadcrumb trail Home › Journal.
-- **FR-021**: The sitemap MUST list the journal listing page and every live post's page. Each post entry MUST carry its cover image and inline images, as work project entries carry their photographs, and a last-modified time reflecting when that post was last changed.
+- **FR-020**: The listing page MUST embed structured data describing the journal as a collection of the live articles on that page, with each article's position counted across the whole journal, together with a breadcrumb trail Home › Journal (and, on a later page, › Page _n_).
+- **FR-021**: The sitemap MUST list the journal listing page, every later listing page, and every live post's page. Each post entry MUST carry its cover image and inline images, as work project entries carry their photographs, and a last-modified time reflecting when that post was last changed.
 - **FR-022**: Unpublished, deleted and scheduled posts MUST NOT appear in the listing, the sitemap, or any structured data.
 
 **Navigation & shell**
 
 - **FR-023**: The journal listing and post pages MUST render inside the site's standard page shell — header, footer, skip-to-content link, page transition and route-change focus handling — with no journal-specific exceptions.
-- **FR-024**: When site settings contain a primary navigation entry pointing to `/journal` (labelled "Journal"), that entry MUST be marked as the current section on the listing page and on every post page. Adding, renaming or reordering that entry remains an editor action in site settings.
+- **FR-024**: When site settings contain a primary navigation entry pointing to `/journal` (labelled "Journal"), that entry MUST be marked as the current section on every listing page and on every post page. Adding, renaming or reordering that entry remains an editor action in site settings.
 
 **Content errors, accessibility & performance**
 
@@ -158,7 +165,7 @@ A visitor already on the site selects "Journal" in the primary navigation and se
 - **Journal Post**: A single long-form article. Title, unique slug, cover image with alt text, excerpt, structured body, location, category, published date, optional search title and description overrides, and a last-changed time maintained by the CMS. Visible on the public site only while published and its published date has arrived (see FR-007a).
 - **Post Body**: The ordered content of a post — section headings; paragraphs with bold/italic emphasis; bulleted and numbered lists; pull quotes; text links; inline images, each with required alt text and an optional caption; and map or video embeds, each identified by a provider URL and an accessible description.
 - **Post Category**: One value from a fixed list shared in name with the work gallery's categories (Portrait, Wedding, Engagement, Family, Graduation) plus editorial categories (Location Guide, Behind the Scenes). Used for display and structured data; it drives no filtering in this feature.
-- **Journal Page Settings**: A single settings document holding the listing heading, the empty-state message, and the end-of-post call-to-action copy.
+- **Journal Page Settings**: A single settings document holding the listing heading and the empty-state message.
 - **Navigation Item** _(existing)_: The editor-managed site settings entry that adds the journal to the primary navigation.
 
 ## Success Criteria _(mandatory)_
@@ -166,13 +173,14 @@ A visitor already on the site selects "Journal" in the primary navigation and se
 ### Measurable Outcomes
 
 - **SC-001**: The studio owner can take a finished draft from the Studio to a live post page within 1 minute of pressing publish (for a post dated today or earlier), with zero code changes and zero deploys — sustained across every post published in the first three months.
-- **SC-002**: 100% of live posts appear on the listing page in the correct order and in the sitemap; 0 unpublished, deleted or still-scheduled posts are reachable at their URL, on the listing, or in the sitemap once the change has taken effect. A scheduled post appears within 1 hour of its date arriving, with no editor action.
+- **SC-002**: 100% of live posts appear on exactly one listing page in the correct order and in the sitemap; 0 unpublished, deleted or still-scheduled posts are reachable at their URL, on the listing, or in the sitemap once the change has taken effect. A scheduled post appears within 1 hour of its date arriving, with no editor action.
 - **SC-003**: 100% of journal pages pass structured-data validation for their article or collection type and their breadcrumb with zero errors.
 - **SC-004**: 100% of post pages expose a title, description, canonical URL and preview image unique to that post; 0 post pages have an empty description.
 - **SC-005**: 0 journal pages ever render placeholder or default content; every test case of a published post or Journal page settings missing a required field produces an explicit content error.
-- **SC-006**: From the end of any post, a visitor reaches the contact page or the work gallery in 1 activation.
+- **SC-006**: _Withdrawn_ together with FR-011.
 - **SC-007a**: A post containing embeds becomes readable — title, cover image and body text — without waiting for any embed to load, in 100% of cases, including when every embed is blocked.
 - **SC-007**: A keyboard or screen-reader visitor can reach and read every post field and every body section, with every image announced by its alt text — 0 accessibility violations of the kind the site's existing checks detect.
+- **SC-009**: With any number of live posts, no listing page shows more than twelve, every live post is reachable from `/journal` by following pagination links alone, and no listing page has two addresses.
 - **SC-008**: Within three months of the first posts going live, journal posts appear in the site's search analytics with impressions for local long-tail queries that none of the five existing pages had impressions for. (A business outcome to track after launch, not a release gate.)
 
 ## Assumptions
@@ -180,7 +188,7 @@ A visitor already on the site selects "Journal" in the primary navigation and se
 - **The studio owner is the only author.** Article structured data names the studio itself — the business identity the site already declares — as author and publisher. No per-person author field or bio exists.
 - **"Override with fallback" is new to the editor, not to the site.** No existing content type has editor-set search title or description fields today; the site's pages derive their titles and descriptions from content in code, and project pages already swap in their own photograph for the site-wide preview image. The journal is the first content type where the editor can override search title and description directly. Adding the same override fields to the existing pages is out of scope.
 - **The category list is fixed rather than free text.** Work project categories are free text today and the gallery's filters are derived from whatever values exist. A fixed list was confirmed for posts (see Clarifications) so typos ("Weddings", "wedding ") cannot split one category into several. Adding a new category is a small content-model change requiring a code change and deploy, made rarely; it never blocks publishing a post in an existing category.
-- **Categories drive no filtering or category archive pages.** The listing is a single list (the brief rules out a wider taxonomy and pagination); category is shown on the post and emitted in structured data.
+- **Categories drive no filtering or category archive pages.** The listing is one list, split into pages by date (FR-016), and the brief still rules out a wider taxonomy; category is shown on the post and emitted in structured data.
 - **The published date schedules the post** (see Clarifications). A post goes live when it is published and its date has arrived, so an editor can finish a post today and have it appear on a chosen future date. Timing is approximate rather than exact: with no publish notification to trigger it, the site refreshes at most hourly, so a scheduled post can appear up to an hour after its date. Scheduling to a specific time of day is out of scope — the field is a calendar date, read in the studio's own time zone.
 - **No redirects on slug change.** Changing a published post's slug breaks the old URL; the Studio warns the editor, but redirect management is out of scope.
 - **The journal lives at its own top-level path, `/journal`** (see Clarifications), separate from `/work`, so post and project slugs never collide. The path is treated as permanent once posts are indexed; changing it later would require redirects, which are out of scope.
@@ -191,4 +199,4 @@ A visitor already on the site selects "Journal" in the primary navigation and se
 - **Embeds are optional in every post.** A post with no embed is complete and normal; embeds are for venue guides and similar posts where a map or a walkthrough video genuinely helps.
 - **Critical-flow coverage applies.** Journal content-error handling is part of the site's "content error handling" critical flow and needs the same automated coverage the existing content types have before it ships.
 - **Downstream spec updates.** When implemented, this feature changes behaviour documented in three retrospective specs, which should be updated in the same change: `006-site-navigation-shell` (a new section in the shell), `007-cms-studio-content-sync` (new content types in the Studio) and `008-seo-metadata` (new public pages, sitemap entries and structured data types).
-- **Out of scope** (from the brief): comments or any reader interaction, multiple authors or author bios, tags or any taxonomy beyond the single category, pagination or infinite scroll, and an RSS feed.
+- **Out of scope** (from the brief): comments or any reader interaction, multiple authors or author bios, tags or any taxonomy beyond the single category, infinite scroll or "load more" (pagination itself was brought into scope on 2026-11-22, FR-016), and an RSS feed.
