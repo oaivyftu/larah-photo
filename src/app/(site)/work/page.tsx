@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const [leadProject] = projects;
 
   return pageMetadata({
-    title: "Work",
+    title: "Portrait, Couple & Family Photography Portfolio",
     description:
       `Selected photography projects by Larah Photo in ${settings.location} ` +
       `— ${projects.length} galleries spanning portrait, engagement, family ` +

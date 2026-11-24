@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const [leadService] = services;
 
   return pageMetadata({
-    title: "Services",
+    title: `Photography Packages & Pricing in ${settings.location}`,
     description: services.length
       ? `Photography session packages from Larah Photo in ${settings.location} ` +
         `— ${services.length} options covering ` +

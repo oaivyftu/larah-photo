@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
 
   return pageMetadata({
-    title: "Contact",
+    title: `Book a Photo Session in ${settings.location}`,
     description:
       `Enquire about a photography session with Larah Photo in ` +
       `${settings.location}. Reach the studio at ${settings.email} or ` +
